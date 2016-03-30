@@ -1,18 +1,32 @@
-package net.grandcentrix.rxmvp;
+package net.grandcentrix.divorce;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-/**
- * Created by pascalwelsch on 9/8/15.
- */
-public abstract class RxMvpActivity<V extends RxMvpView> extends AppCompatActivity {
+public abstract class DivorceActivity<V extends View> extends AppCompatActivity {
 
-    private static final String TAG = RxMvpActivity.class.getSimpleName();
+    private static final String TAG = DivorceActivity.class.getSimpleName();
 
-    private RxMvpPresenter<V> mPresenter;
+    private Presenter<V> mPresenter;
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.movedToBackground();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getWindow().getDecorView().post(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.moveToForeground();
+            }
+        });
+    }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
@@ -33,24 +47,33 @@ public abstract class RxMvpActivity<V extends RxMvpView> extends AppCompatActivi
             //noinspection unchecked
             mPresenter = pnci.getPresenter();
         }
+
         if (mPresenter == null) {
             final Bundle activityExtras = getIntent().getExtras();
             mPresenter = onCreatePresenter(activityExtras);
             Log.d(TAG, "created Presenter: " + mPresenter);
         }
 
-        mPresenter.bindView(getRxView());
+        mPresenter.bindNewView(getRxView());
         Log.d(TAG, "bound new View to Presenter: " + mPresenter);
     }
 
     @NonNull
-    protected abstract RxMvpPresenter<V> onCreatePresenter(
+    protected abstract Presenter<V> onCreatePresenter(
             @NonNull final Bundle activityIntentBundle);
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mPresenter.destroy();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        mPresenter.bindNewView(getRxView());
+        Log.d(TAG, "rebound View to Presenter: " + mPresenter);
     }
 
     @Override

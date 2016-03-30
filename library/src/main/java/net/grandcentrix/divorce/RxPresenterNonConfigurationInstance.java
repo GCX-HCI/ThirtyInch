@@ -1,15 +1,12 @@
-package net.grandcentrix.rxmvp;
+package net.grandcentrix.divorce;
 
-/**
- * Created by pascalwelsch on 9/8/15.
- */
-public class RxPresenterNonConfigurationInstance<V extends RxMvpView> {
+public class RxPresenterNonConfigurationInstance<V extends View> {
 
     private Object OtherNonConfigurationInstance;
 
-    private RxMvpPresenter<V> mPresenter;
+    private Presenter<V> mPresenter;
 
-    public RxPresenterNonConfigurationInstance(final RxMvpPresenter<V> presenter,
+    public RxPresenterNonConfigurationInstance(final Presenter<V> presenter,
             final Object otherNonConfigurationInstance) {
         mPresenter = presenter;
         OtherNonConfigurationInstance = otherNonConfigurationInstance;
@@ -19,7 +16,7 @@ public class RxPresenterNonConfigurationInstance<V extends RxMvpView> {
         return OtherNonConfigurationInstance;
     }
 
-    public RxMvpPresenter<V> getPresenter() {
+    public Presenter<V> getPresenter() {
         return mPresenter;
     }
 }

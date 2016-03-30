@@ -1,4 +1,4 @@
-package net.grandcentrix.rxmvp;
+package net.grandcentrix.divorce;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

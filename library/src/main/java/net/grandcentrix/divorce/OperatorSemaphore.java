@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package net.grandcentrix.rxmvp;
+package net.grandcentrix.divorce;
 
 import java.util.ArrayList;
 
