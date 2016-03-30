@@ -1,4 +1,7 @@
-package net.grandcentrix.divorce;
+package net.grandcentrix.divorce.internal;
+
+import net.grandcentrix.divorce.DivorceActivity;
+import net.grandcentrix.divorce.Presenter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -15,7 +18,7 @@ import java.util.HashMap;
  *
  * {@link DivorceActivity} is responsible to manage the references
  */
-/*package*/ enum PresenterSavior {
+public enum PresenterSavior {
 
     INSTANCE;
 
@@ -23,16 +26,16 @@ import java.util.HashMap;
 
     private HashMap<String, Presenter> mPresenters = new HashMap<>();
 
-    /*package*/ void free(final String presenterId) {
+    public void free(final String presenterId) {
         mPresenters.remove(presenterId);
     }
 
     @Nullable
-    /*package*/ Presenter recover(final String id) {
+    public Presenter recover(final String id) {
         return mPresenters.get(id);
     }
 
-    /*package*/ String safe(@NonNull final Presenter presenter) {
+    public String safe(@NonNull final Presenter presenter) {
         final String id = generateId(presenter);
         Log.v(TAG, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);

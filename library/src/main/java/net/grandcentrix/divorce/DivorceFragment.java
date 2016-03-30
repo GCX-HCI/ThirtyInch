@@ -1,5 +1,8 @@
 package net.grandcentrix.divorce;
 
+import net.grandcentrix.divorce.internal.PresenterSavior;
+import net.grandcentrix.divorce.internal.UiPlatform;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;

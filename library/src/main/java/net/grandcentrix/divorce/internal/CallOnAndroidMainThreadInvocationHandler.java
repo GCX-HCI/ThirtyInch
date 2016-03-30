@@ -1,4 +1,6 @@
-package net.grandcentrix.divorce;
+package net.grandcentrix.divorce.internal;
+
+import net.grandcentrix.divorce.View;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -7,7 +9,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class CallOnAndroidMainThreadInvocationHandler<V> implements InvocationHandler {
+public final class CallOnAndroidMainThreadInvocationHandler<V> implements InvocationHandler {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 

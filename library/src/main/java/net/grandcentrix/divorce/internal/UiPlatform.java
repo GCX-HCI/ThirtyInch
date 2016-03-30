@@ -1,4 +1,4 @@
-package net.grandcentrix.divorce;
+package net.grandcentrix.divorce.internal;
 
 public enum UiPlatform {
     /**

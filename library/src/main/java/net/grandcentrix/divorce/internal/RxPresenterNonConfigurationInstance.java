@@ -1,4 +1,7 @@
-package net.grandcentrix.divorce;
+package net.grandcentrix.divorce.internal;
+
+import net.grandcentrix.divorce.Presenter;
+import net.grandcentrix.divorce.View;
 
 public class RxPresenterNonConfigurationInstance<V extends View> {
 
