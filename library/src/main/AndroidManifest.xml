@@ -1,8 +1,0 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.grandcentrix.rxmvp">
-
-    <application android:allowBackup="true">
-
-    </application>
-
-</manifest>
