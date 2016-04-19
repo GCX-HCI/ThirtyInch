@@ -19,6 +19,8 @@ public abstract class DivorceFragment<V extends View> extends Fragment implement
             + "@" + Integer.toHexString(this.hashCode())
             + ":" + DivorceFragment.class.getSimpleName();
 
+    private volatile boolean mActivityStarted = false;
+
     private Presenter<V> mPresenter;
 
     private String mPresenterId;
@@ -95,6 +97,7 @@ public abstract class DivorceFragment<V extends View> extends Fragment implement
     public void onStart() {
         super.onStart();
         Log.v(TAG, "onStart()");
+        mActivityStarted = true;
 
         if (isUiPossible()) {
             final V view = provideView();
@@ -103,7 +106,7 @@ public abstract class DivorceFragment<V extends View> extends Fragment implement
             getActivity().getWindow().getDecorView().post(new Runnable() {
                 @Override
                 public void run() {
-                    if (isUiPossible()) {
+                    if (isUiPossible() && mActivityStarted) {
                         mPresenter.wakeUp();
                     }
                 }
@@ -114,6 +117,7 @@ public abstract class DivorceFragment<V extends View> extends Fragment implement
     @Override
     public void onStop() {
         Log.v(TAG, "onStop()");
+        mActivityStarted = false;
         mPresenter.sleep();
         super.onStop();
     }

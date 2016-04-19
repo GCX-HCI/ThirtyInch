@@ -20,6 +20,8 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
             + "@" + Integer.toHexString(this.hashCode())
             + ":" + DivorceActivity.class.getSimpleName();
 
+    private volatile boolean mActivityStarted = false;
+
     private Presenter<V> mPresenter;
 
     private String mPresenterId;
@@ -50,9 +52,6 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
     protected Presenter<V> getPresenter() {
         return mPresenter;
     }
-
-    @NonNull
-    protected abstract V provideView();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -103,7 +102,8 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
     }
 
     @NonNull
-    protected abstract Presenter<V> onCreatePresenter(@NonNull final Bundle activityIntentBundle);
+    protected abstract Presenter<V> onCreatePresenter(
+            @NonNull final Bundle activityIntentBundle);
 
     @Override
     protected void onDestroy() {
@@ -128,10 +128,13 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
         mPresenter.bindNewView(MainThreadViewWrapper.wrap(view));
         Log.d(TAG, "bound new View (" + view + ") to Presenter (" + mPresenter + ")");
         super.onStart();
+        mActivityStarted = true;
         getWindow().getDecorView().post(new Runnable() {
             @Override
             public void run() {
-                mPresenter.wakeUp();
+                if (mActivityStarted) {
+                    mPresenter.wakeUp();
+                }
             }
         });
     }
@@ -139,7 +142,11 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
     @Override
     protected void onStop() {
         Log.v(TAG, "onStop()");
+        mActivityStarted = false;
         super.onStop();
         mPresenter.sleep();
     }
+
+    @NonNull
+    protected abstract V provideView();
 }
