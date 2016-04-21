@@ -4,6 +4,7 @@ import net.grandcentrix.divorce.Presenter;
 import net.grandcentrix.divorce.PresenterSavior;
 import net.grandcentrix.divorce.View;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -22,9 +23,19 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
 
     private volatile boolean mActivityStarted = false;
 
+    private V mLastView;
+
+    private boolean mNewConfig;
+
     private Presenter<V> mPresenter;
 
     private String mPresenterId;
+
+    @Override
+    public void onConfigurationChanged(final Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mNewConfig = true;
+    }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
@@ -94,16 +105,14 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
             if (activityExtras == null) {
                 activityExtras = new Bundle();
             }
-            mPresenter = onCreatePresenter(activityExtras);
+            mPresenter = providePresenter(activityExtras);
             Log.d(TAG, "created Presenter: " + mPresenter);
             mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             mPresenter.create();
         }
-    }
 
-    @NonNull
-    protected abstract Presenter<V> onCreatePresenter(
-            @NonNull final Bundle activityIntentBundle);
+        mNewConfig = true;
+    }
 
     @Override
     protected void onDestroy() {
@@ -124,9 +133,17 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
     @Override
     protected void onStart() {
         Log.v(TAG, "onStart()");
-        final V view = provideView();
-        mPresenter.bindNewView(MainThreadViewWrapper.wrap(view));
-        Log.d(TAG, "bound new View (" + view + ") to Presenter (" + mPresenter + ")");
+        if (mNewConfig || mLastView == null) {
+            mNewConfig = false;
+            final V view = provideView();
+            mLastView = view;
+            mLastView = CallOnMainThreadViewWrapper.wrap(mLastView);
+            mPresenter.bindNewView(mLastView);
+            Log.d(TAG, "bound NEW View (" + mLastView + ") to Presenter (" + mPresenter + ")");
+        } else {
+            mPresenter.bindNewView(mLastView);
+            Log.d(TAG, "bound View (" + mLastView + ") to Presenter (" + mPresenter + ")");
+        }
         super.onStart();
         mActivityStarted = true;
         getWindow().getDecorView().post(new Runnable() {
@@ -146,6 +163,10 @@ public abstract class DivorceActivity<V extends View> extends AppCompatActivity 
         super.onStop();
         mPresenter.sleep();
     }
+
+    @NonNull
+    protected abstract Presenter<V> providePresenter(
+            @NonNull final Bundle activityIntentBundle);
 
     @NonNull
     protected abstract V provideView();
