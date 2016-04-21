@@ -1,6 +1,7 @@
 package net.grandcentrix.divorce;
 
 
+import java.lang.ref.WeakReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,9 +16,13 @@ import rx.subscriptions.CompositeSubscription;
  * <p/>
  * The presenter connects the View V to a model which don't know each other. The View is passive
  * and provides this Presenter with events from the UI. It's an Presenter because it works with
- * {@link rx.Observable} from RxJava to communicate with the View.
+ * {@link Observable} from RxJava to communicate with the View.
  */
 public abstract class Presenter<V extends View> implements PresenterLifecycle<V> {
+
+    Logger mLogger = Logger.getLogger(this.getClass().getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode())
+            + ":" + Presenter.class.getSimpleName());
 
     private boolean mCalled = true;
 
@@ -25,10 +30,10 @@ public abstract class Presenter<V extends View> implements PresenterLifecycle<V>
 
     private boolean mDestroyed = false;
 
-    private Logger mLogger =
-            Logger.getLogger(this.getClass().getSimpleName()
-                    + "@" + Integer.toHexString(this.hashCode())
-                    + ":" + Presenter.class.getSimpleName());
+    /**
+     * reference to the last view which was provided with {@link #bindNewView(View)}
+     */
+    private WeakReference<V> mOriginalView;
 
     private CompositeSubscription mPresenterSubscriptions = new CompositeSubscription();
 
@@ -38,12 +43,34 @@ public abstract class Presenter<V extends View> implements PresenterLifecycle<V>
 
     private BehaviorSubject<Boolean> mViewReady = BehaviorSubject.create(false);
 
+    private WeakReference<V> mWrappedView;
+
     public Presenter() {
+
     }
 
     @Override
     public void bindNewView(final V view) {
-        mView = view;
+
+        // check if view has changed
+        if (mWrappedView == null || mWrappedView.get() == null
+                || mOriginalView == null || mOriginalView.get() == null
+                || !mOriginalView.get().equals(view)) {
+
+            // safe the original view to detect a change
+            mOriginalView = new WeakReference<>(view);
+
+            // proxy the view for the distinct until change feature
+            final V wrappedView = DistinctUntilChangedViewWrapper.wrap(view);
+
+            // safe the wrapped view. The detection of distinct until changed happens inside the
+            // proxy. wrapping it again for every bindView would break the feature
+            // will be reused when view did not change
+            mWrappedView = new WeakReference<>(wrappedView);
+            mView = wrappedView;
+        } else {
+            mView = mWrappedView.get();
+        }
     }
 
     @Override
@@ -144,7 +171,7 @@ public abstract class Presenter<V extends View> implements PresenterLifecycle<V>
      * <p/>
      * call this in {@code Fragment#onDestroy()}
      * <p/>
-     * complete all {@link rx.Observer}, i.e. BehaviourSubjects with {@link Observer#onCompleted()}
+     * complete all {@link Observer}, i.e. BehaviourSubjects with {@link Observer#onCompleted()}
      * to unsubscribe all observers
      */
     @Override
