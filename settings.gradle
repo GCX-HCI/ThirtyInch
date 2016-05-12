@@ -1,1 +1,1 @@
-include ':core', ':android'
+include ':thirtyinch',':plugin'

@@ -15,5 +15,10 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenLocal()
+    }
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
     }
 }

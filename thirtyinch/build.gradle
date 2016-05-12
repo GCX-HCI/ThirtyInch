@@ -1,0 +1,58 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+
+def VERSION_NAME = "0.5-SNAPSHOT"
+
+apply plugin: 'com.android.library'
+apply plugin: 'bintray-release'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 23
+        versionCode 1
+        versionName VERSION_NAME
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:23.2.1'
+
+    compile 'io.reactivex:rxjava:1.0.14'
+    compile 'org.jetbrains:annotations-java5:15.0'
+    compile 'org.slf4j:slf4j-api:1.7.20'
+
+    testCompile 'junit:junit:4.12'
+    compile 'org.jetbrains:annotations-java5:15.0'
+}
+
+// usage:
+// ./gradlew clean build bintrayUpload -PbintrayUser=BINTRAY_USERNAME -PbintrayKey=BINTRAY_KEY -PdryRun=true
+publish {
+
+    userOrg = 'grandcentrix GmbH'
+    groupId = 'net.grandcentrix.thirtyinch'
+    publishVersion = VERSION_NAME
+    artifactId = 'thirtyinch'
+    uploadName = 'ThirtyInch'
+    //description = ''
+    //website = ''
+}

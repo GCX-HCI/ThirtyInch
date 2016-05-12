@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+
+def VERSION_NAME = "0.1-SNAPSHOT"
+
+apply plugin: 'com.android.library'
+apply plugin: 'bintray-release'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 23
+        versionCode 1
+        versionName VERSION_NAME
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    compile project(':thirtyinch')
+    compile 'com.pascalwelsch.compositeandroid:activity:0.1.2'
+}
+
+publish {
+    userOrg = 'grandcentrix GmbH'
+    groupId = 'net.grandcentrix.thirtyinch'
+    artifactId = 'thirtyinch-plugin'
+    uploadName = 'ThirtyInch - CompositeAndroid Plugin'
+    publishVersion = VERSION_NAME
+    //description = ''
+    //website = ''
+}
