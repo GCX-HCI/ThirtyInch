@@ -117,7 +117,7 @@ public interface HelloWorldView extends View {
 ```
 
 Add a `Presenter` to your `Activity` by extending from `ThirtyInchActivity<View>`.
-Another, advanced option is to use the [plugin]().
+Another, advanced option is to use the [plugin](plugin/).
 Also implement the `View` interface.
 The Activity is the view implementation.
 
@@ -131,7 +131,7 @@ Remember, the `Activity` is the entry point.
 `provideView()` has to return the `View` for the `Presenter`.
 It will be called whenever the `Activity` is visible to the User (`onStart()`).
 The `Activity` (`this`) itself is the `View`.
-It's open for discussion if this is generally true.
+It's open for discussion if `this` is generally true.
 
 
 ```java
@@ -276,11 +276,3 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 ```
-
-
-
-
-
-
-
-
