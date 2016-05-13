@@ -10,14 +10,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-public abstract class ThrityInchFragment<V extends View> extends Fragment implements
+public abstract class ThirtyInchFragment<V extends View> extends Fragment implements
         View {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThrityInchFragment.class.getSimpleName();
+            + ":" + ThirtyInchFragment.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 

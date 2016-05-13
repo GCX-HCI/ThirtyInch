@@ -14,7 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-public abstract class ThrityInchActivityPlugin<V extends View> extends ActivityPlugin {
+public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityPlugin {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -22,7 +22,7 @@ public abstract class ThrityInchActivityPlugin<V extends View> extends ActivityP
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThrityInchActivityPlugin.class.getSimpleName();
+            + ":" + ThirtyInchActivityPlugin.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 
@@ -34,7 +34,7 @@ public abstract class ThrityInchActivityPlugin<V extends View> extends ActivityP
 
     private String mPresenterId;
 
-    public ThrityInchActivityPlugin() {
+    public ThirtyInchActivityPlugin() {
 
     }
 

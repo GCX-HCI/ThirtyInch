@@ -15,13 +15,13 @@ import android.util.Log;
 /**
  * Created by pascalwelsch on 9/8/15.
  */
-public abstract class ThrityInchActivity<V extends View> extends AppCompatActivity {
+public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivity {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThrityInchActivity.class.getSimpleName();
+            + ":" + ThirtyInchActivity.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 

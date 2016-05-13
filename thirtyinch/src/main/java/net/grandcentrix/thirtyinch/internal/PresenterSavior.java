@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * has enabled "Do not keep activities" in the developer options. This singleton holds strong
  * references to those presenters and returns them when needed.
  *
- * {@code ThrityInchActivity} is responsible to manage the references
+ * {@code ThirtyInchActivity} is responsible to manage the references
  */
 public enum PresenterSavior {
 

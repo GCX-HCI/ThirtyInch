@@ -1,1 +1,1 @@
-include ':thirtyinch',':plugin'
+include ':thirtyinch', ':plugin', ':sample'
