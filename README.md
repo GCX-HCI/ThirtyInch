@@ -279,18 +279,12 @@ configurations.all {
 
 Or add the aars manually and put them in the libs folder. Download [ThrityInch 0.5](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/0.5) and [plugin 0.1](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/plugin_0.1)
 
-```gradlew
-buildscript {
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
-}
+For each AAR `File > New > New Module > Import .JAR/.AAR`
 
+```gradlew
 
 dependencies {
-    compile 'net.grandcentrix.thirtyinch:thirtyinch:0.5-SNAPSHOT@aar'
-    compile 'net.grandcentrix.thirtyinch:thirtyinch-plugin:0.1-SNAPSHOT@aar'
+    compile project(':thirtyinch')
+    compile project(':thirtyinch-plugin')
 }
 ```
