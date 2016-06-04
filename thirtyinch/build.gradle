@@ -7,7 +7,7 @@ buildscript {
     }
 }
 
-def VERSION_NAME = "0.5-SNAPSHOT"
+def VERSION_NAME = "0.6-SNAPSHOT"
 
 apply plugin: 'com.android.library'
 apply plugin: 'bintray-release'
