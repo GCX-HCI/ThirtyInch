@@ -177,7 +177,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     protected V provideView() {
 
         final Class<?> foundViewInterface = AnnotationUtil
-                .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
+                .getInterfaceOfClassExtendingGivenInterface(getActivity().getClass(), TiView.class);
 
         if (foundViewInterface == null) {
             throw new IllegalArgumentException(
@@ -191,7 +191,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
             } else {
                 // assume that the activity itself is the view and implements the TiView interface
                 //noinspection unchecked
-                return (V) this;
+                return (V) getActivity();
             }
         }
     }
