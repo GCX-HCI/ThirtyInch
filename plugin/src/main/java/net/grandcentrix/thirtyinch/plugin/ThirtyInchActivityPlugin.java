@@ -7,6 +7,7 @@ import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInsta
 import net.grandcentrix.thirtyinch.Presenter;
 import net.grandcentrix.thirtyinch.View;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
+import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 
 import android.content.res.Configuration;
@@ -14,7 +15,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityPlugin {
+public class ThirtyInchActivityPlugin<P extends Presenter<V>, V extends View>
+        extends ActivityPlugin {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -30,12 +32,18 @@ public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityP
 
     private boolean mNewConfig;
 
-    private Presenter<V> mPresenter;
+    private P mPresenter;
 
     private String mPresenterId;
 
-    public ThirtyInchActivityPlugin() {
+    private final ActivityPresenterProvider<P> mPresenterProvider;
 
+    public ThirtyInchActivityPlugin(@NonNull final ActivityPresenterProvider<P> presenterProvider) {
+        mPresenterProvider = presenterProvider;
+    }
+
+    public P getPresenter() {
+        return mPresenter;
     }
 
     @Override
@@ -54,7 +62,7 @@ public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityP
         final Object nci = getLastNonConfigurationInstance(NCI_KEY_PRESENTER);
         if (nci instanceof Presenter) {
             //noinspection unchecked
-            mPresenter = (Presenter<V>) nci;
+            mPresenter = (P) nci;
             Log.d(TAG, "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
@@ -66,7 +74,7 @@ public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityP
             if (recoveredPresenterId != null) {
                 Log.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
-                mPresenter = PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
@@ -84,7 +92,7 @@ public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityP
             if (activityExtras == null) {
                 activityExtras = new Bundle();
             }
-            mPresenter = providePresenter(activityExtras);
+            mPresenter = mPresenterProvider.providePresenter(activityExtras);
             Log.d(TAG, "created Presenter: " + mPresenter);
             mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             mPresenter.create();
@@ -156,26 +164,11 @@ public abstract class ThirtyInchActivityPlugin<V extends View> extends ActivityP
 
     @Override
     public String toString() {
-        final Presenter<V> p = mPresenter;
-        String presenter;
-        if (p == null) {
-            presenter = "null";
-        } else {
-            presenter = p.getClass().getSimpleName()
-                    + "@" + Integer.toHexString(p.hashCode());
-        }
+        String presenter = mPresenter == null ? "null" :
+                mPresenter.getClass().getSimpleName()
+                        + "@" + Integer.toHexString(mPresenter.hashCode());
 
         return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode())
-                + "{"
-                + "presenter=" + presenter
-                + "}";
+                + "{presenter=" + presenter + "}";
     }
-
-    protected Presenter<V> getPresenter() {
-        return mPresenter;
-    }
-
-    @NonNull
-    protected abstract Presenter<V> providePresenter(
-            @NonNull final Bundle activityIntentBundle);
 }

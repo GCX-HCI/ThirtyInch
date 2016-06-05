@@ -1,8 +1,9 @@
 package net.grandcentrix.thirtyinch.android;
 
 import net.grandcentrix.thirtyinch.Presenter;
-import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.android.internal.FragmentPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,8 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-public abstract class ThirtyInchFragment<V extends View> extends Fragment implements
-        View {
+public abstract class ThirtyInchFragment<P extends Presenter<V>, V extends View>
+        extends Fragment implements FragmentPresenterProvider<P>, View {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -21,9 +22,13 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
 
     private volatile boolean mActivityStarted = false;
 
-    private Presenter<V> mPresenter;
+    private P mPresenter;
 
     private String mPresenterId;
+
+    public P getPresenter() {
+        return mPresenter;
+    }
 
     @Override
     public void onAttach(final Activity activity) {
@@ -52,7 +57,7 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
             if (recoveredPresenterId != null) {
                 Log.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
-                mPresenter = PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
@@ -126,14 +131,6 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
     final public void setRetainInstance(final boolean retain) {
         super.setRetainInstance(true);
     }
-
-    protected Presenter<V> getPresenter() {
-        return mPresenter;
-    }
-
-    @NonNull
-    protected abstract Presenter<V> providePresenter(
-            @NonNull final Bundle activityIntentBundle, @NonNull final Bundle fragmentArguments);
 
     @NonNull
     protected abstract V provideView();
