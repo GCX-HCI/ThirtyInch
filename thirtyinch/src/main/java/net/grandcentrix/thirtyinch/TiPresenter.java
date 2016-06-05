@@ -197,6 +197,26 @@ public abstract class TiPresenter<V extends TiView> implements
         }
     }
 
+    public void manageSubscription(final Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+        if (mDestroyed) {
+            subscription.unsubscribe();
+        }
+        mPresenterSubscriptions.add(subscription);
+    }
+
+    /**
+     * add your subscriptions for View events to this method to get them automatically cleaned up
+     * in
+     * {@link #sleep()}. typically call this in {@link #wakeUp()} where you subscribe to the UI
+     * events
+     */
+    public void manageViewSubscription(final Subscription subscription) {
+        mUiSubscriptions.add(subscription);
+    }
+
     /**
      * call sleep as the opposite of {@link #wakeUp()} to unsubscribe all observers listening to
      * the
@@ -267,26 +287,6 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     protected V getView() {
         return mView;
-    }
-
-    protected void manageSubscription(final Subscription subscription) {
-        if (subscription.isUnsubscribed()) {
-            return;
-        }
-        if (mDestroyed) {
-            subscription.unsubscribe();
-        }
-        mPresenterSubscriptions.add(subscription);
-    }
-
-    /**
-     * add your subscriptions for View events to this method to get them automatically cleaned up
-     * in
-     * {@link #sleep()}. typically call this in {@link #wakeUp()} where you subscribe to the UI
-     * events
-     */
-    protected void manageViewSubscription(final Subscription subscription) {
-        mUiSubscriptions.add(subscription);
     }
 
     /**
