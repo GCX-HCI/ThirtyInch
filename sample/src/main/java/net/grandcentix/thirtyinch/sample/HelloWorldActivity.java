@@ -50,10 +50,4 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         mOutput = (TextView) findViewById(R.id.output);
         mUptime = (TextView) findViewById(R.id.uptime);
     }
-
-    @NonNull
-    @Override
-    protected HelloWorldView provideView() {
-        return this;
-    }
 }

@@ -1,14 +1,14 @@
 package net.grandcentrix.thirtyinch.plugin;
 
 import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
-import com.pascalwelsch.compositeandroid.activity.CompositeActivity;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
+import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -128,12 +128,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         Log.v(TAG, "onStart()");
         if (mNewConfig || mLastView == null) {
             mNewConfig = false;
-            final CompositeActivity activity = getActivity();
-            if (!(activity instanceof TiView)) {
-                throw new IllegalStateException("Activity doesn't implement the View interface");
-            }
-
-            final V view = (V) activity;
+            final V view = provideView();
             mLastView = view;
             mLastView = CallOnMainThreadViewWrapper.wrap(mLastView);
             mPresenter.bindNewView(mLastView);
@@ -170,5 +165,34 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
 
         return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode())
                 + "{presenter=" + presenter + "}";
+    }
+
+    /**
+     * the default implementation assumes that the activity is the view and implements the {@link
+     * TiView} interface. Override this method for a different behaviour.
+     *
+     * @return the object implementing the TiView interface
+     */
+    @NonNull
+    protected V provideView() {
+
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Activity doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the activity itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) this;
+            }
+        }
     }
 }

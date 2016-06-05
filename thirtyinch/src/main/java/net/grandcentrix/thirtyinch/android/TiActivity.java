@@ -6,6 +6,7 @@ import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationInstance;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -161,6 +162,33 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         mPresenter.sleep();
     }
 
+    /**
+     * the default implementation assumes that the activity is the view and implements the {@link
+     * TiView} interface. Override this method for a different behaviour.
+     *
+     * @return the object implementing the TiView interface
+     */
     @NonNull
-    protected abstract V provideView();
+    protected V provideView() {
+
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Activity doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the activity itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) this;
+            }
+        }
+    }
+
 }

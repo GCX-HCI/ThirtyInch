@@ -4,6 +4,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.internal.FragmentPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -132,8 +133,35 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         super.setRetainInstance(true);
     }
 
+
+    /**
+     * the default implementation assumes that the fragment is the view and implements the {@link
+     * TiView} interface. Override this method for a different behaviour.
+     *
+     * @return the object implementing the TiView interface
+     */
     @NonNull
-    protected abstract V provideView();
+    protected V provideView() {
+
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Fragment doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the fragment itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) this;
+            }
+        }
+    }
 
     private boolean isUiPossible() {
         return isAdded() && !isDetached();
