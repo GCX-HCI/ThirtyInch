@@ -1,6 +1,9 @@
 package net.grandcentrix.thirtyinch;
 
 
+import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
+import net.grandcentrix.thirtyinch.internal.OperatorSemaphore;
+
 import java.lang.ref.WeakReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +65,7 @@ public abstract class TiPresenter<V extends TiView> implements
             mOriginalView = new WeakReference<>(view);
 
             // proxy the view for the distinct until change feature
-            final V wrappedView = net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper.wrap(view);
+            final V wrappedView = DistinctUntilChangedViewWrapper.wrap(view);
 
             // safe the wrapped view. The detection of distinct until changed happens inside the
             // proxy. wrapping it again for every bindView would break the feature
@@ -113,7 +116,7 @@ public abstract class TiPresenter<V extends TiView> implements
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> observable) {
-                return observable.lift(net.grandcentrix.thirtyinch.internal.OperatorSemaphore.<T>semaphoreLatestCache(isViewReady()));
+                return observable.lift(OperatorSemaphore.<T>semaphoreLatestCache(isViewReady()));
             }
         };
     }
@@ -135,7 +138,7 @@ public abstract class TiPresenter<V extends TiView> implements
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> observable) {
-                return observable.lift(net.grandcentrix.thirtyinch.internal.OperatorSemaphore.<T>semaphoreLatest(isViewReady()));
+                return observable.lift(OperatorSemaphore.<T>semaphoreLatest(isViewReady()));
             }
         };
     }
@@ -161,7 +164,7 @@ public abstract class TiPresenter<V extends TiView> implements
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> observable) {
-                return observable.lift(net.grandcentrix.thirtyinch.internal.OperatorSemaphore.<T>semaphore(isViewReady()));
+                return observable.lift(OperatorSemaphore.<T>semaphore(isViewReady()));
             }
         };
     }
