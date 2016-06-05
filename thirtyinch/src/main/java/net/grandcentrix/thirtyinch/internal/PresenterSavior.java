@@ -1,6 +1,6 @@
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.Presenter;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,25 +23,25 @@ public enum PresenterSavior {
 
     private Logger mLogger = Logger.getLogger(PresenterSavior.class.getSimpleName());
 
-    private HashMap<String, Presenter> mPresenters = new HashMap<>();
+    private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
     public void free(final String presenterId) {
         mPresenters.remove(presenterId);
     }
 
     @Nullable
-    public Presenter recover(final String id) {
+    public TiPresenter recover(final String id) {
         return mPresenters.get(id);
     }
 
-    public String safe(@NotNull final Presenter presenter) {
+    public String safe(@NotNull final TiPresenter presenter) {
         final String id = generateId(presenter);
         mLogger.log(Level.FINER, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
     }
 
-    private String generateId(@NotNull final Presenter presenter) {
+    private String generateId(@NotNull final TiPresenter presenter) {
         return presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();

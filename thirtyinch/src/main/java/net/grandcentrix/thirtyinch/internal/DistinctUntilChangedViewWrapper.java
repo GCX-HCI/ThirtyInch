@@ -12,10 +12,10 @@ import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWit
 public class DistinctUntilChangedViewWrapper {
 
     @NotNull
-    public static <V extends View> V wrap(@NotNull final V view) {
+    public static <V extends TiView> V wrap(@NotNull final V view) {
 
         Class<?> foundInterfaceClass =
-                getInterfaceOfClassExtendingGivenInterface(view.getClass(), View.class);
+                getInterfaceOfClassExtendingGivenInterface(view.getClass(), TiView.class);
         if (foundInterfaceClass == null) {
             throw new IllegalStateException("the interface extending View could not be found");
         }

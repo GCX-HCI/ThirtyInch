@@ -4,8 +4,8 @@ import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeActivity;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
-import net.grandcentrix.thirtyinch.Presenter;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
@@ -15,7 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-public class ThirtyInchActivityPlugin<P extends Presenter<V>, V extends View>
+public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         extends ActivityPlugin {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
@@ -24,7 +24,7 @@ public class ThirtyInchActivityPlugin<P extends Presenter<V>, V extends View>
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThirtyInchActivityPlugin.class.getSimpleName();
+            + ":" + TiActivityPlugin.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 
@@ -38,7 +38,7 @@ public class ThirtyInchActivityPlugin<P extends Presenter<V>, V extends View>
 
     private final ActivityPresenterProvider<P> mPresenterProvider;
 
-    public ThirtyInchActivityPlugin(@NonNull final ActivityPresenterProvider<P> presenterProvider) {
+    public TiActivityPlugin(@NonNull final ActivityPresenterProvider<P> presenterProvider) {
         mPresenterProvider = presenterProvider;
     }
 
@@ -60,7 +60,7 @@ public class ThirtyInchActivityPlugin<P extends Presenter<V>, V extends View>
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
         final Object nci = getLastNonConfigurationInstance(NCI_KEY_PRESENTER);
-        if (nci instanceof Presenter) {
+        if (nci instanceof TiPresenter) {
             //noinspection unchecked
             mPresenter = (P) nci;
             Log.d(TAG, "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
@@ -129,7 +129,7 @@ public class ThirtyInchActivityPlugin<P extends Presenter<V>, V extends View>
         if (mNewConfig || mLastView == null) {
             mNewConfig = false;
             final CompositeActivity activity = getActivity();
-            if (!(activity instanceof View)) {
+            if (!(activity instanceof TiView)) {
                 throw new IllegalStateException("Activity doesn't implement the View interface");
             }
 

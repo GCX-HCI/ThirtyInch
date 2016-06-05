@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.android;
 
-import net.grandcentrix.thirtyinch.Presenter;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.internal.FragmentPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 
@@ -11,14 +11,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-public abstract class ThirtyInchFragment<P extends Presenter<V>, V extends View>
-        extends Fragment implements FragmentPresenterProvider<P>, View {
+public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
+        extends Fragment implements FragmentPresenterProvider<P>, TiView {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThirtyInchFragment.class.getSimpleName();
+            + ":" + TiFragment.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 

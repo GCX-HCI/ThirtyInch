@@ -2,7 +2,7 @@ package net.grandcentix.thirtyinch.sample;
 
 import com.jakewharton.rxbinding.view.RxView;
 
-import net.grandcentrix.thirtyinch.android.ThirtyInchActivity;
+import net.grandcentrix.thirtyinch.android.TiActivity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import rx.Observable;
 
-public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldPresenter, HelloWorldView>
+public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWorldView>
         implements HelloWorldView {
 
     private Button mButton;

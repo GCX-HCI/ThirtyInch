@@ -1,8 +1,8 @@
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiView;
 
-public interface PresenterLifecycle<V extends View> {
+public interface PresenterLifecycle<V extends TiView> {
 
     void bindNewView(V view);
 

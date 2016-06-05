@@ -1,6 +1,6 @@
 package net.grandcentix.thirtyinch.sample;
 
-import net.grandcentrix.thirtyinch.Presenter;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,7 +10,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
-public class HelloWorldPresenter extends Presenter<HelloWorldView> {
+public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
     private static final String TAG = HelloWorldPresenter.class.getSimpleName();
 

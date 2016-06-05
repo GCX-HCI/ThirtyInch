@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.android;
 
-import net.grandcentrix.thirtyinch.Presenter;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationInstance;
@@ -16,14 +16,14 @@ import android.util.Log;
 /**
  * Created by pascalwelsch on 9/8/15.
  */
-public abstract class ThirtyInchActivity<P extends Presenter<V>, V extends View>
+public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity implements ActivityPresenterProvider<P> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThirtyInchActivity.class.getSimpleName();
+            + ":" + TiActivity.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 

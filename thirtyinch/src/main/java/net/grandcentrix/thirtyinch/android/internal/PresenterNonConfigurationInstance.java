@@ -1,8 +1,8 @@
 package net.grandcentrix.thirtyinch.android.internal;
 
-import net.grandcentrix.thirtyinch.Presenter;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
-public class PresenterNonConfigurationInstance<P extends Presenter> {
+public class PresenterNonConfigurationInstance<P extends TiPresenter> {
 
     private Object OtherNonConfigurationInstance;
 

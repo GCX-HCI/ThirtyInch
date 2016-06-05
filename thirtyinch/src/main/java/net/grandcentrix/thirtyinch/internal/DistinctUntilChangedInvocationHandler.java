@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.DistinctUntilChanged;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 import java.lang.reflect.InvocationTargetException;
@@ -53,7 +53,7 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             }
 
             // @DistinctUntilChanged is only valid on methods of the view interface extending View
-            if (!View.class.isAssignableFrom(declaringClass)) {
+            if (!TiView.class.isAssignableFrom(declaringClass)) {
                 return method.invoke(mView, args);
             }
 

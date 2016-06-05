@@ -18,12 +18,12 @@ import rx.subscriptions.CompositeSubscription;
  * and provides this Presenter with events from the UI. It's an Presenter because it works with
  * {@link Observable} from RxJava to communicate with the View.
  */
-public abstract class Presenter<V extends View> implements
+public abstract class TiPresenter<V extends TiView> implements
         net.grandcentrix.thirtyinch.internal.PresenterLifecycle<V> {
 
     Logger mLogger = Logger.getLogger(this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + Presenter.class.getSimpleName());
+            + ":" + TiPresenter.class.getSimpleName());
 
     private boolean mCalled = true;
 
@@ -32,7 +32,7 @@ public abstract class Presenter<V extends View> implements
     private boolean mDestroyed = false;
 
     /**
-     * reference to the last view which was provided with {@link #bindNewView(View)}
+     * reference to the last view which was provided with {@link #bindNewView(TiView)}
      */
     private WeakReference<V> mOriginalView;
 
@@ -46,7 +46,7 @@ public abstract class Presenter<V extends View> implements
 
     private WeakReference<V> mWrappedView;
 
-    public Presenter() {
+    public TiPresenter() {
 
     }
 

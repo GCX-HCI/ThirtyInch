@@ -1,6 +1,6 @@
 package net.grandcentrix.thirtyinch.android.internal;
 
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.CallOnMainThread;
 
 import java.lang.reflect.Proxy;
@@ -10,10 +10,10 @@ import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWit
 
 public class CallOnMainThreadViewWrapper {
 
-    public static <V extends View> V wrap(final V view) {
+    public static <V extends TiView> V wrap(final V view) {
 
         Class<?> foundInterfaceClass = getInterfaceOfClassExtendingGivenInterface(
-                view.getClass(), View.class);
+                view.getClass(), TiView.class);
         if (foundInterfaceClass == null) {
             throw new IllegalStateException("the interface extending View could not be found");
         }
