@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
@@ -16,7 +17,9 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
     private int mCounter = 0;
 
-    private PublishSubject<String> mText = PublishSubject.create();
+    private BehaviorSubject<String> mText = BehaviorSubject.create();
+
+    private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
 
     @Override
     protected void onCreate() {
@@ -32,21 +35,8 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                         getView().showPresenterUpTime(uptime);
                     }
                 }));
-    }
 
-    @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
-
-        manageViewSubscription(mText.asObservable()
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(final String text) {
-                        getView().showText(text);
-                    }
-                }));
-
-        manageViewSubscription(getView().onButtonClicked()
+        manageSubscription(triggerHeavyCalculation
                 .doOnNext(new Action1<Void>() {
                     @Override
                     public void call(final Void aVoid) {
@@ -65,10 +55,32 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                         return increaseCounter();
                     }
                 }, 1)
-                .subscribe(new Action1<Integer>() {
+                .doOnNext(new Action1<Integer>() {
                     @Override
                     public void call(final Integer integer) {
-                        mText.onNext("value: " + mCounter);
+                        mText.onNext("Count: " + mCounter);
+                    }
+                })
+                .subscribe());
+    }
+
+    @Override
+    protected void onWakeUp() {
+        super.onWakeUp();
+
+        manageViewSubscription(mText.asObservable()
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(final String text) {
+                        getView().showText(text);
+                    }
+                }));
+
+        manageViewSubscription(getView().onButtonClicked()
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(final Void aVoid) {
+                        triggerHeavyCalculation.onNext(null);
                     }
                 }));
     }
@@ -85,6 +97,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                     @Override
                     public void call(final Integer integer) {
                         mCounter++;
+                        mText.onNext("value: " + mCounter);
                     }
                 });
     }
