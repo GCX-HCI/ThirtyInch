@@ -42,7 +42,7 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(" + savedInstanceState + ")");
-        //setRetainInstance(true);
+        setRetainInstance(true);
 
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
