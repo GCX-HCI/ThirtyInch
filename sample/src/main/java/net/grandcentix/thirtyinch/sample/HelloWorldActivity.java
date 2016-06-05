@@ -2,7 +2,6 @@ package net.grandcentix.thirtyinch.sample;
 
 import com.jakewharton.rxbinding.view.RxView;
 
-import net.grandcentrix.thirtyinch.Presenter;
 import net.grandcentrix.thirtyinch.android.ThirtyInchActivity;
 
 import android.os.Bundle;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 
 import rx.Observable;
 
-public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldView>
+public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldPresenter, HelloWorldView>
         implements HelloWorldView {
 
     private Button mButton;
@@ -24,6 +23,12 @@ public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldView>
     @Override
     public Observable<Void> onButtonClicked() {
         return RxView.clicks(mButton);
+    }
+
+    @NonNull
+    @Override
+    public HelloWorldPresenter providePresenter(final Bundle activityIntentBundle) {
+        return new HelloWorldPresenter();
     }
 
     @Override
@@ -44,13 +49,6 @@ public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldView>
         mButton = (Button) findViewById(R.id.button);
         mOutput = (TextView) findViewById(R.id.output);
         mUptime = (TextView) findViewById(R.id.uptime);
-    }
-
-    @NonNull
-    @Override
-    protected Presenter<HelloWorldView> providePresenter(
-            @NonNull final Bundle activityIntentBundle) {
-        return new HelloWorldPresenter();
     }
 
     @NonNull
