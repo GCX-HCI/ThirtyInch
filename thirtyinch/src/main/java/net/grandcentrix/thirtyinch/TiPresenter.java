@@ -73,6 +73,11 @@ public abstract class TiPresenter<V extends TiView> implements
                             + "Binding a view is not allowed");
         }
 
+        if (view == null) {
+            throw new IllegalStateException(
+                    "the view cannot be set to null. Call #sleep() instead");
+        }
+
         // check if view has changed
         if (mWrappedView == null || mWrappedView.get() == null
                 || mOriginalView == null || mOriginalView.get() == null
