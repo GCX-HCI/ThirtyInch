@@ -2,8 +2,8 @@ package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -34,14 +34,14 @@ public enum PresenterSavior {
         return mPresenters.get(id);
     }
 
-    public String safe(@NotNull final TiPresenter presenter) {
+    public String safe(@NonNull final TiPresenter presenter) {
         final String id = generateId(presenter);
         mLogger.log(Level.FINER, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
     }
 
-    private String generateId(@NotNull final TiPresenter presenter) {
+    private String generateId(@NonNull final TiPresenter presenter) {
         return presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();

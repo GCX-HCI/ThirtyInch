@@ -23,3 +23,14 @@ allprojects {
         options.addStringOption('encoding', 'UTF-8')
     }
 }
+
+ext{
+    supportLibraryVersion = '23.4.0'
+    VERSION_NAME = "0.6-SNAPSHOT"
+    VERSION_CODE = 1
+    MIN_SDK_VERSION = 14
+    TARGET_SDK_VERSION = 23
+    COMPILE_SDK_VERSION = 23
+    BUILD_TOOLS_VERSION = '23.0.3'
+
+}
