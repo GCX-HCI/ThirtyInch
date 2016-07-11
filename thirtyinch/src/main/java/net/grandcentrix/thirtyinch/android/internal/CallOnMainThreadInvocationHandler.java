@@ -37,6 +37,11 @@ final class CallOnMainThreadInvocationHandler<V> extends AbstractInvocationHandl
                 return method.invoke(this, args);
             }
 
+            // simply call the method when already on the main thread
+            if (Looper.getMainLooper() == Looper.myLooper()) {
+                return method.invoke(mView, args);
+            }
+
             // only void methods are supported. Otherwise
             if (!method.getReturnType().equals(Void.TYPE)) {
                 return method.invoke(mView, args);
