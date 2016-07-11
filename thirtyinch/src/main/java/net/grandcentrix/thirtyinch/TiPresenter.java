@@ -4,6 +4,8 @@ package net.grandcentrix.thirtyinch;
 import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
 import net.grandcentrix.thirtyinch.internal.OperatorSemaphore;
 
+import android.support.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,7 +56,22 @@ public abstract class TiPresenter<V extends TiView> implements
     }
 
     @Override
-    public void bindNewView(final V view) {
+    public void bindNewView(@NonNull final V view) {
+
+        if (!mCreated) {
+            throw new IllegalStateException("Presenter is not created, call #create() first");
+        }
+
+        if (mViewReady.getValue()) {
+            throw new IllegalStateException(
+                    "Can't bind new view, Presenter #wakeUp() already called. First call #sleep()");
+        }
+
+        if (mDestroyed) {
+            throw new IllegalStateException(
+                    "The presenter is already in it's terminal state and waits for garbage collection. "
+                            + "Binding a view is not allowed");
+        }
 
         // check if view has changed
         if (mWrappedView == null || mWrappedView.get() == null
