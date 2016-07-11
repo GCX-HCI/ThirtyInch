@@ -14,6 +14,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -41,6 +43,7 @@ public class TiPresenterTest {
     @Test
     public void testBindNewView() throws Exception {
         TiView viewOverride = mock(TiView.class);
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         assertThat(mPresenter.getView(), equalTo(mView));
@@ -51,9 +54,17 @@ public class TiPresenterTest {
         mPresenter.bindNewView(viewOverride);
         assertThat(mPresenter.getView(), equalTo(viewOverride));
 
-        // TODO This should work somehow - at least not crash ;-)
-        //mPresenter.bindNewView(null);
-        //assertThat(mPresenter.getView(), nullValue());
+        try {
+            mPresenter.bindNewView(null);
+            fail();
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("sleep"));
+        }
+
+        mPresenter.wakeUp();
+        assertThat(mPresenter.getView(), equalTo(viewOverride));
+        mPresenter.sleep();
+        assertThat(mPresenter.getView(), nullValue());
     }
 
     @Test
@@ -80,6 +91,7 @@ public class TiPresenterTest {
 
     @Test
     public void testDeliverLatestCacheToViewViewNotReady() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
@@ -100,6 +112,7 @@ public class TiPresenterTest {
 
     @Test
     public void testDeliverLatestCacheToViewViewReady() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         mPresenter.wakeUp();
@@ -115,6 +128,7 @@ public class TiPresenterTest {
 
     @Test
     public void testDeliverLatestToViewViewNotReady() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
@@ -135,6 +149,7 @@ public class TiPresenterTest {
 
     @Test
     public void testDeliverLatestToViewViewReady() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         mPresenter.wakeUp();
@@ -150,6 +165,7 @@ public class TiPresenterTest {
 
     @Test
     public void testDeliverToViewViewNotReady() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
@@ -170,6 +186,7 @@ public class TiPresenterTest {
 
     @Test
     public void testDeliverToViewViewReady() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
 
         mPresenter.wakeUp();
@@ -191,9 +208,8 @@ public class TiPresenterTest {
         mPresenter.destroy();
         assertThat(mPresenter.onDestroyCalled, equalTo(1));
 
-        // TODO View already destroyed - should not destroy again?!
-        //mPresenter.destroy();
-        //assertThat(mPresenter.onDestroyCalled, equalTo(1));
+        mPresenter.destroy();
+        assertThat(mPresenter.onDestroyCalled, equalTo(1));
     }
 
     @Test
@@ -217,6 +233,7 @@ public class TiPresenterTest {
 
     @Test
     public void testGetView() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
         assertThat(mPresenter.getView(), equalTo(mView));
     }
@@ -300,6 +317,7 @@ public class TiPresenterTest {
 
     @Test
     public void testSleep() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
         mPresenter.wakeUp();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
@@ -314,6 +332,7 @@ public class TiPresenterTest {
 
     @Test
     public void testSleepBeforeWakeUp() throws Exception {
+        mPresenter.create();
         mPresenter.bindNewView(mView);
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
@@ -339,6 +358,7 @@ public class TiPresenterTest {
 
     @Test
     public void testToString() throws Exception {
+        mPresenter.create();
         assertThat(mPresenter.toString(), containsString("TiMockPresenter"));
         assertThat(mPresenter.toString(), containsString("{view = null}"));
         mPresenter.bindNewView(mView);
