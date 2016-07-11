@@ -1,15 +1,14 @@
 package net.grandcentrix.thirtyinch.android.internal;
 
-import net.grandcentrix.thirtyinch.Presenter;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
-public class PresenterNonConfigurationInstance<V extends View> {
+public class PresenterNonConfigurationInstance<P extends TiPresenter> {
 
     private Object OtherNonConfigurationInstance;
 
-    private Presenter<V> mPresenter;
+    private P mPresenter;
 
-    public PresenterNonConfigurationInstance(final Presenter<V> presenter,
+    public PresenterNonConfigurationInstance(final P presenter,
             final Object otherNonConfigurationInstance) {
         mPresenter = presenter;
         OtherNonConfigurationInstance = otherNonConfigurationInstance;
@@ -19,7 +18,7 @@ public class PresenterNonConfigurationInstance<V extends View> {
         return OtherNonConfigurationInstance;
     }
 
-    public Presenter<V> getPresenter() {
+    public P getPresenter() {
         return mPresenter;
     }
 }

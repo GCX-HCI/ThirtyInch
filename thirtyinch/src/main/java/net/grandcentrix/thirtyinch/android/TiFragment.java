@@ -1,8 +1,10 @@
 package net.grandcentrix.thirtyinch.android;
 
-import net.grandcentrix.thirtyinch.Presenter;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.android.internal.FragmentPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,20 +12,24 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-public abstract class ThirtyInchFragment<V extends View> extends Fragment implements
-        View {
+public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
+        extends Fragment implements FragmentPresenterProvider<P>, TiView {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThirtyInchFragment.class.getSimpleName();
+            + ":" + TiFragment.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 
-    private Presenter<V> mPresenter;
+    private P mPresenter;
 
     private String mPresenterId;
+
+    public P getPresenter() {
+        return mPresenter;
+    }
 
     @Override
     public void onAttach(final Activity activity) {
@@ -42,7 +48,7 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(" + savedInstanceState + ")");
-        //setRetainInstance(true);
+        setRetainInstance(true);
 
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -52,7 +58,7 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
             if (recoveredPresenterId != null) {
                 Log.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
-                mPresenter = PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
@@ -127,16 +133,35 @@ public abstract class ThirtyInchFragment<V extends View> extends Fragment implem
         super.setRetainInstance(true);
     }
 
-    protected Presenter<V> getPresenter() {
-        return mPresenter;
+
+    /**
+     * the default implementation assumes that the fragment is the view and implements the {@link
+     * TiView} interface. Override this method for a different behaviour.
+     *
+     * @return the object implementing the TiView interface
+     */
+    @NonNull
+    protected V provideView() {
+
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Fragment doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the fragment itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) this;
+            }
+        }
     }
-
-    @NonNull
-    protected abstract Presenter<V> providePresenter(
-            @NonNull final Bundle activityIntentBundle, @NonNull final Bundle fragmentArguments);
-
-    @NonNull
-    protected abstract V provideView();
 
     private boolean isUiPossible() {
         return isAdded() && !isDetached();

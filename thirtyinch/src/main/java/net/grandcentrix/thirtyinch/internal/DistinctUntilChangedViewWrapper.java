@@ -1,8 +1,9 @@
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.*;
+import net.grandcentrix.thirtyinch.DistinctUntilChanged;
+import net.grandcentrix.thirtyinch.TiView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.lang.reflect.Proxy;
 
@@ -11,11 +12,11 @@ import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWit
 
 public class DistinctUntilChangedViewWrapper {
 
-    @NotNull
-    public static <V extends View> V wrap(@NotNull final V view) {
+    @NonNull
+    public static <V extends TiView> V wrap(@NonNull final V view) {
 
         Class<?> foundInterfaceClass =
-                getInterfaceOfClassExtendingGivenInterface(view.getClass(), View.class);
+                getInterfaceOfClassExtendingGivenInterface(view.getClass(), TiView.class);
         if (foundInterfaceClass == null) {
             throw new IllegalStateException("the interface extending View could not be found");
         }

@@ -1,10 +1,13 @@
 package net.grandcentrix.thirtyinch.util;
 
+import android.support.annotation.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 public class AnnotationUtil {
 
+    @Nullable
     public static Class<?> getInterfaceOfClassExtendingGivenInterface(
             final Class<?> possibleExtendingClass,
             final Class<?> givenInterface) {

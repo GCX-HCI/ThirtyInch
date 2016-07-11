@@ -13,13 +13,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'bintray-release'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 23
-        versionCode 1
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode VERSION_CODE
         versionName VERSION_NAME
     }
     buildTypes {
@@ -31,7 +31,7 @@ android {
 
 dependencies {
     compile project(':thirtyinch')
-    compile 'com.pascalwelsch.compositeandroid:activity:0.1.2'
+    compile 'com.pascalwelsch.compositeandroid:activity:0.2.1'
 }
 
 publish {

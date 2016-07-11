@@ -1,9 +1,9 @@
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.Presenter;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * has enabled "Do not keep activities" in the developer options. This singleton holds strong
  * references to those presenters and returns them when needed.
  *
- * {@code ThirtyInchActivity} is responsible to manage the references
+ * {@link net.grandcentrix.thirtyinch.android.TiActivity} is responsible to manage the references
  */
 public enum PresenterSavior {
 
@@ -23,25 +23,25 @@ public enum PresenterSavior {
 
     private Logger mLogger = Logger.getLogger(PresenterSavior.class.getSimpleName());
 
-    private HashMap<String, Presenter> mPresenters = new HashMap<>();
+    private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
     public void free(final String presenterId) {
         mPresenters.remove(presenterId);
     }
 
     @Nullable
-    public Presenter recover(final String id) {
+    public TiPresenter recover(final String id) {
         return mPresenters.get(id);
     }
 
-    public String safe(@NotNull final Presenter presenter) {
+    public String safe(@NonNull final TiPresenter presenter) {
         final String id = generateId(presenter);
         mLogger.log(Level.FINER, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
     }
 
-    private String generateId(@NotNull final Presenter presenter) {
+    private String generateId(@NonNull final TiPresenter presenter) {
         return presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();

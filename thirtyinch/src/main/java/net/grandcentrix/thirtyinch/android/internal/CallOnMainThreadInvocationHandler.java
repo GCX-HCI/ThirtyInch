@@ -1,6 +1,6 @@
 package net.grandcentrix.thirtyinch.android.internal;
 
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.CallOnMainThread;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
@@ -48,7 +48,7 @@ final class CallOnMainThreadInvocationHandler<V> extends AbstractInvocationHandl
             }
 
             // only methods of the View interface are supported
-            if (!View.class.isAssignableFrom(declaringClass)) {
+            if (!TiView.class.isAssignableFrom(declaringClass)) {
                 return method.invoke(mView, args);
             }
 

@@ -1,6 +1,11 @@
 package net.grandcentrix.thirtyinch;
 
 
+import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
+import net.grandcentrix.thirtyinch.internal.OperatorSemaphore;
+
+import android.support.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,12 +23,12 @@ import rx.subscriptions.CompositeSubscription;
  * and provides this Presenter with events from the UI. It's an Presenter because it works with
  * {@link Observable} from RxJava to communicate with the View.
  */
-public abstract class Presenter<V extends View> implements
+public abstract class TiPresenter<V extends TiView> implements
         net.grandcentrix.thirtyinch.internal.PresenterLifecycle<V> {
 
     Logger mLogger = Logger.getLogger(this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + Presenter.class.getSimpleName());
+            + ":" + TiPresenter.class.getSimpleName());
 
     private boolean mCalled = true;
 
@@ -32,7 +37,7 @@ public abstract class Presenter<V extends View> implements
     private boolean mDestroyed = false;
 
     /**
-     * reference to the last view which was provided with {@link #bindNewView(View)}
+     * reference to the last view which was provided with {@link #bindNewView(TiView)}
      */
     private WeakReference<V> mOriginalView;
 
@@ -46,12 +51,32 @@ public abstract class Presenter<V extends View> implements
 
     private WeakReference<V> mWrappedView;
 
-    public Presenter() {
+    public TiPresenter() {
 
     }
 
     @Override
-    public void bindNewView(final V view) {
+    public void bindNewView(@NonNull final V view) {
+
+        if (!mCreated) {
+            throw new IllegalStateException("Presenter is not created, call #create() first");
+        }
+
+        if (mViewReady.getValue()) {
+            throw new IllegalStateException(
+                    "Can't bind new view, Presenter #wakeUp() already called. First call #sleep()");
+        }
+
+        if (mDestroyed) {
+            throw new IllegalStateException(
+                    "The presenter is already in it's terminal state and waits for garbage collection. "
+                            + "Binding a view is not allowed");
+        }
+
+        if (view == null) {
+            throw new IllegalStateException(
+                    "the view cannot be set to null. Call #sleep() instead");
+        }
 
         // check if view has changed
         if (mWrappedView == null || mWrappedView.get() == null
@@ -62,7 +87,7 @@ public abstract class Presenter<V extends View> implements
             mOriginalView = new WeakReference<>(view);
 
             // proxy the view for the distinct until change feature
-            final V wrappedView = net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper.wrap(view);
+            final V wrappedView = DistinctUntilChangedViewWrapper.wrap(view);
 
             // safe the wrapped view. The detection of distinct until changed happens inside the
             // proxy. wrapping it again for every bindView would break the feature
@@ -113,7 +138,7 @@ public abstract class Presenter<V extends View> implements
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> observable) {
-                return observable.lift(net.grandcentrix.thirtyinch.internal.OperatorSemaphore.<T>semaphoreLatestCache(isViewReady()));
+                return observable.lift(OperatorSemaphore.<T>semaphoreLatestCache(isViewReady()));
             }
         };
     }
@@ -135,7 +160,7 @@ public abstract class Presenter<V extends View> implements
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> observable) {
-                return observable.lift(net.grandcentrix.thirtyinch.internal.OperatorSemaphore.<T>semaphoreLatest(isViewReady()));
+                return observable.lift(OperatorSemaphore.<T>semaphoreLatest(isViewReady()));
             }
         };
     }
@@ -161,7 +186,7 @@ public abstract class Presenter<V extends View> implements
         return new Observable.Transformer<T, T>() {
             @Override
             public Observable<T> call(Observable<T> observable) {
-                return observable.lift(net.grandcentrix.thirtyinch.internal.OperatorSemaphore.<T>semaphore(isViewReady()));
+                return observable.lift(OperatorSemaphore.<T>semaphore(isViewReady()));
             }
         };
     }
@@ -177,10 +202,11 @@ public abstract class Presenter<V extends View> implements
      */
     @Override
     public final void destroy() {
-        if (!mCreated) {
+        if (!mCreated || mDestroyed) {
             mLogger.log(Level.WARNING, "not calling onDestroy(), destroy was already called");
             return;
         }
+
         mViewReady.onNext(false);
         mPresenterSubscriptions.unsubscribe();
         mPresenterSubscriptions = new CompositeSubscription();
@@ -192,6 +218,26 @@ public abstract class Presenter<V extends View> implements
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onDestroy()");
         }
+    }
+
+    public void manageSubscription(final Subscription subscription) {
+        if (subscription.isUnsubscribed()) {
+            return;
+        }
+        if (mDestroyed) {
+            subscription.unsubscribe();
+        }
+        mPresenterSubscriptions.add(subscription);
+    }
+
+    /**
+     * add your subscriptions for View events to this method to get them automatically cleaned up
+     * in
+     * {@link #sleep()}. typically call this in {@link #wakeUp()} where you subscribe to the UI
+     * events
+     */
+    public void manageViewSubscription(final Subscription subscription) {
+        mUiSubscriptions.add(subscription);
     }
 
     /**
@@ -264,26 +310,6 @@ public abstract class Presenter<V extends View> implements
      */
     protected V getView() {
         return mView;
-    }
-
-    protected void manageSubscription(final Subscription subscription) {
-        if (subscription.isUnsubscribed()) {
-            return;
-        }
-        if (mDestroyed) {
-            subscription.unsubscribe();
-        }
-        mPresenterSubscriptions.add(subscription);
-    }
-
-    /**
-     * add your subscriptions for View events to this method to get them automatically cleaned up
-     * in
-     * {@link #sleep()}. typically call this in {@link #wakeUp()} where you subscribe to the UI
-     * events
-     */
-    protected void manageViewSubscription(final Subscription subscription) {
-        mUiSubscriptions.add(subscription);
     }
 
     /**

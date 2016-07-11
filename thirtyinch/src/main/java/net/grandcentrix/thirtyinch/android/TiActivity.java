@@ -1,10 +1,12 @@
 package net.grandcentrix.thirtyinch.android;
 
-import net.grandcentrix.thirtyinch.Presenter;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationInstance;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
-import net.grandcentrix.thirtyinch.View;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,13 +17,14 @@ import android.util.Log;
 /**
  * Created by pascalwelsch on 9/8/15.
  */
-public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivity {
+public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
+        extends AppCompatActivity implements ActivityPresenterProvider<P> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
-            + ":" + ThirtyInchActivity.class.getSimpleName();
+            + ":" + TiActivity.class.getSimpleName();
 
     private volatile boolean mActivityStarted = false;
 
@@ -29,9 +32,13 @@ public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivi
 
     private boolean mNewConfig;
 
-    private Presenter<V> mPresenter;
+    private P mPresenter;
 
     private String mPresenterId;
+
+    public P getPresenter() {
+        return mPresenter;
+    }
 
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
@@ -47,23 +54,12 @@ public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivi
 
     @Override
     public String toString() {
-        final Presenter<V> p = mPresenter;
-        String presenter;
-        if (p == null) {
-            presenter = "null";
-        } else {
-            presenter = p.getClass().getSimpleName()
-                    + "@" + Integer.toHexString(p.hashCode());
-        }
+        String presenter = mPresenter == null ? "null" :
+                mPresenter.getClass().getSimpleName()
+                        + "@" + Integer.toHexString(mPresenter.hashCode());
 
         return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode())
-                + "{"
-                + "presenter=" + presenter
-                + "}";
-    }
-
-    protected Presenter<V> getPresenter() {
-        return mPresenter;
+                + "{presenter=" + presenter + "}";
     }
 
     @Override
@@ -77,7 +73,7 @@ public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivi
         if (nci instanceof PresenterNonConfigurationInstance) {
             final PresenterNonConfigurationInstance pnci = (PresenterNonConfigurationInstance) nci;
             //noinspection unchecked
-            mPresenter = pnci.getPresenter();
+            mPresenter = (P) pnci.getPresenter();
             Log.d(TAG, "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
@@ -89,7 +85,7 @@ public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivi
             if (recoveredPresenterId != null) {
                 Log.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
-                mPresenter = PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
@@ -166,10 +162,33 @@ public abstract class ThirtyInchActivity<V extends View> extends AppCompatActivi
         mPresenter.sleep();
     }
 
+    /**
+     * the default implementation assumes that the activity is the view and implements the {@link
+     * TiView} interface. Override this method for a different behaviour.
+     *
+     * @return the object implementing the TiView interface
+     */
     @NonNull
-    protected abstract Presenter<V> providePresenter(
-            @NonNull final Bundle activityIntentBundle);
+    protected V provideView() {
 
-    @NonNull
-    protected abstract V provideView();
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Activity doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the activity itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) this;
+            }
+        }
+    }
+
 }
