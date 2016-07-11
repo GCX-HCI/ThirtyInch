@@ -197,10 +197,11 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     @Override
     public final void destroy() {
-        if (!mCreated) {
+        if (!mCreated || mDestroyed) {
             mLogger.log(Level.WARNING, "not calling onDestroy(), destroy was already called");
             return;
         }
+
         mViewReady.onNext(false);
         mPresenterSubscriptions.unsubscribe();
         mPresenterSubscriptions = new CompositeSubscription();
