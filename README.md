@@ -269,7 +269,7 @@ configurations.all {
 }
 ```
 
-Or add the aars manually and put them in the libs folder. Download [ThrityInch 0.6](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/0.6) and [plugin 0.6](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/plugin_0.6)
+Or add the aars manually and put them in the libs folder. Download the [ThrityInch 0.6 aars here](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/v0.6)
 
 For each AAR `File > New > New Module > Import .JAR/.AAR`
 
