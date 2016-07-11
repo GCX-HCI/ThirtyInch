@@ -106,36 +106,35 @@ Using injection is recommended.
 
 ## Hello World Example
 
-First create an interface for your `View` extending the empty ThirtyInch `View` interface.
+First create an interface for your `View` extending the empty ThirtyInch `TiView` interface.
 
 ```java
-public interface HelloWorldView extends View {
+public interface HelloWorldView extends TiView {
 
     void showText(final String text);
 
 }
 ```
 
-Add a `Presenter` to your `Activity` by extending from `ThirtyInchActivity<View>`.
+Add a `Presenter` to your `Activity` by extending from `TiActivity<TiPresenter, TiView>`.
 Another, advanced option is to use the [plugin](plugin/).
-Also implement the `View` interface.
+Also implement the `TiView` interface.
 The Activity is the view implementation.
 
 Two methods have to be implemented:
 
-`providePresenter()` has to return an instance of the `Presenter`.
+`providePresenter()` has to return an instance of the `TiPresenter`.
 This method will be called only once in `onCreate(Bundle)`, the first time the Activity gets launched (`savedInstanceState == null`).
 Sadly there is no other way to create the `Presenter` than creating it after the `Activity` was launched.
 Remember, the `Activity` is the entry point.
 
-`provideView()` has to return the `View` for the `Presenter`.
-It will be called whenever the `Activity` is visible to the User (`onStart()`).
 The `Activity` (`this`) itself is the `View`.
-It's open for discussion if `this` is generally true.
+It will be bound to the presenter whenever the `Activity` is visible to the User (`onStart()`).
+In case the `TiActivity` doesn't implement the `TiView` interface check `TiActivity#provideView()`.
 
 
 ```java
-public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldView>
+public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWorldView>
         implements HelloWorldView {
 
     private TextView mOutput;
@@ -155,15 +154,8 @@ public class HelloWorldActivity extends ThirtyInchActivity<HelloWorldView>
 
     @NonNull
     @Override
-    protected Presenter<HelloWorldView> providePresenter(
-            @NonNull final Bundle activityIntentBundle) {
+    public HelloWorldPresenter providePresenter(final Bundle activityIntentBundle) {
         return new HelloWorldPresenter();
-    }
-
-    @NonNull
-    @Override
-    protected HelloWorldView provideView() {
-        return this;
     }
 }
 ```
@@ -173,7 +165,7 @@ Creating the `Presenter` and add your logic
 
 ```java
 
-public class HelloWorldPresenter extends Presenter<HelloWorldView> {
+public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
     private String mText = "Hello World";
 
@@ -206,10 +198,10 @@ Notice: `mText` works here as "Model".
 
 ## View interface Annotations
 
-There are two very helpful annotations you can add to *void* methods of your `View` interface.
+There are two very helpful annotations you can add to *void* methods of your `TiView` interface.
 
 ```java
-public interface HelloWorldView extends View {
+public interface HelloWorldView extends TiView {
 
     @CallOnMainThread
     @DistinctUntilChanged
@@ -219,10 +211,10 @@ public interface HelloWorldView extends View {
 
 ##### @CallOnMainThread
 
-Whenever you call this method from the `Presenter` it will be called on the Android main thread.
+Whenever you call this method it will be called on the Android main thread.
 This allows to run code off the main thread but send events to the UI without dealing with Handlers and Loopers.
 
-Requires to be a `void` method. Works only for "Android Views" (`ThirtyInchActivity`, `ThirtyInchFragment`).
+Requires to be a `void` method. Works only for `TiView` interfaces implemented by "Android Views" (`TiActivity`, `TiFragment`).
 
 ##### @DistinctUntilChanged
 
@@ -230,7 +222,7 @@ When calling this method the `View` receives no duplicated (equal) calls.
 When the View received a parameter and gets called again with the same parameter (equals) the call gets swallowed.
 
 Usecase:
-The Presenter bind a huge list to the `View`. The app loses focus (`onSleep()`) and the exact same Activity instance gains focus again (`onWakeUp()`).
+The Presenter binds a huge list to the `View`. The app loses focus (`onSleep()`) and the exact same Activity instance gains focus again (`onWakeUp()`).
 The `Activity` still shows the huge list.
 The `Presenter` binds the huge list again to the `View`.
 When the data has changed the list will be updated.
@@ -246,7 +238,7 @@ This workaround will be removed once public released.
 Clone this project and generate the `aar` package. Add the artifact to your local maven repository
 ```bash
 # generate aars and push them to maven local
-./gradlew clean bundleRelease bintrayUpload -PdryRun=true`
+./gradlew clean bundleRelease bintrayUpload -PbintrayUser=wrongName -PbintrayKey=invalidKey -PdryRun=true`
 ```
 
 in your app `build.gradle`
@@ -265,10 +257,10 @@ dependencies {
     // "changing true" always loads the latest version from maven (here: mavenLocal)
 
     // the normal version
-    compile('net.grandcentrix.thirtyinch:thirtyinch:0.5-SNAPSHOT') { changing true }
+    compile('net.grandcentrix.thirtyinch:thirtyinch:0.7-SNAPSHOT') { changing true }
 
     // the plugin version for CompositeAndroid
-    compile('net.grandcentrix.thirtyinch:thirtyinch-plugin:0.1-SNAPSHOT') { changing true }
+    compile('net.grandcentrix.thirtyinch:thirtyinch-plugin:0.7-SNAPSHOT') { changing true }
 }
 
 configurations.all {
@@ -277,7 +269,7 @@ configurations.all {
 }
 ```
 
-Or add the aars manually and put them in the libs folder. Download [ThrityInch 0.5](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/0.5) and [plugin 0.1](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/plugin_0.1)
+Or add the aars manually and put them in the libs folder. Download [ThrityInch 0.6](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/0.6) and [plugin 0.6](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/plugin_0.6)
 
 For each AAR `File > New > New Module > Import .JAR/.AAR`
 
