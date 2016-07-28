@@ -27,7 +27,7 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
     @NonNull
     @Override
-    public HelloWorldPresenter providePresenter(final Bundle activityIntentBundle) {
+    public HelloWorldPresenter providePresenter() {
         return new HelloWorldPresenter();
     }
 

@@ -2,7 +2,7 @@ package net.grandcentrix.thirtyinch.android;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.FragmentPresenterProvider;
+import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -13,7 +13,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
-        extends Fragment implements FragmentPresenterProvider<P>, TiView {
+        extends Fragment implements PresenterProvider<P>, TiView {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -37,8 +37,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         Log.v(TAG, "onDestroy()");
 
         if (mPresenter == null) {
-            final Bundle activityExtras = activity.getIntent().getExtras();
-            mPresenter = providePresenter(activityExtras, getArguments());
+            mPresenter = providePresenter();
             Log.d(TAG, "created Presenter: " + mPresenter);
             mPresenter.create();
         }

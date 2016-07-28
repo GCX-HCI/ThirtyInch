@@ -2,7 +2,7 @@ package net.grandcentrix.thirtyinch.android;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.ActivityPresenterProvider;
+import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationInstance;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
@@ -18,7 +18,7 @@ import android.util.Log;
  * Created by pascalwelsch on 9/8/15.
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
-        extends AppCompatActivity implements ActivityPresenterProvider<P> {
+        extends AppCompatActivity implements PresenterProvider<P> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -99,11 +99,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
         if (mPresenter == null) {
             // create a new presenter
-            Bundle activityExtras = getIntent().getExtras();
-            if (activityExtras == null) {
-                activityExtras = new Bundle();
-            }
-            mPresenter = providePresenter(activityExtras);
+            mPresenter = providePresenter();
             Log.d(TAG, "created Presenter: " + mPresenter);
             mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             mPresenter.create();
