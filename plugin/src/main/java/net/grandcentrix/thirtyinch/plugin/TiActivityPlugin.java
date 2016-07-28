@@ -5,8 +5,8 @@ import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInsta
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
+import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -41,10 +41,12 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
 
     /**
      * Binds a {@link TiPresenter} returned by the {@link PresenterProvider} to the {@link
-     * Activity} and all future {@link Activity} instances created due to configuration changes. The
-     * provider will be only called once during {@link TiActivityPlugin#onCreate(Bundle)}. This lets
-     * you inject objects which require a {@link android.content.Context} and can't be instantiated
-     * in the constructor of the {@link Activity}.
+     * Activity} and all future {@link Activity} instances created due to configuration changes.
+     * The provider will be only called once during {@link TiActivityPlugin#onCreate(Bundle)}. This
+     * lets you inject objects which require a {@link android.content.Context} and can't be
+     * instantiated in the constructor of the {@link Activity}. Using the interface also prevents
+     * instantiating the (possibly) heavy {@link TiPresenter} which will never be used when a
+     * presenter is already created for this {@link Activity}.
      *
      * @param presenterProvider callback returning the presenter.
      */
