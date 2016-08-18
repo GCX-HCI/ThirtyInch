@@ -56,5 +56,11 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         mButton = (Button) findViewById(R.id.button);
         mOutput = (TextView) findViewById(R.id.output);
         mUptime = (TextView) findViewById(R.id.uptime);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new SampleFragment())
+                    .commit();
+        }
     }
 }

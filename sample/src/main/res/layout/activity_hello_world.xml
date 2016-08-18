@@ -18,8 +18,8 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/fragment_container"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
         android:text="click me" />
 
@@ -32,4 +32,10 @@
         android:padding="16dp"
         android:textSize="24sp"
         tools:text="output" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>

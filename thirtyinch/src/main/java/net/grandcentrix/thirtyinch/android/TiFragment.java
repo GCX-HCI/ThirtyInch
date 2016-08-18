@@ -1,5 +1,8 @@
 package net.grandcentrix.thirtyinch.android;
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.OnTimeRemovable;
+import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
@@ -12,6 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         extends Fragment implements PresenterProvider<P>, TiView {
 
@@ -23,9 +29,28 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     private volatile boolean mActivityStarted = false;
 
+    private List<BindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
+
+    /**
+     * the cached version of the view send to the presenter after it passed the interceptors
+     */
+    private V mLastView;
+
     private P mPresenter;
 
     private String mPresenterId;
+
+    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+        mBindViewInterceptors.add(interceptor);
+        mLastView = null;
+
+        return new OnTimeRemovable() {
+            @Override
+            public void onRemove() {
+                mBindViewInterceptors.remove(interceptor);
+            }
+        };
+    }
 
     public P getPresenter() {
         return mPresenter;
@@ -105,9 +130,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            final V view = provideView();
-            mPresenter.bindNewView(view);
-            Log.d(TAG, "bound new View (" + view + ") to Presenter (" + mPresenter + ")");
+            bindViewToPresenter();
             getActivity().getWindow().getDecorView().post(new Runnable() {
                 @Override
                 public void run() {
@@ -131,7 +154,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     final public void setRetainInstance(final boolean retain) {
         super.setRetainInstance(true);
     }
-
 
     /**
      * the default implementation assumes that the fragment is the view and implements the {@link
@@ -159,6 +181,25 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                 //noinspection unchecked
                 return (V) this;
             }
+        }
+    }
+
+    /**
+     * binds the view (this Fragment) to the {@link #mPresenter}. Allows interceptors to change,
+     * delegate or wrap the view before it gets attached to the presenter.
+     */
+    private void bindViewToPresenter() {
+        if (mLastView == null) {
+            V interceptedView = provideView();
+            for (final BindViewInterceptor interceptor : mBindViewInterceptors) {
+                interceptedView = interceptor.intercept(interceptedView);
+            }
+            mLastView = interceptedView;
+            Log.v(TAG, "binding NEW view to Presenter " + mLastView);
+            mPresenter.bindNewView(mLastView);
+        } else {
+            Log.v(TAG, "binding the cached view to Presenter " + mLastView);
+            mPresenter.bindNewView(mLastView);
         }
     }
 
