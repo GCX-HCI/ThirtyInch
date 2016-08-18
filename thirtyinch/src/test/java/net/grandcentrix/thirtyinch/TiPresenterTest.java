@@ -273,6 +273,7 @@ public class TiPresenterTest {
 
     @Test
     public void testManageViewSubscription() throws Exception {
+        mPresenter.create();
         mPresenter.wakeUp();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
@@ -352,6 +353,7 @@ public class TiPresenterTest {
                 // Intentionally not calling super.onSleep()
             }
         };
+        presenter.create();
         presenter.wakeUp();
         presenter.sleep();
     }
@@ -368,9 +370,11 @@ public class TiPresenterTest {
 
     @Test
     public void testWakeUp() throws Exception {
+        mPresenter.create();
         assertThat(mPresenter.onWakeUpCalled, equalTo(0));
         mPresenter.wakeUp();
         assertThat(mPresenter.onWakeUpCalled, equalTo(1));
+        // not calling again
         mPresenter.wakeUp();
         assertThat(mPresenter.onWakeUpCalled, equalTo(1));
     }
@@ -383,6 +387,7 @@ public class TiPresenterTest {
                 // Intentionally not calling super.onWakeup()
             }
         };
+        presenter.create();
         presenter.wakeUp();
     }
 }

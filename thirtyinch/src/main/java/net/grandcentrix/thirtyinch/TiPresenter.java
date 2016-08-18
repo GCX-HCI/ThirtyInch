@@ -5,8 +5,12 @@ import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
 import net.grandcentrix.thirtyinch.internal.OperatorSemaphore;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,15 +30,48 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class TiPresenter<V extends TiView> implements
         net.grandcentrix.thirtyinch.internal.PresenterLifecycle<V> {
 
+    /**
+     * The LifecycleState of a {@link TiPresenter}
+     */
+    public enum State {
+        /**
+         * Initial state of the presenter before {@link #create()} got called
+         */
+        INITIALIZED,
+        /**
+         * presenter is running fine but has no attached view. Either it gets a view  and
+         * transitions to {@link #VIEW_ATTACHED_AND_AWAKE} or the presenter gets destroyed ->
+         * {@link
+         * #DESTROYED}
+         */
+        CREATED_WITH_DETACHED_VIEW,
+        /**
+         * the view is attached. In any case, the next step will be {@link
+         * #CREATED_WITH_DETACHED_VIEW}
+         */
+        VIEW_ATTACHED_AND_AWAKE,
+        /**
+         * termination state. It will never change again.
+         */
+        DESTROYED
+    }
+
+    /**
+     * list of the added observers
+     */
+    @VisibleForTesting
+    final List<TiLifecycleObserver> mLifecycleObservers = new ArrayList<>();
+
     Logger mLogger = Logger.getLogger(this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
             + ":" + TiPresenter.class.getSimpleName());
 
+    /**
+     * used to check that lifecycle methods (starting with on..) cannot be called directly. i.e.
+     * {@link #onCreate()} cannot be called. Instead use {@link #create()} which calls {@link
+     * #onCreate()} and makes sure the Presenter has the correct state.
+     */
     private boolean mCalled = true;
-
-    private boolean mCreated = false;
-
-    private boolean mDestroyed = false;
 
     /**
      * reference to the last view which was provided with {@link #bindNewView(TiView)}
@@ -42,6 +79,8 @@ public abstract class TiPresenter<V extends TiView> implements
     private WeakReference<V> mOriginalView;
 
     private CompositeSubscription mPresenterSubscriptions = new CompositeSubscription();
+
+    private State mState = State.INITIALIZED;
 
     private CompositeSubscription mUiSubscriptions = new CompositeSubscription();
 
@@ -55,19 +94,48 @@ public abstract class TiPresenter<V extends TiView> implements
 
     }
 
+    /**
+     * Observes the lifecycle state of this presenter.
+     *
+     * @param observer called when lifecycle state changes after the lifecycle method such as
+     *                 {@link
+     *                 #onCreate()} got called
+     * @return a {@link Removable} allowing to remove the {@link TiLifecycleObserver} from the
+     * presenter
+     */
+    public Removable addLifecycleObserver(final TiLifecycleObserver observer) {
+        mLifecycleObservers.add(observer);
+        final AtomicBoolean removed = new AtomicBoolean(false);
+
+        return new Removable() {
+            @Override
+            public boolean isRemoved() {
+                return removed.get();
+            }
+
+            @Override
+            public void remove() {
+                // allow calling remove only once
+                if (removed.compareAndSet(false, true)) {
+                    mLifecycleObservers.remove(observer);
+                }
+            }
+        };
+    }
+
     @Override
     public void bindNewView(@NonNull final V view) {
 
-        if (!mCreated) {
+        if (!isCreated()) {
             throw new IllegalStateException("Presenter is not created, call #create() first");
         }
 
-        if (mViewReady.getValue()) {
+        if (isAwake()) {
             throw new IllegalStateException(
                     "Can't bind new view, Presenter #wakeUp() already called. First call #sleep()");
         }
 
-        if (mDestroyed) {
+        if (isDestroyed()) {
             throw new IllegalStateException(
                     "The presenter is already in it's terminal state and waits for garbage collection. "
                             + "Binding a view is not allowed");
@@ -99,13 +167,17 @@ public abstract class TiPresenter<V extends TiView> implements
         }
     }
 
+    private Boolean isAwake() {
+        return mViewReady.getValue();
+    }
+
     @Override
     public final void create() {
-        if (mCreated) {
+        if (isCreated()) {
             mLogger.log(Level.WARNING, "not calling onCreate(), it was already called");
             return;
         }
-        mCreated = true;
+        moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
         mCalled = false;
         mLogger.log(Level.FINE, "onCreate()");
         onCreate();
@@ -113,6 +185,7 @@ public abstract class TiPresenter<V extends TiView> implements
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onCreate()");
         }
+        moveToState(State.CREATED_WITH_DETACHED_VIEW, true);
     }
 
     /**
@@ -202,15 +275,15 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     @Override
     public final void destroy() {
-        if (!mCreated || mDestroyed) {
+        if (!isCreated() || isDestroyed()) {
             mLogger.log(Level.WARNING, "not calling onDestroy(), destroy was already called");
             return;
         }
 
+        moveToState(State.DESTROYED, false);
         mViewReady.onNext(false);
         mPresenterSubscriptions.unsubscribe();
         mPresenterSubscriptions = new CompositeSubscription();
-        mDestroyed = true;
         mCalled = false;
         mLogger.log(Level.FINE, "onDestroy()");
         onDestroy();
@@ -218,13 +291,25 @@ public abstract class TiPresenter<V extends TiView> implements
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onDestroy()");
         }
+        moveToState(State.DESTROYED, true);
+    }
+
+    /**
+     * @return the current lifecycle state
+     */
+    public State getState() {
+        return mState;
+    }
+
+    public boolean isDestroyed() {
+        return mState == State.DESTROYED;
     }
 
     public void manageSubscription(final Subscription subscription) {
         if (subscription.isUnsubscribed()) {
             return;
         }
-        if (mDestroyed) {
+        if (isDestroyed()) {
             subscription.unsubscribe();
         }
         mPresenterSubscriptions.add(subscription);
@@ -248,10 +333,11 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     @Override
     public final void sleep() {
-        if (!mViewReady.getValue()) {
+        if (!isAwake()) {
             mLogger.log(Level.FINE, "not calling onSleep(), not woken up");
             return;
         }
+        moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
         mViewReady.onNext(false);
         // unsubscribe all UI subscriptions created in wakeUp() and added
         // via manageViewSubscription(Subscription)
@@ -267,6 +353,7 @@ public abstract class TiPresenter<V extends TiView> implements
         }
 
         mView = null;
+        moveToState(State.CREATED_WITH_DETACHED_VIEW, true);
     }
 
     @Override
@@ -291,10 +378,11 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     @Override
     public final void wakeUp() {
-        if (mViewReady.getValue()) {
+        if (isAwake()) {
             mLogger.log(Level.FINE, "not calling onWakeUp(), already woken up");
             return;
         }
+        moveToState(State.VIEW_ATTACHED_AND_AWAKE, false);
         mCalled = false;
         mLogger.log(Level.FINE, "onWakeUp()");
         onWakeUp();
@@ -303,6 +391,7 @@ public abstract class TiPresenter<V extends TiView> implements
                     + " did not call through to super.onWakeUp()");
         }
         mViewReady.onNext(true);
+        moveToState(State.VIEW_ATTACHED_AND_AWAKE, true);
     }
 
     /**
@@ -374,11 +463,72 @@ public abstract class TiPresenter<V extends TiView> implements
         mCalled = true;
     }
 
+    private boolean isCreated() {
+        return mState == State.CREATED_WITH_DETACHED_VIEW;
+    }
+
     /**
      * Observable of the view state. The View is ready to receive calls after calling {@link
      * #wakeUp()} and before calling {@link #sleep()}.
      */
     private Observable<Boolean> isViewReady() {
         return mViewReady.asObservable().distinctUntilChanged();
+    }
+
+    /**
+     * moves the presenter to the new state and validates the correctness of the transition
+     *
+     * @param newState the new state to set
+     */
+    private void moveToState(final State newState, final boolean hasLifecycleMethodBeenCalled) {
+        final State oldState = mState;
+
+        if (hasLifecycleMethodBeenCalled) {
+            if (newState != oldState) {
+                throw new IllegalStateException("first call moveToState(<state>, false);");
+            }
+        }
+
+        if (newState != oldState) {
+            switch (oldState) {
+                case INITIALIZED:
+                    if (newState == State.CREATED_WITH_DETACHED_VIEW) {
+                        // move allowed
+                        break;
+                    } else {
+                        throw new IllegalStateException("Can't move to state " + newState
+                                + ", the next state after INITIALIZED has to be CREATED_WITH_DETACHED_VIEW");
+                    }
+                case CREATED_WITH_DETACHED_VIEW:
+                    if (newState == State.VIEW_ATTACHED_AND_AWAKE) {
+                        // move allowed
+                        break;
+                    } else if (newState == State.DESTROYED) {
+                        // move allowed
+                        break;
+                    } else {
+                        throw new IllegalStateException("Can't move to state " + newState
+                                + ", the allowed states after CREATED_WITH_DETACHED_VIEW are VIEW_ATTACHED_AND_AWAKE or DESTROYED");
+                    }
+                case VIEW_ATTACHED_AND_AWAKE:
+                    // directly moving to DESTROYED is not possible, first detach the view
+                    if (newState == State.CREATED_WITH_DETACHED_VIEW) {
+                        // move allowed
+                        break;
+                    } else {
+                        throw new IllegalStateException("Can't move to state " + newState
+                                + ", the next state after VIEW_ATTACHED_AND_AWAKE has to be CREATED_WITH_DETACHED_VIEW");
+                    }
+                case DESTROYED:
+                    throw new IllegalStateException(
+                            "once destroyed the presenter can't be moved to a different state");
+            }
+
+            mState = newState;
+        }
+
+        for (int i = 0; i < mLifecycleObservers.size(); i++) {
+            mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+        }
     }
 }
