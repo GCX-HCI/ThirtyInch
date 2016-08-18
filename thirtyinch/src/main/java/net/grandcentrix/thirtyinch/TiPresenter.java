@@ -94,6 +94,12 @@ public abstract class TiPresenter<V extends TiView> implements
      * presenter
      */
     public Removable addLifecycleObserver(final TiLifecycleObserver observer) {
+        if (mState == State.DESTROYED) {
+            throw new IllegalStateException("Don't add observers "
+                    + "when the presenter reached the DESTROYED state. "
+                    + "They wont get any new events anyways.");
+        }
+
         mLifecycleObservers.add(observer);
         final AtomicBoolean removed = new AtomicBoolean(false);
 
@@ -199,6 +205,9 @@ public abstract class TiPresenter<V extends TiView> implements
                     + " did not call through to super.onDestroy()");
         }
         moveToState(State.DESTROYED, true);
+
+        // release everything, no new states will be posted
+        mLifecycleObservers.clear();
     }
 
     /**
