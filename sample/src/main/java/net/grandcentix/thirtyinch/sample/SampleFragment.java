@@ -40,7 +40,6 @@ public class SampleFragment extends TiFragment<SamplePresenter, SampleView> impl
         return new SamplePresenter();
     }
 
-
     @Override
     public void showText(final String s) {
         mSampleText.setText(s);
