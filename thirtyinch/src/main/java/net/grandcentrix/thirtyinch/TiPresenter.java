@@ -2,7 +2,6 @@ package net.grandcentrix.thirtyinch;
 
 
 import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
-import net.grandcentrix.thirtyinch.internal.OperatorSemaphore;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -16,9 +15,6 @@ import java.util.logging.Logger;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Subscription;
-import rx.subjects.BehaviorSubject;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern.
@@ -78,15 +74,9 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     private WeakReference<V> mOriginalView;
 
-    private CompositeSubscription mPresenterSubscriptions = new CompositeSubscription();
-
     private State mState = State.INITIALIZED;
 
-    private CompositeSubscription mUiSubscriptions = new CompositeSubscription();
-
     private V mView;
-
-    private BehaviorSubject<Boolean> mViewReady = BehaviorSubject.create(false);
 
     private WeakReference<V> mWrappedView;
 
@@ -167,10 +157,6 @@ public abstract class TiPresenter<V extends TiView> implements
         }
     }
 
-    private Boolean isAwake() {
-        return mViewReady.getValue();
-    }
-
     @Override
     public final void create() {
         if (isCreated()) {
@@ -186,82 +172,6 @@ public abstract class TiPresenter<V extends TiView> implements
                     + " did not call through to super.onCreate()");
         }
         moveToState(State.CREATED_WITH_DETACHED_VIEW, true);
-    }
-
-    /**
-     * Returns a transformer that will delay onNext, onError and onComplete emissions unless a view
-     * become available. getView() is guaranteed to be != null during all emissions. This
-     * transformer can only be used on application's main thread.
-     * <p/>
-     * If the transformer receives a next value while the previous value has not been delivered,
-     * the
-     * previous value will be dropped.
-     * <p/>
-     * The transformer will duplicate the latest onNext emission in case if a view has been
-     * reattached.
-     * <p/>
-     * This operator ignores onComplete emission and never sends one.
-     * <p/>
-     * Use this operator when you need to show updatable data that needs to be cached in memory.
-     *
-     * @param <T> a type of onNext value.
-     * @return the delaying operator.
-     */
-    public <T> Observable.Transformer<T, T> deliverLatestCacheToView() {
-        return new Observable.Transformer<T, T>() {
-            @Override
-            public Observable<T> call(Observable<T> observable) {
-                return observable.lift(OperatorSemaphore.<T>semaphoreLatestCache(isViewReady()));
-            }
-        };
-    }
-
-    /**
-     * Returns a transformer that will delay onNext, onError and onComplete emissions unless a view
-     * become available. getView() is guaranteed to be != null during all emissions. This
-     * transformer can only be used on application's main thread.
-     * <p/>
-     * If this transformer receives a next value while the previous value has not been delivered,
-     * the previous value will be dropped.
-     * <p/>
-     * Use this operator when you need to show updatable data.
-     *
-     * @param <T> a type of onNext value.
-     * @return the delaying operator.
-     */
-    public <T> Observable.Transformer<T, T> deliverLatestToView() {
-        return new Observable.Transformer<T, T>() {
-            @Override
-            public Observable<T> call(Observable<T> observable) {
-                return observable.lift(OperatorSemaphore.<T>semaphoreLatest(isViewReady()));
-            }
-        };
-    }
-
-    /**
-     * Returns a transformer that will delay onNext, onError and onComplete emissions unless a view
-     * become available. getView() is guaranteed to be != null during all emissions. This
-     * transformer can only be used on application's main thread. See the correct order:
-     * <pre>
-     * <code>
-     *
-     * .observeOn(AndroidSchedulers.mainThread())
-     * .compose(this.&lt;T&gt;deliverToView())
-     * </code>
-     * </pre>
-     * Use this operator if you need to deliver *all* emissions to a view, in example when you're
-     * sending items into adapter one by one.
-     *
-     * @param <T> a type of onNext value.
-     * @return the delaying operator.
-     */
-    public <T> Observable.Transformer<T, T> deliverToView() {
-        return new Observable.Transformer<T, T>() {
-            @Override
-            public Observable<T> call(Observable<T> observable) {
-                return observable.lift(OperatorSemaphore.<T>semaphore(isViewReady()));
-            }
-        };
     }
 
     /**
@@ -281,9 +191,6 @@ public abstract class TiPresenter<V extends TiView> implements
         }
 
         moveToState(State.DESTROYED, false);
-        mViewReady.onNext(false);
-        mPresenterSubscriptions.unsubscribe();
-        mPresenterSubscriptions = new CompositeSubscription();
         mCalled = false;
         mLogger.log(Level.FINE, "onDestroy()");
         onDestroy();
@@ -305,25 +212,6 @@ public abstract class TiPresenter<V extends TiView> implements
         return mState == State.DESTROYED;
     }
 
-    public void manageSubscription(final Subscription subscription) {
-        if (subscription.isUnsubscribed()) {
-            return;
-        }
-        if (isDestroyed()) {
-            subscription.unsubscribe();
-        }
-        mPresenterSubscriptions.add(subscription);
-    }
-
-    /**
-     * add your subscriptions for View events to this method to get them automatically cleaned up
-     * in
-     * {@link #sleep()}. typically call this in {@link #wakeUp()} where you subscribe to the UI
-     * events
-     */
-    public void manageViewSubscription(final Subscription subscription) {
-        mUiSubscriptions.add(subscription);
-    }
 
     /**
      * call sleep as the opposite of {@link #wakeUp()} to unsubscribe all observers listening to
@@ -338,12 +226,6 @@ public abstract class TiPresenter<V extends TiView> implements
             return;
         }
         moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
-        mViewReady.onNext(false);
-        // unsubscribe all UI subscriptions created in wakeUp() and added
-        // via manageViewSubscription(Subscription)
-        mUiSubscriptions.unsubscribe();
-        // there is no reuse possible. recreation works fine
-        mUiSubscriptions = new CompositeSubscription();
         mCalled = false;
         mLogger.log(Level.FINE, "onSleep()");
         onSleep();
@@ -390,7 +272,6 @@ public abstract class TiPresenter<V extends TiView> implements
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onWakeUp()");
         }
-        mViewReady.onNext(true);
         moveToState(State.VIEW_ATTACHED_AND_AWAKE, true);
     }
 
@@ -405,8 +286,6 @@ public abstract class TiPresenter<V extends TiView> implements
      * the first lifecycle method after the presenter was created. This will be called only once!
      * The view is not attached at this state. But doing network requests is possible at this
      * state.
-     * Use {@link #deliverToView()} to make sure you don't try to touch the view before it is
-     * ready.
      */
     protected void onCreate() {
         if (mCalled) {
@@ -463,17 +342,14 @@ public abstract class TiPresenter<V extends TiView> implements
         mCalled = true;
     }
 
+    private Boolean isAwake() {
+        return mState == State.VIEW_ATTACHED_AND_AWAKE;
+    }
+
     private boolean isCreated() {
         return mState == State.CREATED_WITH_DETACHED_VIEW;
     }
 
-    /**
-     * Observable of the view state. The View is ready to receive calls after calling {@link
-     * #wakeUp()} and before calling {@link #sleep()}.
-     */
-    private Observable<Boolean> isViewReady() {
-        return mViewReady.asObservable().distinctUntilChanged();
-    }
 
     /**
      * moves the presenter to the new state and validates the correctness of the transition

@@ -1,6 +1,8 @@
 package net.grandcentix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
+import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,14 +23,16 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
     private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
 
+    private RxTiPresenterSubscriptionHandler rxSubscriptionHelper = new RxTiPresenterSubscriptionHandler(this);
+
     @Override
     protected void onCreate() {
         super.onCreate();
 
         mText.onNext("Hello World!");
 
-        manageSubscription(Observable.interval(1, TimeUnit.SECONDS)
-                .compose(this.<Long>deliverLatestToView())
+        rxSubscriptionHelper.manageSubscription(Observable.interval(0, 1, TimeUnit.SECONDS)
+                .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(final Long uptime) {
@@ -36,7 +40,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                     }
                 }));
 
-        manageSubscription(triggerHeavyCalculation
+        rxSubscriptionHelper.manageSubscription(triggerHeavyCalculation
                 .doOnNext(new Action1<Void>() {
                     @Override
                     public void call(final Void aVoid) {
@@ -68,7 +72,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     protected void onWakeUp() {
         super.onWakeUp();
 
-        manageViewSubscription(mText.asObservable()
+        rxSubscriptionHelper.manageViewSubscription(mText.asObservable()
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(final String text) {
@@ -76,7 +80,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                     }
                 }));
 
-        manageViewSubscription(getView().onButtonClicked()
+        rxSubscriptionHelper.manageViewSubscription(getView().onButtonClicked()
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(final Void aVoid) {

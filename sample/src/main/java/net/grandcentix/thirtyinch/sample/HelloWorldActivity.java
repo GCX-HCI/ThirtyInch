@@ -33,7 +33,7 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
     @Override
     public void showPresenterUpTime(final Long uptime) {
-        mUptime.setText(String.format("Presenter alive fore %ss", uptime));
+        mUptime.setText(String.format("Presenter alive for %ss", uptime));
     }
 
     @Override
