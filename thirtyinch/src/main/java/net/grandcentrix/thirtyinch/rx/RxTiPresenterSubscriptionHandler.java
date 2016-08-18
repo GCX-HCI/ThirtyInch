@@ -53,9 +53,6 @@ public class RxTiPresenterSubscriptionHandler {
         if (subscription.isUnsubscribed()) {
             return;
         }
-        if (mPresenter.isDestroyed()) {
-            subscription.unsubscribe();
-        }
         mPresenterSubscriptions.add(subscription);
     }
 
