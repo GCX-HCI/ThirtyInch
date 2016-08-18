@@ -1,19 +1,31 @@
 package net.grandcentrix.thirtyinch.internal;
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.DistinctUntilChanged;
 import net.grandcentrix.thirtyinch.TiView;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.lang.reflect.Proxy;
 
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
-public class DistinctUntilChangedViewWrapper {
+public class DistinctUntilChangedViewWrapper implements BindViewInterceptor {
+
+    private static final String TAG = DistinctUntilChangedViewWrapper.class.getSimpleName();
+
+    @Override
+    public <V extends TiView> V intercept(final V view) {
+        final V wrapped = wrap(view);
+
+        Log.d(TAG, "wrapping View " + view + " in " + wrapped);
+        return wrapped;
+    }
 
     @NonNull
-    public static <V extends TiView> V wrap(@NonNull final V view) {
+    public <V extends TiView> V wrap(@NonNull final V view) {
 
         Class<?> foundInterfaceClass =
                 getInterfaceOfClassExtendingGivenInterface(view.getClass(), TiView.class);

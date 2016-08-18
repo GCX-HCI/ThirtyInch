@@ -1,15 +1,11 @@
 package net.grandcentrix.thirtyinch;
 
 
-import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,16 +65,9 @@ public abstract class TiPresenter<V extends TiView> implements
      */
     private boolean mCalled = true;
 
-    /**
-     * reference to the last view which was provided with {@link #bindNewView(TiView)}
-     */
-    private WeakReference<V> mOriginalView;
-
     private State mState = State.INITIALIZED;
 
     private V mView;
-
-    private WeakReference<V> mWrappedView;
 
     public TiPresenter() {
 
@@ -91,7 +80,7 @@ public abstract class TiPresenter<V extends TiView> implements
      *                 {@link
      *                 #onCreate()} got called
      * @return a {@link Removable} allowing to remove the {@link TiLifecycleObserver} from the
-     * presenter
+     * {@link TiPresenter} before it reaches its termination state
      */
     public Removable addLifecycleObserver(final TiLifecycleObserver observer) {
         if (mState == State.DESTROYED) {
@@ -101,24 +90,17 @@ public abstract class TiPresenter<V extends TiView> implements
         }
 
         mLifecycleObservers.add(observer);
-        final AtomicBoolean removed = new AtomicBoolean(false);
 
-        return new Removable() {
-            @Override
-            public boolean isRemoved() {
-                return removed.get();
-            }
+        return new OnTimeRemovable() {
 
             @Override
-            public void remove() {
-                // allow calling remove only once
-                if (removed.compareAndSet(false, true)) {
-                    mLifecycleObservers.remove(observer);
-                }
+            public void onRemove() {
+                mLifecycleObservers.remove(observer);
             }
         };
     }
 
+    // TODO check if this could be combined with #wakeUp
     @Override
     public void bindNewView(@NonNull final V view) {
 
@@ -142,25 +124,7 @@ public abstract class TiPresenter<V extends TiView> implements
                     "the view cannot be set to null. Call #sleep() instead");
         }
 
-        // check if view has changed
-        if (mWrappedView == null || mWrappedView.get() == null
-                || mOriginalView == null || mOriginalView.get() == null
-                || !mOriginalView.get().equals(view)) {
-
-            // safe the original view to detect a change
-            mOriginalView = new WeakReference<>(view);
-
-            // proxy the view for the distinct until change feature
-            final V wrappedView = DistinctUntilChangedViewWrapper.wrap(view);
-
-            // safe the wrapped view. The detection of distinct until changed happens inside the
-            // proxy. wrapping it again for every bindView would break the feature
-            // will be reused when view did not change
-            mWrappedView = new WeakReference<>(wrappedView);
-            mView = wrappedView;
-        } else {
-            mView = mWrappedView.get();
-        }
+        mView = view;
     }
 
     @Override
@@ -217,10 +181,17 @@ public abstract class TiPresenter<V extends TiView> implements
         return mState;
     }
 
+    public boolean isAwake() {
+        return mState == State.VIEW_ATTACHED_AND_AWAKE;
+    }
+
+    public boolean isCreated() {
+        return mState == State.CREATED_WITH_DETACHED_VIEW;
+    }
+
     public boolean isDestroyed() {
         return mState == State.DESTROYED;
     }
-
 
     /**
      * call sleep as the opposite of {@link #wakeUp()} to unsubscribe all observers listening to
@@ -350,15 +321,6 @@ public abstract class TiPresenter<V extends TiView> implements
         }
         mCalled = true;
     }
-
-    private Boolean isAwake() {
-        return mState == State.VIEW_ATTACHED_AND_AWAKE;
-    }
-
-    private boolean isCreated() {
-        return mState == State.CREATED_WITH_DETACHED_VIEW;
-    }
-
 
     /**
      * moves the presenter to the new state and validates the correctness of the transition

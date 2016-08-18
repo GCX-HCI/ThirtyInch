@@ -1,16 +1,28 @@
 package net.grandcentrix.thirtyinch.android.internal;
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.CallOnMainThread;
+
+import android.util.Log;
 
 import java.lang.reflect.Proxy;
 
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
-public class CallOnMainThreadViewWrapper {
+public class CallOnMainThreadViewWrapper implements BindViewInterceptor {
 
-    public static <V extends TiView> V wrap(final V view) {
+    private static final String TAG = CallOnMainThreadViewWrapper.class.getSimpleName();
+
+    @Override
+    public <V extends TiView> V intercept(final V view) {
+        final V wrapped = wrap(view);
+        Log.d(TAG, "wrapping View " + view + " in " + wrapped);
+        return wrapped;
+    }
+
+    private <V extends TiView> V wrap(final V view) {
 
         Class<?> foundInterfaceClass = getInterfaceOfClassExtendingGivenInterface(
                 view.getClass(), TiView.class);

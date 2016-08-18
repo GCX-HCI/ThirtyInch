@@ -4,6 +4,7 @@ import net.grandcentrix.thirtyinch.TiView;
 
 import android.support.annotation.NonNull;
 
+//TODO check if this is interface makes sense
 public interface PresenterLifecycle<V extends TiView> {
 
     /**

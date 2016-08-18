@@ -1,10 +1,12 @@
 package net.grandcentrix.thirtyinch.android;
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.OnTimeRemovable;
+import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
-import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
 import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationInstance;
+import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -13,6 +15,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by pascalwelsch on 9/8/15.
@@ -26,15 +31,41 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
             + "@" + Integer.toHexString(this.hashCode())
             + ":" + TiActivity.class.getSimpleName();
 
+    /**
+     * flag indicating the started state of the Activity between {@link #onStart()} and {@link
+     * #onStop()}.
+     */
     private volatile boolean mActivityStarted = false;
 
+    private List<BindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
+
+    /**
+     * the cached version of the view send to the presenter after it passed the interceptors
+     */
     private V mLastView;
 
-    private boolean mNewConfig;
-
+    /**
+     * The presenter to which this activity will be attached as view when in the right state.
+     */
     private P mPresenter;
 
+    /**
+     * The id of the presenter this view got attached to. Will be stored in the savedInstanceState
+     * to find the same presenter after the Activity got recreated.
+     */
     private String mPresenterId;
+
+    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+        mBindViewInterceptors.add(interceptor);
+        mLastView = null;
+
+        return new OnTimeRemovable() {
+            @Override
+            public void onRemove() {
+                mBindViewInterceptors.remove(interceptor);
+            }
+        };
+    }
 
     public P getPresenter() {
         return mPresenter;
@@ -43,7 +74,8 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mNewConfig = true;
+        // make sure the new view will be wrapped again
+        mLastView = null;
     }
 
     @Override
@@ -104,8 +136,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
             mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             mPresenter.create();
         }
-
-        mNewConfig = true;
     }
 
     @Override
@@ -127,22 +157,14 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     protected void onStart() {
         Log.v(TAG, "onStart()");
-        if (mNewConfig || mLastView == null) {
-            mNewConfig = false;
-            final V view = provideView();
-            mLastView = view;
-            mLastView = CallOnMainThreadViewWrapper.wrap(mLastView);
-            mPresenter.bindNewView(mLastView);
-            Log.d(TAG, "bound NEW View (" + mLastView + ") to Presenter (" + mPresenter + ")");
-        } else {
-            mPresenter.bindNewView(mLastView);
-            Log.d(TAG, "bound View (" + mLastView + ") to Presenter (" + mPresenter + ")");
-        }
+        bindViewToPresenter();
         super.onStart();
         mActivityStarted = true;
         getWindow().getDecorView().post(new Runnable() {
             @Override
             public void run() {
+                // check if still started. It happens that onStop got already called, specially
+                // when the Activity is not the top Activity and a configuration change happens
                 if (mActivityStarted) {
                     mPresenter.wakeUp();
                 }
@@ -184,6 +206,25 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
                 //noinspection unchecked
                 return (V) this;
             }
+        }
+    }
+
+    /**
+     * binds the view (this Activity) to the {@link #mPresenter}. Allows interceptors to change,
+     * delegate or wrap the view before it gets attached to the presenter.
+     */
+    private void bindViewToPresenter() {
+        if (mLastView == null) {
+            V interceptedView = provideView();
+            for (final BindViewInterceptor interceptor : mBindViewInterceptors) {
+                interceptedView = interceptor.intercept(interceptedView);
+            }
+            mLastView = interceptedView;
+            Log.v(TAG, "binding NEW view to Presenter " + mLastView);
+            mPresenter.bindNewView(mLastView);
+        } else {
+            Log.v(TAG, "binding the cached view to Presenter " + mLastView);
+            mPresenter.bindNewView(mLastView);
         }
     }
 
