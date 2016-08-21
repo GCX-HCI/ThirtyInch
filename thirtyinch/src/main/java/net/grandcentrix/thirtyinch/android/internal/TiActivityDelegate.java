@@ -7,6 +7,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.TiActivity;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -14,7 +15,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +27,10 @@ import java.util.List;
  * <p>
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
-public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> implements ViewProvider<V> {
+public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
+        implements ViewProvider<V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
-
-    private final String TAG = this.getClass().getSimpleName()
-            + "@" + Integer.toHexString(this.hashCode())
-            + ":" + TiActivity.class.getSimpleName();
 
     private final AppCompatActivityProvider mActivityProvider;
 
@@ -49,6 +46,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
      * the cached version of the view send to the presenter after it passed the interceptors
      */
     private V mLastView;
+
+    private TiPresenterLogger mLogger;
 
     /**
      * The presenter to which this activity will be attached as view when in the right state.
@@ -70,11 +69,13 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
     public TiActivityDelegate(final AppCompatActivityProvider activityProvider,
             final ViewProvider<V> viewProvider,
             final PresenterProvider<P> presenterProvider,
-            final ActivityRetainedPresenterProvider<P> retainedPresenterProvider) {
+            final ActivityRetainedPresenterProvider<P> retainedPresenterProvider,
+            final TiPresenterLogger logger) {
         mActivityProvider = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
         mRetainedPresenterProvider = retainedPresenterProvider;
+        mLogger = logger;
     }
 
     public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
@@ -93,19 +94,20 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
         return mPresenter;
     }
 
-    public void onConfigurationChanged(final Configuration newConfig) {
+    public void onConfigurationChanged_afterSuper(final Configuration newConfig) {
         // make sure the new view will be wrapped again
         mLastView = null;
     }
 
-    public void onCreate(final Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate(" + savedInstanceState + ")");
+    public void onCreate_afterSuper(final Bundle savedInstanceState) {
+        mLogger.log("onCreate(" + savedInstanceState + ")");
 
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
         mPresenter = mRetainedPresenterProvider.getRetainedPresenter();
         if (mPresenter != null) {
-            Log.d(TAG, "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
+            mLogger.log(
+                    "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
         if (mPresenter == null && savedInstanceState != null) {
@@ -114,7 +116,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
-                Log.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
+                mLogger.log("try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
@@ -124,29 +126,29 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
                     PresenterSavior.INSTANCE.free(recoveredPresenterId);
                     mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
                 }
-                Log.d(TAG, "recovered Presenter " + mPresenter);
+                mLogger.log("recovered Presenter " + mPresenter);
             }
         }
 
         if (mPresenter == null) {
             // create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
-            Log.d(TAG, "created Presenter: " + mPresenter);
+            mLogger.log("created Presenter: " + mPresenter);
             mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             mPresenter.create();
         }
     }
 
-    public void onDestroy() {
+    public void onDestroy_afterSuper() {
         final AppCompatActivity activity = mActivityProvider.getAppCompatActivity();
-        Log.v(TAG, "onDestroy() recreating=" + !activity.isFinishing());
+        mLogger.log("onDestroy() recreating=" + !activity.isFinishing());
         if (activity.isFinishing()) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
         }
     }
 
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState_afterSuper(final Bundle outState) {
         outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
     }
 
@@ -165,7 +167,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
     }
 
     public void onStart_beforeSuper() {
-        Log.v(TAG, "onStart()");
+        mLogger.log("onStart()");
         bindViewToPresenter();
     }
 
@@ -174,7 +176,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
     }
 
     public void onStop_beforeSuper() {
-        Log.v(TAG, "onStop()");
+        mLogger.log("onStop()");
         mActivityStarted = false;
     }
 
@@ -213,10 +215,10 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView> impl
                 interceptedView = interceptor.intercept(interceptedView);
             }
             mLastView = interceptedView;
-            Log.v(TAG, "binding NEW view to Presenter " + mLastView);
+            mLogger.log("binding NEW view to Presenter " + mLastView);
             mPresenter.bindNewView(mLastView);
         } else {
-            Log.v(TAG, "binding the cached view to Presenter " + mLastView);
+            mLogger.log("binding the cached view to Presenter " + mLastView);
             mPresenter.bindNewView(mLastView);
         }
     }

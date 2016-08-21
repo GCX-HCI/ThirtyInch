@@ -10,22 +10,28 @@ import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationIns
 import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.android.internal.ViewProvider;
+import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 /**
  * Created by pascalwelsch on 9/8/15.
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity implements PresenterProvider<P>, ViewProvider<V>,
-        ActivityRetainedPresenterProvider<P>, AppCompatActivityProvider {
+        ActivityRetainedPresenterProvider<P>, AppCompatActivityProvider, TiPresenterLogger {
+
+    private final String TAG = this.getClass().getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode())
+            + ":" + TiActivity.class.getSimpleName();
 
     private final TiActivityDelegate<P, V> mDelegate
-            = new TiActivityDelegate<>(this, this, this, this);
+            = new TiActivityDelegate<>(this, this, this, this, this);
 
     public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
@@ -51,9 +57,14 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
+    public void log(final String msg) {
+        Log.v(TAG, msg);
+    }
+
+    @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDelegate.onConfigurationChanged(newConfig);
+        mDelegate.onConfigurationChanged_afterSuper(newConfig);
     }
 
     @Override
@@ -87,19 +98,19 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDelegate.onCreate(savedInstanceState);
+        mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDelegate.onDestroy();
+        mDelegate.onDestroy_afterSuper();
     }
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState(outState);
+        mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
     @Override

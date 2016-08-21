@@ -12,6 +12,7 @@ import net.grandcentrix.thirtyinch.android.internal.AppCompatActivityProvider;
 import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.android.internal.ViewProvider;
+import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -19,12 +20,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         extends ActivityPlugin implements ActivityRetainedPresenterProvider<P>, ViewProvider<V>,
-        AppCompatActivityProvider {
+        AppCompatActivityProvider, TiPresenterLogger {
 
     public static final String NCI_KEY_PRESENTER = "presenter";
+
+    private String TAG = this.getClass().getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode());
 
     private TiActivityDelegate<P, V> mDelegate;
 
@@ -40,7 +45,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
      * @param presenterProvider callback returning the presenter.
      */
     public TiActivityPlugin(@NonNull final PresenterProvider<P> presenterProvider) {
-        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this);
+        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this, this);
     }
 
     public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
@@ -71,21 +76,26 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
+    public void log(final String msg) {
+        Log.v(TAG, msg);
+    }
+
+    @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDelegate.onConfigurationChanged(newConfig);
+        mDelegate.onConfigurationChanged_afterSuper(newConfig);
     }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDelegate.onCreate(savedInstanceState);
+        mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDelegate.onDestroy();
+        mDelegate.onDestroy_afterSuper();
     }
 
     @Override
@@ -96,7 +106,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState(outState);
+        mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
     @Override
@@ -138,5 +148,16 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     @Override
     protected void onAddedToDelegate() {
         super.onAddedToDelegate();
+        TAG = this.getClass().getSimpleName()
+                + "@" + Integer.toHexString(this.hashCode())
+                + ":" + getOriginal().getClass().getSimpleName()
+                + "@" + Integer.toHexString(getOriginal().hashCode());
+    }
+
+    @Override
+    protected void onRemovedFromDelegated() {
+        super.onRemovedFromDelegated();
+        TAG = this.getClass().getSimpleName()
+                + "@" + Integer.toHexString(this.hashCode());
     }
 }

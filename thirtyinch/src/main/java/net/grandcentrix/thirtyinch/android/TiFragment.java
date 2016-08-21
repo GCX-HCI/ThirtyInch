@@ -63,7 +63,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
-        Log.v(TAG, "onDestroy()");
+        Log.v(TAG, "onAttach()");
 
         if (mPresenter == null) {
             mPresenter = providePresenter();
