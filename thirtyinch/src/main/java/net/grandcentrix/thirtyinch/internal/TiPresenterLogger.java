@@ -1,8 +1,10 @@
 package net.grandcentrix.thirtyinch.internal;
 
+import net.grandcentrix.thirtyinch.TiActivity;
+
 /**
- * Super simple logging interface because the {@link net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate}
- * is not responsible for actually logging. The using {@link net.grandcentrix.thirtyinch.android.TiActivity}
+ * Super simple logging interface because the {@link TiActivityDelegate}
+ * is not responsible for actually logging. The using {@link TiActivity}
  * or {@code TiActivityPlugin} takes care of logging and providing the correct logging TAG.
  */
 public interface TiPresenterLogger {

@@ -1,6 +1,6 @@
 package net.grandcentrix.thirtyinch;
 
-import net.grandcentrix.thirtyinch.android.callonmainthread.CallOnMainThread;
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
 
 /**

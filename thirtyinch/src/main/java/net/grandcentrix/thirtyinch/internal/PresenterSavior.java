@@ -1,5 +1,6 @@
 package net.grandcentrix.thirtyinch.internal;
 
+import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import android.support.annotation.NonNull;
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
  * has enabled "Do not keep activities" in the developer options. This singleton holds strong
  * references to those presenters and returns them when needed.
  *
- * {@link net.grandcentrix.thirtyinch.android.TiActivity} is responsible to manage the references
+ * {@link TiActivity} is responsible to manage the references
  */
 public enum PresenterSavior {
 

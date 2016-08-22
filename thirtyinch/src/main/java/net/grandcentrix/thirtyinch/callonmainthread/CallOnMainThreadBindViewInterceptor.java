@@ -1,4 +1,4 @@
-package net.grandcentrix.thirtyinch.android.callonmainthread;
+package net.grandcentrix.thirtyinch.callonmainthread;
 
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiView;

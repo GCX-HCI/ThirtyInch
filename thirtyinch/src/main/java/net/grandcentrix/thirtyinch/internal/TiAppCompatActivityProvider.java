@@ -1,4 +1,4 @@
-package net.grandcentrix.thirtyinch.android.internal;
+package net.grandcentrix.thirtyinch.internal;
 
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;

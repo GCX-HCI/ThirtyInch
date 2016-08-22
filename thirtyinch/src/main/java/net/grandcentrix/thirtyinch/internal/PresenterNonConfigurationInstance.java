@@ -1,4 +1,4 @@
-package net.grandcentrix.thirtyinch.android.internal;
+package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 

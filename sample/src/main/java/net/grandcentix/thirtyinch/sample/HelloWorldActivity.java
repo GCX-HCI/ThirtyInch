@@ -4,8 +4,8 @@ package net.grandcentix.thirtyinch.sample;
 import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
-import net.grandcentrix.thirtyinch.android.TiActivity;
-import net.grandcentrix.thirtyinch.android.callonmainthread.CallOnMainThreadBindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadBindViewInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedBindViewInterceptor;
 
 import android.os.Bundle;

@@ -1,9 +1,5 @@
-package net.grandcentrix.thirtyinch.android;
+package net.grandcentrix.thirtyinch;
 
-import net.grandcentrix.thirtyinch.Removable;
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.PresenterViewBinder;

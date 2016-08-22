@@ -1,7 +1,7 @@
 package net.grandcentix.thirtyinch.sample;
 
-import net.grandcentrix.thirtyinch.android.TiFragment;
-import net.grandcentrix.thirtyinch.android.callonmainthread.CallOnMainThreadBindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiFragment;
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadBindViewInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedBindViewInterceptor;
 
 import android.os.Bundle;

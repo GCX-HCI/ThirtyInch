@@ -1,16 +1,10 @@
-package net.grandcentrix.thirtyinch.android.internal;
+package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.TiActivity;
-import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
-import net.grandcentrix.thirtyinch.internal.PresenterSavior;
-import net.grandcentrix.thirtyinch.internal.PresenterViewBinder;
-import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
