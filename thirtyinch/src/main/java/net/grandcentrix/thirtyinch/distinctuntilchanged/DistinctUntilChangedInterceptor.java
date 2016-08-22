@@ -13,9 +13,9 @@ import java.lang.reflect.Proxy;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
-public class DistinctUntilChangedBindViewInterceptor implements TiBindViewInterceptor {
+public class DistinctUntilChangedInterceptor implements TiBindViewInterceptor {
 
-    private static final String TAG = DistinctUntilChangedBindViewInterceptor.class.getSimpleName();
+    private static final String TAG = DistinctUntilChangedInterceptor.class.getSimpleName();
 
     @Nullable
     public static DistinctUntilChangedInvocationHandler<TiView> unwrap(@NonNull final TiView view) {
@@ -31,7 +31,7 @@ public class DistinctUntilChangedBindViewInterceptor implements TiBindViewInterc
         final TiView wrappedView = interceptable.getInterceptedViewOf(this);
         if (wrappedView != null) {
             final DistinctUntilChangedInvocationHandler<TiView> view
-                    = DistinctUntilChangedBindViewInterceptor.unwrap(wrappedView);
+                    = DistinctUntilChangedInterceptor.unwrap(wrappedView);
             if (view != null) {
                 view.clearCache();
                 Log.v(TAG, "cleared the distinctUntilChanged cache of " + view);

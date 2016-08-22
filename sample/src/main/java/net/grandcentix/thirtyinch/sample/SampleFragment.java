@@ -1,8 +1,8 @@
 package net.grandcentix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiFragment;
-import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadBindViewInterceptor;
-import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedBindViewInterceptor;
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,8 +17,8 @@ public class SampleFragment extends TiFragment<SamplePresenter, SampleView> impl
     private TextView mSampleText;
 
     public SampleFragment() {
-        addBindViewInterceptor(new CallOnMainThreadBindViewInterceptor());
-        addBindViewInterceptor(new DistinctUntilChangedBindViewInterceptor());
+        addBindViewInterceptor(new CallOnMainThreadInterceptor());
+        addBindViewInterceptor(new DistinctUntilChangedInterceptor());
     }
 
     @Nullable
