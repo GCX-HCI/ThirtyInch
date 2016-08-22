@@ -12,6 +12,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Binds a {@link TiView} to a {@link TiPresenter<V>} and allows {@link TiBindViewInterceptor}s to
+ * pivot the view before attaching
+ *
+ * @param <V> the {@link TiView}
+ */
 public class PresenterViewBinder<V extends TiView> implements InterceptableViewBinder<V> {
 
     private List<TiBindViewInterceptor> mBindViewInterceptors = new ArrayList<>();

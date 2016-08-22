@@ -16,8 +16,7 @@ import java.util.logging.Logger;
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern.
  */
-public abstract class TiPresenter<V extends TiView> implements
-        net.grandcentrix.thirtyinch.internal.PresenterLifecycle<V> {
+public abstract class TiPresenter<V extends TiView> {
 
     /**
      * The LifecycleState of a {@link TiPresenter}
@@ -98,7 +97,13 @@ public abstract class TiPresenter<V extends TiView> implements
     }
 
     // TODO check if this could be combined with #wakeUp
-    @Override
+
+    /**
+     * bind a new view to this presenter.
+     *
+     * @param view the new view, can't be null. To set the view to {@code null} call {@link
+     *             #sleep()}
+     */
     public void bindNewView(@NonNull final V view) {
 
         if (!isCreated()) {
@@ -127,7 +132,6 @@ public abstract class TiPresenter<V extends TiView> implements
     /**
      * @see #onCreate()
      */
-    @Override
     public final void create() {
         if (isCreated()) {
             mLogger.log(Level.WARNING, "not calling onCreate(), it was already called");
@@ -151,7 +155,6 @@ public abstract class TiPresenter<V extends TiView> implements
      *
      * @see #onDestroy()
      */
-    @Override
     public final void destroy() {
         if (!isCreated() || isDestroyed()) {
             mLogger.log(Level.WARNING, "not calling onDestroy(), destroy was already called");
@@ -205,7 +208,6 @@ public abstract class TiPresenter<V extends TiView> implements
      *
      * @see #onSleep()
      */
-    @Override
     public final void sleep() {
         if (!isAwake()) {
             mLogger.log(Level.FINE, "not calling onSleep(), not woken up");
@@ -243,7 +245,6 @@ public abstract class TiPresenter<V extends TiView> implements
      *
      * @see #onWakeUp()
      */
-    @Override
     public final void wakeUp() {
         if (isAwake()) {
             mLogger.log(Level.FINE, "not calling onWakeUp(), already woken up");
