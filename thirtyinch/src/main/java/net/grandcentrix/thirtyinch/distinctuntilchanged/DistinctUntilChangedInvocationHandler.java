@@ -23,6 +23,10 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
         mLogger = Logger.getLogger(toString());
     }
 
+    public void clearCache() {
+        mLatestMethodCalls.clear();
+    }
+
     @Override
     public String toString() {
         return "DistinctUntilChangedProxy@"

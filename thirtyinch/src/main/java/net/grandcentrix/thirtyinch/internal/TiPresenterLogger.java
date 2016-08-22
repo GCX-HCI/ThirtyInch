@@ -12,5 +12,5 @@ public interface TiPresenterLogger {
      *
      * @param msg message from the presenter to display
      */
-    void log(final String msg);
+    void logTiMessages(final String msg);
 }

@@ -7,9 +7,11 @@ import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.android.TiActivity;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityRetainedPresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.TiAppCompatActivityProvider;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
@@ -22,9 +24,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import java.util.List;
+
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         extends ActivityPlugin implements TiActivityRetainedPresenterProvider<P>, TiViewProvider<V>,
-        TiAppCompatActivityProvider, TiPresenterLogger {
+        TiAppCompatActivityProvider, TiPresenterLogger, InterceptableViewBinder<V> {
 
     public static final String NCI_KEY_PRESENTER = "presenter";
 
@@ -48,6 +52,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this, this);
     }
 
+    @NonNull
+    @Override
     public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
@@ -57,6 +63,26 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     public AppCompatActivity getAppCompatActivity() {
         // getOriginal is null until the plugin is attached.
         return getOriginal();
+    }
+
+    /**
+     * @return the cached result of {@link TiBindViewInterceptor#intercept(TiView)}
+     */
+    @Nullable
+    @Override
+    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+        return mDelegate.getInterceptedViewOf(interceptor);
+    }
+
+    /**
+     * @param predicate filter the results
+     * @return all interceptors matching the filter
+     */
+    @NonNull
+    @Override
+    public List<TiBindViewInterceptor> getInterceptors(
+            final Filter<TiBindViewInterceptor> predicate) {
+        return mDelegate.getInterceptors(predicate);
     }
 
     public P getPresenter() {
@@ -75,8 +101,17 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         return null;
     }
 
+    /**
+     * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
+     * through all the interceptors (again).
+     */
     @Override
-    public void log(final String msg) {
+    public void invalidateView() {
+        mDelegate.invalidateView();
+    }
+
+    @Override
+    public void logTiMessages(final String msg) {
         Log.v(TAG, msg);
     }
 
@@ -141,7 +176,9 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
                 mDelegate.getPresenter().getClass().getSimpleName()
                         + "@" + Integer.toHexString(mDelegate.getPresenter().hashCode());
 
-        return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode())
+        return getClass().getSimpleName()
+                + ":" + TiActivity.class.getSimpleName()
+                + "@" + Integer.toHexString(hashCode())
                 + "{presenter=" + presenter + "}";
     }
 
@@ -149,6 +186,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     protected void onAddedToDelegate() {
         super.onAddedToDelegate();
         TAG = this.getClass().getSimpleName()
+                + ":" + TiActivity.class.getSimpleName()
                 + "@" + Integer.toHexString(this.hashCode())
                 + ":" + getOriginal().getClass().getSimpleName()
                 + "@" + Integer.toHexString(getOriginal().hashCode());
@@ -158,6 +196,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     protected void onRemovedFromDelegated() {
         super.onRemovedFromDelegated();
         TAG = this.getClass().getSimpleName()
+                + ":" + TiActivity.class.getSimpleName()
                 + "@" + Integer.toHexString(this.hashCode());
     }
 }

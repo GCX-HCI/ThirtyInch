@@ -52,8 +52,8 @@ public abstract class TiPresenter<V extends TiView> implements
     final List<TiLifecycleObserver> mLifecycleObservers = new ArrayList<>();
 
     Logger mLogger = Logger.getLogger(this.getClass().getSimpleName()
-            + "@" + Integer.toHexString(this.hashCode())
-            + ":" + TiPresenter.class.getSimpleName());
+            + ":" + TiPresenter.class.getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode()));
 
     /**
      * used to check that lifecycle methods (starting with on..) cannot be called directly. i.e.

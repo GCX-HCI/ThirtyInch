@@ -8,6 +8,7 @@ import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationIns
 import net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityRetainedPresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.TiAppCompatActivityProvider;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
@@ -19,20 +20,25 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import java.util.List;
+
 /**
  * Created by pascalwelsch on 9/8/15.
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity implements TiPresenterProvider<P>, TiViewProvider<V>,
-        TiActivityRetainedPresenterProvider<P>, TiAppCompatActivityProvider, TiPresenterLogger {
+        TiActivityRetainedPresenterProvider<P>, TiAppCompatActivityProvider, TiPresenterLogger,
+        InterceptableViewBinder<V> {
 
     private final String TAG = this.getClass().getSimpleName()
-            + "@" + Integer.toHexString(this.hashCode())
-            + ":" + TiActivity.class.getSimpleName();
+            + ":" + TiActivity.class.getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode());
 
     private final TiActivityDelegate<P, V> mDelegate
             = new TiActivityDelegate<>(this, this, this, this, this);
 
+    @NonNull
+    @Override
     public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
@@ -41,6 +47,19 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public AppCompatActivity getAppCompatActivity() {
         return this;
+    }
+
+    @Nullable
+    @Override
+    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+        return mDelegate.getInterceptedViewOf(interceptor);
+    }
+
+    @NonNull
+    @Override
+    public List<TiBindViewInterceptor> getInterceptors(
+            final Filter<TiBindViewInterceptor> predicate) {
+        return mDelegate.getInterceptors(predicate);
     }
 
     @Nullable
@@ -56,8 +75,17 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return null;
     }
 
+    /**
+     * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
+     * through all the interceptors (again).
+     */
     @Override
-    public void log(final String msg) {
+    public void invalidateView() {
+        mDelegate.invalidateView();
+    }
+
+    @Override
+    public void logTiMessages(final String msg) {
         Log.v(TAG, msg);
     }
 
@@ -91,7 +119,9 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
                 mDelegate.getPresenter().getClass().getSimpleName()
                         + "@" + Integer.toHexString(mDelegate.getPresenter().hashCode());
 
-        return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode())
+        return getClass().getSimpleName()
+                + ":" + TiActivity.class.getSimpleName()
+                + "@" + Integer.toHexString(hashCode())
                 + "{presenter=" + presenter + "}";
     }
 

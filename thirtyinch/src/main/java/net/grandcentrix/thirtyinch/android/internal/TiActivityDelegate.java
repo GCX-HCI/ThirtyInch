@@ -5,8 +5,9 @@ import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.TiActivity;
-import net.grandcentrix.thirtyinch.internal.OnTimeRemovable;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.internal.PresenterViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
@@ -16,9 +17,9 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
 public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements TiViewProvider<V> {
+        implements TiViewProvider<V>, InterceptableViewBinder<V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -41,13 +42,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      * {@link Activity#onStop()}.
      */
     private volatile boolean mActivityStarted = false;
-
-    private List<TiBindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
-
-    /**
-     * the cached version of the view send to the presenter after it passed the interceptors
-     */
-    private V mLastView;
 
     private TiPresenterLogger mLogger;
 
@@ -66,6 +60,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private TiActivityRetainedPresenterProvider<P> mRetainedPresenterProvider;
 
+    private final PresenterViewBinder<V> mViewBinder;
+
     private TiViewProvider<V> mViewProvider;
 
     public TiActivityDelegate(final TiAppCompatActivityProvider activityProvider,
@@ -78,37 +74,54 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         mPresenterProvider = presenterProvider;
         mRetainedPresenterProvider = retainedPresenterProvider;
         mLogger = logger;
+        mViewBinder = new PresenterViewBinder<>(logger);
     }
 
+    @NonNull
+    @Override
     public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
-        mBindViewInterceptors.add(interceptor);
-        mLastView = null;
+        return mViewBinder.addBindViewInterceptor(interceptor);
+    }
 
-        return new OnTimeRemovable() {
-            @Override
-            public void onRemove() {
-                mBindViewInterceptors.remove(interceptor);
-            }
-        };
+    @Nullable
+    @Override
+    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+        return mViewBinder.getInterceptedViewOf(interceptor);
+    }
+
+    @NonNull
+    @Override
+    public List<TiBindViewInterceptor> getInterceptors(
+            final Filter<TiBindViewInterceptor> predicate) {
+        return mViewBinder.getInterceptors(predicate);
     }
 
     public P getPresenter() {
         return mPresenter;
     }
 
+    /**
+     * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
+     * through all the interceptors (again).
+     */
+    @Override
+    public void invalidateView() {
+        mViewBinder.invalidateView();
+    }
+
     public void onConfigurationChanged_afterSuper(final Configuration newConfig) {
         // make sure the new view will be wrapped again
-        mLastView = null;
+        mViewBinder.invalidateView();
     }
 
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
-        mLogger.log("onCreate(" + savedInstanceState + ")");
+        mLogger.logTiMessages("onCreate(" + savedInstanceState + ")");
 
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
         mPresenter = mRetainedPresenterProvider.getRetainedPresenter();
         if (mPresenter != null) {
-            mLogger.log(
+            mLogger.logTiMessages(
                     "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
@@ -118,7 +131,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
-                mLogger.log("try to recover Presenter with id: " + recoveredPresenterId);
+                mLogger.logTiMessages("try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
@@ -128,14 +141,14 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     PresenterSavior.INSTANCE.free(recoveredPresenterId);
                     mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
                 }
-                mLogger.log("recovered Presenter " + mPresenter);
+                mLogger.logTiMessages("recovered Presenter " + mPresenter);
             }
         }
 
         if (mPresenter == null) {
             // create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
-            mLogger.log("created Presenter: " + mPresenter);
+            mLogger.logTiMessages("created Presenter: " + mPresenter);
             mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             mPresenter.create();
         }
@@ -143,7 +156,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onDestroy_afterSuper() {
         final AppCompatActivity activity = mActivityProvider.getAppCompatActivity();
-        mLogger.log("onDestroy() recreating=" + !activity.isFinishing());
+        mLogger.logTiMessages("onDestroy() recreating=" + !activity.isFinishing());
         if (activity.isFinishing()) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
@@ -169,8 +182,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onStart_beforeSuper() {
-        mLogger.log("onStart()");
-        bindViewToPresenter();
+        mLogger.logTiMessages("onStart()");
+        mViewBinder.bindView(mPresenter, mViewProvider);
     }
 
     public void onStop_afterSuper() {
@@ -178,7 +191,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onStop_beforeSuper() {
-        mLogger.log("onStop()");
+        mLogger.logTiMessages("onStop()");
         mActivityStarted = false;
     }
 
@@ -203,25 +216,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 //noinspection unchecked
                 return (V) activity;
             }
-        }
-    }
-
-    /**
-     * binds the view (this Activity) to the {@link #mPresenter}. Allows interceptors to change,
-     * delegate or wrap the view before it gets attached to the presenter.
-     */
-    private void bindViewToPresenter() {
-        if (mLastView == null) {
-            V interceptedView = mViewProvider.provideView();
-            for (final TiBindViewInterceptor interceptor : mBindViewInterceptors) {
-                interceptedView = interceptor.intercept(interceptedView);
-            }
-            mLastView = interceptedView;
-            mLogger.log("binding NEW view to Presenter " + mLastView);
-            mPresenter.bindNewView(mLastView);
-        } else {
-            mLogger.log("binding the cached view to Presenter " + mLastView);
-            mPresenter.bindNewView(mLastView);
         }
     }
 }

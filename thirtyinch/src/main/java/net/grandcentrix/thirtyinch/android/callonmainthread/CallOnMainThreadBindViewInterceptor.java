@@ -10,9 +10,9 @@ import java.lang.reflect.Proxy;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
-public class CallOnMainThreadViewWrapper implements TiBindViewInterceptor {
+public class CallOnMainThreadBindViewInterceptor implements TiBindViewInterceptor {
 
-    private static final String TAG = CallOnMainThreadViewWrapper.class.getSimpleName();
+    private static final String TAG = CallOnMainThreadBindViewInterceptor.class.getSimpleName();
 
     @Override
     public <V extends TiView> V intercept(final V view) {

@@ -4,9 +4,12 @@ import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.internal.OnTimeRemovable;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.internal.PresenterViewBinder;
+import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -19,45 +22,61 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
-        extends Fragment implements TiPresenterProvider<P>, TiView {
+        extends Fragment implements TiPresenterProvider<P>, TiPresenterLogger,
+        TiViewProvider<V>, InterceptableViewBinder<V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     private final String TAG = this.getClass().getSimpleName()
-            + "@" + Integer.toHexString(this.hashCode())
-            + ":" + TiFragment.class.getSimpleName();
+            + ":" + TiFragment.class.getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode());
 
     private volatile boolean mActivityStarted = false;
-
-    private List<TiBindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
-
-    /**
-     * the cached version of the view send to the presenter after it passed the interceptors
-     */
-    private V mLastView;
 
     private P mPresenter;
 
     private String mPresenterId;
 
-    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
-        mBindViewInterceptors.add(interceptor);
-        mLastView = null;
+    private PresenterViewBinder<V> mViewBinder = new PresenterViewBinder<>(this);
 
-        return new OnTimeRemovable() {
-            @Override
-            public void onRemove() {
-                mBindViewInterceptors.remove(interceptor);
-            }
-        };
+    @NonNull
+    @Override
+    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
+        return mViewBinder.addBindViewInterceptor(interceptor);
+    }
+
+    @Nullable
+    @Override
+    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+        return mViewBinder.getInterceptedViewOf(interceptor);
+    }
+
+    @NonNull
+    @Override
+    public List<TiBindViewInterceptor> getInterceptors(
+            final Filter<TiBindViewInterceptor> predicate) {
+        return mViewBinder.getInterceptors(predicate);
     }
 
     public P getPresenter() {
         return mPresenter;
+    }
+
+    /**
+     * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
+     * through all the interceptors (again).
+     */
+    @Override
+    public void invalidateView() {
+        mViewBinder.invalidateView();
+    }
+
+    @Override
+    public void logTiMessages(final String msg) {
+        Log.v(TAG, msg);
     }
 
     @Override
@@ -103,7 +122,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
-        mLastView = null;
+        mViewBinder.invalidateView();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -142,7 +161,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            bindViewToPresenter();
+            mViewBinder.bindView(mPresenter, this);
             getActivity().getWindow().getDecorView().post(new Runnable() {
                 @Override
                 public void run() {
@@ -162,11 +181,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         super.onStop();
     }
 
-    @Override
-    final public void setRetainInstance(final boolean retain) {
-        super.setRetainInstance(true);
-    }
-
     /**
      * the default implementation assumes that the fragment is the view and implements the {@link
      * TiView} interface. Override this method for a different behaviour.
@@ -174,7 +188,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
      * @return the object implementing the TiView interface
      */
     @NonNull
-    protected V provideView() {
+    public V provideView() {
 
         final Class<?> foundViewInterface = AnnotationUtil
                 .getInterfaceOfClassExtendingGivenInterface(this.getClass(), TiView.class);
@@ -196,23 +210,21 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         }
     }
 
-    /**
-     * binds the view (this Fragment) to the {@link #mPresenter}. Allows interceptors to change,
-     * delegate or wrap the view before it gets attached to the presenter.
-     */
-    private void bindViewToPresenter() {
-        if (mLastView == null) {
-            V interceptedView = provideView();
-            for (final TiBindViewInterceptor interceptor : mBindViewInterceptors) {
-                interceptedView = interceptor.intercept(interceptedView);
-            }
-            mLastView = interceptedView;
-            Log.v(TAG, "binding NEW view to Presenter " + mLastView);
-            mPresenter.bindNewView(mLastView);
-        } else {
-            Log.v(TAG, "binding the cached view to Presenter " + mLastView);
-            mPresenter.bindNewView(mLastView);
-        }
+    @Override
+    final public void setRetainInstance(final boolean retain) {
+        super.setRetainInstance(true);
+    }
+
+    @Override
+    public String toString() {
+        String presenter = getPresenter() == null ? "null" :
+                getPresenter().getClass().getSimpleName()
+                        + "@" + Integer.toHexString(getPresenter().hashCode());
+
+        return getClass().getSimpleName()
+                + ":" + TiFragment.class.getSimpleName()
+                + "@" + Integer.toHexString(hashCode())
+                + "{presenter=" + presenter + "}";
     }
 
     private boolean isUiPossible() {
