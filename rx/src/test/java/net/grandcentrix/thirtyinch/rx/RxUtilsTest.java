@@ -1,7 +1,6 @@
-package net.grandcentrix.thirtyinch;
+package net.grandcentrix.thirtyinch.rx;
 
-import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
-import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
+import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.After;
 import org.junit.Assert;

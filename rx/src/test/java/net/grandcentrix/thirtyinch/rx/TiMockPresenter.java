@@ -1,4 +1,7 @@
-package net.grandcentrix.thirtyinch;
+package net.grandcentrix.thirtyinch.rx;
+
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 /**
  * @author jannisveerkamp

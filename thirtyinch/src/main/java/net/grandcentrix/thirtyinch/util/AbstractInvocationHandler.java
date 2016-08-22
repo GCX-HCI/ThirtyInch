@@ -22,8 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
-import rx.annotations.Beta;
-
 /**
  * Abstract implementation of {@link InvocationHandler} that handles {@link Object#equals},
  * {@link Object#hashCode} and {@link Object#toString}. For example: <pre>
@@ -39,7 +37,6 @@ import rx.annotations.Beta;
  * @author Ben Yu
  * @since 12.0
  */
-@Beta
 public abstract class AbstractInvocationHandler implements InvocationHandler {
 
     private static final Object[] NO_ARGS = {};

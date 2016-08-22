@@ -1,7 +1,5 @@
 package net.grandcentrix.thirtyinch;
 
-import net.grandcentrix.thirtyinch.test.TiPresenterInstructor;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,15 +15,12 @@ public class TiLifecycleObserverTest {
 
     private TiMockPresenter mPresenter;
 
-    private TiPresenterInstructor<TiView> mPresenterInstructor;
-
     private TiView mView;
 
     @Before
     public void setUp() throws Exception {
         mView = mock(TiView.class);
         mPresenter = new TiMockPresenter();
-        mPresenterInstructor = new TiPresenterInstructor<>(mPresenter);
     }
 
     @After
@@ -45,8 +40,11 @@ public class TiLifecycleObserverTest {
             }
         });
 
-        mPresenterInstructor.attachView(mView);
-        mPresenterInstructor.destroy();
+        mPresenter.create();
+        mPresenter.bindNewView(mView);
+        mPresenter.wakeUp();
+        mPresenter.sleep();
+        mPresenter.destroy();
 
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.DESTROYED);
@@ -56,6 +54,7 @@ public class TiLifecycleObserverTest {
         assertEquals(last[0], TiPresenter.State.DESTROYED);
         assertEquals(last[1], true);
     }
+
     @Test
     public void testCreate() throws Exception {
         final List<Object[]> states = new ArrayList<>();
@@ -67,7 +66,7 @@ public class TiLifecycleObserverTest {
             }
         });
 
-        mPresenterInstructor.create();
+        mPresenter.create();
 
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.CREATED_WITH_DETACHED_VIEW);
@@ -77,7 +76,6 @@ public class TiLifecycleObserverTest {
         assertEquals(last[0], TiPresenter.State.CREATED_WITH_DETACHED_VIEW);
         assertEquals(last[1], true);
     }
-
 
     @Test
     public void testRemoveObserver() throws Exception {
@@ -90,7 +88,7 @@ public class TiLifecycleObserverTest {
             }
         });
 
-        mPresenterInstructor.create();
+        mPresenter.create();
 
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.CREATED_WITH_DETACHED_VIEW);
@@ -102,7 +100,8 @@ public class TiLifecycleObserverTest {
 
         removable.remove();
 
-        mPresenterInstructor.attachView(mView);
+        mPresenter.bindNewView(mView);
+        mPresenter.wakeUp();
 
         final Object[] beforeLast2 = states.get(states.size() - 2);
         assertNotEquals(beforeLast2[0], TiPresenter.State.VIEW_ATTACHED_AND_AWAKE);
@@ -147,8 +146,10 @@ public class TiLifecycleObserverTest {
             }
         });
 
-        mPresenterInstructor.attachView(mView);
-        mPresenterInstructor.detachView();
+        mPresenter.create();
+        mPresenter.bindNewView(mView);
+        mPresenter.wakeUp();
+        mPresenter.sleep();
 
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.CREATED_WITH_DETACHED_VIEW);
@@ -170,7 +171,9 @@ public class TiLifecycleObserverTest {
             }
         });
 
-        mPresenterInstructor.attachView(mView);
+        mPresenter.create();
+        mPresenter.bindNewView(mView);
+        mPresenter.wakeUp();
 
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.VIEW_ATTACHED_AND_AWAKE);

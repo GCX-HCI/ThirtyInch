@@ -25,5 +25,6 @@ dependencies {
 
 
     compile project(':thirtyinch')
+    compile project(':rx')
     testCompile 'junit:junit:4.12'
 }

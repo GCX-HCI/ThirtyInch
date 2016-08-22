@@ -179,6 +179,13 @@ public abstract class TiPresenter<V extends TiView> implements
         return mState;
     }
 
+    /**
+     * @return the view of this presenter
+     */
+    public V getView() {
+        return mView;
+    }
+
     public boolean isAwake() {
         return mState == State.VIEW_ATTACHED_AND_AWAKE;
     }
@@ -251,13 +258,6 @@ public abstract class TiPresenter<V extends TiView> implements
                     + " did not call through to super.onWakeUp()");
         }
         moveToState(State.VIEW_ATTACHED_AND_AWAKE, true);
-    }
-
-    /**
-     * @return the view of this presenter
-     */
-    protected V getView() {
-        return mView;
     }
 
     /**
