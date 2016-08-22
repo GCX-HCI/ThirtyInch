@@ -1,4 +1,4 @@
-package net.grandcentrix.thirtyinch.android;
+package net.grandcentrix.thirtyinch.android.callonmainthread;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

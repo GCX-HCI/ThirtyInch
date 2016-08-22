@@ -1,11 +1,11 @@
-package net.grandcentrix.thirtyinch.android.internal;
+package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public interface PresenterProvider<P extends TiPresenter> {
+public interface TiPresenterProvider<P extends TiPresenter> {
 
     /**
      * Function returning a {@link net.grandcentrix.thirtyinch.TiPresenter}

@@ -1,6 +1,5 @@
-package net.grandcentrix.thirtyinch.internal;
+package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import net.grandcentrix.thirtyinch.DistinctUntilChanged;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 

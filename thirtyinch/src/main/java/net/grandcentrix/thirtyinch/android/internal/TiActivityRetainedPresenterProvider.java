@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
  * user of the {@link TiActivityDelegate} such as the {@link net.grandcentrix.thirtyinch.android.TiActivity}
  * or {@code TiActivityPlugin}
  */
-public interface ActivityRetainedPresenterProvider<P> {
+public interface TiActivityRetainedPresenterProvider<P> {
 
     /**
      * @return the retained presenter from {@link AppCompatActivity#getLastCustomNonConfigurationInstance()}

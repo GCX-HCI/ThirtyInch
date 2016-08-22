@@ -1,8 +1,8 @@
 package net.grandcentix.thirtyinch.sample;
 
-import net.grandcentrix.thirtyinch.DistinctUntilChanged;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.CallOnMainThread;
+import net.grandcentrix.thirtyinch.android.callonmainthread.CallOnMainThread;
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
 
 import rx.Observable;
 

@@ -3,7 +3,6 @@ package net.grandcentrix.thirtyinch.rx;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.internal.OperatorSemaphore;
 
 import rx.Observable;
 import rx.Subscriber;

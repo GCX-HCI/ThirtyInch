@@ -1,12 +1,12 @@
 package net.grandcentrix.thirtyinch.android;
 
-import net.grandcentrix.thirtyinch.BindViewInterceptor;
-import net.grandcentrix.thirtyinch.OnTimeRemovable;
 import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
+import net.grandcentrix.thirtyinch.internal.OnTimeRemovable;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
-        extends Fragment implements PresenterProvider<P>, TiView {
+        extends Fragment implements TiPresenterProvider<P>, TiView {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -33,7 +33,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     private volatile boolean mActivityStarted = false;
 
-    private List<BindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
+    private List<TiBindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
 
     /**
      * the cached version of the view send to the presenter after it passed the interceptors
@@ -44,7 +44,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     private String mPresenterId;
 
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
         mBindViewInterceptors.add(interceptor);
         mLastView = null;
 
@@ -97,6 +97,14 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                 Log.d(TAG, "recovered Presenter " + mPresenter);
             }
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
+        mLastView = null;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -188,14 +196,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
-            @Nullable final Bundle savedInstanceState) {
-        mLastView = null;
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
     /**
      * binds the view (this Fragment) to the {@link #mPresenter}. Allows interceptors to change,
      * delegate or wrap the view before it gets attached to the presenter.
@@ -203,7 +203,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     private void bindViewToPresenter() {
         if (mLastView == null) {
             V interceptedView = provideView();
-            for (final BindViewInterceptor interceptor : mBindViewInterceptors) {
+            for (final TiBindViewInterceptor interceptor : mBindViewInterceptors) {
                 interceptedView = interceptor.intercept(interceptedView);
             }
             mLastView = interceptedView;

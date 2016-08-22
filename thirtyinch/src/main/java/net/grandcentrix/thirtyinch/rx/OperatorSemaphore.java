@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package net.grandcentrix.thirtyinch.internal;
+package net.grandcentrix.thirtyinch.rx;
 
 import java.util.ArrayList;
 

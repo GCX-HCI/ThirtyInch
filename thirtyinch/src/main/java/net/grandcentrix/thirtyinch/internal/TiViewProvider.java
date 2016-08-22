@@ -1,4 +1,4 @@
-package net.grandcentrix.thirtyinch.android.internal;
+package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiView;
 
@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  * the {@link TiView} even though it's the default implementation. This interface allows the
  * possible separation.
  */
-public interface ViewProvider<V extends TiView> {
+public interface TiViewProvider<V extends TiView> {
 
     /**
      * @return the {@link TiView} for the {@link net.grandcentrix.thirtyinch.TiPresenter}

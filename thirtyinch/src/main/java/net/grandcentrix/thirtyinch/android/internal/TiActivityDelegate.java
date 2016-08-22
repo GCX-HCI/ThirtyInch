@@ -1,13 +1,15 @@
 package net.grandcentrix.thirtyinch.android.internal;
 
-import net.grandcentrix.thirtyinch.BindViewInterceptor;
-import net.grandcentrix.thirtyinch.OnTimeRemovable;
 import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.android.TiActivity;
+import net.grandcentrix.thirtyinch.internal.OnTimeRemovable;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -28,11 +30,11 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
 public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements ViewProvider<V> {
+        implements TiViewProvider<V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
-    private final AppCompatActivityProvider mActivityProvider;
+    private final TiAppCompatActivityProvider mActivityProvider;
 
     /**
      * flag indicating the started state of the Activity between {@link Activity#onStart()} and
@@ -40,7 +42,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      */
     private volatile boolean mActivityStarted = false;
 
-    private List<BindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
+    private List<TiBindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
 
     /**
      * the cached version of the view send to the presenter after it passed the interceptors
@@ -60,16 +62,16 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      */
     private String mPresenterId;
 
-    private final PresenterProvider<P> mPresenterProvider;
+    private final TiPresenterProvider<P> mPresenterProvider;
 
-    private ActivityRetainedPresenterProvider<P> mRetainedPresenterProvider;
+    private TiActivityRetainedPresenterProvider<P> mRetainedPresenterProvider;
 
-    private ViewProvider<V> mViewProvider;
+    private TiViewProvider<V> mViewProvider;
 
-    public TiActivityDelegate(final AppCompatActivityProvider activityProvider,
-            final ViewProvider<V> viewProvider,
-            final PresenterProvider<P> presenterProvider,
-            final ActivityRetainedPresenterProvider<P> retainedPresenterProvider,
+    public TiActivityDelegate(final TiAppCompatActivityProvider activityProvider,
+            final TiViewProvider<V> viewProvider,
+            final TiPresenterProvider<P> presenterProvider,
+            final TiActivityRetainedPresenterProvider<P> retainedPresenterProvider,
             final TiPresenterLogger logger) {
         mActivityProvider = activityProvider;
         mViewProvider = viewProvider;
@@ -78,7 +80,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         mLogger = logger;
     }
 
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
         mBindViewInterceptors.add(interceptor);
         mLastView = null;
 
@@ -211,7 +213,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     private void bindViewToPresenter() {
         if (mLastView == null) {
             V interceptedView = mViewProvider.provideView();
-            for (final BindViewInterceptor interceptor : mBindViewInterceptors) {
+            for (final TiBindViewInterceptor interceptor : mBindViewInterceptors) {
                 interceptedView = interceptor.intercept(interceptedView);
             }
             mLastView = interceptedView;

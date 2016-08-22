@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
  * <p>
  * The first usage is when the Activity Lifecycle reaches {@link AppCompatActivity#onStart()}
  */
-public interface AppCompatActivityProvider {
+public interface TiAppCompatActivityProvider {
 
     /**
      * @return the Activity associated with the {@link TiActivityDelegate}

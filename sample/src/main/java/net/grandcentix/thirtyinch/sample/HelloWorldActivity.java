@@ -1,10 +1,11 @@
 package net.grandcentix.thirtyinch.sample;
 
+
 import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.android.TiActivity;
-import net.grandcentrix.thirtyinch.android.internal.CallOnMainThreadViewWrapper;
-import net.grandcentrix.thirtyinch.internal.DistinctUntilChangedViewWrapper;
+import net.grandcentrix.thirtyinch.android.callonmainthread.CallOnMainThreadViewWrapper;
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedViewWrapper;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

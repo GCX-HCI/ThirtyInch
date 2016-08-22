@@ -1,16 +1,16 @@
 package net.grandcentrix.thirtyinch.android;
 
-import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.ActivityRetainedPresenterProvider;
-import net.grandcentrix.thirtyinch.android.internal.AppCompatActivityProvider;
 import net.grandcentrix.thirtyinch.android.internal.PresenterNonConfigurationInstance;
-import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate;
-import net.grandcentrix.thirtyinch.android.internal.ViewProvider;
+import net.grandcentrix.thirtyinch.android.internal.TiActivityRetainedPresenterProvider;
+import net.grandcentrix.thirtyinch.android.internal.TiAppCompatActivityProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -23,8 +23,8 @@ import android.util.Log;
  * Created by pascalwelsch on 9/8/15.
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
-        extends AppCompatActivity implements PresenterProvider<P>, ViewProvider<V>,
-        ActivityRetainedPresenterProvider<P>, AppCompatActivityProvider, TiPresenterLogger {
+        extends AppCompatActivity implements TiPresenterProvider<P>, TiViewProvider<V>,
+        TiActivityRetainedPresenterProvider<P>, TiAppCompatActivityProvider, TiPresenterLogger {
 
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode())
@@ -33,7 +33,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     private final TiActivityDelegate<P, V> mDelegate
             = new TiActivityDelegate<>(this, this, this, this, this);
 
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 

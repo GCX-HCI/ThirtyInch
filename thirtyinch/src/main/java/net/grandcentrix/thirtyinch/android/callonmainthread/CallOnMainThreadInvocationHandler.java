@@ -1,7 +1,6 @@
-package net.grandcentrix.thirtyinch.android.internal;
+package net.grandcentrix.thirtyinch.android.callonmainthread;
 
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.CallOnMainThread;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 import android.os.Handler;

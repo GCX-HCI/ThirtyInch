@@ -1,23 +1,20 @@
 package net.grandcentrix.thirtyinch;
 
 
+import net.grandcentrix.thirtyinch.internal.OnTimeRemovable;
+
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import rx.Observable;
-import rx.Observer;
-
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern.
- * <p/>
- * The presenter connects the View V to a model which don't know each other. The View is passive
- * and provides this Presenter with events from the UI. It's an Presenter because it works with
- * {@link Observable} from RxJava to communicate with the View.
  */
 public abstract class TiPresenter<V extends TiView> implements
         net.grandcentrix.thirtyinch.internal.PresenterLifecycle<V> {
@@ -127,6 +124,9 @@ public abstract class TiPresenter<V extends TiView> implements
         mView = view;
     }
 
+    /**
+     * @see #onCreate()
+     */
     @Override
     public final void create() {
         if (isCreated()) {
@@ -145,13 +145,11 @@ public abstract class TiPresenter<V extends TiView> implements
     }
 
     /**
-     * completes all observables of this presenter. Should be called when the view is about to die
-     * and will never come back.
+     * Should be called when the view is about to die and will never come back.
      * <p/>
-     * call this in {@code Fragment#onDestroy()}
-     * <p/>
-     * complete all {@link Observer}, i.e. BehaviourSubjects with {@link Observer#onCompleted()}
-     * to unsubscribe all observers
+     * call this in {@link Fragment#onDestroy()} or {@link Activity#onDestroy()}
+     *
+     * @see #onDestroy()
      */
     @Override
     public final void destroy() {
@@ -194,10 +192,11 @@ public abstract class TiPresenter<V extends TiView> implements
     }
 
     /**
-     * call sleep as the opposite of {@link #wakeUp()} to unsubscribe all observers listening to
-     * the
-     * UI observables of the view. Calling sleep in {@code Fragment#onDestroyView()} makes sense
-     * because observing a discarded view does not.
+     * call sleep as the opposite of {@link #wakeUp()}, when the view is not available anymore.
+     * Calling sleep in {@code Fragment#onDestroyView()} makes sense because observing a discarded
+     * view does not.
+     *
+     * @see #onSleep()
      */
     @Override
     public final void sleep() {
@@ -232,11 +231,10 @@ public abstract class TiPresenter<V extends TiView> implements
     }
 
     /**
-     * when calling wakeUp the presenter starts to observe the observables of the View.
-     * <p/>
-     * Call this in a Fragment after {@code Fragment#onCreateView(LayoutInflater, ViewGroup,
-     * Bundle)} and after you created and published all observables the presenter will use. At the
-     * end of {@code Fragment#onViewCreated(android.view.View, Bundle)} is an appropriate place.
+     * when calling {@link #wakeUp()} the presenter can start communicating with the {@link
+     * TiView}.
+     *
+     * @see #onWakeUp()
      */
     @Override
     public final void wakeUp() {

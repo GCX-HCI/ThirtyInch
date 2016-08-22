@@ -3,16 +3,16 @@ package net.grandcentrix.thirtyinch.plugin;
 import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
-import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.android.internal.ActivityRetainedPresenterProvider;
-import net.grandcentrix.thirtyinch.android.internal.AppCompatActivityProvider;
-import net.grandcentrix.thirtyinch.android.internal.PresenterProvider;
 import net.grandcentrix.thirtyinch.android.internal.TiActivityDelegate;
-import net.grandcentrix.thirtyinch.android.internal.ViewProvider;
+import net.grandcentrix.thirtyinch.android.internal.TiActivityRetainedPresenterProvider;
+import net.grandcentrix.thirtyinch.android.internal.TiAppCompatActivityProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -23,8 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
-        extends ActivityPlugin implements ActivityRetainedPresenterProvider<P>, ViewProvider<V>,
-        AppCompatActivityProvider, TiPresenterLogger {
+        extends ActivityPlugin implements TiActivityRetainedPresenterProvider<P>, TiViewProvider<V>,
+        TiAppCompatActivityProvider, TiPresenterLogger {
 
     public static final String NCI_KEY_PRESENTER = "presenter";
 
@@ -34,7 +34,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     private TiActivityDelegate<P, V> mDelegate;
 
     /**
-     * Binds a {@link TiPresenter} returned by the {@link PresenterProvider} to the {@link
+     * Binds a {@link TiPresenter} returned by the {@link TiPresenterProvider} to the {@link
      * Activity} and all future {@link Activity} instances created due to configuration changes.
      * The provider will be only called once during {@link TiActivityPlugin#onCreate(Bundle)}. This
      * lets you inject objects which require a {@link android.content.Context} and can't be
@@ -44,11 +44,11 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
      *
      * @param presenterProvider callback returning the presenter.
      */
-    public TiActivityPlugin(@NonNull final PresenterProvider<P> presenterProvider) {
+    public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
         mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this, this);
     }
 
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
