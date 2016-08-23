@@ -44,6 +44,8 @@ public abstract class TiPresenter<V extends TiView> {
         DESTROYED
     }
 
+    private static TiPresenterConfiguration sDefaultConfig = TiPresenterConfiguration.DEFAULT;
+
     /**
      * list of the added observers
      */
@@ -61,12 +63,26 @@ public abstract class TiPresenter<V extends TiView> {
      */
     private boolean mCalled = true;
 
+    private final TiPresenterConfiguration mConfig;
+
     private State mState = State.INITIALIZED;
 
     private V mView;
 
-    public TiPresenter() {
+    public static void setDefaultConfig(final TiPresenterConfiguration config) {
+        sDefaultConfig = config;
+    }
 
+    public TiPresenter() {
+        this(sDefaultConfig);
+    }
+
+    /**
+     * Constructs a presenter with a different configuration then the default one. Change the
+     * default configuration with {@link #setDefaultConfig(TiPresenterConfiguration)}
+     */
+    public TiPresenter(final TiPresenterConfiguration config) {
+        mConfig = config;
     }
 
     /**
@@ -96,7 +112,6 @@ public abstract class TiPresenter<V extends TiView> {
         };
     }
 
-    // TODO check if this could be combined with #wakeUp
 
     /**
      * bind a new view to this presenter.
@@ -104,6 +119,7 @@ public abstract class TiPresenter<V extends TiView> {
      * @param view the new view, can't be null. To set the view to {@code null} call {@link
      *             #sleep()}
      */
+    // TODO check if this could be combined with #wakeUp
     public void bindNewView(@NonNull final V view) {
 
         if (!isCreated()) {
@@ -173,6 +189,11 @@ public abstract class TiPresenter<V extends TiView> {
 
         // release everything, no new states will be posted
         mLifecycleObservers.clear();
+    }
+
+    @NonNull
+    public TiPresenterConfiguration getConfig() {
+        return mConfig;
     }
 
     /**

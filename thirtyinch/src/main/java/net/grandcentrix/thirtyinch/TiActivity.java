@@ -93,8 +93,17 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return new PresenterNonConfigurationInstance<>(mDelegate.getPresenter(),
-                super.onRetainCustomNonConfigurationInstance());
+        final P presenter = mDelegate.getPresenter();
+        if (presenter == null) {
+            return null;
+        }
+
+        if (presenter.getConfig().shouldRetainPresenter()) {
+            return new PresenterNonConfigurationInstance<>(presenter,
+                    super.onRetainCustomNonConfigurationInstance());
+        }
+
+        return null;
     }
 
     /**

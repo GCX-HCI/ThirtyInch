@@ -4,14 +4,14 @@ import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
 import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiActivityRetainedPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiAppCompatActivityProvider;
-import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
@@ -135,7 +135,16 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public CompositeNonConfigurationInstance onRetainNonConfigurationInstance() {
-        return new CompositeNonConfigurationInstance(NCI_KEY_PRESENTER, mDelegate.getPresenter());
+        final P presenter = mDelegate.getPresenter();
+        if (presenter == null) {
+            return null;
+        }
+
+        if (presenter.getConfig().shouldRetainPresenter()) {
+            return new CompositeNonConfigurationInstance(NCI_KEY_PRESENTER, presenter);
+        }
+
+        return null;
     }
 
     @Override

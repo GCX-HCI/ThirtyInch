@@ -1,10 +1,13 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiPresenterConfiguration;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -143,8 +146,20 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             // create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
             mLogger.logTiMessages("created Presenter: " + mPresenter);
-            mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+            final TiPresenterConfiguration config = mPresenter.getConfig();
+            if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
+                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+            }
             mPresenter.create();
+        }
+
+        final TiPresenterConfiguration config = mPresenter.getConfig();
+        if (config.isCallOnMainThreadInterceptorEnabled()) {
+            addBindViewInterceptor(new CallOnMainThreadInterceptor());
+        }
+
+        if (config.isDistinctUntilChangedInterceptorEnabled()) {
+            addBindViewInterceptor(new DistinctUntilChangedInterceptor());
         }
     }
 

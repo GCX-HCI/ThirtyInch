@@ -4,8 +4,6 @@ package net.grandcentix.thirtyinch.sample;
 import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
-import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,8 +22,6 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     private TextView mUptime;
 
     public HelloWorldActivity() {
-        addBindViewInterceptor(new CallOnMainThreadInterceptor());
-        addBindViewInterceptor(new DistinctUntilChangedInterceptor());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.grandcentix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiPresenterConfiguration;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
@@ -24,6 +25,13 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
 
     private RxTiPresenterSubscriptionHandler rxSubscriptionHelper = new RxTiPresenterSubscriptionHandler(this);
+
+
+    public HelloWorldPresenter() {
+        super(new TiPresenterConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .build());
+    }
 
     @Override
     protected void onCreate() {
