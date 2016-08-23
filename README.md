@@ -18,21 +18,23 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
+    def thirtyinchVersion = '0.7.0'
+    
     // MVP for activity and fragment
-    compile 'net.grandcentrix.thirtyinch:thirtyinch:0.7.0'
+    compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
     
     // rx extension
-    compile 'net.grandcentrix.thirtyinch:thirtyinch-rx:0.7.0'
+    compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     
     // composite android extension
-    compile 'net.grandcentrix.thirtyinch:thirtyinch-plugin:0.7.0'
+    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
     
     // test extension
-    testCompile 'net.grandcentrix.thirtyinch:thirtyinch-test:0.7.0'
+    testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
 }
 ```
 
-## Hello World ThirtyInch
+## Hello World MVP example with ThirtyInch
 
 `HelloWorldActivity.java`
 ```java
@@ -86,7 +88,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
 ```
 
-## `ThirtyInch features`
+## ThirtyInch features
 
 ### Presenter
 
@@ -103,7 +105,7 @@ It can be `CREATED` and `DESTROYED`.
 The corresponding callbacks `onCreate()` and `onDestroy()` will be only called once!
 
 The `TiView` can either be `ATTACHED` or `DETACHED`.
-The corresponding callbacks are `onWakeUp()` and `onSleep()` which maps to `onStart()` and `onStop`.
+The corresponding callbacks are `onWakeUp()` and `onSleep()` which maps to `onStart()` and `onStop()`.
 
 
 ```java
@@ -229,7 +231,7 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 ```
 
 
-### [Rx](https://github.com/ReactiveX/RxJava)
+### [RxJava](https://github.com/ReactiveX/RxJava)
 
 Using RxJava for networking is very often used.
 Observing a `Model` is another good usecase where Rx can be used inside of a `TiPresenter`.
@@ -239,14 +241,14 @@ The Rx package provides helper classes to deal with `Subscription` or wait for a
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
     // add the subscription helper to your presenter
-    private RxTiPresenterSubscriptionHandler rxSubscriptionHelper = new RxTiPresenterSubscriptionHandler(this);
+    private RxTiPresenterSubscriptionHandler rxHelper = new RxTiPresenterSubscriptionHandler(this);
 
     @Override
     protected void onCreate() {
         super.onCreate();
         
         // automatically unsubscribe in onDestroy()
-        rxSubscriptionHelper.manageSubscription(
+        rxHelper.manageSubscription(
                 Observable.interval(0, 1, TimeUnit.SECONDS)
                     // cache the latest value when no view is attached
                     // emits when the view got attached
@@ -260,9 +262,9 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
         super.onWakeUp();
 
         // automatically unsubscribe in onSleep()
-        rxSubscriptionHelper.manageViewSubscription(anotherObservable.subscribe());
-
+        rxHelper.manageViewSubscription(anotherObservable.subscribe());
     }
+}
 ```
 
 ### [CompositeAndroid](https://github.com/passsy/CompositeAndroid)
