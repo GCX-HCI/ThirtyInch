@@ -149,16 +149,6 @@ public class TiPresenterTest {
     }
 
     @Test(expected = IllegalAccessError.class)
-    public void testOnMoveToForeground() throws Exception {
-        mPresenter.onMoveToForeground();
-    }
-
-    @Test(expected = IllegalAccessError.class)
-    public void testOnMovedToBackground() throws Exception {
-        mPresenter.onMovedToBackground();
-    }
-
-    @Test(expected = IllegalAccessError.class)
     public void testOnSleep() throws Exception {
         mPresenter.onSleep();
     }
