@@ -171,7 +171,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onDestroy_afterSuper() {
-        final TiConfiguration config = mPresenter.getConfig();
         final boolean isFinishing = mTiActivity.isActivityFinishing();
         mLogger.logTiMessages("onDestroy() recreating=" + !isFinishing);
 
@@ -182,6 +181,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             destroyPresenter = true;
         }
 
+        final TiConfiguration config = mPresenter.getConfig();
         if (!destroyPresenter &&
                 !config.shouldRetainPresenter()) {
             // configuration says the presenter should not be retained, a new presenter instance

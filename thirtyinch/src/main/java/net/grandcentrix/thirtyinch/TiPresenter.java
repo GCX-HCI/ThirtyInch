@@ -14,7 +14,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents the Presenter of the popular Model-View-Presenter design pattern.
+ * Represents the Presenter of the popular Model-View-Presenter design pattern. If used with {@link
+ * TiActivity} or {@link TiFragment} this presenter survives configuration changes.
+ *
+ * @see TiConfiguration
  */
 public abstract class TiPresenter<V extends TiView> {
 
@@ -73,6 +76,7 @@ public abstract class TiPresenter<V extends TiView> {
         sDefaultConfig = config;
     }
 
+
     public TiPresenter() {
         this(sDefaultConfig);
     }
@@ -118,6 +122,7 @@ public abstract class TiPresenter<V extends TiView> {
      *
      * @param view the new view, can't be null. To set the view to {@code null} call {@link
      *             #sleep()}
+     * @see #wakeUp()
      */
     // TODO check if this could be combined with #wakeUp
     public void bindNewView(@NonNull final V view) {
@@ -146,6 +151,10 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
+     * Initializes the presenter. This is like the constructor. Keeping things separate allows
+     * manually injecting fields in test cases after initializing the presenter and then start the
+     * work with {@link #create()}
+     *
      * @see #onCreate()
      */
     public final void create() {
@@ -191,6 +200,9 @@ public abstract class TiPresenter<V extends TiView> {
         mLifecycleObservers.clear();
     }
 
+    /**
+     * @return the presenter configuration
+     */
     @NonNull
     public TiConfiguration getConfig() {
         return mConfig;
@@ -199,12 +211,13 @@ public abstract class TiPresenter<V extends TiView> {
     /**
      * @return the current lifecycle state
      */
+    @NonNull
     public State getState() {
         return mState;
     }
 
     /**
-     * @return the view of this presenter
+     * @return the currently attached view of this presenter
      */
     public V getView() {
         return mView;
@@ -287,6 +300,9 @@ public abstract class TiPresenter<V extends TiView> {
      * the first lifecycle method after the presenter was created. This will be called only once!
      * The view is not attached at this state. But doing network requests is possible at this
      * state.
+     *
+     * @see #create()
+     * @see #onDestroy()
      */
     protected void onCreate() {
         if (mCalled) {
@@ -298,6 +314,9 @@ public abstract class TiPresenter<V extends TiView> {
     /**
      * this Presenter is about to die. make a complete cleanup and don't leak anything. i.e.
      * complete Subjects
+     *
+     * @see #destroy()
+     * @see #onCreate()
      */
     protected void onDestroy() {
         if (mCalled) {
@@ -310,6 +329,7 @@ public abstract class TiPresenter<V extends TiView> {
      * the view is now visible to the user. Good point to start battery intensive background tasks
      * like GPS
      */
+    @Deprecated
     protected void onMoveToForeground() {
         if (mCalled) {
             throw new IllegalAccessError(
@@ -321,6 +341,7 @@ public abstract class TiPresenter<V extends TiView> {
     /**
      * the view is now in the background and not visible to the user.
      */
+    @Deprecated
     protected void onMovedToBackground() {
         if (mCalled) {
             throw new IllegalAccessError(
@@ -329,6 +350,13 @@ public abstract class TiPresenter<V extends TiView> {
         mCalled = true;
     }
 
+
+    /**
+     * Right after this method the view will be detached. {@link #getView()} will return
+     * <code>null</code> afterwards.
+     *
+     * @see #sleep()
+     */
     protected void onSleep() {
         if (mCalled) {
             throw new IllegalAccessError("don't call #onSleep() directly, call #sleep()");
@@ -336,6 +364,14 @@ public abstract class TiPresenter<V extends TiView> {
         mCalled = true;
     }
 
+    /**
+     * The view is now attached and ready to receive events. {@link #getView()} is not guaranteed
+     * to
+     * be not <code>null</code>
+     *
+     * @see #wakeUp()
+     * @see #onSleep()
+     */
     protected void onWakeUp() {
         if (mCalled) {
             throw new IllegalAccessError("don't call #onWakeUp() directly, call #wakeup()");
