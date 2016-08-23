@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiPresenterConfiguration;
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
@@ -28,8 +28,8 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
 
     public HelloWorldPresenter() {
-        super(new TiPresenterConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
+        super(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
                 .setRetainPresenterEnabled(true)
                 .build());
     }

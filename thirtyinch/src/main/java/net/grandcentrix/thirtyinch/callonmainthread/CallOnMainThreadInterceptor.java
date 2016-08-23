@@ -1,6 +1,6 @@
 package net.grandcentrix.thirtyinch.callonmainthread;
 
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiView;
 
 import android.util.Log;
@@ -10,7 +10,7 @@ import java.lang.reflect.Proxy;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
-public class CallOnMainThreadInterceptor implements TiBindViewInterceptor {
+public class CallOnMainThreadInterceptor implements BindViewInterceptor {
 
     private static final String TAG = CallOnMainThreadInterceptor.class.getSimpleName();
 

@@ -1,17 +1,17 @@
 package net.grandcentrix.thirtyinch;
 
 //TODO add documentation. this will be one of the most read documentations people will read
-public class TiPresenterConfiguration {
+public class TiConfiguration {
 
     public static class Builder {
 
-        private final TiPresenterConfiguration mConfig;
+        private final TiConfiguration mConfig;
 
         public Builder() {
-            mConfig = new TiPresenterConfiguration();
+            mConfig = new TiConfiguration();
         }
 
-        public TiPresenterConfiguration build() {
+        public TiConfiguration build() {
             return mConfig;
         }
 
@@ -37,7 +37,7 @@ public class TiPresenterConfiguration {
 
     }
 
-    public static final TiPresenterConfiguration DEFAULT = new Builder().build();
+    public static final TiConfiguration DEFAULT = new Builder().build();
 
     private boolean mCallOnMainThreadInterceptorEnabled = true;
 
@@ -47,7 +47,7 @@ public class TiPresenterConfiguration {
 
     private boolean mUseStaticSaviorToRetain = true;
 
-    private TiPresenterConfiguration() {
+    private TiConfiguration() {
     }
 
     public boolean isCallOnMainThreadInterceptorEnabled() {

@@ -5,30 +5,30 @@ import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInsta
 
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
-import net.grandcentrix.thirtyinch.internal.TiActivityRetainedPresenterProvider;
-import net.grandcentrix.thirtyinch.internal.TiAppCompatActivityProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.util.List;
 
-public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
-        extends ActivityPlugin implements TiActivityRetainedPresenterProvider<P>, TiViewProvider<V>,
-        TiAppCompatActivityProvider, TiPresenterLogger, InterceptableViewBinder<V> {
+public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extends ActivityPlugin
+        implements TiViewProvider<V>, DelegatedTiActivity<P>, TiPresenterLogger,
+        InterceptableViewBinder<V> {
 
     public static final String NCI_KEY_PRESENTER = "presenter";
 
@@ -49,28 +49,21 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
      * @param presenterProvider callback returning the presenter.
      */
     public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
-        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this, this);
+        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this);
     }
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
-    @NonNull
-    @Override
-    public AppCompatActivity getAppCompatActivity() {
-        // getOriginal is null until the plugin is attached.
-        return getOriginal();
-    }
-
     /**
-     * @return the cached result of {@link TiBindViewInterceptor#intercept(TiView)}
+     * @return the cached result of {@link BindViewInterceptor#intercept(TiView)}
      */
     @Nullable
     @Override
-    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
@@ -80,8 +73,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
      */
     @NonNull
     @Override
-    public List<TiBindViewInterceptor> getInterceptors(
-            final Filter<TiBindViewInterceptor> predicate) {
+    public List<BindViewInterceptor> getInterceptors(
+            final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
 
@@ -108,6 +101,16 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void invalidateView() {
         mDelegate.invalidateView();
+    }
+
+    @Override
+    public boolean isActivityFinishing() {
+        return isFinishing();
+    }
+
+    @Override
+    public boolean isDontKeepActivitiesEnabled() {
+        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
 
     @Override
@@ -167,16 +170,32 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView>
         mDelegate.onStop_afterSuper();
     }
 
-    /**
-     * the default implementation assumes that the activity is the view and implements the {@link
-     * TiView} interface. Override this method for a different behaviour.
-     *
-     * @return the object implementing the TiView interface
-     */
+    @Override
+    public boolean postToMessageQueue(final Runnable runnable) {
+        return getWindow().getDecorView().post(runnable);
+    }
+
     @NonNull
     @Override
     public V provideView() {
-        return mDelegate.provideView();
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(getActivity().getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Activity doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the activity itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) getActivity();
+            }
+        }
     }
 
     @Override

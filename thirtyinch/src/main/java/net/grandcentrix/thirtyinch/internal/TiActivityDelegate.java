@@ -2,20 +2,19 @@ package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiPresenterConfiguration;
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
-import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
 
@@ -28,11 +27,12 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
 public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements TiViewProvider<V>, InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V> {
 
-    private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
+    @VisibleForTesting
+    static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
-    private final TiAppCompatActivityProvider mActivityProvider;
+    private final DelegatedTiActivity<P> mTiActivity;
 
     /**
      * flag indicating the started state of the Activity between {@link Activity#onStart()} and
@@ -55,41 +55,37 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final TiPresenterProvider<P> mPresenterProvider;
 
-    private TiActivityRetainedPresenterProvider<P> mRetainedPresenterProvider;
-
     private final PresenterViewBinder<V> mViewBinder;
 
     private TiViewProvider<V> mViewProvider;
 
-    public TiActivityDelegate(final TiAppCompatActivityProvider activityProvider,
+    public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
             final TiViewProvider<V> viewProvider,
             final TiPresenterProvider<P> presenterProvider,
-            final TiActivityRetainedPresenterProvider<P> retainedPresenterProvider,
             final TiPresenterLogger logger) {
-        mActivityProvider = activityProvider;
+        mTiActivity = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
-        mRetainedPresenterProvider = retainedPresenterProvider;
         mLogger = logger;
         mViewBinder = new PresenterViewBinder<>(logger);
     }
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
         return mViewBinder.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
         return mViewBinder.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<TiBindViewInterceptor> getInterceptors(
-            final Filter<TiBindViewInterceptor> predicate) {
+    public List<BindViewInterceptor> getInterceptors(
+            final Filter<BindViewInterceptor> predicate) {
         return mViewBinder.getInterceptors(predicate);
     }
 
@@ -116,7 +112,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
-        mPresenter = mRetainedPresenterProvider.getRetainedPresenter();
+        mPresenter = mTiActivity.getRetainedPresenter();
         if (mPresenter != null) {
             mLogger.logTiMessages(
                     "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
@@ -157,14 +153,14 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             // could not recover, create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
             mLogger.logTiMessages("created Presenter: " + mPresenter);
-            final TiPresenterConfiguration config = mPresenter.getConfig();
+            final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             }
             mPresenter.create();
         }
 
-        final TiPresenterConfiguration config = mPresenter.getConfig();
+        final TiConfiguration config = mPresenter.getConfig();
         if (config.isCallOnMainThreadInterceptorEnabled()) {
             addBindViewInterceptor(new CallOnMainThreadInterceptor());
         }
@@ -175,9 +171,35 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onDestroy_afterSuper() {
-        final AppCompatActivity activity = mActivityProvider.getAppCompatActivity();
-        mLogger.logTiMessages("onDestroy() recreating=" + !activity.isFinishing());
-        if (activity.isFinishing()) {
+        final TiConfiguration config = mPresenter.getConfig();
+        final boolean isFinishing = mTiActivity.isActivityFinishing();
+        mLogger.logTiMessages("onDestroy() recreating=" + !isFinishing);
+
+        boolean destroyPresenter = false;
+        if (isFinishing) {
+            // Probably a backpress and not a configuration change
+            // Activity will not be recreated and finally destroyed, also destroyed the presenter
+            destroyPresenter = true;
+        }
+
+        if (!destroyPresenter &&
+                !config.shouldRetainPresenter()) {
+            // configuration says the presenter should not be retained, a new presenter instance
+            // will be created and the current presenter should be destroyed
+            destroyPresenter = true;
+        }
+
+        if (!destroyPresenter &&
+                !config.useStaticSaviorToRetain()
+                && mTiActivity.isDontKeepActivitiesEnabled()) {
+            // configuration says the PresenterSavior should not be used. Retaining the presenter
+            // relays on the Activity nonConfigurationInstance which is always null when
+            // "don't keep activities" is enabled.
+            // a new presenter instance will be created and the current presenter should be destroyed
+            destroyPresenter = true;
+        }
+
+        if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
         }
@@ -189,7 +211,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onStart_afterSuper() {
         mActivityStarted = true;
-        mActivityProvider.getAppCompatActivity().getWindow().getDecorView().post(new Runnable() {
+        mTiActivity.postToMessageQueue(new Runnable() {
             @Override
             public void run() {
                 // check if still started. It happens that onStop got already called, specially
@@ -213,29 +235,5 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     public void onStop_beforeSuper() {
         mLogger.logTiMessages("onStop()");
         mActivityStarted = false;
-    }
-
-    @NonNull
-    @Override
-    public V provideView() {
-        final AppCompatActivity activity = mActivityProvider.getAppCompatActivity();
-        final Class<?> foundViewInterface = AnnotationUtil
-                .getInterfaceOfClassExtendingGivenInterface(activity.getClass(), TiView.class);
-
-        if (foundViewInterface == null) {
-            throw new IllegalArgumentException(
-                    "This Activity doesn't implement a TiView interface. "
-                            + "This is the default behaviour. Override provideView() to explicitly change this.");
-        } else {
-            if (foundViewInterface.getSimpleName().equals("TiView")) {
-                throw new IllegalArgumentException(
-                        "extending TiView doesn't make sense, it's an empty interface."
-                                + " This is the default behaviour. Override provideView() to explicitly change this.");
-            } else {
-                // assume that the activity itself is the view and implements the TiView interface
-                //noinspection unchecked
-                return (V) activity;
-            }
-        }
     }
 }

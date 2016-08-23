@@ -37,4 +37,11 @@ class TiMockPresenter extends TiPresenter<TiView> {
         super.onWakeUp();
         onWakeUpCalled++;
     }
+
+    public TiMockPresenter() {
+    }
+
+    public TiMockPresenter(final TiConfiguration config) {
+        super(config);
+    }
 }

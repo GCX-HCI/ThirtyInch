@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiPresenterConfiguration;
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
@@ -18,7 +18,7 @@ public class SamplePresenter extends TiPresenter<SampleView> {
             = new RxTiPresenterSubscriptionHandler(this);
 
     public SamplePresenter() {
-        super(new TiPresenterConfiguration.Builder()
+        super(new TiConfiguration.Builder()
                 .setRetainPresenterEnabled(true)
                 .setUseStaticSaviorToRetain(true)
                 .build());

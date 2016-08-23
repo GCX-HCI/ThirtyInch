@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.Removable;
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
@@ -13,16 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Binds a {@link TiView} to a {@link TiPresenter<V>} and allows {@link TiBindViewInterceptor}s to
+ * Binds a {@link TiView} to a {@link TiPresenter<V>} and allows {@link BindViewInterceptor}s to
  * pivot the view before attaching
  *
  * @param <V> the {@link TiView}
  */
 public class PresenterViewBinder<V extends TiView> implements InterceptableViewBinder<V> {
 
-    private List<TiBindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
+    private List<BindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
 
-    private HashMap<TiBindViewInterceptor, V> mIntercepterViewOutput = new HashMap<>();
+    private HashMap<BindViewInterceptor, V> mIntercepterViewOutput = new HashMap<>();
 
     /**
      * the cached version of the view send to the presenter after it passed the interceptors
@@ -37,7 +37,7 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
         mBindViewInterceptors.add(interceptor);
         invalidateView();
 
@@ -58,7 +58,7 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
         if (mLastView == null) {
             invalidateView();
             V interceptedView = viewProvider.provideView();
-            for (final TiBindViewInterceptor interceptor : mBindViewInterceptors) {
+            for (final BindViewInterceptor interceptor : mBindViewInterceptors) {
                 interceptedView = interceptor.intercept(interceptedView);
                 mIntercepterViewOutput.put(interceptor, interceptedView);
             }
@@ -73,17 +73,17 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
         return mIntercepterViewOutput.get(interceptor);
     }
 
     @NonNull
     @Override
-    public List<TiBindViewInterceptor> getInterceptors(
-            final Filter<TiBindViewInterceptor> predicate) {
-        final ArrayList<TiBindViewInterceptor> result = new ArrayList<>();
+    public List<BindViewInterceptor> getInterceptors(
+            final Filter<BindViewInterceptor> predicate) {
+        final ArrayList<BindViewInterceptor> result = new ArrayList<>();
         for (int i = 0; i < mBindViewInterceptors.size(); i++) {
-            final TiBindViewInterceptor interceptor = mBindViewInterceptors.get(i);
+            final BindViewInterceptor interceptor = mBindViewInterceptors.get(i);
             if (predicate.apply(interceptor)) {
                 result.add(interceptor);
             }

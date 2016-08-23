@@ -8,7 +8,7 @@ import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
  * the view to add behaviors like {@link DistinctUntilChanged} or {@link
  * CallOnMainThread}
  */
-public interface TiBindViewInterceptor {
+public interface BindViewInterceptor {
 
     <V extends TiView> V intercept(final V view);
 

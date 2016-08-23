@@ -44,7 +44,7 @@ public abstract class TiPresenter<V extends TiView> {
         DESTROYED
     }
 
-    private static TiPresenterConfiguration sDefaultConfig = TiPresenterConfiguration.DEFAULT;
+    private static TiConfiguration sDefaultConfig = TiConfiguration.DEFAULT;
 
     /**
      * list of the added observers
@@ -63,13 +63,13 @@ public abstract class TiPresenter<V extends TiView> {
      */
     private boolean mCalled = true;
 
-    private final TiPresenterConfiguration mConfig;
+    private final TiConfiguration mConfig;
 
     private State mState = State.INITIALIZED;
 
     private V mView;
 
-    public static void setDefaultConfig(final TiPresenterConfiguration config) {
+    public static void setDefaultConfig(final TiConfiguration config) {
         sDefaultConfig = config;
     }
 
@@ -79,9 +79,9 @@ public abstract class TiPresenter<V extends TiView> {
 
     /**
      * Constructs a presenter with a different configuration then the default one. Change the
-     * default configuration with {@link #setDefaultConfig(TiPresenterConfiguration)}
+     * default configuration with {@link #setDefaultConfig(TiConfiguration)}
      */
-    public TiPresenter(final TiPresenterConfiguration config) {
+    public TiPresenter(final TiConfiguration config) {
         mConfig = config;
     }
 
@@ -192,7 +192,7 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     @NonNull
-    public TiPresenterConfiguration getConfig() {
+    public TiConfiguration getConfig() {
         return mConfig;
     }
 

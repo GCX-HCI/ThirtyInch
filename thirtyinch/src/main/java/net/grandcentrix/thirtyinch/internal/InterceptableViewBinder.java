@@ -1,7 +1,7 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.Removable;
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
@@ -34,21 +34,21 @@ public interface InterceptableViewBinder<V extends TiView> {
      * TiPresenter}
      */
     @NonNull
-    Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor);
+    Removable addBindViewInterceptor(final BindViewInterceptor interceptor);
 
     /**
-     * @return the cached result of {@link TiBindViewInterceptor#intercept(TiView)}
+     * @return the cached result of {@link BindViewInterceptor#intercept(TiView)}
      * @param interceptor the interceptor which returned the {@link TiView}
      */
     @Nullable
-    V getInterceptedViewOf(final TiBindViewInterceptor interceptor);
+    V getInterceptedViewOf(final BindViewInterceptor interceptor);
 
     /**
      * @param predicate filter the results
      * @return all interceptors matching the filter
      */
     @NonNull
-    List<TiBindViewInterceptor> getInterceptors(final Filter<TiBindViewInterceptor> predicate);
+    List<BindViewInterceptor> getInterceptors(final Filter<BindViewInterceptor> predicate);
 
     /**
      * Invalidates the cache of the latest bound view. Forces the next binding of the view to run

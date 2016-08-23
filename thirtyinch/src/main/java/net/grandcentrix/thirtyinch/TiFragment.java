@@ -43,20 +43,20 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final TiBindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
         return mViewBinder.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(final TiBindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
         return mViewBinder.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<TiBindViewInterceptor> getInterceptors(
-            final Filter<TiBindViewInterceptor> predicate) {
+    public List<BindViewInterceptor> getInterceptors(
+            final Filter<BindViewInterceptor> predicate) {
         return mViewBinder.getInterceptors(predicate);
     }
 
@@ -113,14 +113,14 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         if (mPresenter == null) {
             mPresenter = providePresenter();
             Log.d(TAG, "created Presenter: " + mPresenter);
-            final TiPresenterConfiguration config = mPresenter.getConfig();
+            final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             }
             mPresenter.create();
         }
 
-        final TiPresenterConfiguration config = mPresenter.getConfig();
+        final TiConfiguration config = mPresenter.getConfig();
         if (config.isCallOnMainThreadInterceptorEnabled()) {
             addBindViewInterceptor(new CallOnMainThreadInterceptor());
         }

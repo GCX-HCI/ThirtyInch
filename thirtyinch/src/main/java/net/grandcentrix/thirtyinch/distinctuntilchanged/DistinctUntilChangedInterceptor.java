@@ -1,6 +1,6 @@
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import net.grandcentrix.thirtyinch.TiBindViewInterceptor;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 
@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
-public class DistinctUntilChangedInterceptor implements TiBindViewInterceptor {
+public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
 
     private static final String TAG = DistinctUntilChangedInterceptor.class.getSimpleName();
 
