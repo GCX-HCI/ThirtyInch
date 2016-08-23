@@ -1,4 +1,4 @@
-package net.grandcentix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "net.grandcentix.thirtyinch.sample"
+        applicationId "net.grandcentrix.thirtyinch.sample"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1

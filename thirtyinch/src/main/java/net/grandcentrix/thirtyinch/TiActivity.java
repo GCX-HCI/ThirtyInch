@@ -127,7 +127,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return getClass().getSimpleName()
                 + ":" + TiActivity.class.getSimpleName()
                 + "@" + Integer.toHexString(hashCode())
-                + "{presenter=" + presenter + "}";
+                + "{presenter = " + presenter + "}";
     }
 
     @Override

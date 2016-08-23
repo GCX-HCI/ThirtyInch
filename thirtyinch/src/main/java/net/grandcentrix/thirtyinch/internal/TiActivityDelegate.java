@@ -122,28 +122,39 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
-        if (mPresenter == null && savedInstanceState != null) {
-            // recover with Savior
-            // this should always work.
+        // try to recover with the PresenterSavior
+        if (savedInstanceState != null) {
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
-            if (recoveredPresenterId != null) {
-                mLogger.logTiMessages("try to recover Presenter with id: " + recoveredPresenterId);
-                //noinspection unchecked
-                mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
-                if (mPresenter != null) {
-                    // save recovered presenter with new id. No other instance of this activity,
-                    // holding the presenter before, is now able to remove the reference to
-                    // this presenter from the savior
-                    PresenterSavior.INSTANCE.free(recoveredPresenterId);
-                    mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+
+            if (mPresenter == null) {
+                if (recoveredPresenterId != null) {
+                    // recover with Savior
+                    // this should always work.
+                    mLogger.logTiMessages(
+                            "try to recover Presenter with id: " + recoveredPresenterId);
+                    //noinspection unchecked
+                    mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                    mLogger.logTiMessages("recovered Presenter from savior " + mPresenter);
+                } else {
+                    mLogger.logTiMessages("could not recover a Presenter from savior");
                 }
-                mLogger.logTiMessages("recovered Presenter " + mPresenter);
+            }
+
+            if (mPresenter == null) {
+                mLogger.logTiMessages("could not recover the Presenter "
+                        + "although it's not the first start of the Activity");
+            } else {
+                // save recovered presenter with new id. No other instance of this activity,
+                // holding the presenter before, is now able to remove the reference to
+                // this presenter from the savior
+                PresenterSavior.INSTANCE.free(recoveredPresenterId);
+                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             }
         }
 
         if (mPresenter == null) {
-            // create a new presenter
+            // could not recover, create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
             mLogger.logTiMessages("created Presenter: " + mPresenter);
             final TiPresenterConfiguration config = mPresenter.getConfig();

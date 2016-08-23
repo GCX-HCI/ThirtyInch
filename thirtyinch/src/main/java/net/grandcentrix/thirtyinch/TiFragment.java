@@ -1,5 +1,7 @@
 package net.grandcentrix.thirtyinch;
 
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.PresenterViewBinder;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,18 +83,12 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         super.onAttach(activity);
         Log.v(TAG, "onAttach()");
 
-        if (mPresenter == null) {
-            mPresenter = providePresenter();
-            Log.d(TAG, "created Presenter: " + mPresenter);
-            mPresenter.create();
-        }
     }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(" + savedInstanceState + ")");
-        setRetainInstance(true);
 
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -112,6 +109,29 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                 Log.d(TAG, "recovered Presenter " + mPresenter);
             }
         }
+
+        if (mPresenter == null) {
+            mPresenter = providePresenter();
+            Log.d(TAG, "created Presenter: " + mPresenter);
+            final TiPresenterConfiguration config = mPresenter.getConfig();
+            if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
+                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+            }
+            mPresenter.create();
+        }
+
+        final TiPresenterConfiguration config = mPresenter.getConfig();
+        if (config.isCallOnMainThreadInterceptorEnabled()) {
+            addBindViewInterceptor(new CallOnMainThreadInterceptor());
+        }
+
+        if (config.isDistinctUntilChangedInterceptorEnabled()) {
+            addBindViewInterceptor(new DistinctUntilChangedInterceptor());
+        }
+
+        if (config.shouldRetainPresenter()) {
+            setRetainInstance(true);
+        }
     }
 
     @Nullable
@@ -124,11 +144,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onDestroy() {
-        Log.v(TAG, "onDestroy()");
-        if (isUiPossible()) {
-            mPresenter.destroy();
-        }
         super.onDestroy();
+        final FragmentActivity activity = getActivity();
+        Log.v(TAG, "onDestroy() recreating=" + !activity.isFinishing());
+        if (activity.isFinishing()) {
+            mPresenter.destroy();
+            PresenterSavior.INSTANCE.free(mPresenterId);
+        }
     }
 
     @Override
@@ -204,11 +226,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                 return (V) this;
             }
         }
-    }
-
-    @Override
-    final public void setRetainInstance(final boolean retain) {
-        super.setRetainInstance(true);
     }
 
     @Override

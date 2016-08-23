@@ -255,9 +255,10 @@ public abstract class TiPresenter<V extends TiView> {
         } else {
             viewName = "null";
         }
-        return getClass().getSimpleName() + "@" + hashCode() + "{"
-                + "view = " + viewName
-                + "}";
+        return getClass().getSimpleName()
+                + ":" + TiPresenter.class.getSimpleName()
+                + "@" + Integer.toHexString(hashCode())
+                + "{view = " + viewName + "}";
     }
 
     /**

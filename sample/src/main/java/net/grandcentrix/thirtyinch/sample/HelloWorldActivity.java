@@ -1,4 +1,4 @@
-package net.grandcentix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample;
 
 
 import com.jakewharton.rxbinding.view.RxView;
