@@ -326,32 +326,6 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * the view is now visible to the user. Good point to start battery intensive background tasks
-     * like GPS
-     */
-    @Deprecated
-    protected void onMoveToForeground() {
-        if (mCalled) {
-            throw new IllegalAccessError(
-                    "don't call #onMoveToForeground() directly, call #moveToForeground()");
-        }
-        mCalled = true;
-    }
-
-    /**
-     * the view is now in the background and not visible to the user.
-     */
-    @Deprecated
-    protected void onMovedToBackground() {
-        if (mCalled) {
-            throw new IllegalAccessError(
-                    "don't call #onMovedToBackground() directly, call #movedToBackground()");
-        }
-        mCalled = true;
-    }
-
-
-    /**
      * Right after this method the view will be detached. {@link #getView()} will return
      * <code>null</code> afterwards.
      *

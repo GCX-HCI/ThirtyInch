@@ -93,10 +93,55 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
 ### Presenter
 
-- The `Presenter` survives configuration changes
-- The `Presenter` survives when the `Activity` got killed in background
-- The `Presenter` is not a singleton
-- When the `Activity` gets finished the `Presenter` dies, too
+- survives configuration changes
+- survives when the `Activity` got killed in background
+- is not a singleton
+- dies when the `Activity` gets finished
+
+##### Lifecycle
+
+The `TiPresenter` lifecycle is very easy.
+
+It can be `CREATED` and `DESTROYED`. 
+The corresponding callbacks `onCreate()` and `onDestroy()` will be only called once!
+
+The `TiView` can either be `ATTACHED` or `DETACHED`.
+The corresponding callbacks are `onWakeUp()` and `onSleep()` which maps to `onStart()` and `onStop`.
+
+
+```java
+public class MyPresenter extends TiPresenter<MyView> {
+
+    @Override
+    protected void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    protected void onWakeUp() {
+        super.onWakeUp();
+    }
+
+    @Override
+    protected void onSleep() {
+        super.onSleep();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+}
+
+```
+
+The lifecycle can be observed using `TiLifecycleObserver`
+
+There is no callback for `onResume()` and `onPause()` in the `TiPresenter`. 
+This is something the view layer should handle.
+Read more about this here [Hannes Dorfmann - Presenters don't need lifecycle events](http://hannesdorfmann.com/android/presenters-dont-need-lifecycle)
+
+##### Configuration
 
 The default behaviour might not fit your needs. 
 You can disable unwanted features by providing a configuration in the `TiPresenter` constructor.
@@ -130,7 +175,7 @@ public class MyApplication extends Application{
 }
 ```
 
-### View Annotations
+### TiView Annotations
 
 Two awesome annotations for the `TiView` interface made it already into `Ti` saving you a lot of time.
 
