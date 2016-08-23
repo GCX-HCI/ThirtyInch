@@ -8,6 +8,7 @@ import net.grandcentrix.thirtyinch.internal.PresenterViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -147,7 +148,33 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         super.onDestroy();
         final FragmentActivity activity = getActivity();
         Log.v(TAG, "onDestroy() recreating=" + !activity.isFinishing());
+
+        boolean destroyPresenter = false;
         if (activity.isFinishing()) {
+            // Probably a backpress and not a configuration change
+            // Activity will not be recreated and finally destroyed, also destroyed the presenter
+            destroyPresenter = true;
+        }
+
+        final TiConfiguration config = mPresenter.getConfig();
+        if (!destroyPresenter &&
+                !config.shouldRetainPresenter()) {
+            // configuration says the presenter should not be retained, a new presenter instance
+            // will be created and the current presenter should be destroyed
+            destroyPresenter = true;
+        }
+
+        if (!destroyPresenter &&
+                !config.useStaticSaviorToRetain()
+                && AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity())) {
+            // configuration says the PresenterSavior should not be used. Retaining the presenter
+            // relays on the Activity nonConfigurationInstance which is always null when
+            // "don't keep activities" is enabled.
+            // a new presenter instance will be created and the current presenter should be destroyed
+            destroyPresenter = true;
+        }
+
+        if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
         }
