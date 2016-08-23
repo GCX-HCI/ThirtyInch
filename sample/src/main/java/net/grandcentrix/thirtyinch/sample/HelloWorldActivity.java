@@ -21,9 +21,6 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
     private TextView mUptime;
 
-    public HelloWorldActivity() {
-    }
-
     @Override
     public Observable<Void> onButtonClicked() {
         return RxView.clicks(mButton);
