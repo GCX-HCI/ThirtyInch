@@ -105,7 +105,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public boolean isActivityFinishing() {
-        return isFinishing();
+        return getActivity().isFinishing();
     }
 
     @Override
@@ -172,7 +172,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public boolean postToMessageQueue(final Runnable runnable) {
-        return getWindow().getDecorView().post(runnable);
+        return getActivity().getWindow().getDecorView().post(runnable);
     }
 
     @NonNull
@@ -213,7 +213,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     protected void onAddedToDelegate() {
         super.onAddedToDelegate();
-        TAG = this.getClass().getSimpleName()
+        TAG = getClass().getSimpleName()
                 + ":" + TiActivity.class.getSimpleName()
                 + "@" + Integer.toHexString(this.hashCode())
                 + ":" + getOriginal().getClass().getSimpleName()
@@ -223,7 +223,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     protected void onRemovedFromDelegated() {
         super.onRemovedFromDelegated();
-        TAG = this.getClass().getSimpleName()
+        TAG = getClass().getSimpleName()
                 + ":" + TiActivity.class.getSimpleName()
                 + "@" + Integer.toHexString(this.hashCode());
     }

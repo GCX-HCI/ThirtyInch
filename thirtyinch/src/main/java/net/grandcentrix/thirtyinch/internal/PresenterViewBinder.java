@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Binds a {@link TiView} to a {@link TiPresenter<V>} and allows {@link BindViewInterceptor}s to
+ * Binds a {@link TiView} to a {@link TiPresenter} and allows {@link BindViewInterceptor}s to
  * pivot the view before attaching
  *
  * @param <V> the {@link TiView}
