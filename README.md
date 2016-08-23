@@ -34,8 +34,7 @@ dependencies {
 
 ## Hello World ThirtyInch
 
-Activity
-
+`HelloWorldActivity.java`
 ```java
 public class HelloWorldActivity 
         extends TiActivity<HelloWorldPresenter, HelloWorldView> 
@@ -64,8 +63,7 @@ public class HelloWorldActivity
 }
 ```
 
-View
-
+`HelloWorldView.java`
 ```java
 public interface HelloWorldView extends TiView {
 
@@ -75,8 +73,7 @@ public interface HelloWorldView extends TiView {
 
 ```
 
-Presenter
-
+`HelloWorldPresenter.java`
 ```java
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
