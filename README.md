@@ -24,11 +24,11 @@ dependencies {
     // rx extension
     compile 'net.grandcentrix.thirtyinch:thirtyinch-rx:0.7.0'
     
-    // test extension
-    compile 'net.grandcentrix.thirtyinch:thirtyinch-test:0.7.0'
-    
     // composite android extension
     compile 'net.grandcentrix.thirtyinch:thirtyinch-plugin:0.7.0'
+    
+    // test extension
+    testCompile 'net.grandcentrix.thirtyinch:thirtyinch-test:0.7.0'
 }
 ```
 
