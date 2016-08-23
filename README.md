@@ -22,13 +22,13 @@ dependencies {
     compile 'net.grandcentrix.thirtyinch:thirtyinch:0.7.0'
     
     // rx extension
-    compile 'net.grandcentrix.thirtyinch:rx:0.7.0'
+    compile 'net.grandcentrix.thirtyinch:thirtyinch-rx:0.7.0'
     
     // test extension
-    compile 'net.grandcentrix.thirtyinch:test:0.7.0'
+    compile 'net.grandcentrix.thirtyinch:thirtyinch-test:0.7.0'
     
     // composite android extension
-    compile 'net.grandcentrix.thirtyinch:test:0.7.0'
+    compile 'net.grandcentrix.thirtyinch:thirtyinch-plugin:0.7.0'
 }
 ```
 
@@ -295,6 +295,7 @@ Yes you have to extends `CompositeActivity`, but that's the last level of inheri
 - `TiActivityDelegate` for code sharing
 - separate Rx module
 - separate Test module
+- public release, projects using `Ti`: ∞
 
 ##### Version 0.6 `11.06.16`
 - Tests
@@ -303,7 +304,7 @@ Yes you have to extends `CompositeActivity`, but that's the last level of inheri
 ##### Version 0.5 `03.05.16`
 - plugin for CompositeAndroid
 - Clean usage syntax by automatically using the `TiActivity` as the `TiView`
-- Projects using `Ti`: 5
+- Projects using `Ti`: 6
 
 ##### Version 0.4 `12.05.16`
 - Extracted into standalone library
