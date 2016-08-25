@@ -51,24 +51,25 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
     public List<BindViewInterceptor> getInterceptors(
-            final Filter<BindViewInterceptor> predicate) {
+            @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
 
     @Nullable
+    @Override
     public P getRetainedPresenter() {
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time

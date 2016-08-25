@@ -31,7 +31,7 @@ public interface InterceptableViewBinder<V extends TiView> {
      * Like Predicate added in API 24 with Java 8
      * <p>
      * A Predicate can determine a true or false value for any input of its
-     * parameterized type. For example, a {@code RegexPredicate} might implement
+     * parametrized type. For example, a {@code RegexPredicate} might implement
      * {@code Predicate<String>}, and return true for any String that matches its
      * given regular expression.
      * <p/>
@@ -49,21 +49,21 @@ public interface InterceptableViewBinder<V extends TiView> {
      * TiPresenter}
      */
     @NonNull
-    Removable addBindViewInterceptor(final BindViewInterceptor interceptor);
+    Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor);
 
     /**
      * @return the cached result of {@link BindViewInterceptor#intercept(TiView)}
      * @param interceptor the interceptor which returned the {@link TiView}
      */
     @Nullable
-    V getInterceptedViewOf(final BindViewInterceptor interceptor);
+    V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor);
 
     /**
      * @param predicate filter the results
      * @return all interceptors matching the filter
      */
     @NonNull
-    List<BindViewInterceptor> getInterceptors(final Filter<BindViewInterceptor> predicate);
+    List<BindViewInterceptor> getInterceptors(@NonNull final Filter<BindViewInterceptor> predicate);
 
     /**
      * Invalidates the cache of the latest bound view. Forces the next binding of the view to run

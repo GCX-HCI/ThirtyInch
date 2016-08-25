@@ -52,7 +52,7 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         mBindViewInterceptors.add(interceptor);
         invalidateView();
 
@@ -88,14 +88,14 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mIntercepterViewOutput.get(interceptor);
     }
 
     @NonNull
     @Override
     public List<BindViewInterceptor> getInterceptors(
-            final Filter<BindViewInterceptor> predicate) {
+            @NonNull final Filter<BindViewInterceptor> predicate) {
         final ArrayList<BindViewInterceptor> result = new ArrayList<>();
         for (int i = 0; i < mBindViewInterceptors.size(); i++) {
             final BindViewInterceptor interceptor = mBindViewInterceptors.get(i);

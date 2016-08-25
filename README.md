@@ -164,7 +164,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
 Or globally for all `TiPresenters`
 ```java
-public class MyApplication extends Application{
+public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
@@ -270,16 +270,26 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 ### [CompositeAndroid](https://github.com/passsy/CompositeAndroid)
 
 Extending `TiActivity` is probably not what you want because you already have a `BaseActivity`.
-Extending all already existing Activities from `TiActivity` doesn't make sense because the don't use MVP right now.
+Extending all already existing Activities from `TiActivity` doesn't make sense because they don't use MVP right now.
 [`CompositeAndroid`](https://github.com/passsy/CompositeAndroid) uses composition to add a `TiPresenter` to an `Activity`.
 One line adds the `TiActivityPlugin` and everything works as expected.
 
 ```java
 public class HelloWorldActivity extends CompositeActivity implements HelloWorldView {
 
-    public HelloWorldActivity() {
-        addPlugin(new TiActivityPlugin<HelloWorldPresenter, HelloWorldView>(()-> new HelloWorldPresenter()));
-    }
+        // Java 7
+        addPlugin(new TiActivityPlugin<>(
+                new TiPresenterProvider<HelloWorldPresenter>() {
+                    @NonNull
+                    @Override
+                    public HelloWorldPresenter providePresenter() {
+                        return new HelloWorldPresenter();
+                    }
+                }));
+
+        // Java 8
+        addPlugin(new TiActivityPlugin<HelloWorldPresenter, HelloWorldView>(
+                () -> new HelloWorldPresenter()));
 }
 ```
 

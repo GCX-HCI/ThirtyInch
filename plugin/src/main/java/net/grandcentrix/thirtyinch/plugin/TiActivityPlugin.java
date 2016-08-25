@@ -69,7 +69,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(final BindViewInterceptor interceptor) {
+    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
@@ -78,7 +78,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     @Nullable
     @Override
-    public V getInterceptedViewOf(final BindViewInterceptor interceptor) {
+    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
@@ -89,7 +89,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @NonNull
     @Override
     public List<BindViewInterceptor> getInterceptors(
-            final Filter<BindViewInterceptor> predicate) {
+            @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
 
@@ -152,6 +152,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
+    @Nullable
     public CompositeNonConfigurationInstance onRetainNonConfigurationInstance() {
         final P presenter = mDelegate.getPresenter();
         if (presenter == null) {

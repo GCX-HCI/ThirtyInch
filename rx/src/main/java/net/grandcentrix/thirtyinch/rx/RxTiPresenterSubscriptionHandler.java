@@ -18,20 +18,19 @@ package net.grandcentrix.thirtyinch.rx;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
+import android.support.annotation.NonNull;
+
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
 public class RxTiPresenterSubscriptionHandler {
-
-    private TiPresenter mPresenter;
 
     private CompositeSubscription mPresenterSubscriptions = new CompositeSubscription();
 
     private CompositeSubscription mUiSubscriptions;
 
     public RxTiPresenterSubscriptionHandler(final TiPresenter presenter) {
-        mPresenter = presenter;
-        mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
+        presenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
                     final boolean beforeLifecycleEvent) {
@@ -59,7 +58,7 @@ public class RxTiPresenterSubscriptionHandler {
      *
      * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
      */
-    public void manageSubscription(final Subscription subscription) {
+    public void manageSubscription(@NonNull final Subscription subscription) {
         if (mPresenterSubscriptions == null) {
             throw new IllegalStateException("subscription handling doesn't work"
                     + " when the presenter has reached the DESTROYED state");
@@ -78,7 +77,7 @@ public class RxTiPresenterSubscriptionHandler {
      *
      * @throws IllegalStateException when no view is attached
      */
-    public void manageViewSubscription(final Subscription subscription) {
+    public void manageViewSubscription(@NonNull final Subscription subscription) {
         if (mUiSubscriptions == null) {
             throw new IllegalStateException("view subscriptions can't be handled"
                     + " when there is no view");
