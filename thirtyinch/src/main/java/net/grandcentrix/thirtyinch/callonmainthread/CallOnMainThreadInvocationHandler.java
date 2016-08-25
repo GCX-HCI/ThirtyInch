@@ -43,7 +43,6 @@ final class CallOnMainThreadInvocationHandler<V> extends AbstractInvocationHandl
     protected Object handleInvocation(final Object proxy, final Method method, final Object[] args)
             throws Throwable {
 
-        //noinspection TryWithIdenticalCatches
         try {
             // If the method is a method from Object then defer to normal invocation.
             final Class<?> declaringClass = method.getDeclaringClass();
@@ -77,23 +76,25 @@ final class CallOnMainThreadInvocationHandler<V> extends AbstractInvocationHandl
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    //noinspection TryWithIdenticalCatches
                     try {
                         method.invoke(mView, args);
                     } catch (InvocationTargetException e) {
+                        // To be consistent, the exception will be thrown, not caught and swallowed.
+                        // Sadly, this exception cannot be caught by wrapping the invoked method with try catch.
                         e.printStackTrace();
+                        throw new RuntimeException(e.getCause());
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 }
             });
             return null;
 
         } catch (InvocationTargetException e) {
-            e.getCause().printStackTrace();
-        } catch (IllegalAccessException e) {
             e.printStackTrace();
+            throw e.getCause();
+        } catch (IllegalAccessException e) {
+            throw e;
         }
-        return null;
     }
 }
