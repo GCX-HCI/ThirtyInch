@@ -4,140 +4,51 @@
 >
 &mdash; Kevin Schultz, Droidcon NYC '14
 
-According to dangerous experiments, heavy calculations and long running tests the perfect distance to the Android Framework is approximately *thirty inches*.
+According to dangerous experiments, heavy calculations and long running tests the perfect distance to the Android Framework is approximately **thirty inches**.
+Sorry for the name, contact us with better ideas.
 
-## Introduction
+## Story
 
-Androids biggest hurdle is the *Activity Lifecycle*.
-Besides of that and some systems APIs it's plain Java.
-Handling the resumed and paused state is easy.
-With `onPause` ond `onResume` it is possible to start/stop unnecessary work (such as GPS) when the user doesn't use the app.
-
-But it gets a lot harder when your Activity gets completely destroyed because of an orientation change.
-Or the `Activity` was in background and got garbage collected.
-The Activity has the same API for both cases.
-The state can be saved in `onSaveInstanceState(Bundle)` and recovered when the Activity gets recreated.
-But it's only possible to save serialized data. Strings, Integers, Booleans, arrays.
-The idea to use the same mechanism to restore the state after a (possible) UI change and returning to an previously opened app was a reasonable decision.
-But is it good practice to serialize all data and deserialize everything a few milliseconds later with the new created Activity object?
-It would be easier without the serialization.
-
-- What about long running operations like unzipping a file?
-Should the zipping stop and restart because the user rotated the phone?
-- Should a network request to order a pizza be cancelled because a user taps a notification and leaves the app?
-
-*No*. This is not the expected behaviour.
-But it happens all the time on Android devices with gigabytes of ram.
-Old laptops with 1GB ram are able to do all those things (and more) in parallel without a problem.
-Changing the screen size of a window, unzipping a file while waiting for the response when booking a flight.
-Everything simultaneously. Nobody fears that the flight will not be booked because he started chatting after submitting the form.
-
-Android is capable to do those things in parallel as well.
-There is the `IntentService`.
-Holding a reference to an `AsyncTask` from a singleton could be another option. And many more.
-
-But here is the thing: All those APIs are hard and often limited.
-Because of that, the decision to lock the screen rotation and stop *all* work when the app goes to background is often the cheapest and quickest solution.
-The bosses are happy if their app doesn't crash.
-
-## Step backwards
-
-What is an `Activity`?
-An `Activity` is the Object that gets started by the system when user taps a launcher icon.
-The Activity allows us to add Views to a `Window` which will be visible to the user.
-There is no other API that can be used to show something to the user.
-The Activity also provides a lot of callbacks when and how the UI is visible.
-There are other methods to connect to system services but they aren't exclusively available using an Activity Object.
-
-*tl;dr* An `Activity` is the UI of an app and we can't get rid of it.
-
-## Living next to the Activity
-
-The idea behind this project is that the `Activity` is *only the UI* (`View`) and displays data but doesn't store them.
-The data/state will be stored in an Object that lives longer than the `Activity`.
-
-This is the `Presenter`.
-
-- The `Presenter` isn't a singleton
-- When the `Activity` gets finished the `Presenter` dies, too
-- The `Presenter` survives orientation changes
-- The `Presenter` survives when the `Activity` got killed in background
-
-The only information the `Presenter` knows about the `View` is if the `View` is in a state to display information or not.
-This results in a very easy Lifecycle:
-
-    The `Activity` gets started
-    The `Presenter` will be created (`onCreate()`)
-
-        The `Activity` is visible
-        The `Activity` will be attached to the `Presenter` (`onWakeUp()`)
-
-        The `Activity` my be invisible
-        The `Activity` will be detached form the `Presenter` (`onSleep()`)
-
-        The `Activity` is visible again
-        The `Activity` will be attached to the `Presenter` (`onWakeUp()`)
-
-        The `Activity` my be destroyed.
-        The `Activity` will be detached form the `Presenter` (`onSleep()`)
-
-        Another `Activity` my be attached to the `Presenter` (`onWakeUp()`)
-
-    The currently attached `Activity` gets finished
-    The Presenter gets destroyed (`onSleep()` followed by `onDestroy()`)
+Interested in the story and a soft introduction? [Read more here](https://github.com/grandcentrix/thirtyinch/wiki/Introduction)
 
 
-*Four* simple lifecycle methods and an `Object` which is able to hold references to long running operations even when the system destroyed the `Activity`.
+## Get it
 
-## The Presenter
+ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
 
-The `Presenter` is written in pure Java and so abstract that it has no idea if the `View` is an AndroidView or a TerminalApplicationView.
-The communication between `View` and `Presenter` is handled with an interface which should be so generalized that it could be implemented for both.
-It's not forbidden but the `Presenter` should *NOT* have a reference to a `Context`. This would break the concept of _"Keep Android At Arm’s Length"_.
-
-## Where is the Model
-
-MVP has a `Model` a `View` and a `Presenter`.
-This project doesn't provide a implementation of the `Model`.
-The heart of this project is the `Presenter`.
-You are free to use whatever you like. A database, a pojo, a service; connecting them to the Presenter is no magic and doesn't require an API.
-Using injection is recommended.
-
-
-## Hello World Example
-
-First create an interface for your `View` extending the empty ThirtyInch `TiView` interface.
-
-```java
-public interface HelloWorldView extends TiView {
-
-    void showText(final String text);
-
+```gradle
+dependencies {
+    def thirtyinchVersion = '0.7.0'
+    
+    // MVP for activity and fragment
+    compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
+    
+    // rx extension
+    compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
+    
+    // composite android extension
+    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
+    
+    // test extension
+    testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
 }
 ```
 
-Add a `Presenter` to your `Activity` by extending from `TiActivity<TiPresenter, TiView>`.
-Another, advanced option is to use the [plugin](plugin/).
-Also implement the `TiView` interface.
-The Activity is the view implementation.
+## Hello World MVP example with ThirtyInch
 
-Two methods have to be implemented:
-
-`providePresenter()` has to return an instance of the `TiPresenter`.
-This method will be called only once in `onCreate(Bundle)`, the first time the Activity gets launched (`savedInstanceState == null`).
-Sadly there is no other way to create the `Presenter` than creating it after the `Activity` was launched.
-Remember, the `Activity` is the entry point.
-
-The `Activity` (`this`) itself is the `View`.
-It will be bound to the presenter whenever the `Activity` is visible to the User (`onStart()`).
-In case the `TiActivity` doesn't implement the `TiView` interface check `TiActivity#provideView()`.
-
-
+`HelloWorldActivity.java`
 ```java
-public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWorldView>
+public class HelloWorldActivity 
+        extends TiActivity<HelloWorldPresenter, HelloWorldView> 
         implements HelloWorldView {
 
     private TextView mOutput;
+
+    @NonNull
+    @Override
+    public HelloWorldPresenter providePresenter() {
+        return new HelloWorldPresenter();
+    }
 
     @Override
     public void showText(final String text) {
@@ -151,23 +62,54 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
         mOutput = (TextView) findViewById(R.id.output);
     }
-
-    @NonNull
-    @Override
-    public HelloWorldPresenter providePresenter() {
-        return new HelloWorldPresenter();
-    }
 }
 ```
 
-
-Creating the `Presenter` and add your logic
-
+`HelloWorldView.java`
 ```java
+public interface HelloWorldView extends TiView {
 
+    @CallOnMainThread
+    void showText(final String text);
+}
+
+```
+
+`HelloWorldPresenter.java`
+```java
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-    private String mText = "Hello World";
+    @Override
+    protected void onWakeUp() {
+        super.onWakeUp();
+        getView().showText("Hello World!");
+    }
+}
+
+```
+
+## ThirtyInch features
+
+### Presenter
+
+- survives configuration changes
+- survives when the `Activity` got killed in background
+- is not a singleton
+- dies when the `Activity` gets finished
+
+##### Lifecycle
+
+The `TiPresenter` lifecycle is very easy.
+
+It can be `CREATED` and `DESTROYED`. 
+The corresponding callbacks `onCreate()` and `onDestroy()` will be only called once!
+
+The `TiView` can either be `ATTACHED` or `DETACHED`.
+The corresponding callbacks are `onWakeUp()` and `onSleep()` which maps to `onStart()` and `onStop()`.
+
+
+```java
+public class MyPresenter extends TiPresenter<MyView> {
 
     @Override
     protected void onCreate() {
@@ -177,8 +119,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     @Override
     protected void onWakeUp() {
         super.onWakeUp();
-
-        getView().showText(mText);
     }
 
     @Override
@@ -194,11 +134,49 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
 ```
 
-Notice: `mText` works here as "Model".
+The lifecycle can be observed using `TiLifecycleObserver`
 
-## View interface Annotations
+There is no callback for `onResume()` and `onPause()` in the `TiPresenter`. 
+This is something the view layer should handle.
+Read more about this here [Hannes Dorfmann - Presenters don't need lifecycle events](http://hannesdorfmann.com/android/presenters-dont-need-lifecycle)
 
-There are two very helpful annotations you can add to *void* methods of your `TiView` interface.
+##### Configuration
+
+The default behaviour might not fit your needs. 
+You can disable unwanted features by providing a configuration in the `TiPresenter` constructor.
+
+```java
+public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
+
+    public static final TiConfiguration PRESENTER_CONFIG = 
+            new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true) 
+                .setUseStaticSaviorToRetain(true)
+                .setCallOnMainThreadInterceptorEnabled(true)
+                .setDistinctUntilChangedInterceptorEnabled(true)
+                .build();
+            
+    public HelloWorldPresenter() {
+        super(PRESENTER_CONFIG);
+    }
+}
+```
+
+Or globally for all `TiPresenters`
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        TiPresenter.setDefaultConfig(MY_DEFAULT_CONFIG);
+    }
+}
+```
+
+### TiView Annotations
+
+Two awesome annotations for the `TiView` interface made it already into `Ti` saving you a lot of time.
 
 ```java
 public interface HelloWorldView extends TiView {
@@ -216,10 +194,12 @@ This allows to run code off the main thread but send events to the UI without de
 
 Requires to be a `void` method. Works only for `TiView` interfaces implemented by "Android Views" (`TiActivity`, `TiFragment`).
 
+Enabled by default, can be disabled with the `TiConfiguration`
+
 ##### @DistinctUntilChanged
 
-When calling this method the `View` receives no duplicated (equal) calls.
-When the View received a parameter and gets called again with the same parameter (equals) the call gets swallowed.
+When calling this method the `View` receives no duplicated calls.
+The View swallows the second call when a method gets called with the same (hashcode) parameters twice.
 
 Usecase:
 The Presenter binds a huge list to the `View`. The app loses focus (`onSleep()`) and the exact same Activity instance gains focus again (`onWakeUp()`).
@@ -230,53 +210,142 @@ When the data hasn't changed the call gets swallowed and prevents flickering.
 
 Requires to be a `void` method and has at least one parameter.
 
+Enabled by default, can be disabled with the `TiConfiguration`
 
-## Build and integrate
 
-This workaround will be removed once public released.
+### View binding interceptors
 
-Clone this project and generate the `aar` package. Add the artifact to your local maven repository
-```bash
-# generate aars and push them to maven local
-./gradlew clean bundleRelease bintrayUpload -PbintrayUser=wrongName -PbintrayKey=invalidKey -PdryRun=true`
-```
+*View Annotations* only work because ThirtyInch supports interceptors. 
+Add interceptors (`BindViewInterceptor`) to `TiActivity` or `TiFragment` to intercept the binding process from `TiView` to `TiPresenter`.
+Interceptors are public API waiting for other great ideas.
 
-in your app `build.gradle`
-```gradle
-buildscript {
-    repositories {
-        mavenLocal()
+
+```java
+public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWorldView>
+        implements HelloWorldView {
+
+    public HelloWorldActivity() {
+        addBindViewInterceptor(new MyInterceptor());
     }
 }
+```
 
-android {
-    // your configuration
-}
 
-dependencies {
-    // "changing true" always loads the latest version from maven (here: mavenLocal)
+### [RxJava](https://github.com/ReactiveX/RxJava)
 
-    // the normal version
-    compile('net.grandcentrix.thirtyinch:thirtyinch:0.7-SNAPSHOT') { changing true }
+Using RxJava for networking is very often used.
+Observing a `Model` is another good usecase where Rx can be used inside of a `TiPresenter`.
+The Rx package provides helper classes to deal with `Subscription` or wait for an attached `TiView`.
 
-    // the plugin version for CompositeAndroid
-    compile('net.grandcentrix.thirtyinch:thirtyinch-plugin:0.7-SNAPSHOT') { changing true }
-}
+```java
+public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-configurations.all {
-    // Check for updates every build, default is every 24h
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    // add the subscription helper to your presenter
+    private RxTiPresenterSubscriptionHandler rxHelper = new RxTiPresenterSubscriptionHandler(this);
+
+    @Override
+    protected void onCreate() {
+        super.onCreate();
+        
+        // automatically unsubscribe in onDestroy()
+        rxHelper.manageSubscription(
+                Observable.interval(0, 1, TimeUnit.SECONDS)
+                    // cache the latest value when no view is attached
+                    // emits when the view got attached
+                    .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
+                    .subscribe(uptime -> getView().showPresenterUpTime(uptime))
+        );
+    }
+
+    @Override
+    protected void onWakeUp() {
+        super.onWakeUp();
+
+        // automatically unsubscribe in onSleep()
+        rxHelper.manageViewSubscription(anotherObservable.subscribe());
+    }
 }
 ```
 
-Or add the aars manually and put them in the libs folder. Download the [ThrityInch 0.6 aars here](https://github.gcxi.de/grandcentrix/ThirtyInch/releases/tag/v0.6)
+### [CompositeAndroid](https://github.com/passsy/CompositeAndroid)
 
-For each AAR `File > New > New Module > Import .JAR/.AAR`
+Extending `TiActivity` is probably not what you want because you already have a `BaseActivity`.
+Extending all already existing Activities from `TiActivity` doesn't make sense because they don't use MVP right now.
+[`CompositeAndroid`](https://github.com/passsy/CompositeAndroid) uses composition to add a `TiPresenter` to an `Activity`.
+One line adds the `TiActivityPlugin` and everything works as expected.
 
-```gradlew
+```java
+public class HelloWorldActivity extends CompositeActivity implements HelloWorldView {
 
-dependencies {
-    compile project(':thirtyinch')
-    compile project(':thirtyinch-plugin')
+        // Java 7
+        addPlugin(new TiActivityPlugin<>(
+                new TiPresenterProvider<HelloWorldPresenter>() {
+                    @NonNull
+                    @Override
+                    public HelloWorldPresenter providePresenter() {
+                        return new HelloWorldPresenter();
+                    }
+                }));
+
+        // Java 8
+        addPlugin(new TiActivityPlugin<HelloWorldPresenter, HelloWorldView>(
+                () -> new HelloWorldPresenter()));
 }
+```
+
+Yes you have to extends `CompositeActivity`, but that's the last level of inheritance you'll ever need.
+
+## Versions
+
+##### Version 0.7 `26.09.16`
+- `TiConfiguration`
+- Presenter LifecycleObservers
+- ViewBindingInterceptors
+- `TiActivityDelegate` for code sharing
+- separate Rx module
+- separate Test module
+- public release, projects using `Ti`: ∞
+
+##### Version 0.6 `11.06.16`
+- Tests
+- Smaller bugfixes and minor breaking changes
+
+##### Version 0.5 `03.05.16`
+- plugin for CompositeAndroid
+- Clean usage syntax by automatically using the `TiActivity` as the `TiView`
+- Projects using `Ti`: 6
+
+##### Version 0.4 `12.05.16`
+- Extracted into standalone library
+- Rebranded to ThirtyInch
+- Projects using `Ti`: 3
+
+##### Version 0.3 `19.02.16`
+- CallOnMainThread annotation
+- fix "Don't keep activities" with `PresenterSavior`
+
+##### Version 0.2 `02.09.15`
+- stabilize Activity and Fragment support
+
+##### Version 0.1 `10.04.15`
+- first configuration change surviving Presenter
+- heavy usage or RxJava
+
+
+# License
+
+```
+Copyright 2016 grandcentrix GmbH
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
