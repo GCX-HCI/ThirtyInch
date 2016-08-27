@@ -18,9 +18,9 @@ package net.grandcentrix.thirtyinch.plugin;
 import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
@@ -101,10 +101,9 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public P getRetainedPresenter() {
         final Object nci = getLastNonConfigurationInstance(NCI_KEY_PRESENTER);
-        if (nci instanceof CompositeNonConfigurationInstance) {
-            final CompositeNonConfigurationInstance cnci = (CompositeNonConfigurationInstance) nci;
+        if (nci != null) {
             //noinspection unchecked
-            return (P) cnci.getNonConfigurationInstance();
+            return (P) nci;
         }
         return null;
     }
