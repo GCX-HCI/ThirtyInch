@@ -29,7 +29,7 @@ android {
 
 dependencies {
     compile project(':thirtyinch')
-    compile 'com.pascalwelsch.compositeandroid:activity:0.2.1'
+    compile 'com.pascalwelsch.compositeandroid:activity:0.2.2'
 }
 
 publish {
