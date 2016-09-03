@@ -276,6 +276,8 @@ One line adds the `TiActivityPlugin` and everything works as expected.
 ```java
 public class HelloWorldActivity extends CompositeActivity implements HelloWorldView {
 
+    public HelloWorldActivity() {
+    
         // Java 7
         addPlugin(new TiActivityPlugin<>(
                 new TiPresenterProvider<HelloWorldPresenter>() {
@@ -289,6 +291,7 @@ public class HelloWorldActivity extends CompositeActivity implements HelloWorldV
         // Java 8
         addPlugin(new TiActivityPlugin<HelloWorldPresenter, HelloWorldView>(
                 () -> new HelloWorldPresenter()));
+    }
 }
 ```
 
