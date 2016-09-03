@@ -4,8 +4,7 @@
 >
 &mdash; Kevin Schultz, Droidcon NYC '14
 
-According to dangerous experiments, heavy calculations and long running tests the perfect distance to the Android Framework is approximately **thirty inches**.
-Sorry for the name, contact us with better ideas.
+The perfect distance to the Android Framework is approximately **thirty inches**, the average length of the human arm, shoulder to fingertips.
 
 ## Story
 
