@@ -26,7 +26,7 @@ allprojects {
 
 ext{
     supportLibraryVersion = '24.2.0'
-    VERSION_NAME = "0.7.0"
+    VERSION_NAME = "0.7.1-SNAPSHOT"
     VERSION_CODE = 1
     MIN_SDK_VERSION = 14
     TARGET_SDK_VERSION = 23
