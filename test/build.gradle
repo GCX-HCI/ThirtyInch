@@ -41,5 +41,5 @@ publish {
     uploadName = 'ThirtyInch-Test'
     publishVersion = VERSION_NAME
     //description = ''
-    //website = ''
+    website = 'https://github.com/grandcentrix/ThirtyInch'
 }

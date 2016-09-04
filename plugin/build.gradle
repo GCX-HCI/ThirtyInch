@@ -39,5 +39,5 @@ publish {
     uploadName = 'ThirtyInch-Plugin'
     publishVersion = VERSION_NAME
     //description = ''
-    //website = ''
+    website = 'https://github.com/grandcentrix/ThirtyInch'
 }

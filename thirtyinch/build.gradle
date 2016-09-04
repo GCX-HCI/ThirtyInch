@@ -51,6 +51,6 @@ publish {
     publishVersion = VERSION_NAME
     artifactId = 'thirtyinch'
     uploadName = 'ThirtyInch'
-    //description = ''
-    //website = ''
+    description = 'a Model View Presenter library for Android'
+    website = 'https://github.com/grandcentrix/ThirtyInch'
 }
