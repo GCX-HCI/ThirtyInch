@@ -36,7 +36,7 @@ publish {
     userOrg = 'passsy'
     groupId = 'net.grandcentrix.thirtyinch'
     artifactId = 'thirtyinch-plugin'
-    uploadName = 'ThirtyInch-Plugin'
+    uploadName = 'ThirtyInch'
     publishVersion = VERSION_NAME
     //description = ''
     website = 'https://github.com/grandcentrix/ThirtyInch'
