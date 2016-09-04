@@ -39,7 +39,7 @@ publish {
     userOrg = 'passsy'
     groupId = 'net.grandcentrix.thirtyinch'
     artifactId = 'thirtyinch-rx'
-    uploadName = 'ThirtyInch - Reactive Extension'
+    uploadName = 'ThirtyInch-Rx'
     publishVersion = VERSION_NAME
     //description = ''
     //website = ''
