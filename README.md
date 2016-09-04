@@ -1,5 +1,7 @@
 # ThirtyInch - a MVP library for Android
 
+![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat)
+
 > Keep Android At Arm’s Length
 >
 &mdash; Kevin Schultz, Droidcon NYC '14
@@ -11,12 +13,11 @@ The perfect distance to the Android Framework is approximately **thirty inches**
 Interested in the story and a soft introduction? [Read more here](https://github.com/grandcentrix/thirtyinch/wiki/Introduction)
 
 
-## Get it
+## Get it [![Download](https://api.bintray.com/packages/passsy/maven/ThirtyInch/images/download.svg) ](https://bintray.com/passsy/maven/ThirtyInch/_latestVersion)
 
 ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
 
 ```gradle
-
 dependencies {
     def thirtyinchVersion = '0.7.0'
     
