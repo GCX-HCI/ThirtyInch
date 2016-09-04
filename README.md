@@ -299,7 +299,7 @@ Yes you have to extends `CompositeActivity`, but that's the last level of inheri
 
 ## Versions
 
-##### Version 0.7 `26.09.16`
+##### Version 0.7 `04.10.16`
 - `TiConfiguration`
 - Presenter LifecycleObservers
 - ViewBindingInterceptors
