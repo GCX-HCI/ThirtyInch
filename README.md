@@ -16,10 +16,6 @@ Interested in the story and a soft introduction? [Read more here](https://github
 ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
 
 ```gradle
-repositories {
-    // only required the first 48h until the artifacts are included in jcenter
-    maven { url "http://dl.bintray.com/passsy/maven" }
-}
 
 dependencies {
     def thirtyinchVersion = '0.7.0'
