@@ -56,7 +56,7 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
         mBindViewInterceptors.add(interceptor);
         invalidateView();
 
-        return new OnTimeRemovable() {
+        return new OneTimeRemovable() {
             @Override
             public void onRemove() {
                 mBindViewInterceptors.remove(interceptor);
