@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Removable which allows removing only once
  */
-public abstract class OnTimeRemovable implements Removable {
+public abstract class OneTimeRemovable implements Removable {
 
     private final AtomicBoolean removed = new AtomicBoolean(false);
 

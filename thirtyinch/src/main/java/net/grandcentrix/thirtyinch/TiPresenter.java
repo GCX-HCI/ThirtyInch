@@ -16,7 +16,7 @@
 package net.grandcentrix.thirtyinch;
 
 
-import net.grandcentrix.thirtyinch.internal.OnTimeRemovable;
+import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -122,7 +122,7 @@ public abstract class TiPresenter<V extends TiView> {
 
         mLifecycleObservers.add(observer);
 
-        return new OnTimeRemovable() {
+        return new OneTimeRemovable() {
 
             @Override
             public void onRemove() {
