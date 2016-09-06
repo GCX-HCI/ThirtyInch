@@ -10,7 +10,7 @@ The perfect distance to the Android Framework is approximately **thirty inches**
 
 ## Story
 
-Interested in the story and a soft introduction? [Read more here](https://github.com/grandcentrix/thirtyinch/wiki/Introduction)
+Read the introduction article on [Medium](https://medium.com/@passsy/thirtyinch-a-new-mvp-library-for-android-bd1a27262fd6#.xihev9jxq)
 
 
 ## Get it [![Download](https://api.bintray.com/packages/passsy/maven/ThirtyInch/images/download.svg) ](https://bintray.com/passsy/maven/ThirtyInch/_latestVersion)
