@@ -68,6 +68,10 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return mDelegate.getInterceptors(predicate);
     }
 
+    public P getPresenter() {
+        return mDelegate.getPresenter();
+    }
+
     @Nullable
     @Override
     public P getRetainedPresenter() {
