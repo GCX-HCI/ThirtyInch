@@ -19,7 +19,7 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.7.0'
+    def thirtyinchVersion = '0.7.1'
     
     // MVP for activity and fragment
     compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
@@ -301,7 +301,11 @@ Yes you have to extends `CompositeActivity`, but that's the last level of inheri
 
 ## Versions
 
-##### Version 0.7 `04.10.16`
+
+##### Version 0.7.1 `07.09.16`
+- add missing `TiActivity#getPresenter()`
+
+##### Version 0.7.0 `04.09.16`
 - `TiConfiguration`
 - Presenter LifecycleObservers
 - ViewBindingInterceptors
