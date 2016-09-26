@@ -19,8 +19,6 @@ package net.grandcentrix.thirtyinch;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import timber.log.Timber;
-
 /**
  * Logging class used for all logging of ThirtyInch.
  */
@@ -42,11 +40,13 @@ public class TiLog {
         void log(final int level, final String tag, final String msg);
     }
 
+    private static final String TAG = "ThirtyInch";
+
     // logs everything to Timber by default
     private static Logger logger = new Logger() {
         @Override
         public void log(final int level, final String tag, final String msg) {
-            Timber.tag(tag).log(level, msg);
+            Log.println(level, TAG, tag + ": " + msg);
         }
     };
 
