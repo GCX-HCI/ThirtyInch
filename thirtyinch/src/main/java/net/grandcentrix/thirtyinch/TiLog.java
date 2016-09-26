@@ -70,6 +70,19 @@ public class TiLog {
 
     /**
      * set a custom logger, {@code null} to disable logging
+     * <p>
+     * Combine it with Timber:<br>
+     *
+     * <code>
+     * <pre>
+     * TiLog.setLogger(new TiLog.Logger() {
+     *    &#64;Override
+     *    public void log(final int level, final String tag, final String msg) {
+     *        Timber.tag(tag).log(level, msg);
+     *    }
+     * });
+     * </pre>
+     * </code>
      */
     public static void setLogger(@Nullable final Logger logger) {
         TiLog.logger = logger;
