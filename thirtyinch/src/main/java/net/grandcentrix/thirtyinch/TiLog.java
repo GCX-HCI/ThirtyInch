@@ -29,7 +29,7 @@ public class TiLog {
      *
      * @see #setLogger(Logger)
      */
-    interface Logger {
+    public interface Logger {
 
         /**
          * @param level one of {@link Log#VERBOSE}, {@link Log#DEBUG},{@link Log#INFO},
