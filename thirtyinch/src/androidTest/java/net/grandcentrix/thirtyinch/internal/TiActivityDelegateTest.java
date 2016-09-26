@@ -15,8 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiConfiguration;
+import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.Before;
@@ -144,38 +144,6 @@ public class TiActivityDelegateTest {
     }
 
     @Test
-    public void testRestorePresenter_withSavior_whichIsDisabled() throws Exception {
-        final TiPresenter firstPresenter = new TiPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build()) {
-        };
-        final TiPresenter secondPresenter = new TiPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build()) {
-        };
-        mPresenter = firstPresenter;
-
-        mDelegate.onCreate_afterSuper(null);
-
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
-
-        final Bundle bundle = new Bundle();
-        mDelegate.onSaveInstanceState_afterSuper(bundle);
-
-        mDelegate.onDestroy_afterSuper();
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
-
-        mPresenter = secondPresenter;
-
-        // check reuse of old presenter
-        mDelegate.onCreate_afterSuper(bundle);
-        assertEquals(secondPresenter, mDelegate.getPresenter());
-
-        // new one got created
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
-    }
-
-    @Test
     public void testRestorePresenter_withSavior() throws Exception {
         final TiPresenter firstPresenter = new TiPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
@@ -205,6 +173,38 @@ public class TiActivityDelegateTest {
 
         // new one got NOT created
         assertEquals(TiPresenter.State.INITIALIZED, mPresenter.getState());
+    }
+
+    @Test
+    public void testRestorePresenter_withSavior_whichIsDisabled() throws Exception {
+        final TiPresenter firstPresenter = new TiPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .build()) {
+        };
+        final TiPresenter secondPresenter = new TiPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .build()) {
+        };
+        mPresenter = firstPresenter;
+
+        mDelegate.onCreate_afterSuper(null);
+
+        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+
+        final Bundle bundle = new Bundle();
+        mDelegate.onSaveInstanceState_afterSuper(bundle);
+
+        mDelegate.onDestroy_afterSuper();
+        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+
+        mPresenter = secondPresenter;
+
+        // check reuse of old presenter
+        mDelegate.onCreate_afterSuper(bundle);
+        assertEquals(secondPresenter, mDelegate.getPresenter());
+
+        // new one got created
+        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
     }
 
     @NonNull
@@ -249,10 +249,10 @@ public class TiActivityDelegateTest {
                         return mPresenter;
                     }
                 },
-                new TiPresenterLogger() {
+                new TiLoggingTagProvider() {
                     @Override
-                    public void logTiMessages(final String msg) {
-                        System.out.println(msg);
+                    public String getLoggingTag() {
+                        return "TestTag";
                     }
                 });
     }

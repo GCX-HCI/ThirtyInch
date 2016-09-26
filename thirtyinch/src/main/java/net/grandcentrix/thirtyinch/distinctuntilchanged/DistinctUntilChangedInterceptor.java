@@ -16,12 +16,12 @@
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.lang.reflect.Proxy;
 
@@ -49,7 +49,7 @@ public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
                     = DistinctUntilChangedInterceptor.unwrap(wrappedView);
             if (view != null) {
                 view.clearCache();
-                Log.v(TAG, "cleared the distinctUntilChanged cache of " + view);
+                TiLog.v(TAG, "cleared the distinctUntilChanged cache of " + view);
             }
         }
     }
@@ -57,7 +57,7 @@ public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
     @Override
     public <V extends TiView> V intercept(final V view) {
         final V wrapped = wrap(view);
-        Log.d(TAG, "wrapping View " + view + " in " + wrapped);
+        TiLog.d(TAG, "wrapping View " + view + " in " + wrapped);
         return wrapped;
     }
 

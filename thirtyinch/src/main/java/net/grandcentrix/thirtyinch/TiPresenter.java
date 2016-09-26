@@ -25,8 +25,6 @@ import android.support.v4.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern. If used with {@link
@@ -70,9 +68,9 @@ public abstract class TiPresenter<V extends TiView> {
     @VisibleForTesting
     final List<TiLifecycleObserver> mLifecycleObservers = new ArrayList<>();
 
-    Logger mLogger = Logger.getLogger(this.getClass().getSimpleName()
+    private final String TAG = this.getClass().getSimpleName()
             + ":" + TiPresenter.class.getSimpleName()
-            + "@" + Integer.toHexString(this.hashCode()));
+            + "@" + Integer.toHexString(this.hashCode());
 
     /**
      * used to check that lifecycle methods (starting with on..) cannot be called directly. i.e.
@@ -174,12 +172,12 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void create() {
         if (isCreated()) {
-            mLogger.log(Level.WARNING, "not calling onCreate(), it was already called");
+            TiLog.w(TAG, "not calling onCreate(), it was already called");
             return;
         }
         moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
         mCalled = false;
-        mLogger.log(Level.FINE, "onCreate()");
+        TiLog.v(TAG, "onCreate()");
         onCreate();
         if (!mCalled) {
             throw new SuperNotCalledException("Presenter " + this
@@ -197,13 +195,13 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void destroy() {
         if (!isCreated() || isDestroyed()) {
-            mLogger.log(Level.WARNING, "not calling onDestroy(), destroy was already called");
+           TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
             return;
         }
 
         moveToState(State.DESTROYED, false);
         mCalled = false;
-        mLogger.log(Level.FINE, "onDestroy()");
+        TiLog.v(TAG, "onDestroy()");
         onDestroy();
         if (!mCalled) {
             throw new SuperNotCalledException("Presenter " + this
@@ -259,12 +257,12 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void sleep() {
         if (!isAwake()) {
-            mLogger.log(Level.FINE, "not calling onSleep(), not woken up");
+            TiLog.v(TAG, "not calling onSleep(), not woken up");
             return;
         }
         moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
         mCalled = false;
-        mLogger.log(Level.FINE, "onSleep()");
+        TiLog.v(TAG, "onSleep()");
         onSleep();
         if (!mCalled) {
             throw new SuperNotCalledException("Presenter " + this
@@ -297,12 +295,12 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void wakeUp() {
         if (isAwake()) {
-            mLogger.log(Level.FINE, "not calling onWakeUp(), already woken up");
+            TiLog.v(TAG, "not calling onWakeUp(), already woken up");
             return;
         }
         moveToState(State.VIEW_ATTACHED_AND_AWAKE, false);
         mCalled = false;
-        mLogger.log(Level.FINE, "onWakeUp()");
+        TiLog.v(TAG, "onWakeUp()");
         onWakeUp();
         if (!mCalled) {
             throw new SuperNotCalledException("Presenter " + this

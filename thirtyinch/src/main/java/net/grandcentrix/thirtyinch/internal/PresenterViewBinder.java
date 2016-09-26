@@ -17,6 +17,7 @@ package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
@@ -37,17 +38,17 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
 
     private List<BindViewInterceptor> mBindViewInterceptors = new ArrayList<>();
 
-    private HashMap<BindViewInterceptor, V> mIntercepterViewOutput = new HashMap<>();
+    private HashMap<BindViewInterceptor, V> mInterceptorViewOutput = new HashMap<>();
 
     /**
      * the cached version of the view send to the presenter after it passed the interceptors
      */
     private V mLastView;
 
-    private final TiPresenterLogger mLogger;
+    private final TiLoggingTagProvider mLogTag;
 
-    public PresenterViewBinder(final TiPresenterLogger logger) {
-        mLogger = logger;
+    public PresenterViewBinder(final TiLoggingTagProvider loggingTagProvider) {
+        mLogTag = loggingTagProvider;
     }
 
     @NonNull
@@ -75,13 +76,13 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
             V interceptedView = viewProvider.provideView();
             for (final BindViewInterceptor interceptor : mBindViewInterceptors) {
                 interceptedView = interceptor.intercept(interceptedView);
-                mIntercepterViewOutput.put(interceptor, interceptedView);
+                mInterceptorViewOutput.put(interceptor, interceptedView);
             }
             mLastView = interceptedView;
-            mLogger.logTiMessages("binding NEW view to Presenter " + mLastView);
+            TiLog.v(mLogTag.getLoggingTag(), "binding NEW view to Presenter " + mLastView);
             presenter.bindNewView(mLastView);
         } else {
-            mLogger.logTiMessages("binding the cached view to Presenter " + mLastView);
+            TiLog.v(mLogTag.getLoggingTag(), "binding the cached view to Presenter " + mLastView);
             presenter.bindNewView(mLastView);
         }
     }
@@ -89,7 +90,7 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
     @Nullable
     @Override
     public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
-        return mIntercepterViewOutput.get(interceptor);
+        return mInterceptorViewOutput.get(interceptor);
     }
 
     @NonNull
@@ -109,6 +110,6 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
     @Override
     public void invalidateView() {
         mLastView = null;
-        mIntercepterViewOutput.clear();
+        mInterceptorViewOutput.clear();
     }
 }

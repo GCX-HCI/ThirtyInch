@@ -15,19 +15,14 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiActivity;
-
 /**
- * Super simple logging interface because the {@link TiActivityDelegate}
- * is not responsible for actually logging. The using {@link TiActivity}
- * or {@code TiActivityPlugin} takes care of logging and providing the correct logging TAG.
+ * Interface providing access to a logging tag for composition classes. Provides better tags for
+ * the log output
  */
-public interface TiPresenterLogger {
+public interface TiLoggingTagProvider {
 
     /**
-     * logs a debug message from the presenter
-     *
-     * @param msg message from the presenter to display
+     * @return the tag which should be used for logging
      */
-    void logTiMessages(final String msg);
+    String getLoggingTag();
 }
