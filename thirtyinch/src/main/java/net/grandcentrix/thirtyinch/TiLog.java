@@ -114,7 +114,7 @@ public class TiLog {
         }
     }
 
-    TiLog() {
+    private TiLog() {
         throw new AssertionError("no instances");
     }
 }
