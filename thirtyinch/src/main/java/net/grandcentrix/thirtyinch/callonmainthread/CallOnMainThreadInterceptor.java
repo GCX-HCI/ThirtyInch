@@ -16,9 +16,8 @@
 package net.grandcentrix.thirtyinch.callonmainthread;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
-
-import android.util.Log;
 
 import java.lang.reflect.Proxy;
 
@@ -32,7 +31,7 @@ public class CallOnMainThreadInterceptor implements BindViewInterceptor {
     @Override
     public <V extends TiView> V intercept(final V view) {
         final V wrapped = wrap(view);
-        Log.d(TAG, "wrapping View " + view + " in " + wrapped);
+        TiLog.d(TAG, "wrapping View " + view + " in " + wrapped);
         return wrapped;
     }
 

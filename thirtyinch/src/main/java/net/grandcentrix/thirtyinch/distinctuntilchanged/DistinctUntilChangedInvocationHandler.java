@@ -15,6 +15,7 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
@@ -22,20 +23,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationHandler {
 
-    private HashMap<String, Integer> mLatestMethodCalls = new HashMap<>();
+    private static final String TAG = DistinctUntilChangedInvocationHandler.class.getSimpleName();
 
-    private final Logger mLogger;
+    private HashMap<String, Integer> mLatestMethodCalls = new HashMap<>();
 
     private final V mView;
 
     public DistinctUntilChangedInvocationHandler(V view) {
         mView = view;
-        mLogger = Logger.getLogger(toString());
     }
 
     public void clearCache() {
@@ -102,7 +100,7 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             } else {
                 // don't call the method, the exact same data was already sent to the view
                 if (ducAnnotation.logDropped()) {
-                    mLogger.log(Level.INFO, "not calling " + method
+                    TiLog.d(TAG, "not calling " + method
                             + " with args " + Arrays.toString(args) + "."
                             + " Was already called with the same parameters before.");
                 }

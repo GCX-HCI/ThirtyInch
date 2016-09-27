@@ -26,7 +26,7 @@ import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
-import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
+import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
@@ -37,12 +37,11 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.List;
 
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extends ActivityPlugin
-        implements TiViewProvider<V>, DelegatedTiActivity<P>, TiPresenterLogger,
+        implements TiViewProvider<V>, DelegatedTiActivity<P>, TiLoggingTagProvider,
         InterceptableViewBinder<V> {
 
     public static final String NCI_KEY_PRESENTER = "presenter";
@@ -93,6 +92,11 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return mDelegate.getInterceptors(predicate);
     }
 
+    @Override
+    public String getLoggingTag() {
+        return TAG;
+    }
+
     public P getPresenter() {
         return mDelegate.getPresenter();
     }
@@ -125,11 +129,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
-    }
-
-    @Override
-    public void logTiMessages(final String msg) {
-        Log.v(TAG, msg);
     }
 
     @Override

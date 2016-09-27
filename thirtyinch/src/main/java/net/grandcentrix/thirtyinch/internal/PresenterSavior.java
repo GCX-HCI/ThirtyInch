@@ -16,14 +16,13 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Activities can be destroyed when the device runs out of memory. Sometimes it doesn't work to
@@ -37,7 +36,7 @@ public enum PresenterSavior {
 
     INSTANCE;
 
-    private Logger mLogger = Logger.getLogger(PresenterSavior.class.getSimpleName());
+    private static final String TAG = PresenterSavior.class.getSimpleName();
 
     private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
@@ -52,7 +51,7 @@ public enum PresenterSavior {
 
     public String safe(@NonNull final TiPresenter presenter) {
         final String id = generateId(presenter);
-        mLogger.log(Level.FINER, "safe presenter with id " + id + " " + presenter);
+        TiLog.v(TAG, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
     }

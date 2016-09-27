@@ -19,7 +19,7 @@ import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterNonConfigurationInstance;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
-import net.grandcentrix.thirtyinch.internal.TiPresenterLogger;
+import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ import java.util.List;
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
         implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
-        TiPresenterLogger, InterceptableViewBinder<V> {
+        TiLoggingTagProvider, InterceptableViewBinder<V> {
 
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiActivity.class.getSimpleName()
@@ -66,6 +65,11 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     public List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
+    }
+
+    @Override
+    public String getLoggingTag() {
+        return TAG;
     }
 
     public P getPresenter() {
@@ -103,11 +107,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
-    }
-
-    @Override
-    public void logTiMessages(final String msg) {
-        Log.v(TAG, msg);
     }
 
     @Override
