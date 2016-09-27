@@ -42,13 +42,19 @@ public class TiLog {
 
     private static final String TAG = "ThirtyInch";
 
-    // logs everything to Timber by default
-    private static Logger logger = new Logger() {
+    /**
+     * predefined logger using {@link Log} to print into Logcat with tag "ThirtyInch"
+     *
+     * @see #setLogger(Logger)
+     */
+    public static Logger LOGCAT = new Logger() {
         @Override
         public void log(final int level, final String tag, final String msg) {
             Log.println(level, TAG, tag + ": " + msg);
         }
     };
+
+    private static Logger logger;
 
     public static void d(final String tag, final String msg) {
         if (logger != null) {
@@ -70,6 +76,14 @@ public class TiLog {
 
     /**
      * set a custom logger, {@code null} to disable logging
+     * <p>
+     *
+     * Use the default logcat logger for Android:
+     * <code>
+     * <pre>
+     * TiLog.setLogger(TiLog.LOGCAT);
+     * </pre>
+     * </code>
      * <p>
      * Combine it with Timber:<br>
      *
