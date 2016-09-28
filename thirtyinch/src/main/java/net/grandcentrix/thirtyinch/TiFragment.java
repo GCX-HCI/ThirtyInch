@@ -26,7 +26,6 @@ import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -103,7 +102,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
-                TiLog.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
+                TiLog.v(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
@@ -113,13 +112,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                     PresenterSavior.INSTANCE.free(recoveredPresenterId);
                     mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
                 }
-                TiLog.d(TAG, "recovered Presenter " + mPresenter);
+                TiLog.v(TAG, "recovered Presenter " + mPresenter);
             }
         }
 
         if (mPresenter == null) {
             mPresenter = providePresenter();
-            TiLog.d(TAG, "created Presenter: " + mPresenter);
+            TiLog.v(TAG, "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);

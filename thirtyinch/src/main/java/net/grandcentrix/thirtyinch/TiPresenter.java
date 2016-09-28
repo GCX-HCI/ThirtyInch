@@ -195,7 +195,7 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void destroy() {
         if (!isCreated() || isDestroyed()) {
-           TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
+            TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
             return;
         }
 
