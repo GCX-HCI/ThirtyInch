@@ -26,6 +26,7 @@ public class SampleApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // log ThirtyInch output with logcat
         TiLog.setLogger(TiLog.LOGCAT);
     }
 }
