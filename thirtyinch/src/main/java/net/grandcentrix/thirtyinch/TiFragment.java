@@ -153,13 +153,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     public void onDestroy() {
         super.onDestroy();
         final FragmentActivity activity = getActivity();
-        TiLog.v(TAG, "onDestroy() recreating=" + !activity.isFinishing());
 
         boolean destroyPresenter = false;
         if (activity.isFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
+            TiLog.v(TAG, "Activity is finishing, destroying presenter " + mPresenter);
         }
 
         final TiConfiguration config = mPresenter.getConfig();
@@ -168,6 +168,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             // configuration says the presenter should not be retained, a new presenter instance
             // will be created and the current presenter should be destroyed
             destroyPresenter = true;
+            TiLog.v(TAG, "presenter configured as not retaining, destroying " + mPresenter);
         }
 
         if (!destroyPresenter &&
@@ -178,11 +179,16 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             // "don't keep activities" is enabled.
             // a new presenter instance will be created and the current presenter should be destroyed
             destroyPresenter = true;
+            TiLog.v(TAG, "the PresenterSavior is disabled and \"don\'t keep activities\" is "
+                    + "activated. The presenter can't be retained. Destroying " + mPresenter);
         }
 
         if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
+        } else {
+            TiLog.v(TAG, "not destroying " + mPresenter
+                    + " which will be reused by the next Activity instance, recreating...");
         }
     }
 
