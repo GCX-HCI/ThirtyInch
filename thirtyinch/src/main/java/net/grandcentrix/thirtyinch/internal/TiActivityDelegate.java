@@ -124,7 +124,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
-        TiLog.v(mLogTag.getLoggingTag(), "onCreate(" + savedInstanceState + ")");
 
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
@@ -192,7 +191,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onDestroy_afterSuper() {
         final boolean isFinishing = mTiActivity.isActivityFinishing();
-        TiLog.v(mLogTag.getLoggingTag(), "onDestroy()");
 
         boolean destroyPresenter = false;
         if (isFinishing) {
@@ -254,7 +252,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onStart_beforeSuper() {
-        TiLog.v(mLogTag.getLoggingTag(), "onStart()");
         mViewBinder.bindView(mPresenter, mViewProvider);
     }
 
@@ -263,7 +260,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onStop_beforeSuper() {
-        TiLog.v(mLogTag.getLoggingTag(), "onStop()");
         mActivityStarted = false;
     }
 }

@@ -94,16 +94,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-        TiLog.v(TAG, "onAttach()");
-
-    }
-
-    @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TiLog.d(TAG, "onCreate(" + savedInstanceState + ")");
 
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -196,15 +188,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onDestroyView() {
-        TiLog.v(TAG, "onDestroyView()");
         mPresenter.sleep();
         super.onDestroyView();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        TiLog.v(TAG, "onDetach()");
     }
 
     @Override
@@ -216,7 +201,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onStart() {
         super.onStart();
-        TiLog.v(TAG, "onStart()");
         mActivityStarted = true;
 
         if (isUiPossible()) {
@@ -234,7 +218,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onStop() {
-        TiLog.v(TAG, "onStop()");
         mActivityStarted = false;
         mPresenter.sleep();
         super.onStop();
