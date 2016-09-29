@@ -26,7 +26,6 @@ import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -94,16 +93,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-        TiLog.v(TAG, "onAttach()");
-
-    }
-
-    @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TiLog.d(TAG, "onCreate(" + savedInstanceState + ")");
 
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -111,7 +102,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
-                TiLog.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
+                TiLog.v(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
@@ -121,13 +112,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                     PresenterSavior.INSTANCE.free(recoveredPresenterId);
                     mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
                 }
-                TiLog.d(TAG, "recovered Presenter " + mPresenter);
+                TiLog.v(TAG, "recovered Presenter " + mPresenter);
             }
         }
 
         if (mPresenter == null) {
             mPresenter = providePresenter();
-            TiLog.d(TAG, "created Presenter: " + mPresenter);
+            TiLog.v(TAG, "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
@@ -161,13 +152,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     public void onDestroy() {
         super.onDestroy();
         final FragmentActivity activity = getActivity();
-        TiLog.v(TAG, "onDestroy() recreating=" + !activity.isFinishing());
 
         boolean destroyPresenter = false;
         if (activity.isFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
+            TiLog.v(TAG, "Activity is finishing, destroying presenter " + mPresenter);
         }
 
         final TiConfiguration config = mPresenter.getConfig();
@@ -176,6 +167,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             // configuration says the presenter should not be retained, a new presenter instance
             // will be created and the current presenter should be destroyed
             destroyPresenter = true;
+            TiLog.v(TAG, "presenter configured as not retaining, destroying " + mPresenter);
         }
 
         if (!destroyPresenter &&
@@ -186,25 +178,23 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             // "don't keep activities" is enabled.
             // a new presenter instance will be created and the current presenter should be destroyed
             destroyPresenter = true;
+            TiLog.v(TAG, "the PresenterSavior is disabled and \"don\'t keep activities\" is "
+                    + "activated. The presenter can't be retained. Destroying " + mPresenter);
         }
 
         if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
+        } else {
+            TiLog.v(TAG, "not destroying " + mPresenter
+                    + " which will be reused by the next Activity instance, recreating...");
         }
     }
 
     @Override
     public void onDestroyView() {
-        TiLog.v(TAG, "onDestroyView()");
         mPresenter.sleep();
         super.onDestroyView();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        TiLog.v(TAG, "onDetach()");
     }
 
     @Override
@@ -216,7 +206,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onStart() {
         super.onStart();
-        TiLog.v(TAG, "onStart()");
         mActivityStarted = true;
 
         if (isUiPossible()) {
@@ -234,7 +223,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onStop() {
-        TiLog.v(TAG, "onStop()");
         mActivityStarted = false;
         mPresenter.sleep();
         super.onStop();

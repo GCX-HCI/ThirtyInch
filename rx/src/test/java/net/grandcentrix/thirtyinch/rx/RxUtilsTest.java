@@ -15,7 +15,6 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
-import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.After;
@@ -45,15 +44,7 @@ public class RxUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        TiLog.setLogger(new TiLog.Logger() {
-            @Override
-            public void log(final int level, final String tag, final String msg) {
-                // prevent RuntimeException: android.util.Log not mocked
-            }
-        });
-
         mView = mock(TiView.class);
-
         mPresenter = new TiMockPresenter();
         mSubscriptionHandler = new RxTiPresenterSubscriptionHandler(mPresenter);
     }

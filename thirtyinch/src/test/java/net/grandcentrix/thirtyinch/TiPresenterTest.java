@@ -39,12 +39,6 @@ public class TiPresenterTest {
 
     @Before
     public void setUp() throws Exception {
-        TiLog.setLogger(new TiLog.Logger() {
-            @Override
-            public void log(final int level, final String tag, final String msg) {
-                // prevent RuntimeException: android.util.Log not mocked
-            }
-        });
         mView = mock(TiView.class);
         mPresenter = new TiMockPresenter();
     }
