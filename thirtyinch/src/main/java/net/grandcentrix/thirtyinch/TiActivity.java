@@ -100,11 +100,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public boolean isActivityFinishing() {
-        return isFinishing();
-    }
-
-    @Override
     public boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
     }

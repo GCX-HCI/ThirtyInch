@@ -35,7 +35,12 @@ public interface DelegatedTiActivity<P> {
     /**
      * @return {@link Activity#isFinishing()}
      */
-    boolean isActivityFinishing();
+    boolean isFinishing();
+
+    /**
+     * @return {@link Activity#isChangingConfigurations()}
+     */
+    boolean isChangingConfigurations();
 
     /**
      * @return true when the developer option "Don't keep Activities" is enabled

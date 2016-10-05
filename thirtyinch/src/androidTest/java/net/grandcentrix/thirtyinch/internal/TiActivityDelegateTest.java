@@ -37,6 +37,8 @@ public class TiActivityDelegateTest {
 
     private TiActivityDelegate mDelegate;
 
+    private boolean mIsActivityChangingConfigurations = false;
+
     private boolean mIsActivityFinishing = false;
 
     private boolean mIsDontKeepActivitiesEnabled = false;
@@ -49,6 +51,9 @@ public class TiActivityDelegateTest {
     public void setUp() throws Exception {
         mDelegate = newDelegate();
 
+        mIsActivityFinishing = false;
+        mIsActivityChangingConfigurations = false;
+        mIsDontKeepActivitiesEnabled = false;
     }
 
     @Test
@@ -216,6 +221,11 @@ public class TiActivityDelegateTest {
                     @Override
                     public TiPresenter<TiView> getRetainedPresenter() {
                         return mRetainedPresenter;
+                    }
+
+                    @Override
+                    public boolean isActivityChangingConfigurations() {
+                        return mIsActivityChangingConfigurations;
                     }
 
                     @Override

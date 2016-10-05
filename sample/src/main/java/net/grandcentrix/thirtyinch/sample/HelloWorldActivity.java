@@ -23,6 +23,7 @@ import net.grandcentrix.thirtyinch.TiLog;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -76,5 +77,12 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
                     .replace(R.id.fragment_container, new SampleFragment())
                     .commit();
         }
+
+        findViewById(R.id.recreate).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                recreate();
+            }
+        });
     }
 }
