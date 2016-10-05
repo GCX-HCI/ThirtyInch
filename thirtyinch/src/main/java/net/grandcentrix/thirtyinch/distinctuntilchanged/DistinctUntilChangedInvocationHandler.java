@@ -28,15 +28,15 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
     private static final String TAG = DistinctUntilChangedInvocationHandler.class.getSimpleName();
 
-    private HashMap<String, Integer> mLatestMethodCalls = new HashMap<>();
+    private HashMap<String, Object[]> mLatestMethodCalls = new HashMap<>();
 
     private final V mView;
 
-    public DistinctUntilChangedInvocationHandler(V view) {
+    DistinctUntilChangedInvocationHandler(V view) {
         mView = view;
     }
 
-    public void clearCache() {
+    void clearCache() {
         mLatestMethodCalls.clear();
     }
 
@@ -82,20 +82,19 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             }
 
             final String methodName = method.toGenericString();
-            final int hashNow = Arrays.hashCode(args);
 
             if (!mLatestMethodCalls.containsKey(methodName)) {
                 // first call to method
                 Object result = method.invoke(mView, args);
-                mLatestMethodCalls.put(methodName, hashNow);
+                mLatestMethodCalls.put(methodName, args);
                 return result;
             }
 
-            final Integer hashBefore = mLatestMethodCalls.get(methodName);
-            if (hashBefore != hashNow) {
+            final Object[] argsBefore = mLatestMethodCalls.get(methodName);
+            if (!Arrays.equals(argsBefore, args)) {
                 // arguments changed, call the method
                 Object result = method.invoke(mView, args);
-                mLatestMethodCalls.put(methodName, hashNow);
+                mLatestMethodCalls.put(methodName, args);
                 return result;
             } else {
                 // don't call the method, the exact same data was already sent to the view
