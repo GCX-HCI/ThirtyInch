@@ -13,21 +13,21 @@ public class DistinctUntilChangedInvocationHandlerTest {
 
     private static class TestView implements TiView {
         int callCount;
+
         @DistinctUntilChanged
         public void ducMethod(String param) {
             callCount++;
         }
     }
 
-    TestView ducView;
-    DistinctUntilChangedInvocationHandler<TestView> handler;
+    private TestView ducView;
+    private DistinctUntilChangedInvocationHandler<TestView> handler;
 
     @Before
     public void setUp() {
         ducView = new TestView();
         handler = new DistinctUntilChangedInvocationHandler<>(ducView);
     }
-
 
     @Test
     public void shouldCallMethodTwice() throws Throwable {
@@ -43,7 +43,6 @@ public class DistinctUntilChangedInvocationHandlerTest {
         assertEquals(2, ducView.callCount);
     }
 
-
     @Test
     public void shouldCallMethodOnce() throws Throwable {
         //given
@@ -55,6 +54,27 @@ public class DistinctUntilChangedInvocationHandlerTest {
 
         //then
         assertEquals(1, ducView.callCount);
+    }
+
+
+    @Test
+    public void shouldCallMethodAfterReferenceIsDropped() throws Throwable {
+        //given
+        Method method = ducView.getClass().getMethod("ducMethod", String.class);
+        Object[] args = new Object[]{"p1"};
+
+
+        //when
+        handler.handleInvocation(null, method, args);
+        handler.handleInvocation(null, method, args);
+        //noinspection UnusedAssignment
+        args = null;
+        //try to clear references
+        System.gc();
+        handler.handleInvocation(null, method, new Object[]{"new param"});
+
+        //then
+        assertEquals(2, ducView.callCount);
     }
 
 }

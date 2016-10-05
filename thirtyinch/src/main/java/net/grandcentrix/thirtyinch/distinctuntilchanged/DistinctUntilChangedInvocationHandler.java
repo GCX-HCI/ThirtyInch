@@ -19,6 +19,7 @@ import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -28,7 +29,7 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
     private static final String TAG = DistinctUntilChangedInvocationHandler.class.getSimpleName();
 
-    private HashMap<String, Object[]> mLatestMethodCalls = new HashMap<>();
+    private HashMap<String, WeakReference<Object[]>> mLatestMethodCalls = new HashMap<>();
 
     private final V mView;
 
@@ -86,15 +87,15 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             if (!mLatestMethodCalls.containsKey(methodName)) {
                 // first call to method
                 Object result = method.invoke(mView, args);
-                mLatestMethodCalls.put(methodName, args);
+                mLatestMethodCalls.put(methodName, new WeakReference<>(args));
                 return result;
             }
 
-            final Object[] argsBefore = mLatestMethodCalls.get(methodName);
-            if (!Arrays.equals(argsBefore, args)) {
+            final Object[] argsBefore = mLatestMethodCalls.get(methodName).get();
+            if (argsBefore == null || !Arrays.equals(argsBefore, args)) {
                 // arguments changed, call the method
                 Object result = method.invoke(mView, args);
-                mLatestMethodCalls.put(methodName, args);
+                mLatestMethodCalls.put(methodName, new WeakReference<>(args));
                 return result;
             } else {
                 // don't call the method, the exact same data was already sent to the view
