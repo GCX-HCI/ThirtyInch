@@ -87,14 +87,15 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
             final String methodName = method.toGenericString();
 
-            if (!mLatestMethodCalls.containsKey(methodName)) {
+            final WeakReference<Object[]> lastCallRef = mLatestMethodCalls.get(methodName);
+            if (lastCallRef == null) {
                 // first call to method
                 Object result = method.invoke(mView, args);
                 mLatestMethodCalls.put(methodName, new WeakReference<>(args));
                 return result;
             }
 
-            final Object[] argsBefore = mLatestMethodCalls.get(methodName).get();
+            final Object[] argsBefore = lastCallRef.get();
             if (argsBefore == null || !Arrays.equals(argsBefore, args)) {
                 // arguments changed, call the method
                 Object result = method.invoke(mView, args);
