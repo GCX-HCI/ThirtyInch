@@ -19,6 +19,8 @@ import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
+import android.support.annotation.VisibleForTesting;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,7 +31,8 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
     private static final String TAG = DistinctUntilChangedInvocationHandler.class.getSimpleName();
 
-    private HashMap<String, WeakReference<Object[]>> mLatestMethodCalls = new HashMap<>();
+    @VisibleForTesting
+    HashMap<String, WeakReference<Object[]>> mLatestMethodCalls = new HashMap<>();
 
     private final V mView;
 

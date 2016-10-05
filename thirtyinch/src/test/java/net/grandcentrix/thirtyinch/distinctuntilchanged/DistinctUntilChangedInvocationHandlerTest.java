@@ -63,16 +63,15 @@ public class DistinctUntilChangedInvocationHandlerTest {
         Method method = ducView.getClass().getMethod("ducMethod", String.class);
         Object[] args = new Object[]{"p1"};
 
-
         //when
         handler.handleInvocation(null, method, args);
         handler.handleInvocation(null, method, args);
-        //noinspection UnusedAssignment
-        args = null;
-        //try to clear references
-        System.gc();
-        handler.clearCache();
+        assertEquals(1, ducView.callCount);
 
+        //simulate reference dropped
+        handler.mLatestMethodCalls.put("ducMethod", null);
+
+        // should be called again
         handler.handleInvocation(null, method, new Object[]{"new param"});
 
         //then
