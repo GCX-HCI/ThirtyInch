@@ -71,6 +71,8 @@ public class DistinctUntilChangedInvocationHandlerTest {
         args = null;
         //try to clear references
         System.gc();
+        handler.clearCache();
+
         handler.handleInvocation(null, method, new Object[]{"new param"});
 
         //then

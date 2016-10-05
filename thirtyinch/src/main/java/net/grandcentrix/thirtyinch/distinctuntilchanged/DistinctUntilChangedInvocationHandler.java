@@ -33,11 +33,11 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
     private final V mView;
 
-    DistinctUntilChangedInvocationHandler(V view) {
+    public DistinctUntilChangedInvocationHandler(V view) {
         mView = view;
     }
 
-    void clearCache() {
+    public void clearCache() {
         mLatestMethodCalls.clear();
     }
 
