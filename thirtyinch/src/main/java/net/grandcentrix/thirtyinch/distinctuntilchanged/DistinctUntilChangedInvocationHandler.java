@@ -21,7 +21,6 @@ import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 import android.support.annotation.VisibleForTesting;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -32,7 +31,7 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
     private static final String TAG = DistinctUntilChangedInvocationHandler.class.getSimpleName();
 
     @VisibleForTesting
-    HashMap<String, WeakReference<Object[]>> mLatestMethodCalls = new HashMap<>();
+    HashMap<String, DistinctComparator> mLatestMethodCalls = new HashMap<>();
 
     private final V mView;
 
@@ -87,19 +86,20 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
             final String methodName = method.toGenericString();
 
-            final WeakReference<Object[]> lastCallRef = mLatestMethodCalls.get(methodName);
-            if (lastCallRef == null) {
+            final DistinctComparator argsBefore = mLatestMethodCalls.get(methodName);
+            if (argsBefore == null) {
                 // first call to method
                 Object result = method.invoke(mView, args);
-                mLatestMethodCalls.put(methodName, new WeakReference<>(args));
+                DistinctComparator comparatorNew = getDistinctComparator(args, ducAnnotation);
+                mLatestMethodCalls.put(methodName, comparatorNew);
                 return result;
             }
 
-            final Object[] argsBefore = lastCallRef.get();
-            if (argsBefore == null || !Arrays.equals(argsBefore, args)) {
+            if (!argsBefore.isEqual(args)) {
                 // arguments changed, call the method
                 Object result = method.invoke(mView, args);
-                mLatestMethodCalls.put(methodName, new WeakReference<>(args));
+                DistinctComparator comparatorNew = getDistinctComparator(args, ducAnnotation);
+                mLatestMethodCalls.put(methodName, comparatorNew);
                 return result;
             } else {
                 // don't call the method, the exact same data was already sent to the view
@@ -118,5 +118,14 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             e.printStackTrace();
             return null;
         }
+    }
+
+    private DistinctComparator getDistinctComparator(final Object[] args,
+            final DistinctUntilChanged ducAnnotation)
+            throws InstantiationException, IllegalAccessException {
+        Class<? extends DistinctComparator> clazz = ducAnnotation.comparator();
+        DistinctComparator comparatorNew = clazz.newInstance();
+        comparatorNew.isEqual(args);
+        return comparatorNew;
     }
 }
