@@ -5,7 +5,8 @@ import java.util.Arrays;
 
 /**
  * {@link DistinctComparator} implementation which uses the {@link Object#equals(Object)} Method
- * of the parameters to detect changes.
+ * of the parameters to detect changes. This is the default implementation used by the
+ * {@link DistinctUntilChanged} annotation.
  */
 public class EqualsComparator implements DistinctComparator {
 

@@ -4,8 +4,7 @@ import java.util.Arrays;
 
 /**
  * {@link DistinctComparator} implementation which uses the {@link Object#hashCode()} of the
- * parameters to detect changes. This is the default implementation used by the
- * {@link DistinctUntilChanged} annotation.
+ * parameters to detect changes.
  */
 public class HashComparator implements DistinctComparator {
 
