@@ -56,16 +56,16 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                 }));
 
         rxSubscriptionHelper.manageSubscription(triggerHeavyCalculation
-                .doOnNext(new Action1<Void>() {
-                    @Override
-                    public void call(final Void aVoid) {
-                        mText.onNext("calculating next number...");
-                    }
-                })
                 .onBackpressureDrop(new Action1<Void>() {
                     @Override
                     public void call(final Void aVoid) {
                         mText.onNext("Don't hurry me!");
+                    }
+                })
+                .doOnNext(new Action1<Void>() {
+                    @Override
+                    public void call(final Void aVoid) {
+                        mText.onNext("calculating next number...");
                     }
                 })
                 .flatMap(new Func1<Void, Observable<Integer>>() {
