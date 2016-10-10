@@ -15,25 +15,24 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 /**
- * A {@link DistinctComparator} implementation which uses the {@link Object#hashCode()} of the
- * parameters to detect changes. It doesn't hold a references to the previously sent parameters.
- * In theory this comparison could miss changes compared to {@link EqualsComparator} when multiple
- * mutated object accidentally return the same hashcode.
+ * A {@link DistinctComparator} implementation which uses the {@link Object#equals(Object)}
+ * method of the parameters to detect changes. This comparator holds weak references to the
+ * previous parameters compared to {@link EqualsComparator}
  */
-public class HashComparator implements DistinctComparator {
+public class WeakEqualsComparator implements DistinctComparator {
 
-    private int mLastParametersHash = 0;
+    private WeakReference<Object[]> mLastParameters;
 
     @Override
     public boolean compareWith(final Object[] newParameters) {
-        final int hash = Arrays.hashCode(newParameters);
-        if (hash == mLastParametersHash) {
-            return true;
+        if (mLastParameters == null || !Arrays.equals(newParameters, mLastParameters.get())) {
+            mLastParameters = new WeakReference<>(newParameters);
+            return false;
         }
-        mLastParametersHash = hash;
-        return false;
+        return true;
     }
 }

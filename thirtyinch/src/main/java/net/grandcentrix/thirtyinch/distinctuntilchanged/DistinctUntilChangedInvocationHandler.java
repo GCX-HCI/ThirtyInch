@@ -86,23 +86,34 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
 
             final String methodName = method.toGenericString();
 
-            final DistinctComparator argsBefore = mLatestMethodCalls.get(methodName);
-            if (argsBefore == null) {
-                // first call to method
-                Object result = method.invoke(mView, args);
-                DistinctComparator comparatorNew = getDistinctComparator(args, ducAnnotation);
-                mLatestMethodCalls.put(methodName, comparatorNew);
-                return result;
+            final DistinctComparator comparator = mLatestMethodCalls.get(methodName);
+            if (comparator == null) {
+                // detected first call to method
+
+                // initialize a new comparator defined by the annotation
+                DistinctComparator newComparator = ducAnnotation.comparator().newInstance();
+
+                // initialize the comparator with the already called parameters
+                // the comparator is now able to compare this call with the next one
+                if (newComparator.compareWith(args)) {
+                    // when initializing the comparator with the first call it cannot return true
+                    // which would mean the first call is the same as the previous call which
+                    // never happened
+                    throw new IllegalStateException("comparator returns 'true' at initialization.");
+                }
+                // save for later usage
+                mLatestMethodCalls.put(methodName, newComparator);
+
+                // it's the first call to this method, call it
+                return method.invoke(mView, args);
             }
 
-            if (!argsBefore.isEqual(args)) {
+            // compare with last called arguments
+            if (!comparator.compareWith(args)) {
                 // arguments changed, call the method
-                Object result = method.invoke(mView, args);
-                DistinctComparator comparatorNew = getDistinctComparator(args, ducAnnotation);
-                mLatestMethodCalls.put(methodName, comparatorNew);
-                return result;
+                return method.invoke(mView, args);
             } else {
-                // don't call the method, the exact same data was already sent to the view
+                // don't call the method, the data was already sent to the view
                 if (ducAnnotation.logDropped()) {
                     TiLog.d(TAG, "not calling " + method
                             + " with args " + Arrays.toString(args) + "."
@@ -118,14 +129,5 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             e.printStackTrace();
             return null;
         }
-    }
-
-    private DistinctComparator getDistinctComparator(final Object[] args,
-            final DistinctUntilChanged ducAnnotation)
-            throws InstantiationException, IllegalAccessException {
-        Class<? extends DistinctComparator> clazz = ducAnnotation.comparator();
-        DistinctComparator comparatorNew = clazz.newInstance();
-        comparatorNew.isEqual(args);
-        return comparatorNew;
     }
 }
