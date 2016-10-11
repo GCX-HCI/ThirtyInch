@@ -25,7 +25,7 @@ import java.util.Arrays;
  */
 public class WeakEqualsComparator implements DistinctComparator {
 
-    private WeakReference<Object[]> mLastParameters;
+    WeakReference<Object[]> mLastParameters;
 
     @Override
     public boolean compareWith(final Object[] newParameters) {
