@@ -123,11 +123,10 @@ final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationH
             }
 
         } catch (InvocationTargetException e) {
-            e.getCause().printStackTrace();
-            return null;
-        } catch (IllegalAccessException e) {
             e.printStackTrace();
-            return null;
+            throw e.getCause();
+        } catch (IllegalAccessException e) {
+            throw e;
         }
     }
 }
