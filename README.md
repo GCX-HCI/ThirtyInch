@@ -27,11 +27,18 @@ dependencies {
     // rx extension
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     
-    // composite android extension
-    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
-    
     // test extension
     testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
+    
+     
+    // CompositeAndroid plugin
+    // When you are using ThirtyInch with the CompositeAndroid extension you have to manually 
+    // include the CompositeAndroid dependency. It has to be the same version as appcompat and 
+    // the support library 
+    
+    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
+    // def supportLibraryVersion = '24.2.1' <-- use your own version
+    compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
 }
 ```
 
