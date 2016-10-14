@@ -17,6 +17,7 @@ package net.grandcentrix.thirtyinch.rx;
 
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 import android.support.annotation.NonNull;
 
@@ -34,7 +35,7 @@ public class RxTiPresenterSubscriptionHandler {
             @Override
             public void onChange(final TiPresenter.State state,
                     final boolean beforeLifecycleEvent) {
-                if (state == TiPresenter.State.CREATED_WITH_DETACHED_VIEW && beforeLifecycleEvent) {
+                if (state == TiPresenter.State.VIEW_DETACHED && beforeLifecycleEvent) {
                     // unsubscribe all UI subscriptions created in wakeUp() and added
                     // via manageViewSubscription(Subscription)
                     if (mUiSubscriptions != null) {
@@ -72,8 +73,8 @@ public class RxTiPresenterSubscriptionHandler {
 
     /**
      * Add your subscriptions for View events to this method to get them automatically cleaned up
-     * in {@link TiPresenter#sleep()}. typically call this in {@link TiPresenter#wakeUp()} where
-     * you subscribe to the UI events.
+     * in {@link TiPresenter#detachView()}. typically call this in {@link
+     * TiPresenter#attachView(TiView)} where you subscribe to the UI events.
      *
      * @throws IllegalStateException when no view is attached
      */

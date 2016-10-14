@@ -20,6 +20,7 @@ import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 
@@ -44,16 +45,16 @@ public abstract class TiPresenter<V extends TiView> {
         INITIALIZED,
         /**
          * presenter is running fine but has no attached view. Either it gets a view  and
-         * transitions to {@link #VIEW_ATTACHED_AND_AWAKE} or the presenter gets destroyed ->
+         * transitions to {@link #VIEW_ATTACHED} or the presenter gets destroyed ->
          * {@link
          * #DESTROYED}
          */
-        CREATED_WITH_DETACHED_VIEW,
+        VIEW_DETACHED,
         /**
          * the view is attached. In any case, the next step will be {@link
-         * #CREATED_WITH_DETACHED_VIEW}
+         * #VIEW_DETACHED}
          */
-        VIEW_ATTACHED_AND_AWAKE,
+        VIEW_ATTACHED,
         /**
          * termination state. It will never change again.
          */
@@ -134,19 +135,14 @@ public abstract class TiPresenter<V extends TiView> {
      * bind a new view to this presenter.
      *
      * @param view the new view, can't be null. To set the view to {@code null} call {@link
-     *             #sleep()}
-     * @see #wakeUp()
+     *             #detachView()}
      */
-    // TODO check if this could be combined with #wakeUp
-    public void bindNewView(@NonNull final V view) {
+    public void attachView(@NonNull final V view) {
 
-        if (!isCreated()) {
-            throw new IllegalStateException("Presenter is not created, call #create() first");
-        }
-
-        if (isAwake()) {
+        //noinspection ConstantConditions
+        if (view == null) {
             throw new IllegalStateException(
-                    "Can't bind new view, Presenter #wakeUp() already called. First call #sleep()");
+                    "the view cannot be set to null. Call #detachView() instead");
         }
 
         if (isDestroyed()) {
@@ -155,12 +151,37 @@ public abstract class TiPresenter<V extends TiView> {
                             + "Binding a view is not allowed");
         }
 
-        if (view == null) {
-            throw new IllegalStateException(
-                    "the view cannot be set to null. Call #sleep() instead");
+        if (isViewAttached()) {
+            if (view.equals(mView)) {
+                TiLog.v(TAG, "not calling onAttachView(), view already attached");
+                return;
+            } else {
+                throw new IllegalStateException(
+                        "a view is already attached, call #detachView first");
+            }
+        }
+
+        if (!isInitialized()) {
+            throw new IllegalStateException("Presenter is not created, call #create() first");
         }
 
         mView = view;
+        moveToState(State.VIEW_ATTACHED, false);
+        mCalled = false;
+        TiLog.v(TAG, "onAttachView(TiView)");
+        onAttachView(view);
+        if (!mCalled) {
+            throw new SuperNotCalledException("Presenter " + this
+                    + " did not call through to super.onAttachView(TiView)");
+        }
+        mCalled = false;
+        TiLog.v(TAG, "deprecated onWakeUp()");
+        onWakeUp();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Presenter " + this
+                    + " did not call through to super.onWakeUp()");
+        }
+        moveToState(State.VIEW_ATTACHED, true);
     }
 
     /**
@@ -171,11 +192,11 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #onCreate()
      */
     public final void create() {
-        if (isCreated()) {
+        if (isInitialized()) {
             TiLog.w(TAG, "not calling onCreate(), it was already called");
             return;
         }
-        moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
+        moveToState(State.VIEW_DETACHED, false);
         mCalled = false;
         TiLog.v(TAG, "onCreate()");
         onCreate();
@@ -183,7 +204,7 @@ public abstract class TiPresenter<V extends TiView> {
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onCreate()");
         }
-        moveToState(State.CREATED_WITH_DETACHED_VIEW, true);
+        moveToState(State.VIEW_DETACHED, true);
     }
 
     /**
@@ -194,7 +215,7 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #onDestroy()
      */
     public final void destroy() {
-        if (!isCreated() || isDestroyed()) {
+        if (!isInitialized() || isDestroyed()) {
             TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
             return;
         }
@@ -214,6 +235,41 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
+     * call detachView as the opposite of {@link #attachView(TiView)}, when the view is not
+     * available
+     * anymore.
+     * Calling detachView in {@code Fragment#onDestroyView()} makes sense because observing a
+     * discarded
+     * view does not.
+     *
+     * @see #onSleep()
+     */
+    public final void detachView() {
+        if (!isViewAttached()) {
+            TiLog.v(TAG, "not calling onDetachView(), not woken up");
+            return;
+        }
+        moveToState(State.VIEW_DETACHED, false);
+        mCalled = false;
+        TiLog.v(TAG, "deprecated onSleep()");
+        onSleep();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Presenter " + this
+                    + " did not call through to super.onSleep()");
+        }
+        mCalled = false;
+        TiLog.v(TAG, "onDetachView()");
+        onDetachView();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Presenter " + this
+                    + " did not call through to super.onDetachView()");
+        }
+
+        mView = null;
+        moveToState(State.VIEW_DETACHED, true);
+    }
+
+    /**
      * @return the presenter configuration
      */
     @NonNull
@@ -230,47 +286,26 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * @return the currently attached view of this presenter
+     * Returns the currently attached view. The view is attached between the lifecycle callbacks
+     * {@link #onAttachView(TiView)} and {@link #onSleep()}.
+     *
+     * @return the currently attached view of this presenter, {@code null} when no view is attached.
      */
+    @Nullable
     public V getView() {
         return mView;
-    }
-
-    public boolean isAwake() {
-        return mState == State.VIEW_ATTACHED_AND_AWAKE;
-    }
-
-    public boolean isCreated() {
-        return mState == State.CREATED_WITH_DETACHED_VIEW;
     }
 
     public boolean isDestroyed() {
         return mState == State.DESTROYED;
     }
 
-    /**
-     * call sleep as the opposite of {@link #wakeUp()}, when the view is not available anymore.
-     * Calling sleep in {@code Fragment#onDestroyView()} makes sense because observing a discarded
-     * view does not.
-     *
-     * @see #onSleep()
-     */
-    public final void sleep() {
-        if (!isAwake()) {
-            TiLog.v(TAG, "not calling onSleep(), not woken up");
-            return;
-        }
-        moveToState(State.CREATED_WITH_DETACHED_VIEW, false);
-        mCalled = false;
-        TiLog.v(TAG, "onSleep()");
-        onSleep();
-        if (!mCalled) {
-            throw new SuperNotCalledException("Presenter " + this
-                    + " did not call through to super.onSleep()");
-        }
+    public boolean isInitialized() {
+        return mState == State.VIEW_DETACHED;
+    }
 
-        mView = null;
-        moveToState(State.CREATED_WITH_DETACHED_VIEW, true);
+    public boolean isViewAttached() {
+        return mState == State.VIEW_ATTACHED;
     }
 
     @Override
@@ -288,25 +323,18 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * when calling {@link #wakeUp()} the presenter can start communicating with the {@link
-     * TiView}.
+     * The view is now attached and ready to receive events. {@link #getView()} is not guaranteed
+     * to
+     * be not <code>null</code>
      *
-     * @see #onWakeUp()
+     * @see #onSleep()
      */
-    public final void wakeUp() {
-        if (isAwake()) {
-            TiLog.v(TAG, "not calling onWakeUp(), already woken up");
-            return;
+    protected void onAttachView(@NonNull V view) {
+        if (mCalled) {
+            throw new IllegalAccessError(
+                    "don't call #onAttachView() directly, call #attachView(TiView)");
         }
-        moveToState(State.VIEW_ATTACHED_AND_AWAKE, false);
-        mCalled = false;
-        TiLog.v(TAG, "onWakeUp()");
-        onWakeUp();
-        if (!mCalled) {
-            throw new SuperNotCalledException("Presenter " + this
-                    + " did not call through to super.onWakeUp()");
-        }
-        moveToState(State.VIEW_ATTACHED_AND_AWAKE, true);
+        mCalled = true;
     }
 
     /**
@@ -342,26 +370,34 @@ public abstract class TiPresenter<V extends TiView> {
      * Right after this method the view will be detached. {@link #getView()} will return
      * <code>null</code> afterwards.
      *
-     * @see #sleep()
+     * @see #detachView()
      */
-    protected void onSleep() {
+    protected void onDetachView() {
         if (mCalled) {
-            throw new IllegalAccessError("don't call #onSleep() directly, call #sleep()");
+            throw new IllegalAccessError("don't call #onSleep() directly, call #detachView()");
         }
         mCalled = true;
     }
 
     /**
-     * The view is now attached and ready to receive events. {@link #getView()} is not guaranteed
-     * to
-     * be not <code>null</code>
-     *
-     * @see #wakeUp()
-     * @see #onSleep()
+     * @deprecated use {@link #onDetachView()} instead
      */
+    @Deprecated
+    protected void onSleep() {
+        if (mCalled) {
+            throw new IllegalAccessError("don't call #onSleep() directly, call #detachView()");
+        }
+        mCalled = true;
+    }
+
+    /**
+     * @deprecated use {@link #onAttachView(TiView)} instead
+     */
+    @Deprecated
     protected void onWakeUp() {
         if (mCalled) {
-            throw new IllegalAccessError("don't call #onWakeUp() directly, call #wakeup()");
+            throw new IllegalAccessError(
+                    "don't call #onWakeUp() directly, call #attachView(TiView)");
         }
         mCalled = true;
     }
@@ -383,15 +419,15 @@ public abstract class TiPresenter<V extends TiView> {
         if (newState != oldState) {
             switch (oldState) {
                 case INITIALIZED:
-                    if (newState == State.CREATED_WITH_DETACHED_VIEW) {
+                    if (newState == State.VIEW_DETACHED) {
                         // move allowed
                         break;
                     } else {
                         throw new IllegalStateException("Can't move to state " + newState
-                                + ", the next state after INITIALIZED has to be CREATED_WITH_DETACHED_VIEW");
+                                + ", the next state after INITIALIZED has to be VIEW_DETACHED");
                     }
-                case CREATED_WITH_DETACHED_VIEW:
-                    if (newState == State.VIEW_ATTACHED_AND_AWAKE) {
+                case VIEW_DETACHED:
+                    if (newState == State.VIEW_ATTACHED) {
                         // move allowed
                         break;
                     } else if (newState == State.DESTROYED) {
@@ -399,16 +435,16 @@ public abstract class TiPresenter<V extends TiView> {
                         break;
                     } else {
                         throw new IllegalStateException("Can't move to state " + newState
-                                + ", the allowed states after CREATED_WITH_DETACHED_VIEW are VIEW_ATTACHED_AND_AWAKE or DESTROYED");
+                                + ", the allowed states after VIEW_DETACHED are VIEW_ATTACHED or DESTROYED");
                     }
-                case VIEW_ATTACHED_AND_AWAKE:
+                case VIEW_ATTACHED:
                     // directly moving to DESTROYED is not possible, first detach the view
-                    if (newState == State.CREATED_WITH_DETACHED_VIEW) {
+                    if (newState == State.VIEW_DETACHED) {
                         // move allowed
                         break;
                     } else {
                         throw new IllegalStateException("Can't move to state " + newState
-                                + ", the next state after VIEW_ATTACHED_AND_AWAKE has to be CREATED_WITH_DETACHED_VIEW");
+                                + ", the next state after VIEW_ATTACHED has to be VIEW_DETACHED");
                     }
                 case DESTROYED:
                     throw new IllegalStateException(

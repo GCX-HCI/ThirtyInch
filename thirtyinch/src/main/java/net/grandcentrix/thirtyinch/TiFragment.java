@@ -193,7 +193,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onDestroyView() {
-        mPresenter.sleep();
+        mPresenter.detachView();
         super.onDestroyView();
     }
 
@@ -209,12 +209,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            mViewBinder.bindView(mPresenter, this);
             getActivity().getWindow().getDecorView().post(new Runnable() {
                 @Override
                 public void run() {
                     if (isUiPossible() && mActivityStarted) {
-                        mPresenter.wakeUp();
+                        mViewBinder.bindView(mPresenter, TiFragment.this);
                     }
                 }
             });
@@ -224,7 +223,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onStop() {
         mActivityStarted = false;
-        mPresenter.sleep();
+        mPresenter.detachView();
         super.onStop();
     }
 

@@ -19,6 +19,8 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
+import android.support.annotation.NonNull;
+
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -84,18 +86,18 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     }
 
     @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
 
         rxSubscriptionHelper.manageViewSubscription(mText.asObservable()
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(final String text) {
-                        getView().showText(text);
+                        view.showText(text);
                     }
                 }));
 
-        rxSubscriptionHelper.manageViewSubscription(getView().onButtonClicked()
+        rxSubscriptionHelper.manageViewSubscription(view.onButtonClicked()
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(final Void aVoid) {
