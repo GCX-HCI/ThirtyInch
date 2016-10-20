@@ -87,9 +87,9 @@ public interface HelloWorldView extends TiView {
 ```java
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-    @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
+    @Override    
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
         getView().showText("Hello World!");
     }
 }
@@ -113,7 +113,7 @@ It can be `CREATED` and `DESTROYED`.
 The corresponding callbacks `onCreate()` and `onDestroy()` will be only called once!
 
 The `TiView` can either be `ATTACHED` or `DETACHED`.
-The corresponding callbacks are `onWakeUp()` and `onSleep()` which maps to `onStart()` and `onStop()`.
+The corresponding callbacks are `onAttachView(TiView)` and `onDetachView()` which maps to `onStart()` and `onStop()`.
 
 
 ```java
@@ -125,13 +125,13 @@ public class MyPresenter extends TiPresenter<MyView> {
     }
 
     @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
     }
 
     @Override
-    protected void onSleep() {
-        super.onSleep();
+    protected void onDetachView() {
+        super.onDetachView();
     }
 
     @Override
@@ -210,7 +210,7 @@ When calling this method the `View` receives no duplicated calls.
 The View swallows the second call when a method gets called with the same (hashcode) parameters twice.
 
 Usecase:
-The Presenter binds a huge list to the `View`. The app loses focus (`onSleep()`) and the exact same Activity instance gains focus again (`onWakeUp()`).
+The Presenter binds a huge list to the `View`. The app loses focus (`onDetachView()`) and the exact same Activity instance gains focus again (`onAttachView(view)`).
 The `Activity` still shows the huge list.
 The `Presenter` binds the huge list again to the `View`.
 When the data has changed the list will be updated.
@@ -266,10 +266,10 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     }
 
     @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
-
-        // automatically unsubscribe in onSleep()
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
+        
+        // automatically unsubscribe in onDetachView(view)
         rxHelper.manageViewSubscription(anotherObservable.subscribe());
     }
 }
