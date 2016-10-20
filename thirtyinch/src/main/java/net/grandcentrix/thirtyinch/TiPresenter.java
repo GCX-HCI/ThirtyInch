@@ -323,16 +323,15 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * The view is now attached and ready to receive events. {@link #getView()} is not guaranteed
-     * to
-     * be not <code>null</code>
+     * The view is now attached and ready to receive events.
      *
-     * @see #onSleep()
+     * @see #onDetachView()
+     * @see #attachView(TiView)
      */
     protected void onAttachView(@NonNull V view) {
         if (mCalled) {
             throw new IllegalAccessError(
-                    "don't call #onAttachView() directly, call #attachView(TiView)");
+                    "don't call #onAttachView(TiView) directly, call #attachView(TiView)");
         }
         mCalled = true;
     }
@@ -370,11 +369,12 @@ public abstract class TiPresenter<V extends TiView> {
      * Right after this method the view will be detached. {@link #getView()} will return
      * <code>null</code> afterwards.
      *
+     * @see #onAttachView(TiView)
      * @see #detachView()
      */
     protected void onDetachView() {
         if (mCalled) {
-            throw new IllegalAccessError("don't call #onSleep() directly, call #detachView()");
+            throw new IllegalAccessError("don't call #onDetachView() directly, call #detachView()");
         }
         mCalled = true;
     }

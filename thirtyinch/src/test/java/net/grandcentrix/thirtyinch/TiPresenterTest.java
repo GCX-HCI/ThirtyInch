@@ -93,10 +93,6 @@ public class TiPresenterTest {
 
     @Test
     public void attachWithoutInitialize() throws Exception {
-
-        // not calling
-        // mPresenter.create();
-
         try {
             mPresenter.attachView(mView);
             fail("no exception thrown");
@@ -156,6 +152,7 @@ public class TiPresenterTest {
             fail("no exception thrown");
         } catch (IllegalAccessError e) {
             assertTrue(e.getMessage().contains("attachView(TiView)"));
+            assertTrue(e.getMessage().contains("#onAttachView(TiView)"));
         }
     }
 
@@ -166,6 +163,7 @@ public class TiPresenterTest {
             fail("no exception thrown");
         } catch (IllegalAccessError e) {
             assertTrue(e.getMessage().contains("create()"));
+            assertTrue(e.getMessage().contains("#onCreate()"));
         }
     }
 
@@ -176,6 +174,7 @@ public class TiPresenterTest {
             fail("no exception thrown");
         } catch (IllegalAccessError e) {
             assertTrue(e.getMessage().contains("destroy()"));
+            assertTrue(e.getMessage().contains("#onDestroy()"));
         }
     }
 
@@ -186,6 +185,7 @@ public class TiPresenterTest {
             fail("no exception thrown");
         } catch (IllegalAccessError e) {
             assertTrue(e.getMessage().contains("detachView()"));
+            assertTrue(e.getMessage().contains("#onDetachView()"));
         }
     }
 
@@ -196,6 +196,7 @@ public class TiPresenterTest {
             fail("no exception thrown");
         } catch (IllegalAccessError e) {
             assertTrue(e.getMessage().contains("detachView()"));
+            assertTrue(e.getMessage().contains("#onSleep()"));
         }
     }
 
@@ -206,6 +207,7 @@ public class TiPresenterTest {
             fail("no exception thrown");
         } catch (IllegalAccessError e) {
             assertTrue(e.getMessage().contains("attachView(TiView)"));
+            assertTrue(e.getMessage().contains("#onWakeUp()"));
         }
     }
 

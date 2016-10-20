@@ -201,7 +201,7 @@ public class RxUtilsTest {
 
 
     @Test
-    public void testSleep() throws Exception {
+    public void testDetach() throws Exception {
         mPresenter.create();
         mPresenter.attachView(mView);
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
@@ -215,7 +215,7 @@ public class RxUtilsTest {
     }
 
     @Test
-    public void testSleepBeforeWakeUp() throws Exception {
+    public void testDetachBeforeAttach() throws Exception {
         mPresenter.create();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
