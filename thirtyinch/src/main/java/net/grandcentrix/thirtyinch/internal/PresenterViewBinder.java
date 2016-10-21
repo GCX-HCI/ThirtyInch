@@ -80,10 +80,10 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
             }
             mLastView = interceptedView;
             TiLog.v(mLogTag.getLoggingTag(), "binding NEW view to Presenter " + mLastView);
-            presenter.bindNewView(mLastView);
+            presenter.attachView(mLastView);
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "binding the cached view to Presenter " + mLastView);
-            presenter.bindNewView(mLastView);
+            presenter.attachView(mLastView);
         }
     }
 

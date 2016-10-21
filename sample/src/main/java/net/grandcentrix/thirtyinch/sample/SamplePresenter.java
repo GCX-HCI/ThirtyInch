@@ -39,6 +39,7 @@ public class SamplePresenter extends TiPresenter<SampleView> {
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(final Long alive) {
+                        // deliverLatestToView makes getView() here @NonNull
                         getView().showText("I'm a fragment and alive for " + (alive * 37) + "ms");
                     }
                 }));

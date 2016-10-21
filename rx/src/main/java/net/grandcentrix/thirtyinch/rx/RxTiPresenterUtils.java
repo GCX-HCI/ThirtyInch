@@ -18,7 +18,7 @@ package net.grandcentrix.thirtyinch.rx;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.rx.OperatorSemaphore;
+import net.grandcentrix.thirtyinch.TiView;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -111,7 +111,7 @@ public class RxTiPresenterUtils {
 
     /**
      * Observable of the view state. The View is ready to receive calls after calling {@link
-     * TiPresenter#wakeUp()} and before calling {@link TiPresenter#sleep()}.
+     * TiPresenter#attachView(TiView)} and before calling {@link TiPresenter#detachView()}.
      */
     public static Observable<Boolean> isViewReady(final TiPresenter presenter) {
         return Observable.create(
@@ -120,7 +120,7 @@ public class RxTiPresenterUtils {
                     public void call(final Subscriber<? super Boolean> subscriber) {
                         if (!subscriber.isUnsubscribed()) {
                             subscriber.onNext(presenter.getState()
-                                    == TiPresenter.State.VIEW_ATTACHED_AND_AWAKE);
+                                    == TiPresenter.State.VIEW_ATTACHED);
                         }
 
                         final Removable removable = presenter
@@ -130,7 +130,7 @@ public class RxTiPresenterUtils {
                                             final boolean beforeLifecycleEvent) {
                                         if (!subscriber.isUnsubscribed()) {
                                             subscriber.onNext(state
-                                                    == TiPresenter.State.VIEW_ATTACHED_AND_AWAKE);
+                                                    == TiPresenter.State.VIEW_ATTACHED);
                                         }
                                     }
                                 });

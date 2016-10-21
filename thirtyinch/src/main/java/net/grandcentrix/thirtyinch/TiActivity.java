@@ -191,7 +191,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     protected void onStart() {
-        mDelegate.onStart_beforeSuper();
         super.onStart();
         mDelegate.onStart_afterSuper();
     }

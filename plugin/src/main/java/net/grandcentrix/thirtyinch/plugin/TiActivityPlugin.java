@@ -172,7 +172,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public void onStart() {
-        mDelegate.onStart_beforeSuper();
         super.onStart();
         mDelegate.onStart_afterSuper();
     }

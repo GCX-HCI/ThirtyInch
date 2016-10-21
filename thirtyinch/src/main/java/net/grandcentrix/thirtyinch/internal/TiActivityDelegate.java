@@ -245,18 +245,14 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // check if still started. It happens that onStop got already called, specially
                 // when the Activity is not the top Activity and a configuration change happens
                 if (mActivityStarted) {
-                    mPresenter.wakeUp();
+                    mViewBinder.bindView(mPresenter, mViewProvider);
                 }
             }
         });
     }
 
-    public void onStart_beforeSuper() {
-        mViewBinder.bindView(mPresenter, mViewProvider);
-    }
-
     public void onStop_afterSuper() {
-        mPresenter.sleep();
+        mPresenter.detachView();
     }
 
     public void onStop_beforeSuper() {
