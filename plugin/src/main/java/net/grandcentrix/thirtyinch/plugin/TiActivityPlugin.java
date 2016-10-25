@@ -112,13 +112,9 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return null;
     }
 
-    /**
-     * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
-     * through all the interceptors (again).
-     */
     @Override
-    public void invalidateView() {
-        mDelegate.invalidateView();
+    public boolean isActivityFinishing() {
+        return getActivity().isFinishing();
     }
 
     @Override
@@ -126,9 +122,13 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return getActivity().isChangingConfigurations();
     }
 
+    /**
+     * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
+     * through all the interceptors (again).
+     */
     @Override
-    public boolean isActivityFinishing() {
-        return getActivity().isFinishing();
+    public void invalidateView() {
+        mDelegate.invalidateView();
     }
 
     @Override

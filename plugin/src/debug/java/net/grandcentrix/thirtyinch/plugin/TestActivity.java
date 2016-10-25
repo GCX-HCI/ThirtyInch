@@ -22,12 +22,14 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.TextView;
 
 /**
  * only for tests
  */
 public class TestActivity extends CompositeActivity implements TestView {
 
+    private TextView mText;
 
     public TestActivity() {
         addPlugin(new TiActivityPlugin<>(new TiPresenterProvider<TestPresenter>() {
@@ -39,11 +41,16 @@ public class TestActivity extends CompositeActivity implements TestView {
         }));
     }
 
-
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_test);
+        mText = (TextView) findViewById(R.id.helloworld_text);
+    }
+
+    @Override
+    public void showText(final String s) {
+        mText.setText(s);
     }
 }

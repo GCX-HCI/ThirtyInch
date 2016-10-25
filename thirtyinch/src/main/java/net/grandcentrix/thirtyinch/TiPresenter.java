@@ -140,10 +140,6 @@ public abstract class TiPresenter<V extends TiView> {
     // TODO check if this could be combined with #wakeUp
     public void bindNewView(@NonNull final V view) {
 
-        if (!isCreated()) {
-            throw new IllegalStateException("Presenter is not created, call #create() first");
-        }
-
         if (isAwake()) {
             throw new IllegalStateException(
                     "Can't bind new view, Presenter #wakeUp() already called. First call #sleep()");
@@ -153,6 +149,10 @@ public abstract class TiPresenter<V extends TiView> {
             throw new IllegalStateException(
                     "The presenter is already in it's terminal state and waits for garbage collection. "
                             + "Binding a view is not allowed");
+        }
+
+        if (!isCreated()) {
+            throw new IllegalStateException("Presenter is not created, call #create() first");
         }
 
         if (view == null) {

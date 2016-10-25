@@ -19,4 +19,13 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 
 public class TestPresenter extends TiPresenter<TestView> {
 
+    private int wakeupCalls = 0;
+
+    @Override
+    protected void onWakeUp() {
+        super.onWakeUp();
+        wakeupCalls++;
+
+        getView().showText("Hello World " + wakeupCalls);
+    }
 }

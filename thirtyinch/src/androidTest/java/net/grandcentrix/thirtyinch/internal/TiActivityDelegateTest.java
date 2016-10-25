@@ -224,13 +224,13 @@ public class TiActivityDelegateTest {
                     }
 
                     @Override
-                    public boolean isActivityChangingConfigurations() {
-                        return mIsActivityChangingConfigurations;
+                    public boolean isFinishing() {
+                        return mIsActivityFinishing;
                     }
 
                     @Override
-                    public boolean isActivityFinishing() {
-                        return mIsActivityFinishing;
+                    public boolean isChangingConfigurations() {
+                        return mIsActivityChangingConfigurations;
                     }
 
                     @Override

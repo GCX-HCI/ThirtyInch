@@ -15,69 +15,77 @@
 
 package net.grandcentrix.thirtyinch.plugin;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.app.Instrumentation;
+import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static junit.framework.Assert.assertEquals;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertNotEquals;
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertSame;
+import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TiPluginTest {
 
-    @Rule
-    public ActivityTestRule<TestActivity> mActivityRule =
-            new ActivityTestRule<>(TestActivity.class);
-
+    /**
+     * Tests the full Activity lifecycle. Guarantees every lifecycle method gets called
+     */
     @Test
     public void recreate() throws Throwable {
-        final TestActivity first = mActivityRule.getActivity();
+        final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
+        // register monitor to track activity startups
+        final Instrumentation.ActivityMonitor activityMonitor =
+                new Instrumentation.ActivityMonitor(TestActivity.class.getName(), null, false);
+        instrumentation.addMonitor(activityMonitor);
+
+        // start the activity for the first time
+        instrumentation.startActivitySync(
+                new Intent(instrumentation.getContext(), TestActivity.class));
+
+        // get activity reference
+        final TestActivity first = (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
+        assertNotNull(first);
+
+        // make sure the attached presenter filled the UI
         Espresso.onView(withId(R.id.helloworld_text))
-                .check(matches(isDisplayed()));
+                .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
 
-        final Instrumentation.ActivityMonitor activityMonitor = new Instrumentation.ActivityMonitor(
-                TestActivity.class.getName(), null, false);
-        InstrumentationRegistry.getInstrumentation().addMonitor(activityMonitor);
-
-        assertNull(activityMonitor.getLastActivity());
-
-        first.runOnUiThread(new Runnable() {
+        // restart the activity
+        instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
                 first.recreate();
             }
         });
-        /*Context context = InstrumentationRegistry.getTargetContext();
-        int orientation = context.getResources().getConfiguration().orientation;
 
-        first.setRequestedOrientation((orientation == Configuration.ORIENTATION_PORTRAIT)
-                ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);*/
+        // the monitor get's hit when onDestroy gets called for the first time. It's the old
+        // activity reference
+        final TestActivity destroyedActivity =
+                (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
+        // make sure it's the previously started activity, and ignore it
+        assertSame(destroyedActivity, first);
 
-        assertNotNull(activityMonitor.getLastActivity());
+        // next hit is the recreated activity
         final TestActivity second = (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
         assertNotNull(second);
+        // is has to be a different Activity object
+        assertNotSame(first, second);
 
-        //final TestActivity second = mActivityRule.getActivity();
-
-        assertEquals(2, activityMonitor.getHits());
-        assertNotEquals(first, second);
-
+        // assert the activity was bound to the presenter. The presenter should update the UI
+        // correctly
         Espresso.onView(withId(R.id.helloworld_text))
-                .check(matches(isDisplayed()));
+                .check(matches(allOf(isDisplayed(), withText("Hello World 2"))));
     }
 }

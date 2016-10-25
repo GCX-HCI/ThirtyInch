@@ -19,4 +19,5 @@ import net.grandcentrix.thirtyinch.TiView;
 
 public interface TestView extends TiView {
 
+    void showText(String s);
 }

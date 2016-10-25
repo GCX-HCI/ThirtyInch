@@ -22,7 +22,6 @@ import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.content.res.Configuration;
@@ -100,8 +99,13 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
+    public boolean isActivityChangingConfigurations() {
+        return isChangingConfigurations();
+    }
+
+    @Override
+    public boolean isActivityFinishing() {
+        return isFinishing();
     }
 
     @Override

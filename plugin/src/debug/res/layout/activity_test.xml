@@ -6,7 +6,6 @@
 
     <TextView
         android:id="@+id/helloworld_text"
-        android:text="Hello World"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

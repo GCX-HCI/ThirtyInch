@@ -35,17 +35,12 @@ public interface DelegatedTiActivity<P> {
     /**
      * @return {@link Activity#isFinishing()}
      */
-    boolean isFinishing();
+    boolean isActivityFinishing();
 
     /**
      * @return {@link Activity#isChangingConfigurations()}
      */
-    boolean isChangingConfigurations();
-
-    /**
-     * @return true when the developer option "Don't keep Activities" is enabled
-     */
-    boolean isDontKeepActivitiesEnabled();
+    boolean isActivityChangingConfigurations();
 
     /**
      * Post the runnable on the UI queue
