@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
@@ -161,7 +162,7 @@ public class TiLifecycleObserverTest {
             @Override
             public void onChange(final TiPresenter.State state,
                     final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                states.add(new Object[]{state, beforeLifecycleEvent, mPresenter.getView()});
             }
         });
 
@@ -172,10 +173,12 @@ public class TiLifecycleObserverTest {
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.VIEW_DETACHED);
         assertEquals(beforeLast[1], false);
+        assertNotNull(beforeLast[2]);
 
         final Object[] last = states.get(states.size() - 1);
         assertEquals(last[0], TiPresenter.State.VIEW_DETACHED);
         assertEquals(last[1], true);
+        assertNotNull(last[2]);
     }
 
     @Test
@@ -185,7 +188,7 @@ public class TiLifecycleObserverTest {
             @Override
             public void onChange(final TiPresenter.State state,
                     final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                states.add(new Object[]{state, beforeLifecycleEvent, mPresenter.getView()});
             }
         });
 
@@ -195,9 +198,11 @@ public class TiLifecycleObserverTest {
         final Object[] beforeLast = states.get(states.size() - 2);
         assertEquals(beforeLast[0], TiPresenter.State.VIEW_ATTACHED);
         assertEquals(beforeLast[1], false);
+        assertNotNull(beforeLast[2]);
 
         final Object[] last = states.get(states.size() - 1);
         assertEquals(last[0], TiPresenter.State.VIEW_ATTACHED);
         assertEquals(last[1], true);
+        assertNotNull(last[2]);
     }
 }
