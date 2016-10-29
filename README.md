@@ -42,6 +42,12 @@ dependencies {
 }
 ```
 
+
+## [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
+
+There is a sample implementation based on the [Android Architecture Blueprints TODO app](https://github.com/googlesamples/android-architecture) which can be found here: [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
+
+
 ## Hello World MVP example with ThirtyInch
 
 `HelloWorldActivity.java`
@@ -95,7 +101,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 }
 
 ```
-
 ## ThirtyInch features
 
 ### Presenter
