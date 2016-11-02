@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -150,7 +151,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //TODO handle attach/detach state
+        //FIXME handle attach/detach state
         TiLog.v(TAG, "isChangingConfigurations = " + getActivity().isChangingConfigurations());
         TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
         TiLog.v(TAG, "isAdded = " + isAdded());
@@ -162,8 +163,43 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
         TiLog.v(TAG, "useStaticSavior = " + config.useStaticSaviorToRetain());
 
-        mPresenter.destroy();
-        PresenterSavior.INSTANCE.free(mPresenterId);
+        final FragmentActivity activity = getActivity();
+
+        boolean destroyPresenter = false;
+        if (activity.isFinishing()) {
+            // Probably a backpress and not a configuration change
+            // Activity will not be recreated and finally destroyed, also destroyed the presenter
+            destroyPresenter = true;
+            TiLog.v(TAG, "Activity is finishing, destroying presenter " + mPresenter);
+        }
+
+        if (!destroyPresenter &&
+                !config.shouldRetainPresenter()) {
+            // configuration says the presenter should not be retained, a new presenter instance
+            // will be created and the current presenter should be destroyed
+            destroyPresenter = true;
+            TiLog.v(TAG, "presenter configured as not retaining, destroying " + mPresenter);
+        }
+
+        if (!destroyPresenter &&
+                !config.useStaticSaviorToRetain()
+                && AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity())) {
+            // configuration says the PresenterSavior should not be used. Retaining the presenter
+            // relays on the Activity nonConfigurationInstance which is always null when
+            // "don't keep activities" is enabled.
+            // a new presenter instance will be created and the current presenter should be destroyed
+            destroyPresenter = true;
+            TiLog.v(TAG, "the PresenterSavior is disabled and \"don\'t keep activities\" is "
+                    + "activated. The presenter can't be retained. Destroying " + mPresenter);
+        }
+
+        if (destroyPresenter) {
+            mPresenter.destroy();
+            PresenterSavior.INSTANCE.free(mPresenterId);
+        } else {
+            TiLog.v(TAG, "not destroying " + mPresenter
+                    + " which will be reused by the next Activity instance, recreating...");
+        }
     }
 
     @Override
