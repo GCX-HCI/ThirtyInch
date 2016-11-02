@@ -43,7 +43,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
     public HelloWorldPresenter() {
         super(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
+                .setUseStaticSaviorToRetain(true)
                 .build());
     }
 

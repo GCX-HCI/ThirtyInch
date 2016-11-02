@@ -15,6 +15,7 @@
 
 package net.grandcentrix.thirtyinch.sample;
 
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
@@ -30,12 +31,20 @@ public class SamplePresenter extends TiPresenter<SampleView> {
     private RxTiPresenterSubscriptionHandler mSubscriptionHandler
             = new RxTiPresenterSubscriptionHandler(this);
 
+    private static final String TAG = SamplePresenter.class.getSimpleName();
+
+    public SamplePresenter() {
+        super(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .build());
+    }
+
     @Override
     protected void onCreate() {
         super.onCreate();
 
         mSubscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
-                .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
+                .compose(RxTiPresenterUtils.<Long>deliverLatestCacheToView(this))
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(final Long alive) {

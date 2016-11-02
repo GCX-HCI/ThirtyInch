@@ -15,12 +15,13 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+
 import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 
@@ -29,7 +30,7 @@ import java.util.HashMap;
  * save objects via {@code Activity#onRetainNonConfigurationInstance()} for example when the user
  * has enabled "Do not keep activities" in the developer options. This singleton holds strong
  * references to those presenters and returns them when needed.
- *
+ * <p>
  * {@link TiActivity} is responsible to manage the references
  */
 public enum PresenterSavior {
@@ -38,7 +39,8 @@ public enum PresenterSavior {
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
 
-    private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
+    @VisibleForTesting
+    HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
     public void free(final String presenterId) {
         mPresenters.remove(presenterId);
@@ -61,4 +63,10 @@ public enum PresenterSavior {
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();
     }
+
+    @VisibleForTesting
+    void clear() {
+        mPresenters.clear();
+    }
+
 }

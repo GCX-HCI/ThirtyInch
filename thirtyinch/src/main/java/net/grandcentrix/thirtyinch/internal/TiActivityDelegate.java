@@ -15,6 +15,13 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.app.Activity;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
@@ -24,13 +31,6 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
-
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
 
@@ -47,38 +47,30 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     @VisibleForTesting
     static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
-
+    private final TiPresenterProvider<P> mPresenterProvider;
+    private final DelegatedTiActivity<P> mTiActivity;
+    private final PresenterViewBinder<V> mViewBinder;
     /**
      * flag indicating the started state of the Activity between {@link Activity#onStart()} and
      * {@link Activity#onStop()}.
      */
     private volatile boolean mActivityStarted = false;
-
     private TiLoggingTagProvider mLogTag;
-
     /**
      * The presenter to which this activity will be attached as view when in the right state.
      */
     private P mPresenter;
-
     /**
      * The id of the presenter this view got attached to. Will be stored in the savedInstanceState
      * to find the same presenter after the Activity got recreated.
      */
     private String mPresenterId;
-
-    private final TiPresenterProvider<P> mPresenterProvider;
-
-    private final DelegatedTiActivity<P> mTiActivity;
-
-    private final PresenterViewBinder<V> mViewBinder;
-
     private TiViewProvider<V> mViewProvider;
 
     public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
-            final TiViewProvider<V> viewProvider,
-            final TiPresenterProvider<P> presenterProvider,
-            final TiLoggingTagProvider logTag) {
+                              final TiViewProvider<V> viewProvider,
+                              final TiPresenterProvider<P> presenterProvider,
+                              final TiLoggingTagProvider logTag) {
         mTiActivity = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
@@ -194,13 +186,16 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     public void onDestroy_afterSuper() {
         TiLog.v(mLogTag.getLoggingTag(), "isChangingConfigurations = " + mTiActivity.isActivityChangingConfigurations());
         TiLog.v(mLogTag.getLoggingTag(), "isActivityFinishing = " + mTiActivity.isActivityFinishing());
+        final TiConfiguration config = mPresenter.getConfig();
+        TiLog.v(mLogTag.getLoggingTag(), "shouldRetain = " + config.shouldRetainPresenter());
+        TiLog.v(mLogTag.getLoggingTag(), "useStaticSavior = " + config.useStaticSaviorToRetain());
 
         if (mTiActivity.isActivityChangingConfigurations()) {
             // Activity will be recreated, due to a change in configuration. This is also the
             // case when calling Activity#recreate() regardless of the value of
             // Activity#isFinishing(). The Activity will be recreated in any case
 
-            if (!mPresenter.getConfig().shouldRetainPresenter()) {
+            if (!config.shouldRetainPresenter()) {
                 // configuration says the presenter should not be retained, a new presenter instance
                 // will be created and the current presenter should be destroyed
                 TiLog.v(mLogTag.getLoggingTag(),
@@ -215,7 +210,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             return;
         } else {
 
-            if (!mPresenter.getConfig().useStaticSaviorToRetain()) {
+            if (!config.useStaticSaviorToRetain()) {
                 // configuration says the PresenterSavior should not be used. Retaining the presenter
                 // relays on the Activity nonConfigurationInstance which is always null when
                 // "don't keep activities" is enabled.

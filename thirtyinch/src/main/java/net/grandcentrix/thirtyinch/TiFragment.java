@@ -15,6 +15,15 @@
 
 package net.grandcentrix.thirtyinch;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
@@ -25,16 +34,6 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
-
-import android.app.Activity;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -160,38 +159,19 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onDestroy() {
         super.onDestroy();
-        final FragmentActivity activity = getActivity();
-        TiLog.v(TAG, "onDestroy() recreating=" + !activity.isFinishing());
 
-        boolean destroyPresenter = false;
-        if (activity.isFinishing()) {
-            // Probably a backpress and not a configuration change
-            // Activity will not be recreated and finally destroyed, also destroyed the presenter
-            destroyPresenter = true;
-        }
+        TiLog.v(TAG, "isChangingConfigurations = " + getActivity().isChangingConfigurations());
+        TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
+        TiLog.v(TAG, "isAdded = " + isAdded());
+        TiLog.v(TAG, "isDetached = " + isDetached());
+        TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity()));
 
         final TiConfiguration config = mPresenter.getConfig();
-        if (!destroyPresenter &&
-                !config.shouldRetainPresenter()) {
-            // configuration says the presenter should not be retained, a new presenter instance
-            // will be created and the current presenter should be destroyed
-            destroyPresenter = true;
-        }
+        TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
+        TiLog.v(TAG, "useStaticSavior = " + config.useStaticSaviorToRetain());
 
-        if (!destroyPresenter &&
-                !config.useStaticSaviorToRetain()
-                && AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity())) {
-            // configuration says the PresenterSavior should not be used. Retaining the presenter
-            // relays on the Activity nonConfigurationInstance which is always null when
-            // "don't keep activities" is enabled.
-            // a new presenter instance will be created and the current presenter should be destroyed
-            destroyPresenter = true;
-        }
-
-        if (destroyPresenter) {
-            mPresenter.destroy();
-            PresenterSavior.INSTANCE.free(mPresenterId);
-        }
+        mPresenter.destroy();
+        PresenterSavior.INSTANCE.free(mPresenterId);
     }
 
     @Override
