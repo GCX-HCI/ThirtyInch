@@ -33,8 +33,6 @@ import rx.subjects.PublishSubject;
 
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-    private static final String TAG = HelloWorldPresenter.class.getSimpleName();
-
     private int mCounter = 0;
 
     private BehaviorSubject<String> mText = BehaviorSubject.create();
@@ -45,9 +43,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
 
     public HelloWorldPresenter() {
-        super(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .build());
+        super(new TiConfiguration.Builder().build());
     }
 
     @Override

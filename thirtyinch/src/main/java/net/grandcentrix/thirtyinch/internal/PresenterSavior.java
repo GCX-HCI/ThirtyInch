@@ -30,7 +30,7 @@ import java.util.HashMap;
  * save objects via {@code Activity#onRetainNonConfigurationInstance()} for example when the user
  * has enabled "Do not keep activities" in the developer options. This singleton holds strong
  * references to those presenters and returns them when needed.
- * <p>
+ *
  * {@link TiActivity} is responsible to manage the references
  */
 public enum PresenterSavior {
@@ -68,5 +68,4 @@ public enum PresenterSavior {
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();
     }
-
 }

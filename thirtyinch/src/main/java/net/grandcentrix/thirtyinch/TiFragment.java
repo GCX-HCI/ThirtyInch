@@ -150,7 +150,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        //TODO handle attach/detach state
         TiLog.v(TAG, "isChangingConfigurations = " + getActivity().isChangingConfigurations());
         TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
         TiLog.v(TAG, "isAdded = " + isAdded());

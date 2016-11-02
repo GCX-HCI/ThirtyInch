@@ -43,7 +43,7 @@ public class TiPluginTest {
      * Tests the full Activity lifecycle. Guarantees every lifecycle method gets called
      */
     @Test
-    public void recreate() throws Throwable {
+    public void testFullLifecycleIncludingConfigurationChange() throws Throwable {
         final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
         // register monitor to track activity startups

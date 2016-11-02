@@ -34,9 +34,7 @@ public class SamplePresenter extends TiPresenter<SampleView> {
             = new RxTiPresenterSubscriptionHandler(this);
 
     public SamplePresenter() {
-        super(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .build());
+        super(new TiConfiguration.Builder().build());
     }
 
     @Override
@@ -44,7 +42,7 @@ public class SamplePresenter extends TiPresenter<SampleView> {
         super.onCreate();
 
         mSubscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
-                .compose(RxTiPresenterUtils.<Long>deliverLatestCacheToView(this))
+                .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(final Long alive) {
