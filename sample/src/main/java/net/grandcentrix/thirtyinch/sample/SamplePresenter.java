@@ -28,10 +28,10 @@ import rx.functions.Action1;
 
 public class SamplePresenter extends TiPresenter<SampleView> {
 
+    private static final String TAG = SamplePresenter.class.getSimpleName();
+
     private RxTiPresenterSubscriptionHandler mSubscriptionHandler
             = new RxTiPresenterSubscriptionHandler(this);
-
-    private static final String TAG = SamplePresenter.class.getSimpleName();
 
     public SamplePresenter() {
         super(new TiConfiguration.Builder()
@@ -48,6 +48,7 @@ public class SamplePresenter extends TiPresenter<SampleView> {
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(final Long alive) {
+                        // deliverLatestToView makes getView() here @NonNull
                         getView().showText("I'm a fragment and alive for " + (alive * 37) + "ms");
                     }
                 }));

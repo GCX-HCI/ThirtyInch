@@ -15,12 +15,6 @@
 
 package net.grandcentrix.thirtyinch;
 
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterNonConfigurationInstance;
@@ -30,6 +24,12 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.List;
 
@@ -47,12 +47,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     private final TiActivityDelegate<P, V> mDelegate
             = new TiActivityDelegate<>(this, this, this, this);
-
-
-    @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
-    }
 
     @NonNull
     @Override
@@ -113,6 +107,11 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public boolean isActivityFinishing() {
         return isFinishing();
+    }
+
+    @Override
+    public boolean isDontKeepActivitiesEnabled() {
+        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
     }
 
     @Override
@@ -186,8 +185,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this));
         mDelegate.onDestroy_afterSuper();
     }
 
@@ -199,7 +196,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     protected void onStart() {
-        mDelegate.onStart_beforeSuper();
         super.onStart();
         mDelegate.onStart_afterSuper();
     }

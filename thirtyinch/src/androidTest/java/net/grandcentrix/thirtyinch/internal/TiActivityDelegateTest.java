@@ -15,12 +15,6 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.SmallTest;
-
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
@@ -28,6 +22,12 @@ import net.grandcentrix.thirtyinch.TiView;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.test.runner.AndroidJUnit4;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -72,7 +72,7 @@ public class TiActivityDelegateTest {
 
         mDelegate.onCreate_afterSuper(null);
 
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         mDelegate.onDestroy_afterSuper();
         assertEquals(TiPresenter.State.DESTROYED, mPresenter.getState());
@@ -99,13 +99,13 @@ public class TiActivityDelegateTest {
         mPresenter = firstPresenter;
         mDelegate.onCreate_afterSuper(null);
 
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         final Bundle bundle = new Bundle();
         mDelegate.onSaveInstanceState_afterSuper(bundle);
 
         mDelegate.onDestroy_afterSuper();
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         mPresenter = secondPresenter;
         mDelegate = newDelegate();
@@ -129,13 +129,13 @@ public class TiActivityDelegateTest {
 
         mDelegate.onCreate_afterSuper(null);
 
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         final Bundle bundle = new Bundle();
         mDelegate.onSaveInstanceState_afterSuper(bundle);
 
         mDelegate.onDestroy_afterSuper();
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         mPresenter = secondPresenter;
         mDelegate = newDelegate();
@@ -162,13 +162,13 @@ public class TiActivityDelegateTest {
 
         mDelegate.onCreate_afterSuper(null);
 
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         final Bundle bundle = new Bundle();
         mDelegate.onSaveInstanceState_afterSuper(bundle);
 
         mDelegate.onDestroy_afterSuper();
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         mPresenter = secondPresenter;
 
@@ -194,13 +194,13 @@ public class TiActivityDelegateTest {
 
         mDelegate.onCreate_afterSuper(null);
 
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         final Bundle bundle = new Bundle();
         mDelegate.onSaveInstanceState_afterSuper(bundle);
 
         mDelegate.onDestroy_afterSuper();
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
 
         mPresenter = secondPresenter;
 
@@ -209,7 +209,7 @@ public class TiActivityDelegateTest {
         assertEquals(secondPresenter, mDelegate.getPresenter());
 
         // new one got created
-        assertEquals(TiPresenter.State.CREATED_WITH_DETACHED_VIEW, mPresenter.getState());
+        assertEquals(TiPresenter.State.VIEW_DETACHED, mPresenter.getState());
     }
 
     @NonNull
@@ -224,13 +224,13 @@ public class TiActivityDelegateTest {
                     }
 
                     @Override
-                    public boolean isActivityFinishing() {
-                        return mIsActivityFinishing;
+                    public boolean isActivityChangingConfigurations() {
+                        return mIsActivityChangingConfigurations;
                     }
 
                     @Override
-                    public boolean isActivityChangingConfigurations() {
-                        return mIsActivityChangingConfigurations;
+                    public boolean isActivityFinishing() {
+                        return mIsActivityFinishing;
                     }
 
                     @Override

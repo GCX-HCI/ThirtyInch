@@ -13,11 +13,20 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.plugin;
+package net.grandcentrix.thirtyinch.sample;
 
-import net.grandcentrix.thirtyinch.TiView;
 
-public interface TestView extends TiView {
+import net.grandcentrix.thirtyinch.TiLog;
 
-    void showText(String s);
+import android.app.Application;
+
+public class SampleApp extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // log ThirtyInch output with logcat
+        TiLog.setLogger(TiLog.LOGCAT);
+    }
 }

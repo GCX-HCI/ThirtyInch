@@ -33,22 +33,22 @@ public interface DelegatedTiActivity<P> {
     P getRetainedPresenter();
 
     /**
-     * @return {@link Activity#isFinishing()}
-     */
-    boolean isActivityFinishing();
-
-    /**
      * @return {@link Activity#isChangingConfigurations()}
      */
     boolean isActivityChangingConfigurations();
 
     /**
-     * Post the runnable on the UI queue
+     * @return {@link Activity#isFinishing()}
      */
-    boolean postToMessageQueue(Runnable runnable);
+    boolean isActivityFinishing();
 
     /**
      * @return true when the developer option "Don't keep Activities" is enabled
      */
     boolean isDontKeepActivitiesEnabled();
+
+    /**
+     * Post the runnable on the UI queue
+     */
+    boolean postToMessageQueue(Runnable runnable);
 }

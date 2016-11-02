@@ -15,13 +15,6 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
@@ -31,6 +24,13 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
+
+import android.app.Activity;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
 
@@ -47,30 +47,38 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     @VisibleForTesting
     static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
-    private final TiPresenterProvider<P> mPresenterProvider;
-    private final DelegatedTiActivity<P> mTiActivity;
-    private final PresenterViewBinder<V> mViewBinder;
+
     /**
      * flag indicating the started state of the Activity between {@link Activity#onStart()} and
      * {@link Activity#onStop()}.
      */
     private volatile boolean mActivityStarted = false;
+
     private TiLoggingTagProvider mLogTag;
+
     /**
      * The presenter to which this activity will be attached as view when in the right state.
      */
     private P mPresenter;
+
     /**
      * The id of the presenter this view got attached to. Will be stored in the savedInstanceState
      * to find the same presenter after the Activity got recreated.
      */
     private String mPresenterId;
+
+    private final TiPresenterProvider<P> mPresenterProvider;
+
+    private final DelegatedTiActivity<P> mTiActivity;
+
+    private final PresenterViewBinder<V> mViewBinder;
+
     private TiViewProvider<V> mViewProvider;
 
     public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
-                              final TiViewProvider<V> viewProvider,
-                              final TiPresenterProvider<P> presenterProvider,
-                              final TiLoggingTagProvider logTag) {
+            final TiViewProvider<V> viewProvider,
+            final TiPresenterProvider<P> presenterProvider,
+            final TiLoggingTagProvider logTag) {
         mTiActivity = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
@@ -116,7 +124,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
-        TiLog.v(mLogTag.getLoggingTag(), "onCreate(" + savedInstanceState + ")");
 
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
@@ -185,7 +192,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onDestroy_afterSuper() {
         final TiConfiguration config = mPresenter.getConfig();
-        TiLog.v(mLogTag.getLoggingTag(), "onDestroy()");
 
         boolean destroyPresenter = false;
         if (mTiActivity.isActivityFinishing()) {
@@ -240,23 +246,17 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // check if still started. It happens that onStop got already called, specially
                 // when the Activity is not the top Activity and a configuration change happens
                 if (mActivityStarted) {
-                    mPresenter.wakeUp();
+                    mViewBinder.bindView(mPresenter, mViewProvider);
                 }
             }
         });
     }
 
-    public void onStart_beforeSuper() {
-        TiLog.v(mLogTag.getLoggingTag(), "onStart()");
-        mViewBinder.bindView(mPresenter, mViewProvider);
-    }
-
     public void onStop_afterSuper() {
-        mPresenter.sleep();
+        mPresenter.detachView();
     }
 
     public void onStop_beforeSuper() {
-        TiLog.v(mLogTag.getLoggingTag(), "onStop()");
         mActivityStarted = false;
     }
 }

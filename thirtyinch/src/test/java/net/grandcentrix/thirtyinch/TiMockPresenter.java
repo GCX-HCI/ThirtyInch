@@ -29,6 +29,13 @@ class TiMockPresenter extends TiPresenter<TiView> {
 
     protected int onWakeUpCalled = 0;
 
+    public TiMockPresenter() {
+    }
+
+    public TiMockPresenter(final TiConfiguration config) {
+        super(config);
+    }
+
     @Override
     protected void onCreate() {
         super.onCreate();
@@ -51,12 +58,5 @@ class TiMockPresenter extends TiPresenter<TiView> {
     protected void onWakeUp() {
         super.onWakeUp();
         onWakeUpCalled++;
-    }
-
-    public TiMockPresenter() {
-    }
-
-    public TiMockPresenter(final TiConfiguration config) {
-        super(config);
     }
 }

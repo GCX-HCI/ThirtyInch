@@ -28,13 +28,11 @@ public class TiPresenterInstructor<V extends TiView> {
 
     /**
      * attaches the new view and takes care for removing the old view when one is attached
-     * @param view
      */
     public void attachView(final V view) {
         detachView();
 
-        mPresenter.bindNewView(view);
-        mPresenter.wakeUp();
+        mPresenter.attachView(view);
     }
 
     public void create() {
@@ -47,7 +45,7 @@ public class TiPresenterInstructor<V extends TiView> {
     }
 
     /**
-     * moves the presenter into state {@link net.grandcentrix.thirtyinch.TiPresenter.State#CREATED_WITH_DETACHED_VIEW}
+     * moves the presenter into state {@link net.grandcentrix.thirtyinch.TiPresenter.State#VIEW_DETACHED}
      * from every state
      */
     public void detachView() {
@@ -56,11 +54,11 @@ public class TiPresenterInstructor<V extends TiView> {
             case INITIALIZED:
                 mPresenter.create();
                 break;
-            case CREATED_WITH_DETACHED_VIEW:
+            case VIEW_DETACHED:
                 // already there
                 break;
-            case VIEW_ATTACHED_AND_AWAKE:
-                mPresenter.sleep();
+            case VIEW_ATTACHED:
+                mPresenter.detachView();
                 break;
             case DESTROYED:
                 throw new IllegalStateException(

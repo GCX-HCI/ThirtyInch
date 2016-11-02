@@ -19,12 +19,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import android.support.annotation.NonNull;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -37,14 +39,102 @@ public class TiPresenterTest {
 
     private TiView mView;
 
+    @Test
+    public void attachDifferentView() throws Exception {
+        TiView viewOverride = mock(TiView.class);
+        mPresenter.create();
+
+        mPresenter.attachView(mView);
+        assertThat(mPresenter.getView(), equalTo(mView));
+
+        try {
+            mPresenter.attachView(viewOverride);
+            fail("no exception thrown");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("detachView"));
+        }
+    }
+
+    @Test
+    public void attachNullView() throws Exception {
+
+        mPresenter.create();
+        try {
+            mPresenter.attachView(null);
+            fail("no exception thrown");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("detachView()"));
+        }
+    }
+
+    @Test
+    public void attachSameViewTwice() throws Exception {
+        mPresenter.create();
+
+        mPresenter.attachView(mView);
+        assertThat(mPresenter.getView(), equalTo(mView));
+
+        mPresenter.attachView(mView);
+        assertThat(mPresenter.getView(), equalTo(mView));
+    }
+
+    @Test
+    public void attachViewToDestroyedPresenter() throws Exception {
+        mPresenter.create();
+        mPresenter.destroy();
+
+        try {
+            mPresenter.attachView(mView);
+            fail("no exception thrown");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("terminal state"));
+        }
+    }
+
+    @Test
+    public void attachWithoutInitialize() throws Exception {
+        try {
+            mPresenter.attachView(mView);
+            fail("no exception thrown");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("create()"));
+        }
+    }
+
+    @Test
+    public void destroyWithoutAttachingView() throws Exception {
+        mPresenter.create();
+        mPresenter.destroy();
+    }
+
+    @Test
+    public void detachView() throws Exception {
+        mPresenter.create();
+        assertEquals(null, mPresenter.getView());
+
+        final TiView view = mock(TiView.class);
+        mPresenter.attachView(view);
+        assertEquals(view, mPresenter.getView());
+
+        mPresenter.detachView();
+        assertEquals(null, mPresenter.getView());
+    }
+
+    @Test
+    public void detachViewNotAttached() throws Exception {
+        mPresenter.create();
+
+        // no exception, just ignoring
+        mPresenter.detachView();
+
+        mPresenter.attachView(mock(TiView.class));
+        // no exception, just ignoring
+        mPresenter.detachView();
+        mPresenter.detachView();
+    }
+
     @Before
     public void setUp() throws Exception {
-        TiLog.setLogger(new TiLog.Logger() {
-            @Override
-            public void log(final int level, final String tag, final String msg) {
-                // prevent RuntimeException: android.util.Log not mocked
-            }
-        });
         mView = mock(TiView.class);
         mPresenter = new TiMockPresenter();
     }
@@ -56,30 +146,69 @@ public class TiPresenterTest {
     }
 
     @Test
-    public void testBindNewView() throws Exception {
-        TiView viewOverride = mock(TiView.class);
-        mPresenter.create();
-        mPresenter.bindNewView(mView);
-
-        assertThat(mPresenter.getView(), equalTo(mView));
-
-        mPresenter.bindNewView(mView);
-        assertThat(mPresenter.getView(), equalTo(mView));
-
-        mPresenter.bindNewView(viewOverride);
-        assertThat(mPresenter.getView(), equalTo(viewOverride));
-
+    public void testCallingOnAttachViewDirectly() throws Exception {
         try {
-            mPresenter.bindNewView(null);
-            fail();
-        } catch (IllegalStateException e) {
-            assertTrue(e.getMessage().contains("sleep"));
+            mPresenter.onAttachView(mock(TiView.class));
+            fail("no exception thrown");
+        } catch (IllegalAccessError e) {
+            assertTrue(e.getMessage().contains("attachView(TiView)"));
+            assertTrue(e.getMessage().contains("#onAttachView(TiView)"));
         }
+    }
 
-        mPresenter.wakeUp();
-        assertThat(mPresenter.getView(), equalTo(viewOverride));
-        mPresenter.sleep();
-        assertThat(mPresenter.getView(), nullValue());
+    @Test
+    public void testCallingOnCreateDirectly() throws Exception {
+        try {
+            mPresenter.onCreate();
+            fail("no exception thrown");
+        } catch (IllegalAccessError e) {
+            assertTrue(e.getMessage().contains("create()"));
+            assertTrue(e.getMessage().contains("#onCreate()"));
+        }
+    }
+
+    @Test
+    public void testCallingOnDestroyDirectly() throws Exception {
+        try {
+            mPresenter.onDestroy();
+            fail("no exception thrown");
+        } catch (IllegalAccessError e) {
+            assertTrue(e.getMessage().contains("destroy()"));
+            assertTrue(e.getMessage().contains("#onDestroy()"));
+        }
+    }
+
+    @Test
+    public void testCallingOnDetachViewDirectly() throws Exception {
+        try {
+            mPresenter.onDetachView();
+            fail("no exception thrown");
+        } catch (IllegalAccessError e) {
+            assertTrue(e.getMessage().contains("detachView()"));
+            assertTrue(e.getMessage().contains("#onDetachView()"));
+        }
+    }
+
+    @Test
+    public void testCallingOnSleepDirectly() throws Exception {
+        try {
+            mPresenter.onSleep();
+            fail("no exception thrown");
+        } catch (IllegalAccessError e) {
+            assertTrue(e.getMessage().contains("detachView()"));
+            assertTrue(e.getMessage().contains("#onSleep()"));
+        }
+    }
+
+    @Test
+    public void testCallingOnWakeUpDirectly() throws Exception {
+        try {
+            mPresenter.onWakeUp();
+            fail("no exception thrown");
+        } catch (IllegalAccessError e) {
+            assertTrue(e.getMessage().contains("attachView(TiView)"));
+            assertTrue(e.getMessage().contains("#onWakeUp()"));
+        }
     }
 
     @Test
@@ -103,7 +232,6 @@ public class TiPresenterTest {
         };
         presenter.create();
     }
-
 
     @Test
     public void testDestroy() throws Exception {
@@ -139,33 +267,48 @@ public class TiPresenterTest {
     @Test
     public void testGetView() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
+        mPresenter.attachView(mView);
         assertThat(mPresenter.getView(), equalTo(mView));
     }
 
+    @Test
+    public void testOnAttachViewSuperNotCalled() throws Exception {
+        TiPresenter<TiView> presenter = new TiPresenter<TiView>() {
 
-    @Test(expected = IllegalAccessError.class)
-    public void testOnCreate() throws Exception {
-        mPresenter.onCreate();
+            @Override
+            protected void onAttachView(@NonNull final TiView view) {
+                // Intentionally not calling super.onSleep()
+            }
+        };
+        presenter.create();
+        try {
+            presenter.attachView(mock(TiView.class));
+            fail("no exception thrown");
+        } catch (SuperNotCalledException e) {
+            assertTrue(e.getMessage().contains("super.onAttachView(TiView)"));
+        }
     }
 
-    @Test(expected = IllegalAccessError.class)
-    public void testOnDestroy() throws Exception {
-        mPresenter.onDestroy();
+    @Test
+    public void testOnDetachViewSuperNotCalled() throws Exception {
+        TiPresenter<TiView> presenter = new TiPresenter<TiView>() {
+
+            @Override
+            protected void onDetachView() {
+                // Intentionally not calling super.onSleep()
+            }
+        };
+        presenter.create();
+        presenter.attachView(mock(TiView.class));
+        try {
+            presenter.detachView();
+            fail("no exception thrown");
+        } catch (SuperNotCalledException e) {
+            assertTrue(e.getMessage().contains("super.onDetachView()"));
+        }
     }
 
-    @Test(expected = IllegalAccessError.class)
-    public void testOnSleep() throws Exception {
-        mPresenter.onSleep();
-    }
-
-    @Test(expected = IllegalAccessError.class)
-    public void testOnWakeUp() throws Exception {
-        mPresenter.onWakeUp();
-    }
-
-
-    @Test(expected = SuperNotCalledException.class)
+    @Test
     public void testSleepSuperNotCalled() throws Exception {
         TiPresenter<TiView> presenter = new TiPresenter<TiView>() {
             @Override
@@ -174,8 +317,13 @@ public class TiPresenterTest {
             }
         };
         presenter.create();
-        presenter.wakeUp();
-        presenter.sleep();
+        presenter.attachView(mock(TiView.class));
+        try {
+            presenter.detachView();
+            fail("no exception thrown");
+        } catch (SuperNotCalledException e) {
+            assertTrue(e.getMessage().contains("super.onSleep()"));
+        }
     }
 
     @Test
@@ -183,23 +331,13 @@ public class TiPresenterTest {
         mPresenter.create();
         assertThat(mPresenter.toString(), containsString("TiMockPresenter"));
         assertThat(mPresenter.toString(), containsString("{view = null}"));
-        mPresenter.bindNewView(mView);
+        mPresenter.attachView(mView);
         assertThat(mPresenter.toString(), containsString("TiMockPresenter"));
         assertThat(mPresenter.toString(), containsString("{view = Mock for TiView, hashCode: "));
     }
 
-    @Test
-    public void testWakeUp() throws Exception {
-        mPresenter.create();
-        assertThat(mPresenter.onWakeUpCalled, equalTo(0));
-        mPresenter.wakeUp();
-        assertThat(mPresenter.onWakeUpCalled, equalTo(1));
-        // not calling again
-        mPresenter.wakeUp();
-        assertThat(mPresenter.onWakeUpCalled, equalTo(1));
-    }
 
-    @Test(expected = SuperNotCalledException.class)
+    @Test
     public void testWakeUpSuperNotCalled() throws Exception {
         TiPresenter<TiView> presenter = new TiPresenter<TiView>() {
             @Override
@@ -208,6 +346,11 @@ public class TiPresenterTest {
             }
         };
         presenter.create();
-        presenter.wakeUp();
+        try {
+            presenter.attachView(mock(TiView.class));
+            fail("no exception thrown");
+        } catch (SuperNotCalledException e) {
+            assertTrue(e.getMessage().contains("super.onWakeUp()"));
+        }
     }
 }

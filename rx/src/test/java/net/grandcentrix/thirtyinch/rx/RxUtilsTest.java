@@ -15,7 +15,6 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
-import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.After;
@@ -45,15 +44,7 @@ public class RxUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        TiLog.setLogger(new TiLog.Logger() {
-            @Override
-            public void log(final int level, final String tag, final String msg) {
-                // prevent RuntimeException: android.util.Log not mocked
-            }
-        });
-
         mView = mock(TiView.class);
-
         mPresenter = new TiMockPresenter();
         mSubscriptionHandler = new RxTiPresenterSubscriptionHandler(mPresenter);
     }
@@ -67,18 +58,13 @@ public class RxUtilsTest {
     @Test
     public void testDeliverLatestCacheToViewViewNotReady() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
                 .compose(RxTiPresenterUtils.<Integer>deliverLatestCacheToView(mPresenter))
                 .subscribe(testSubscriber);
 
-        testSubscriber.assertNotCompleted();
-        testSubscriber.assertNoErrors();
-        testSubscriber.assertNoValues();
-
-        mPresenter.wakeUp();
+        mPresenter.attachView(mView);
 
         testSubscriber.assertNotCompleted();
         testSubscriber.assertNoErrors();
@@ -88,9 +74,8 @@ public class RxUtilsTest {
     @Test
     public void testDeliverLatestCacheToViewViewReady() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
+        mPresenter.attachView(mView);
 
-        mPresenter.wakeUp();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
                 .compose(RxTiPresenterUtils.<Integer>deliverLatestCacheToView(mPresenter))
@@ -104,18 +89,13 @@ public class RxUtilsTest {
     @Test
     public void testDeliverLatestToViewViewNotReady() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
                 .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
                 .subscribe(testSubscriber);
 
-        testSubscriber.assertNotCompleted();
-        testSubscriber.assertNoErrors();
-        testSubscriber.assertNoValues();
-
-        mPresenter.wakeUp();
+        mPresenter.attachView(mView);
 
         testSubscriber.assertCompleted();
         testSubscriber.assertNoErrors();
@@ -125,9 +105,8 @@ public class RxUtilsTest {
     @Test
     public void testDeliverLatestToViewViewReady() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
+        mPresenter.attachView(mView);
 
-        mPresenter.wakeUp();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
                 .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
@@ -141,18 +120,27 @@ public class RxUtilsTest {
     @Test
     public void testDeliverToViewViewNotReady() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
+        mPresenter.attachView(mView);
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
                 .compose(RxTiPresenterUtils.<Integer>deliverToView(mPresenter))
                 .subscribe(testSubscriber);
 
-        testSubscriber.assertNotCompleted();
+        testSubscriber.assertCompleted();
         testSubscriber.assertNoErrors();
-        testSubscriber.assertNoValues();
+        testSubscriber.assertReceivedOnNext(Arrays.asList(1, 2, 3));
+    }
 
-        mPresenter.wakeUp();
+    @Test
+    public void testDeliverToViewViewReady() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+        Observable.just(1, 2, 3)
+                .compose(RxTiPresenterUtils.<Integer>deliverToView(mPresenter))
+                .subscribe(testSubscriber);
 
         testSubscriber.assertCompleted();
         testSubscriber.assertNoErrors();
@@ -160,21 +148,30 @@ public class RxUtilsTest {
     }
 
     @Test
-    public void testDeliverToViewViewReady() throws Exception {
+    public void testDetach() throws Exception {
         mPresenter.create();
-        mPresenter.bindNewView(mView);
-
-        mPresenter.wakeUp();
+        mPresenter.attachView(mView);
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-        Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverToView(mPresenter))
-                .subscribe(testSubscriber);
 
-        testSubscriber.assertCompleted();
-        testSubscriber.assertNoErrors();
-        testSubscriber.assertReceivedOnNext(Arrays.asList(1, 2, 3));
+        mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        mPresenter.detachView();
+
+        testSubscriber.assertUnsubscribed();
+        assertThat(mPresenter.getView(), nullValue());
+        assertThat(mPresenter.onDetachCalled, equalTo(1));
     }
 
+    @Test
+    public void testDetachBeforeAttach() throws Exception {
+        mPresenter.create();
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        mPresenter.detachView();
+
+        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(mPresenter.onDetachCalled, equalTo(0));
+    }
 
     @Test
     public void testManageSubscription() throws Exception {
@@ -215,45 +212,15 @@ public class RxUtilsTest {
     @Test
     public void testManageViewSubscription() throws Exception {
         mPresenter.create();
-        mPresenter.wakeUp();
+        mPresenter.attachView(mock(TiView.class));
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
         mSubscriptionHandler.manageViewSubscription(testSubscriber);
 
         assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
 
-        mPresenter.sleep();
+        mPresenter.detachView();
 
         testSubscriber.assertUnsubscribed();
-    }
-
-
-    @Test
-    public void testSleep() throws Exception {
-        mPresenter.create();
-        mPresenter.bindNewView(mView);
-        mPresenter.wakeUp();
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        mPresenter.sleep();
-
-        testSubscriber.assertUnsubscribed();
-        assertThat(mPresenter.getView(), nullValue());
-        assertThat(mPresenter.onSleepCalled, equalTo(1));
-    }
-
-    @Test
-    public void testSleepBeforeWakeUp() throws Exception {
-        mPresenter.create();
-        mPresenter.bindNewView(mView);
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        mPresenter.sleep();
-
-        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(mPresenter.getView(), equalTo(mView));
-        assertThat(mPresenter.onSleepCalled, equalTo(0));
     }
 }

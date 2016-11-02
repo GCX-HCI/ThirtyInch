@@ -29,7 +29,8 @@ import android.support.v7.app.AppCompatActivity;
 
 /**
  * Configure how ThirtyInch should handle the {@link TiPresenter}.
- * Can be applied to the constructor of a presenter {@link TiPresenter#TiPresenter(TiConfiguration)} or global (in {@link
+ * Can be applied to the constructor of a presenter {@link TiPresenter#TiPresenter(TiConfiguration)}
+ * or global (in {@link
  * Application#onCreate()}) with {@link TiPresenter#setDefaultConfig(TiConfiguration)}.
  * <p>
  * Use the {@link Builder} to change the default configuration.
@@ -76,7 +77,8 @@ public class TiConfiguration {
          * This allows to run code off the main thread but send events to the UI without dealing
          * with {@link android.os.Handler} and {@link android.os.Looper}.
          * <p>
-         * You'll never see "CalledFromWrongThreadException: Only the original thread that created a
+         * You'll never see "CalledFromWrongThreadException: Only the original thread that created
+         * a
          * view hierarchy can touch its views." again.
          * <p>
          * Disable this option and the {@link CallOnMainThread} annotation will be ignored

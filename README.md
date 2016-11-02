@@ -27,13 +27,26 @@ dependencies {
     // rx extension
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     
-    // composite android extension
-    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
-    
     // test extension
     testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
+    
+     
+    // CompositeAndroid plugin
+    // When you are using ThirtyInch with the CompositeAndroid extension you have to manually 
+    // include the CompositeAndroid dependency. It has to be the same version as appcompat and 
+    // the support library 
+    
+    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
+    // def supportLibraryVersion = '24.2.1' <-- use your own version
+    compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
 }
 ```
+
+
+## [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
+
+There is a sample implementation based on the [Android Architecture Blueprints TODO app](https://github.com/googlesamples/android-architecture) which can be found here: [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
+
 
 ## Hello World MVP example with ThirtyInch
 
@@ -80,15 +93,14 @@ public interface HelloWorldView extends TiView {
 ```java
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-    @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
+    @Override    
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
         getView().showText("Hello World!");
     }
 }
 
 ```
-
 ## ThirtyInch features
 
 ### Presenter
@@ -106,7 +118,7 @@ It can be `CREATED` and `DESTROYED`.
 The corresponding callbacks `onCreate()` and `onDestroy()` will be only called once!
 
 The `TiView` can either be `ATTACHED` or `DETACHED`.
-The corresponding callbacks are `onWakeUp()` and `onSleep()` which maps to `onStart()` and `onStop()`.
+The corresponding callbacks are `onAttachView(TiView)` and `onDetachView()` which maps to `onStart()` and `onStop()`.
 
 
 ```java
@@ -118,13 +130,13 @@ public class MyPresenter extends TiPresenter<MyView> {
     }
 
     @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
     }
 
     @Override
-    protected void onSleep() {
-        super.onSleep();
+    protected void onDetachView() {
+        super.onDetachView();
     }
 
     @Override
@@ -203,7 +215,7 @@ When calling this method the `View` receives no duplicated calls.
 The View swallows the second call when a method gets called with the same (hashcode) parameters twice.
 
 Usecase:
-The Presenter binds a huge list to the `View`. The app loses focus (`onSleep()`) and the exact same Activity instance gains focus again (`onWakeUp()`).
+The Presenter binds a huge list to the `View`. The app loses focus (`onDetachView()`) and the exact same Activity instance gains focus again (`onAttachView(view)`).
 The `Activity` still shows the huge list.
 The `Presenter` binds the huge list again to the `View`.
 When the data has changed the list will be updated.
@@ -259,10 +271,10 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     }
 
     @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
-
-        // automatically unsubscribe in onSleep()
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
+        
+        // automatically unsubscribe in onDetachView(view)
         rxHelper.manageViewSubscription(anotherObservable.subscribe());
     }
 }

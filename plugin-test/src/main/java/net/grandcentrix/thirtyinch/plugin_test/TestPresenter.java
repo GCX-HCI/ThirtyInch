@@ -13,27 +13,19 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.internal;
+package net.grandcentrix.thirtyinch.plugin_test;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 
-import java.util.HashMap;
+public class TestPresenter extends TiPresenter<TestView> {
 
-public class PresenterSaviorTestHelper {
+    private int wakeupCalls = 0;
 
-    /**
-     * helper to clear the savior without exposing this to the public api
-     */
-    public static void clear() {
-        PresenterSavior.INSTANCE.clear();
+    @Override
+    protected void onWakeUp() {
+        super.onWakeUp();
+        wakeupCalls++;
+
+        getView().showText("Hello World " + wakeupCalls);
     }
-
-    public static int presenterCount() {
-        return presenters().entrySet().size();
-    }
-
-    public static HashMap<String, TiPresenter> presenters() {
-        return PresenterSavior.INSTANCE.mPresenters;
-    }
-
 }

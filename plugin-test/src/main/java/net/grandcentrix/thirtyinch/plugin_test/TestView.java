@@ -13,19 +13,11 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.plugin;
+package net.grandcentrix.thirtyinch.plugin_test;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
-public class TestPresenter extends TiPresenter<TestView> {
+public interface TestView extends TiView {
 
-    private int wakeupCalls = 0;
-
-    @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
-        wakeupCalls++;
-
-        getView().showText("Hello World " + wakeupCalls);
-    }
+    void showText(String s);
 }

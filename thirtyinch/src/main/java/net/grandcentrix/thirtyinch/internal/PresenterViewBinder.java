@@ -15,8 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
@@ -80,10 +80,10 @@ public class PresenterViewBinder<V extends TiView> implements InterceptableViewB
             }
             mLastView = interceptedView;
             TiLog.v(mLogTag.getLoggingTag(), "binding NEW view to Presenter " + mLastView);
-            presenter.bindNewView(mLastView);
+            presenter.attachView(mLastView);
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "binding the cached view to Presenter " + mLastView);
-            presenter.bindNewView(mLastView);
+            presenter.attachView(mLastView);
         }
     }
 

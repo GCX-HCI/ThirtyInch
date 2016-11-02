@@ -33,10 +33,7 @@ android {
 
 dependencies {
     compile project(':thirtyinch')
-    compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
-    androidTestCompile 'com.android.support.test:runner:0.5';
-    androidTestCompile 'com.android.support.test:rules:0.5';
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2';
+    provided "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
 }
 
 publish {

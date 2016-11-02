@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.plugin;
+package net.grandcentrix.thirtyinch.plugin_test;
 
 
 import android.app.Activity;
@@ -24,14 +24,6 @@ import android.content.res.Configuration;
  * Useful test methods common to all activities
  */
 public class TestUtils {
-
-    private static void rotateToLandscape(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
-
-    private static void rotateToPortrait(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }
 
     public static void rotateOrientation(Activity activity) {
         int currentOrientation = activity.getResources().getConfiguration().orientation;
@@ -46,5 +38,13 @@ public class TestUtils {
             default:
                 rotateToLandscape(activity);
         }
+    }
+
+    private static void rotateToLandscape(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    private static void rotateToPortrait(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 }

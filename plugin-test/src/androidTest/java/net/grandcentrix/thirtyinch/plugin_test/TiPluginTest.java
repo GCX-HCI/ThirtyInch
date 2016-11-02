@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.plugin;
+package net.grandcentrix.thirtyinch.plugin_test;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import android.app.Instrumentation;
 import android.content.Intent;
@@ -22,9 +25,6 @@ import android.support.test.espresso.Espresso;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -32,7 +32,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertSame;
-import static net.grandcentrix.thirtyinch.plugin.TestUtils.rotateOrientation;
+import static net.grandcentrix.thirtyinch.plugin_test.TestUtils.rotateOrientation;
 import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -52,7 +52,7 @@ public class TiPluginTest {
         instrumentation.addMonitor(activityMonitor);
 
         // start the activity for the first time
-        final Intent intent = new Intent(instrumentation.getContext(), TestActivity.class);
+        final Intent intent = new Intent(instrumentation.getTargetContext(), TestActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         instrumentation.startActivitySync(intent);
 

@@ -15,15 +15,6 @@
 
 package net.grandcentrix.thirtyinch;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
@@ -34,6 +25,14 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -93,16 +92,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-        TiLog.v(TAG, "onAttach()");
-
-    }
-
-    @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TiLog.d(TAG, "onCreate(" + savedInstanceState + ")");
 
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -110,7 +101,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
-                TiLog.d(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
+                TiLog.v(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
@@ -120,13 +111,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
                     PresenterSavior.INSTANCE.free(recoveredPresenterId);
                     mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
                 }
-                TiLog.d(TAG, "recovered Presenter " + mPresenter);
+                TiLog.v(TAG, "recovered Presenter " + mPresenter);
             }
         }
 
         if (mPresenter == null) {
             mPresenter = providePresenter();
-            TiLog.d(TAG, "created Presenter: " + mPresenter);
+            TiLog.v(TAG, "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
@@ -164,7 +155,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
         TiLog.v(TAG, "isAdded = " + isAdded());
         TiLog.v(TAG, "isDetached = " + isDetached());
-        TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity()));
+        TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions
+                .isDontKeepActivitiesEnabled(getActivity()));
 
         final TiConfiguration config = mPresenter.getConfig();
         TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
@@ -176,15 +168,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onDestroyView() {
-        TiLog.v(TAG, "onDestroyView()");
-        mPresenter.sleep();
+        mPresenter.detachView();
         super.onDestroyView();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        TiLog.v(TAG, "onDetach()");
     }
 
     @Override
@@ -196,16 +181,14 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onStart() {
         super.onStart();
-        TiLog.v(TAG, "onStart()");
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            mViewBinder.bindView(mPresenter, this);
             getActivity().getWindow().getDecorView().post(new Runnable() {
                 @Override
                 public void run() {
                     if (isUiPossible() && mActivityStarted) {
-                        mPresenter.wakeUp();
+                        mViewBinder.bindView(mPresenter, TiFragment.this);
                     }
                 }
             });
@@ -214,9 +197,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public void onStop() {
-        TiLog.v(TAG, "onStop()");
         mActivityStarted = false;
-        mPresenter.sleep();
+        mPresenter.detachView();
         super.onStop();
     }
 

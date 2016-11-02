@@ -15,12 +15,6 @@
 
 package net.grandcentrix.thirtyinch.plugin;
 
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
@@ -37,6 +31,12 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+
+import android.app.Activity;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
@@ -112,16 +112,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return null;
     }
 
-    @Override
-    public boolean isActivityFinishing() {
-        return getActivity().isFinishing();
-    }
-
-    @Override
-    public boolean isActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
     /**
      * Invalidates the cache of the latest bound view. Forces the next binding of the view to run
      * through all the interceptors (again).
@@ -129,6 +119,16 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public void invalidateView() {
         mDelegate.invalidateView();
+    }
+
+    @Override
+    public boolean isActivityChangingConfigurations() {
+        return getActivity().isChangingConfigurations();
+    }
+
+    @Override
+    public boolean isActivityFinishing() {
+        return getActivity().isFinishing();
     }
 
     @Override
@@ -177,7 +177,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public void onStart() {
-        mDelegate.onStart_beforeSuper();
         super.onStart();
         mDelegate.onStart_afterSuper();
     }

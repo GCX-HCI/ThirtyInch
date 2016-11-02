@@ -13,7 +13,13 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.plugin;
+package net.grandcentrix.thirtyinch.plugin_test;
+
+import com.pascalwelsch.compositeandroid.activity.CompositeActivity;
+
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.plugin.TiActivityPlugin;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,24 +27,10 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.pascalwelsch.compositeandroid.activity.CompositeActivity;
-
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-
 /**
  * only for tests
  */
 public class TestActivity extends CompositeActivity implements TestView {
-
-    static {
-        TiLog.setLogger(new TiLog.Logger() {
-            @Override
-            public void log(int level, String tag, String msg) {
-                Log.println(level, tag, msg);
-            }
-        });
-    }
 
     private TextView mText;
 
@@ -63,5 +55,14 @@ public class TestActivity extends CompositeActivity implements TestView {
     @Override
     public void showText(final String s) {
         mText.setText(s);
+    }
+
+    static {
+        TiLog.setLogger(new TiLog.Logger() {
+            @Override
+            public void log(int level, String tag, String msg) {
+                Log.println(level, tag, msg);
+            }
+        });
     }
 }

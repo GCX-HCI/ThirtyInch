@@ -31,7 +31,7 @@ public class CallOnMainThreadInterceptor implements BindViewInterceptor {
     @Override
     public <V extends TiView> V intercept(final V view) {
         final V wrapped = wrap(view);
-        TiLog.d(TAG, "wrapping View " + view + " in " + wrapped);
+        TiLog.v(TAG, "wrapping View " + view + " in " + wrapped);
         return wrapped;
     }
 
