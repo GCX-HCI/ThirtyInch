@@ -37,7 +37,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-public class TiPresenterDestroyTest {
+public class TiActivityPresenterDestroyTest {
 
     private class PutInMapAnswer implements Answer<Void> {
 
