@@ -15,6 +15,12 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.test.runner.AndroidJUnit4;
+import android.test.suitebuilder.annotation.SmallTest;
+
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
@@ -22,12 +28,6 @@ import net.grandcentrix.thirtyinch.TiView;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -224,12 +224,12 @@ public class TiActivityDelegateTest {
                     }
 
                     @Override
-                    public boolean isFinishing() {
+                    public boolean isActivityFinishing() {
                         return mIsActivityFinishing;
                     }
 
                     @Override
-                    public boolean isChangingConfigurations() {
+                    public boolean isActivityChangingConfigurations() {
                         return mIsActivityChangingConfigurations;
                     }
 
