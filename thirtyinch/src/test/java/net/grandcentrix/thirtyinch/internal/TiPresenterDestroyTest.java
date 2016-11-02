@@ -32,6 +32,7 @@ import org.mockito.stubbing.Answer;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -282,6 +283,122 @@ public class TiPresenterDestroyTest {
 
         retainedPresenter[0] = presenter;
         delegate.onCreate_afterSuper(savedState);
+    }
+
+    @Test
+    public void saviorTrue_dontKeepActivitiesFalse_finish() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .build());
+
+        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true, false, false, new TiPresenterProvider<TestPresenter>() {
+            @NonNull
+            @Override
+            public TestPresenter providePresenter() {
+                return null;
+            }
+        });
+
+        final Bundle savedState = mock(Bundle.class);
+        doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+
+        try {
+            // presenter is destroyed and cannot be recreated
+            delegate.onCreate_afterSuper(savedState);
+            fail("did not throw");
+        } catch (Exception e) {
+            assertThat(e).hasMessageContaining("destroyed");
+        }
+    }
+
+    @Test
+    public void saviorTrue_dontKeepActivitiesTrue_finish() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .build());
+
+        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true, false, true, new TiPresenterProvider<TestPresenter>() {
+            @NonNull
+            @Override
+            public TestPresenter providePresenter() {
+                return null;
+            }
+        });
+
+        final Bundle savedState = mock(Bundle.class);
+        doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+
+        try {
+            // presenter is destroyed and cannot be recreated
+            delegate.onCreate_afterSuper(savedState);
+            fail("did not throw");
+        } catch (Exception e) {
+            assertThat(e).hasMessageContaining("destroyed");
+        }
+    }
+
+    @Test
+    public void saviorFalse_dontKeepActivitiesFalse_finish() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .build());
+
+        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true, false, false, new TiPresenterProvider<TestPresenter>() {
+            @NonNull
+            @Override
+            public TestPresenter providePresenter() {
+                return null;
+            }
+        });
+
+        final Bundle savedState = mock(Bundle.class);
+        doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+
+        try {
+            // presenter is destroyed and cannot be recreated
+            delegate.onCreate_afterSuper(savedState);
+            fail("did not throw");
+        } catch (Exception e) {
+            assertThat(e).hasMessageContaining("destroyed");
+        }
+    }
+
+    @Test
+    public void saviorFalse_dontKeepActivitiesTrue_finish() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .build());
+
+        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true, false, true, new TiPresenterProvider<TestPresenter>() {
+            @NonNull
+            @Override
+            public TestPresenter providePresenter() {
+                return null;
+            }
+        });
+
+        final Bundle savedState = mock(Bundle.class);
+        doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+
+        try {
+            // presenter is destroyed and cannot be recreated
+            delegate.onCreate_afterSuper(null);
+            fail("did not throw");
+        } catch (Exception e) {
+            assertThat(e).hasMessageContaining("destroyed");
+        }
     }
 
     private void doFullLifecycleAndDestroy(final TiActivityDelegate<TestPresenter, TiView> delegate, final Bundle savedState) {
