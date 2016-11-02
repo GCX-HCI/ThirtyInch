@@ -15,15 +15,15 @@
 
 package net.grandcentrix.thirtyinch.plugin;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -32,6 +32,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertSame;
+import static net.grandcentrix.thirtyinch.plugin.TestUtils.rotateOrientation;
 import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -51,8 +52,9 @@ public class TiPluginTest {
         instrumentation.addMonitor(activityMonitor);
 
         // start the activity for the first time
-        instrumentation.startActivitySync(
-                new Intent(instrumentation.getContext(), TestActivity.class));
+        final Intent intent = new Intent(instrumentation.getContext(), TestActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        instrumentation.startActivitySync(intent);
 
         // get activity reference
         final TestActivity first = (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
@@ -63,12 +65,7 @@ public class TiPluginTest {
                 .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
 
         // restart the activity
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                first.recreate();
-            }
-        });
+        rotateOrientation(first);
 
         // the monitor get's hit when onDestroy gets called for the first time. It's the old
         // activity reference

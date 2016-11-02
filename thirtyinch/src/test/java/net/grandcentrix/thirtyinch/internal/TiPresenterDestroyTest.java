@@ -59,7 +59,13 @@ public class TiPresenterDestroyTest {
         });
 
         final Bundle savedState = mock(Bundle.class);
+        final PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
         doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
+        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).isNull();
 
         assertThat(presenter.isDestroyed()).isFalse();
         assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
@@ -193,7 +199,13 @@ public class TiPresenterDestroyTest {
         });
 
         final Bundle savedState = mock(Bundle.class);
+        final PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
         doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
+        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).contains("TestPresenter");
 
         assertThat(presenter.isDestroyed()).isFalse();
         assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
@@ -236,7 +248,13 @@ public class TiPresenterDestroyTest {
         });
 
         final Bundle savedState = mock(Bundle.class);
+        final PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
         doFullLifecycleAndDestroy(delegate, savedState);
+
+        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
+        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).contains("TestPresenter");
 
         assertThat(presenter.isDestroyed()).isFalse();
         assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
