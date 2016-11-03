@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch.plugin_test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
@@ -29,15 +30,28 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertSame;
 import static net.grandcentrix.thirtyinch.plugin_test.TestUtils.rotateOrientation;
 import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TiPluginTest {
+
+    @Test
+    public void startTestActivity() throws Exception {
+        final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+
+        // start the activity for the first time
+        final Intent intent = new Intent(instrumentation.getTargetContext(), TestActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        final Activity activity = instrumentation.startActivitySync(intent);
+
+        // make sure the attached presenter filled the UI
+        Espresso.onView(withId(R.id.helloworld_text))
+                .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
+
+        activity.finish();
+    }
 
     /**
      * Tests the full Activity lifecycle. Guarantees every lifecycle method gets called
@@ -46,43 +60,23 @@ public class TiPluginTest {
     public void testFullLifecycleIncludingConfigurationChange() throws Throwable {
         final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
-        // register monitor to track activity startups
-        final Instrumentation.ActivityMonitor activityMonitor =
-                new Instrumentation.ActivityMonitor(TestActivity.class.getName(), null, false);
-        instrumentation.addMonitor(activityMonitor);
-
         // start the activity for the first time
         final Intent intent = new Intent(instrumentation.getTargetContext(), TestActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        instrumentation.startActivitySync(intent);
-
-        // get activity reference
-        final TestActivity first = (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
-        assertNotNull(first);
+        final TestActivity activity = (TestActivity) instrumentation.startActivitySync(intent);
 
         // make sure the attached presenter filled the UI
         Espresso.onView(withId(R.id.helloworld_text))
                 .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
 
         // restart the activity
-        rotateOrientation(first);
-
-        // the monitor get's hit when onDestroy gets called for the first time. It's the old
-        // activity reference
-        final TestActivity destroyedActivity =
-                (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
-        // make sure it's the previously started activity, and ignore it
-        assertSame(destroyedActivity, first);
-
-        // next hit is the recreated activity
-        final TestActivity second = (TestActivity) activityMonitor.waitForActivityWithTimeout(5000);
-        assertNotNull(second);
-        // is has to be a different Activity object
-        assertNotSame(first, second);
+        rotateOrientation(activity);
 
         // assert the activity was bound to the presenter. The presenter should update the UI
         // correctly
         Espresso.onView(withId(R.id.helloworld_text))
                 .check(matches(allOf(isDisplayed(), withText("Hello World 2"))));
+
+        activity.finish();
     }
 }
