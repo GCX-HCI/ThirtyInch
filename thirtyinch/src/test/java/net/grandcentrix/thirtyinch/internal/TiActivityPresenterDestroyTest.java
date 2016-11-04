@@ -27,7 +27,6 @@ import org.mockito.stubbing.Answer;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 
@@ -51,63 +50,6 @@ public class TiActivityPresenterDestroyTest {
         }
     }
 
-    private class Delegate extends TiActivityDelegate<TestPresenter, TiView> {
-
-        public Delegate(
-                final TestPresenter presenter,
-                final boolean isFinishing,
-                final boolean isChangingConfigurations,
-                final boolean dontdontKeepActivitiesEnabled,
-                final TiPresenterProvider<TestPresenter> retainedInstance) {
-
-            super(new DelegatedTiActivity<TestPresenter>() {
-                @Nullable
-                @Override
-                public TestPresenter getRetainedPresenter() {
-                    return retainedInstance.providePresenter();
-                }
-
-                @Override
-                public boolean isActivityChangingConfigurations() {
-                    return isChangingConfigurations;
-                }
-
-                @Override
-                public boolean isActivityFinishing() {
-                    return isFinishing;
-                }
-
-                @Override
-                public boolean isDontKeepActivitiesEnabled() {
-                    return dontdontKeepActivitiesEnabled;
-                }
-
-                @Override
-                public boolean postToMessageQueue(Runnable runnable) {
-                    runnable.run();
-                    return true;
-                }
-            }, new TiViewProvider<TiView>() {
-                @NonNull
-                @Override
-                public TiView provideView() {
-                    return mock(TiView.class);
-                }
-            }, new TiPresenterProvider<TestPresenter>() {
-                @NonNull
-                @Override
-                public TestPresenter providePresenter() {
-                    return presenter;
-                }
-            }, new TiLoggingTagProvider() {
-                @Override
-                public String getLoggingTag() {
-                    return "";
-                }
-            });
-        }
-    }
-
     private class TestPresenter extends TiPresenter<TiView> {
 
         public TestPresenter(TiConfiguration config) {
@@ -121,14 +63,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(false)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                true, false, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(true)
+                .setDontKeepActivitiesEnabled(false)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         final PutInMapAnswer putInMap = putInMap();
@@ -151,14 +91,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(false)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true,
-                false, false, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(true)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(false)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
@@ -182,14 +120,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(false)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                false, false, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(false)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         delegate.onCreate_afterSuper(null);
@@ -218,14 +154,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(false)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                true, true, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(true)
+                .setDontKeepActivitiesEnabled(true)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         final PutInMapAnswer putInMap = putInMap();
@@ -248,14 +182,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(false)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true,
-                false, true, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(true)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(true)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
@@ -279,14 +211,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(false)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                false, true, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(true)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         delegate.onCreate_afterSuper(null);
@@ -318,14 +248,19 @@ public class TiActivityPresenterDestroyTest {
                 .build());
 
         final TestPresenter[] retainedPresenter = new TestPresenter[]{null};
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                true, false, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return retainedPresenter[0];
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(true)
+                .setDontKeepActivitiesEnabled(false)
+                .setRetainedPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
+                    @Override
+                    public TiPresenter<TiView> providePresenter() {
+                        return retainedPresenter[0];
+                    }
+                })
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         final PutInMapAnswer putInMap = putInMap();
@@ -350,14 +285,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(true)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true,
-                false, false, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(true)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(false)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
@@ -382,14 +315,19 @@ public class TiActivityPresenterDestroyTest {
                 .build());
 
         final TestPresenter[] retainedPresenter = new TestPresenter[]{null};
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                false, false, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return retainedPresenter[0];
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(false)
+                .setRetainedPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
+                    @Override
+                    public TiPresenter<TiView> providePresenter() {
+                        return retainedPresenter[0];
+                    }
+                })
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         delegate.onCreate_afterSuper(null);
@@ -420,14 +358,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(true)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                true, true, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(true)
+                .setDontKeepActivitiesEnabled(true)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         final PutInMapAnswer putInMap = putInMap();
@@ -449,14 +385,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(true)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, true,
-                false, true, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(true)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(true)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
@@ -480,14 +414,12 @@ public class TiActivityPresenterDestroyTest {
                 .setUseStaticSaviorToRetain(true)
                 .build());
 
-        final TiActivityDelegate<TestPresenter, TiView> delegate = new Delegate(presenter, false,
-                false, true, new TiPresenterProvider<TestPresenter>() {
-            @NonNull
-            @Override
-            public TestPresenter providePresenter() {
-                return null;
-            }
-        });
+        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+                .setPresenter(presenter)
+                .setIsFinishing(false)
+                .setIsChangingConfigurations(false)
+                .setDontKeepActivitiesEnabled(true)
+                .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
@@ -501,7 +433,7 @@ public class TiActivityPresenterDestroyTest {
         PresenterSaviorTestHelper.clear();
     }
 
-    private void doFullLifecycleAndDestroy(final TiActivityDelegate<TestPresenter, TiView> delegate,
+    private void doFullLifecycleAndDestroy(final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate,
             final Bundle savedState) {
         delegate.onCreate_afterSuper(null);
 
