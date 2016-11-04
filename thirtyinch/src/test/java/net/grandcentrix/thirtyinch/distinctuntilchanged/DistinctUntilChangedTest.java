@@ -70,6 +70,12 @@ public class DistinctUntilChangedTest {
             mTest = test;
         }
 
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+        @Override
+        public boolean equals(final Object o) {
+            return true;
+        }
+
         @Override
         public int hashCode() {
             return mTest != null ? mTest.hashCode() : 0;
@@ -79,84 +85,26 @@ public class DistinctUntilChangedTest {
     private interface TestViewHash extends TiView {
 
         @DistinctUntilChanged(comparator = HashComparator.class)
-        void annotatedMethod(String str);
+        void annotatedMethod(Object o);
     }
 
     private interface TestViewEquals extends TiView {
 
         @DistinctUntilChanged(comparator = EqualsComparator.class)
-        void annotatedMethod(String str);
-    }
-
-    private interface TestViewBadHash extends TiView {
-
-        @DistinctUntilChanged(comparator = EqualsComparator.class)
-        void annotatedMethod(BadHashObject bho);
-    }
-
-    private interface TestViewBadEquals extends TiView {
-
-        @DistinctUntilChanged(comparator = HashComparator.class)
-        void annotatedMethod(BadEqualsObject bho);
-    }
-
-    /**
-     * Using {@link HashComparator} when the objects have a bad equals method works.
-     */
-    @Test
-    public void testDistincUntilChangedBadEquals() throws Exception {
-        DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
-        final CountWrapper counter = new CountWrapper();
-        final TestViewBadEquals testView = new TestViewBadEquals() {
-
-            @Override
-            public void annotatedMethod(final BadEqualsObject beo) {
-                counter.call();
-            }
-        };
-        final TestViewBadEquals testViewWrapped = interceptor.intercept(testView);
-
-        testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
-        testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
-        testViewWrapped.annotatedMethod(new BadEqualsObject("test2"));
-
-        assertThat(counter.getCalled(), is(equalTo(2)));
-    }
-
-    /**
-     * Using {@link EqualsComparator} when the objects have a bad hashcode method works.
-     */
-    @Test
-    public void testDistincUntilChangedBadHash() throws Exception {
-        DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
-        final CountWrapper counter = new CountWrapper();
-        final TestViewBadHash testView = new TestViewBadHash() {
-
-            @Override
-            public void annotatedMethod(final BadHashObject bho) {
-                counter.call();
-            }
-        };
-        final TestViewBadHash testViewWrapped = interceptor.intercept(testView);
-
-        testViewWrapped.annotatedMethod(new BadHashObject("test"));
-        testViewWrapped.annotatedMethod(new BadHashObject("test"));
-        testViewWrapped.annotatedMethod(new BadHashObject("test2"));
-
-        assertThat(counter.getCalled(), is(equalTo(2)));
+        void annotatedMethod(Object o);
     }
 
     /**
      * Using {@link EqualsComparator} should work on well defined objects.
      */
     @Test
-    public void testDistincUntilChangedEquals() throws Exception {
+    public void testDistinctUntilChangedEquals() throws Exception {
         DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
         final CountWrapper counter = new CountWrapper();
         final TestViewEquals testView = new TestViewEquals() {
 
             @Override
-            public void annotatedMethod(final String str) {
+            public void annotatedMethod(final Object o) {
                 counter.call();
             }
         };
@@ -173,13 +121,13 @@ public class DistinctUntilChangedTest {
      * Using {@link HashComparator} should work on well defined objects.
      */
     @Test
-    public void testDistincUntilChangedHash() throws Exception {
+    public void testDistinctUntilChangedHash() throws Exception {
         DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
         final CountWrapper counter = new CountWrapper();
         final TestViewHash testView = new TestViewHash() {
 
             @Override
-            public void annotatedMethod(final String str) {
+            public void annotatedMethod(final Object o) {
                 counter.call();
             }
         };
@@ -190,5 +138,97 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod("test2");
 
         assertThat(counter.getCalled(), is(equalTo(2)));
+    }
+
+    /**
+     * test custom equals implementation (always equals)
+     */
+    @Test
+    public void testEqualsComparison_badEquals() throws Exception {
+        DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
+        final CountWrapper counter = new CountWrapper();
+        final TestViewEquals testView = new TestViewEquals() {
+
+            @Override
+            public void annotatedMethod(final Object o) {
+                counter.call();
+            }
+        };
+        final TestViewEquals testViewWrapped = interceptor.intercept(testView);
+
+        testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
+        testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
+        testViewWrapped.annotatedMethod(new BadEqualsObject("test2"));
+
+        assertThat(counter.getCalled(), is(equalTo(1)));
+    }
+
+    /**
+     * make sure the equals comparison doesn't use the hash implementation
+     */
+    @Test
+    public void testEqualsComparison_badHash_works() throws Exception {
+        DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
+        final CountWrapper counter = new CountWrapper();
+        final TestViewEquals testView = new TestViewEquals() {
+
+            @Override
+            public void annotatedMethod(final Object o) {
+                counter.call();
+            }
+        };
+        final TestViewEquals testViewWrapped = interceptor.intercept(testView);
+
+        testViewWrapped.annotatedMethod(new BadHashObject("test"));
+        testViewWrapped.annotatedMethod(new BadHashObject("test"));
+        testViewWrapped.annotatedMethod(new BadHashObject("test2"));
+
+        assertThat(counter.getCalled(), is(equalTo(2)));
+    }
+
+    /**
+     * make sure the hash comparison doesn't use the equals implementation
+     */
+    @Test
+    public void testHashComparison_badEquals_works() throws Exception {
+        DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
+        final CountWrapper counter = new CountWrapper();
+        final TestViewHash testView = new TestViewHash() {
+
+            @Override
+            public void annotatedMethod(final Object o) {
+                counter.call();
+            }
+        };
+        final TestViewHash testViewWrapped = interceptor.intercept(testView);
+
+        testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
+        testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
+        testViewWrapped.annotatedMethod(new BadEqualsObject("test2"));
+
+        assertThat(counter.getCalled(), is(equalTo(2)));
+    }
+
+    /**
+     * test custom hash implementation (always the same)
+     */
+    @Test
+    public void testHashComparison_badHash() throws Exception {
+        DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
+        final CountWrapper counter = new CountWrapper();
+        final TestViewHash testView = new TestViewHash() {
+
+            @Override
+            public void annotatedMethod(final Object o) {
+                counter.call();
+            }
+        };
+        final TestViewHash testViewWrapped = interceptor.intercept(testView);
+
+        testViewWrapped.annotatedMethod(new BadHashObject("test"));
+        testViewWrapped.annotatedMethod(new BadHashObject("test"));
+        testViewWrapped.annotatedMethod(new BadHashObject("test2"));
+
+        assertThat(counter.getCalled(), is(equalTo(1)));
     }
 }
