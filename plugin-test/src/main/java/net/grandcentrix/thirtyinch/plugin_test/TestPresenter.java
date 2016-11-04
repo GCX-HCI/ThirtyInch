@@ -17,15 +17,18 @@ package net.grandcentrix.thirtyinch.plugin_test;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 
+import android.support.annotation.NonNull;
+
 public class TestPresenter extends TiPresenter<TestView> {
 
-    private int wakeupCalls = 0;
+    private int mViewAttachedCount = 0;
 
     @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
-        wakeupCalls++;
+    protected void onAttachView(@NonNull final TestView view) {
+        super.onAttachView(view);
 
-        getView().showText("Hello World " + wakeupCalls);
+        mViewAttachedCount++;
+
+        getView().showText("Hello World " + mViewAttachedCount);
     }
 }

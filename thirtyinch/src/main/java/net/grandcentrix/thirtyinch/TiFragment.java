@@ -43,6 +43,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
+    /**
+     * enables debug logging during development
+     */
+    private static final boolean DEBUG = false;
+
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiFragment.class.getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
@@ -148,20 +153,25 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         //FIXME handle attach/detach state
-        TiLog.v(TAG, "isChangingConfigurations = " + getActivity().isChangingConfigurations());
-        TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
-        TiLog.v(TAG, "isAdded = " + isAdded());
-        TiLog.v(TAG, "isDetached = " + isDetached());
-        TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions
-                .isDontKeepActivitiesEnabled(getActivity()));
 
         final TiConfiguration config = mPresenter.getConfig();
-        TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
-        TiLog.v(TAG, "useStaticSavior = " + config.useStaticSaviorToRetain());
+
+        if (DEBUG) {
+            TiLog.v(TAG, "isChangingConfigurations = " + getActivity().isChangingConfigurations());
+            TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
+            TiLog.v(TAG, "isAdded = " + isAdded());
+            TiLog.v(TAG, "isDetached = " + isDetached());
+            TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions
+                    .isDontKeepActivitiesEnabled(getActivity()));
+
+            TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
+            TiLog.v(TAG, "useStaticSavior = " + config.useStaticSaviorToRetain());
+        }
 
         final FragmentActivity activity = getActivity();
 

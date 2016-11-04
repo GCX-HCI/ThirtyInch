@@ -42,9 +42,7 @@ public class TiPluginTest {
         final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
         // start the activity for the first time
-        final Intent intent = new Intent(instrumentation.getTargetContext(), TestActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        final Activity activity = instrumentation.startActivitySync(intent);
+        final TestActivity activity = startTestActivity(instrumentation);
 
         // make sure the attached presenter filled the UI
         Espresso.onView(withId(R.id.helloworld_text))
@@ -61,9 +59,7 @@ public class TiPluginTest {
         final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
         // start the activity for the first time
-        final Intent intent = new Intent(instrumentation.getTargetContext(), TestActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        final TestActivity activity = (TestActivity) instrumentation.startActivitySync(intent);
+        final TestActivity activity = startTestActivity(instrumentation);
 
         // make sure the attached presenter filled the UI
         Espresso.onView(withId(R.id.helloworld_text))
@@ -78,5 +74,11 @@ public class TiPluginTest {
                 .check(matches(allOf(isDisplayed(), withText("Hello World 2"))));
 
         activity.finish();
+    }
+
+    private TestActivity startTestActivity(final Instrumentation instrumentation) {
+        final Intent intent = new Intent(instrumentation.getTargetContext(), TestActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return (TestActivity) instrumentation.startActivitySync(intent);
     }
 }

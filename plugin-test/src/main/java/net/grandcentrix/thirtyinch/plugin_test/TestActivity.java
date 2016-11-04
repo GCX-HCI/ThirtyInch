@@ -27,9 +27,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.TextView;
 
-/**
- * only for tests
- */
 public class TestActivity extends CompositeActivity implements TestView {
 
     private TextView mText;

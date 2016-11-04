@@ -19,11 +19,11 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 
 import java.util.HashMap;
 
+/**
+ * helper to clear the savior in the test environment without exposing this to the public API
+ */
 public class PresenterSaviorTestHelper {
 
-    /**
-     * helper to clear the savior without exposing this to the public api
-     */
     public static void clear() {
         PresenterSavior.INSTANCE.clear();
     }
