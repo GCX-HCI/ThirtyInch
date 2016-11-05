@@ -265,8 +265,8 @@ public abstract class TiPresenter<V extends TiView> {
                     + " did not call through to super.onDetachView()");
         }
 
-        mView = null;
         moveToState(State.VIEW_DETACHED, true);
+        mView = null;
     }
 
     /**
