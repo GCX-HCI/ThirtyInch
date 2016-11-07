@@ -25,13 +25,16 @@ import java.lang.annotation.Target;
 
 /**
  * When added to a {@code void} method with at least one parameter inside a {@link TiView}, the
- * method implementation will only be called when the parameters change. The {@link
- * Object#hashCode()} method is used to detect changes.
+ * method implementation will only be called when the parameters change. A
+ * {@link DistinctComparator} class is used to detect changes. By default it uses
+ * {@link EqualsComparator}.
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DistinctUntilChanged {
+
+    Class<? extends DistinctComparator> comparator() default EqualsComparator.class;
 
     boolean logDropped() default false;
 
