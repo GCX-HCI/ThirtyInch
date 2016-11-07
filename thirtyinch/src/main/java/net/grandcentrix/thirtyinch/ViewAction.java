@@ -18,7 +18,7 @@ package net.grandcentrix.thirtyinch;
 /**
  * Action which will be be executed when once a view is available
  */
-interface ViewAction<V extends TiView> {
+public interface ViewAction<V extends TiView> {
 
     void call(V v);
 }
