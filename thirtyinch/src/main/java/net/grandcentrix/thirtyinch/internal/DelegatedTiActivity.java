@@ -33,6 +33,11 @@ public interface DelegatedTiActivity<P> {
     P getRetainedPresenter();
 
     /**
+     * @return {@link Activity#isChangingConfigurations()}
+     */
+    boolean isActivityChangingConfigurations();
+
+    /**
      * @return {@link Activity#isFinishing()}
      */
     boolean isActivityFinishing();

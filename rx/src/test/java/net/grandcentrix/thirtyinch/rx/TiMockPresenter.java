@@ -26,13 +26,19 @@ import android.support.annotation.NonNull;
  */
 class TiMockPresenter extends TiPresenter<TiView> {
 
+    protected int onAttachCalled = 0;
+
     protected int onCreateCalled = 0;
 
     protected int onDestroyCalled = 0;
 
     protected int onDetachCalled = 0;
 
-    protected int onAttachCalled = 0;
+    @Override
+    protected void onAttachView(@NonNull final TiView view) {
+        super.onAttachView(view);
+        onAttachCalled++;
+    }
 
     @Override
     protected void onCreate() {
@@ -50,11 +56,5 @@ class TiMockPresenter extends TiPresenter<TiView> {
     protected void onDetachView() {
         super.onDetachView();
         onDetachCalled++;
-    }
-
-    @Override
-    protected void onAttachView(@NonNull final TiView view) {
-        super.onAttachView(view);
-        onAttachCalled++;
     }
 }

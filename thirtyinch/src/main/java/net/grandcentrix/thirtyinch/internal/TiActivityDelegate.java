@@ -157,8 +157,9 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             }
 
             if (mPresenter == null) {
-                TiLog.w(mLogTag.getLoggingTag(), "could not recover the Presenter "
-                        + "although it's not the first start of the Activity");
+                TiLog.i(mLogTag.getLoggingTag(), "could not recover the Presenter "
+                        + "although it's not the first start of the Activity. This is normal when "
+                        + "configured as .setRetainPresenterEnabled(false).");
             } else {
                 // save recovered presenter with new id. No other instance of this activity,
                 // holding the presenter before, is now able to remove the reference to
@@ -190,10 +191,10 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onDestroy_afterSuper() {
-        final boolean isFinishing = mTiActivity.isActivityFinishing();
+        final TiConfiguration config = mPresenter.getConfig();
 
         boolean destroyPresenter = false;
-        if (isFinishing) {
+        if (mTiActivity.isActivityFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
@@ -201,7 +202,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     "Activity is finishing, destroying presenter " + mPresenter);
         }
 
-        final TiConfiguration config = mPresenter.getConfig();
         if (!destroyPresenter &&
                 !config.shouldRetainPresenter()) {
             // configuration says the presenter should not be retained, a new presenter instance
@@ -211,8 +211,9 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     "presenter configured as not retaining, destroying " + mPresenter);
         }
 
-        if (!destroyPresenter &&
-                !config.useStaticSaviorToRetain()
+        if (!destroyPresenter
+                && !config.useStaticSaviorToRetain()
+                && !mTiActivity.isActivityChangingConfigurations()
                 && mTiActivity.isDontKeepActivitiesEnabled()) {
             // configuration says the PresenterSavior should not be used. Retaining the presenter
             // relays on the Activity nonConfigurationInstance which is always null when

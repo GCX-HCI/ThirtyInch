@@ -21,6 +21,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.HashMap;
 
@@ -38,7 +39,8 @@ public enum PresenterSavior {
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
 
-    private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
+    @VisibleForTesting
+    HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
     public void free(final String presenterId) {
         mPresenters.remove(presenterId);
@@ -54,6 +56,11 @@ public enum PresenterSavior {
         TiLog.v(TAG, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
+    }
+
+    @VisibleForTesting
+    void clear() {
+        mPresenters.clear();
     }
 
     private String generateId(@NonNull final TiPresenter presenter) {
