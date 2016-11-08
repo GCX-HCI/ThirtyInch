@@ -23,6 +23,8 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class SendToViewTest {
 
@@ -114,5 +116,43 @@ public class SendToViewTest {
         verify(view).doSomething1();
 
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
+    }
+
+    @Test
+    public void viewReceivesNoInteractionsAfterDetaching() throws Exception {
+        final TestPresenter presenter = new TestPresenter();
+        presenter.create();
+        assertThat(presenter.getQueuedViewActions()).hasSize(0);
+
+        final TestView view = mock(TestView.class);
+        presenter.attachView(view);
+        presenter.detachView();
+
+        presenter.sendToView(new ViewAction<TestView>() {
+            @Override
+            public void call(final TestView view) {
+                view.doSomething1();
+            }
+        });
+        assertThat(presenter.getQueuedViewActions()).hasSize(1);
+        verifyZeroInteractions(view);
+
+        presenter.attachView(view);
+
+        verify(view).doSomething1();
+        assertThat(presenter.getQueuedViewActions()).hasSize(0);
+
+
+        presenter.detachView();
+
+        presenter.sendToView(new ViewAction<TestView>() {
+            @Override
+            public void call(final TestView view) {
+                view.doSomething1();
+            }
+        });
+        assertThat(presenter.getQueuedViewActions()).hasSize(1);
+
+        verifyNoMoreInteractions(view);
     }
 }
