@@ -147,6 +147,31 @@ public class RxUtilsTest {
         testSubscriber.assertReceivedOnNext(Arrays.asList(1, 2, 3));
     }
 
+    @Test
+    public void testDetach() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        mPresenter.detachView();
+
+        testSubscriber.assertUnsubscribed();
+        assertThat(mPresenter.getView(), nullValue());
+        assertThat(mPresenter.onDetachCalled, equalTo(1));
+    }
+
+    @Test
+    public void testDetachBeforeAttach() throws Exception {
+        mPresenter.create();
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        mPresenter.detachView();
+
+        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(mPresenter.onDetachCalled, equalTo(0));
+    }
 
     @Test
     public void testManageSubscription() throws Exception {
@@ -197,32 +222,5 @@ public class RxUtilsTest {
         mPresenter.detachView();
 
         testSubscriber.assertUnsubscribed();
-    }
-
-
-    @Test
-    public void testDetach() throws Exception {
-        mPresenter.create();
-        mPresenter.attachView(mView);
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        mPresenter.detachView();
-
-        testSubscriber.assertUnsubscribed();
-        assertThat(mPresenter.getView(), nullValue());
-        assertThat(mPresenter.onDetachCalled, equalTo(1));
-    }
-
-    @Test
-    public void testDetachBeforeAttach() throws Exception {
-        mPresenter.create();
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        mPresenter.detachView();
-
-        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(mPresenter.onDetachCalled, equalTo(0));
     }
 }

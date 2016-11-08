@@ -32,15 +32,35 @@ import rx.subjects.PublishSubject;
 
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-    private static final String TAG = HelloWorldPresenter.class.getSimpleName();
-
     private int mCounter = 0;
 
     private BehaviorSubject<String> mText = BehaviorSubject.create();
 
+    private RxTiPresenterSubscriptionHandler rxSubscriptionHelper
+            = new RxTiPresenterSubscriptionHandler(this);
+
     private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
 
-    private RxTiPresenterSubscriptionHandler rxSubscriptionHelper = new RxTiPresenterSubscriptionHandler(this);
+    @Override
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
+
+        rxSubscriptionHelper.manageViewSubscription(mText.asObservable()
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(final String text) {
+                        view.showText(text);
+                    }
+                }));
+
+        rxSubscriptionHelper.manageViewSubscription(view.onButtonClicked()
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(final Void aVoid) {
+                        triggerHeavyCalculation.onNext(null);
+                    }
+                }));
+    }
 
     @Override
     protected void onCreate() {
@@ -83,27 +103,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                     }
                 })
                 .subscribe());
-    }
-
-    @Override
-    protected void onAttachView(@NonNull final HelloWorldView view) {
-        super.onAttachView(view);
-
-        rxSubscriptionHelper.manageViewSubscription(mText.asObservable()
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(final String text) {
-                        view.showText(text);
-                    }
-                }));
-
-        rxSubscriptionHelper.manageViewSubscription(view.onButtonClicked()
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(final Void aVoid) {
-                        triggerHeavyCalculation.onNext(null);
-                    }
-                }));
     }
 
     /**

@@ -52,6 +52,28 @@ public class TiLifecycleObserverTest {
     }
 
     @Test
+    public void testCreate() throws Exception {
+        final List<Object[]> states = new ArrayList<>();
+        mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
+            @Override
+            public void onChange(final TiPresenter.State state,
+                    final boolean beforeLifecycleEvent) {
+                states.add(new Object[]{state, beforeLifecycleEvent});
+            }
+        });
+
+        mPresenter.create();
+
+        final Object[] beforeLast = states.get(states.size() - 2);
+        assertEquals(beforeLast[0], TiPresenter.State.VIEW_DETACHED);
+        assertEquals(beforeLast[1], false);
+
+        final Object[] last = states.get(states.size() - 1);
+        assertEquals(last[0], TiPresenter.State.VIEW_DETACHED);
+        assertEquals(last[1], true);
+    }
+
+    @Test
     public void testDestroy() throws Exception {
         final List<Object[]> states = new ArrayList<>();
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
@@ -73,28 +95,6 @@ public class TiLifecycleObserverTest {
 
         final Object[] last = states.get(states.size() - 1);
         assertEquals(last[0], TiPresenter.State.DESTROYED);
-        assertEquals(last[1], true);
-    }
-
-    @Test
-    public void testCreate() throws Exception {
-        final List<Object[]> states = new ArrayList<>();
-        mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
-            @Override
-            public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
-            }
-        });
-
-        mPresenter.create();
-
-        final Object[] beforeLast = states.get(states.size() - 2);
-        assertEquals(beforeLast[0], TiPresenter.State.VIEW_DETACHED);
-        assertEquals(beforeLast[1], false);
-
-        final Object[] last = states.get(states.size() - 1);
-        assertEquals(last[0], TiPresenter.State.VIEW_DETACHED);
         assertEquals(last[1], true);
     }
 

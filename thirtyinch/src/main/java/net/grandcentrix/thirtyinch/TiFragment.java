@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +41,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         TiViewProvider<V>, InterceptableViewBinder<V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
+
+    /**
+     * enables debug logging during development
+     */
+    private static final boolean ENABLE_DEBUG_LOGGING = false;
 
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiFragment.class.getSimpleName()
@@ -148,13 +152,16 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        final FragmentActivity activity = getActivity();
+        //FIXME handle attach/detach state
+
+        logState();
 
         boolean destroyPresenter = false;
-        if (activity.isFinishing()) {
+        if (getActivity().isFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
@@ -270,5 +277,20 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     private boolean isUiPossible() {
         return isAdded() && !isDetached();
+    }
+
+    private void logState() {
+        if (ENABLE_DEBUG_LOGGING) {
+            TiLog.v(TAG, "isChangingConfigurations = " + getActivity().isChangingConfigurations());
+            TiLog.v(TAG, "isActivityFinishing = " + getActivity().isFinishing());
+            TiLog.v(TAG, "isAdded = " + isAdded());
+            TiLog.v(TAG, "isDetached = " + isDetached());
+            TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions
+                    .isDontKeepActivitiesEnabled(getActivity()));
+
+            final TiConfiguration config = mPresenter.getConfig();
+            TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
+            TiLog.v(TAG, "useStaticSavior = " + config.useStaticSaviorToRetain());
+        }
     }
 }

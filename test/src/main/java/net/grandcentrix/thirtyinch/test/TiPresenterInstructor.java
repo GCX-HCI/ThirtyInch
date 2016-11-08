@@ -28,7 +28,6 @@ public class TiPresenterInstructor<V extends TiView> {
 
     /**
      * attaches the new view and takes care for removing the old view when one is attached
-     * @param view
      */
     public void attachView(final V view) {
         detachView();

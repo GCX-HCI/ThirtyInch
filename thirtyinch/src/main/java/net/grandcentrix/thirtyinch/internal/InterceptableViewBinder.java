@@ -15,8 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
@@ -52,8 +52,8 @@ public interface InterceptableViewBinder<V extends TiView> {
     Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor);
 
     /**
-     * @return the cached result of {@link BindViewInterceptor#intercept(TiView)}
      * @param interceptor the interceptor which returned the {@link TiView}
+     * @return the cached result of {@link BindViewInterceptor#intercept(TiView)}
      */
     @Nullable
     V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor);

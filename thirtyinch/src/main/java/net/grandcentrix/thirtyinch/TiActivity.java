@@ -100,6 +100,11 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
+    public boolean isActivityChangingConfigurations() {
+        return isChangingConfigurations();
+    }
+
+    @Override
     public boolean isActivityFinishing() {
         return isFinishing();
     }
