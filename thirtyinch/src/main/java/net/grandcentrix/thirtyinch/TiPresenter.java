@@ -19,6 +19,7 @@ package net.grandcentrix.thirtyinch;
 import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -26,6 +27,8 @@ import android.support.v4.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern. If used with {@link
@@ -81,6 +84,8 @@ public abstract class TiPresenter<V extends TiView> {
     private boolean mCalled = true;
 
     private final TiConfiguration mConfig;
+
+    private LinkedBlockingQueue<ViewAction<V>> mPostponedViewActions = new LinkedBlockingQueue<>();
 
     private State mState = State.INITIALIZED;
 
@@ -236,11 +241,9 @@ public abstract class TiPresenter<V extends TiView> {
 
     /**
      * call detachView as the opposite of {@link #attachView(TiView)}, when the view is not
-     * available
-     * anymore.
+     * available anymore.
      * Calling detachView in {@code Fragment#onDestroyView()} makes sense because observing a
-     * discarded
-     * view does not.
+     * discarded view does not.
      *
      * @see #onSleep()
      */
@@ -288,6 +291,10 @@ public abstract class TiPresenter<V extends TiView> {
     /**
      * Returns the currently attached view. The view is attached between the lifecycle callbacks
      * {@link #onAttachView(TiView)} and {@link #onSleep()}.
+     * <p>
+     * If you don't care about the view being attached or detached you should either rethink your
+     * architecture or use {@link #sendToView(ViewAction)} where the action will be executed when
+     * the view is attached.
      *
      * @return the currently attached view of this presenter, {@code null} when no view is attached.
      */
@@ -323,6 +330,15 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
+     * Gives access to the postponed actions while the view is not attached.
+     *
+     * @return the queued actions
+     */
+    protected Queue<ViewAction<V>> getQueuedViewActions() {
+        return mPostponedViewActions;
+    }
+
+    /**
      * The view is now attached and ready to receive events.
      *
      * @see #onDetachView()
@@ -334,6 +350,11 @@ public abstract class TiPresenter<V extends TiView> {
                     "don't call #onAttachView(TiView) directly, call #attachView(TiView)");
         }
         mCalled = true;
+
+        // send all queued actions since the view was detached to the new view.
+        // It's part of the super call because there might be usecases where the implementer
+        // wants to execute actions on the view before executing the queued ones.
+        sendPostponedActionsToView(view);
     }
 
     /**
@@ -403,6 +424,37 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
+     * Executes the {@link ViewAction} when the view is available.
+     * Once a view is attached the actions get called in the same order they have been added.
+     * When the view is already attached the action will be executed immediately.
+     * <p>
+     * This method might be very useful for single actions which invoke function like {@link
+     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link
+     * android.widget.Toast} in the view.
+     * <p>
+     * <b>But don't overuse it.</b>
+     * The action will only be called <b>once</b>.
+     * When a new view attaches (after a configuration change) it doesn't know about the previously
+     * sent actions.
+     * If your using this method too often you should rethink your architecture.
+     * A model which can be bound to the view in {@link #onAttachView(TiView)} and when changes
+     * happen might be a better solution.
+     * See the <a href="https://github.com/passsy/thirtyinch-sample">thirtyinch-sample</a> project
+     * for ideas.
+     *
+     * @see #sendPostponedActionsToView
+     * @see #onAttachView(TiView)
+     */
+    protected void sendToView(ViewAction<V> action) {
+        final V view = getView();
+        if (view != null) {
+            action.call(view);
+        } else {
+            mPostponedViewActions.add(action);
+        }
+    }
+
+    /**
      * moves the presenter to the new state and validates the correctness of the transition
      *
      * @param newState the new state to set
@@ -456,6 +508,17 @@ public abstract class TiPresenter<V extends TiView> {
 
         for (int i = 0; i < mLifecycleObservers.size(); i++) {
             mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+        }
+    }
+
+    /**
+     * Executes all postponed view actions
+     *
+     * @param view where the actions will be sent to
+     */
+    private void sendPostponedActionsToView(V view) {
+        while (!mPostponedViewActions.isEmpty()) {
+            mPostponedViewActions.poll().call(view);
         }
     }
 }
