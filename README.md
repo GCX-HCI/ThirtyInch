@@ -1,6 +1,10 @@
+![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat)
 # ThirtyInch - a MVP library for Android
 
-![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat)
+
+This library adds Presenters to Activities and Fragments. It favors the stateful Presenter pattern, where the Presenter survives configuration changes and dumb View pattern, where the View only sends user events and receives information from the Presenter but never actively asks for data. This makes testing very easy because no logic lives in the View (Activity, Fragment) except for fancy animations which anyways aren't testable.
+
+#### The name
 
 > Keep Android At Arm’s Length
 >
