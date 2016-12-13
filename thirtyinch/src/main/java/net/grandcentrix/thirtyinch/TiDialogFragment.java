@@ -178,7 +178,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
 
     @Override
     public void onDestroyView() {
-        mPresenter.sleep();
+        mPresenter.detachView();
         super.onDestroyView();
     }
 
@@ -194,12 +194,11 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            mViewBinder.bindView(mPresenter, this);
             getActivity().getWindow().getDecorView().post(new Runnable() {
                 @Override
                 public void run() {
                     if (isUiPossible() && mActivityStarted) {
-                        mPresenter.wakeUp();
+                        mViewBinder.bindView(mPresenter, TiDialogFragment.this);
                     }
                 }
             });
@@ -209,7 +208,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     @Override
     public void onStop() {
         mActivityStarted = false;
-        mPresenter.sleep();
+        mPresenter.detachView();
         super.onStop();
     }
 
