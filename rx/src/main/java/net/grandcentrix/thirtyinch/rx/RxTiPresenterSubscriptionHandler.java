@@ -54,10 +54,11 @@ public class RxTiPresenterSubscriptionHandler {
     }
 
     /**
-     * Add your subscriptions here and they will automatically unsubscribed when {@link
-     * TiPresenter#destroy()} gets called
+     * Add your subscriptions here and they will automatically unsubscribed when
+     * {@link TiPresenter#destroy()} gets called
      *
      * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
+     * @see #manageSubscriptions(Subscription...)
      */
     public void manageSubscription(@NonNull final Subscription subscription) {
         if (mPresenterSubscriptions == null) {
@@ -72,11 +73,25 @@ public class RxTiPresenterSubscriptionHandler {
     }
 
     /**
+     * Add your subscriptions here and they will automatically unsubscribed when
+     * {@link TiPresenter#destroy()} gets called
+     *
+     * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
+     * @see #manageSubscription(Subscription)
+     **/
+    public void manageSubscriptions(@NonNull final Subscription... subscriptions) {
+        for (final Subscription subscription : subscriptions) {
+            manageSubscription(subscription);
+        }
+    }
+
+    /**
      * Add your subscriptions for View events to this method to get them automatically cleaned up
      * in {@link TiPresenter#detachView()}. typically call this in {@link
      * TiPresenter#attachView(TiView)} where you subscribe to the UI events.
      *
      * @throws IllegalStateException when no view is attached
+     * @see #manageViewSubscriptions(Subscription...)
      */
     public void manageViewSubscription(@NonNull final Subscription subscription) {
         if (mUiSubscriptions == null) {
@@ -85,4 +100,20 @@ public class RxTiPresenterSubscriptionHandler {
         }
         mUiSubscriptions.add(subscription);
     }
+
+    /**
+     * Add your subscriptions for View events to this method to get them automatically cleaned up
+     * in {@link TiPresenter#detachView()}. typically call this in {@link
+     * TiPresenter#attachView(TiView)} where you subscribe to the UI events.
+     *
+     * @throws IllegalStateException when no view is attached
+     * @see #manageViewSubscription(Subscription)
+     */
+    public void manageViewSubscriptions(@NonNull final Subscription... subscriptions) {
+        for (final Subscription subscription : subscriptions) {
+            manageViewSubscription(subscription);
+        }
+    }
+
+
 }
