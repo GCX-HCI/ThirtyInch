@@ -82,6 +82,20 @@ public class RxTiPresenterSubscriptionHandlerTest {
     }
 
     @Test
+    public void testManageViewSubscription_WithDetachSingleSub_ShouldUnsubscribe()
+            throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
+
+        mPresenter.detachView();
+        testSubscriber.assertUnsubscribed();
+    }
+
+    @Test
     public void testManageViewSubscription_WithDetachView_ShouldUnsubscribe() throws Exception {
         mPresenter.create();
         mPresenter.attachView(mView);
@@ -94,16 +108,37 @@ public class RxTiPresenterSubscriptionHandlerTest {
     }
 
     @Test
-    public void testManageViewSubscription_WithDetach_ShouldUnsubscribe() throws Exception {
+    public void testManageViewSubscriptions_WithOneAlreadyUnsubscribed_ShouldNotAddToSubscription()
+            throws Exception {
         mPresenter.create();
-        mPresenter.attachView(mock(TiView.class));
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+        mPresenter.attachView(mView);
+        TestSubscriber<Void> firstSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
+        secondSubscriber.unsubscribe();
 
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
+        mSubscriptionHandler.manageViewSubscription(firstSubscriber, secondSubscriber);
 
-        mPresenter.detachView();
-        testSubscriber.assertUnsubscribed();
+        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
+        secondSubscriber.assertUnsubscribed();
     }
 
+    @Test
+    public void testManagerViewSubscriptions_WithDetach_ShouldUnsubcribe() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        TestSubscriber<Void> firstSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler
+                .manageViewSubscription(firstSubscriber, secondSubscriber, thirdSubscriber);
+        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
+
+        mPresenter.detachView();
+        firstSubscriber.assertUnsubscribed();
+        secondSubscriber.assertUnsubscribed();
+        thirdSubscriber.assertUnsubscribed();
+    }
 }
