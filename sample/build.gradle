@@ -29,5 +29,5 @@ dependencies {
 
     compile project(':thirtyinch')
     compile project(':rx')
-    testCompile 'junit:junit:4.12'
+    testCompile "junit:junit:$junitVersion"
 }
