@@ -32,7 +32,7 @@ android {
 
 dependencies {
     compile project(':thirtyinch')
-    provided "com.pascalwelsch.compositeandroid:activity:$compositeAndroidVersion"
+    provided "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
 }
 
 publish {
