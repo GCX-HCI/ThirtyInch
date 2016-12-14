@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.novoda:bintray-release:0.3.4'
+        classpath "com.novoda:bintray-release:$bintrayVersion"
     }
 }
 
@@ -38,18 +38,17 @@ android {
 dependencies {
     provided "com.android.support:appcompat-v7:$supportLibraryVersion"
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.assertj:assertj-core:2.5.0'
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    testCompile "org.assertj:assertj-core:$assertjVersion"
 
     androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
 }
 
 // usage:
 // ./gradlew clean build bintrayUpload -PbintrayUser=BINTRAY_USERNAME -PbintrayKey=BINTRAY_KEY -PdryRun=true
 publish {
-
     userOrg = 'passsy'
     groupId = 'net.grandcentrix.thirtyinch'
     publishVersion = VERSION_NAME
