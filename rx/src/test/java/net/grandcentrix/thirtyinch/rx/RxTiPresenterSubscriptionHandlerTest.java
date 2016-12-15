@@ -52,18 +52,6 @@ public class RxTiPresenterSubscriptionHandlerTest {
         mSubscriptionHandler = null;
     }
 
-    @Test(expected = AssertionError.class)
-    public void tesManageViewSubscription_DetachBeforeAttach_ShouldThrowAssertError()
-            throws Exception {
-        mPresenter.create();
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        mPresenter.detachView();
-
-        testSubscriber.assertUnsubscribed();
-    }
-
     @Test(expected = IllegalStateException.class)
     public void testManageSubscription_AfterDestroy_ShouldThrowIllegalState() throws Exception {
         mPresenter.create();
@@ -93,6 +81,18 @@ public class RxTiPresenterSubscriptionHandlerTest {
         assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
 
         mPresenter.destroy();
+        testSubscriber.assertUnsubscribed();
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testManageViewSubscription_DetachBeforeAttach_ShouldThrowAssertError()
+            throws Exception {
+        mPresenter.create();
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        mPresenter.detachView();
+
         testSubscriber.assertUnsubscribed();
     }
 
