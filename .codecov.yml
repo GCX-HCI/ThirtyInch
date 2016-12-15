@@ -1,1 +1,5 @@
+coverage:
+  status:
+    patch: false
+
 comment: false
