@@ -25,8 +25,10 @@ import org.junit.runners.JUnit4;
 
 import rx.observers.TestSubscriber;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 @RunWith(JUnit4.class)
@@ -52,13 +54,18 @@ public class RxTiPresenterSubscriptionHandlerTest {
         mSubscriptionHandler = null;
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testManageSubscription_AfterDestroy_ShouldThrowIllegalState() throws Exception {
         mPresenter.create();
         mPresenter.destroy();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
-        mSubscriptionHandler.manageSubscription(testSubscriber);
+        try {
+            mSubscriptionHandler.manageSubscription(testSubscriber);
+            fail("no exception");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), containsString("DESTROYED"));
+        }
     }
 
     @Test
