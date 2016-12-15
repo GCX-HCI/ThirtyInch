@@ -90,7 +90,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         mViewBinder.invalidateView();
     }
 
-    // TODO
     public void onCreate(final Bundle savedInstanceState) {
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -136,14 +135,12 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         }
     }
 
-    // TODO
     @SuppressWarnings("UnusedParameters")
     public void onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
         mViewBinder.invalidateView();
     }
 
-    // TODO
     public void onDestroy() {
         //FIXME handle attach/detach state
 
@@ -187,17 +184,14 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         }
     }
 
-    // TODO
     public void onDestroyView() {
         mPresenter.detachView();
     }
 
-    // TODO
     public void onSaveInstanceState(final Bundle outState) {
         outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
     }
 
-    // TODO
     public void onStart() {
         mActivityStarted = true;
 
@@ -213,7 +207,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         }
     }
 
-    // TODO
     public void onStop() {
         mActivityStarted = false;
         mPresenter.detachView();
