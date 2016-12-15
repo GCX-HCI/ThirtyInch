@@ -316,6 +316,76 @@ public class HelloWorldActivity extends CompositeActivity implements HelloWorldV
 }
 ```
 
+### TiFragmentDelegate
+
+If you can't extend `TiFragment` in your existing codebase, then you can create a `TiFragmentDelegate` object yourself. You only need forward all lifecycle callbacks like in the following snippet.
+
+```java
+public class SampleFragment extends Fragment implements TiPresenterProvider<SamplePresenter>, SampleView {
+
+    private final TiFragmentDelegate<SamplePresenter, SampleView, SampleFragment> mDelegate = new TiFragmentDelegate<>(this);
+
+    private TextView mSampleText;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDelegate.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mDelegate.onCreateView(inflater, container, savedInstanceState);
+
+        final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_sample, container, false);
+        mSampleText = (TextView) view.findViewById(R.id.sample_text);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mDelegate.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        mDelegate.onStop();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        mDelegate.onDestroyView();
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDelegate.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mDelegate.onSaveInstanceState(outState);
+    }
+
+    @NonNull
+    @Override
+    public SamplePresenter providePresenter() {
+        return new SamplePresenter();
+    }
+
+    @Override
+    public void showText(final String s) {
+        mSampleText.setText(s);
+    }
+}
+```
+
 Yes you have to extends `CompositeActivity`, but that's the last level of inheritance you'll ever need.
 
 ## Versions
