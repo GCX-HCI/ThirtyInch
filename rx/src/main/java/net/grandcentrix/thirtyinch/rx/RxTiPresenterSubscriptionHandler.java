@@ -54,21 +54,18 @@ public class RxTiPresenterSubscriptionHandler {
     }
 
     /**
-     * Add your subscriptions here and they will automatically unsubscribed when {@link
-     * TiPresenter#destroy()} gets called
+     * Add your subscriptions here and they will automatically unsubscribed when
+     * {@link TiPresenter#destroy()} gets called
      *
      * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
      */
-    public void manageSubscription(@NonNull final Subscription subscription) {
+    public void manageSubscription(@NonNull final Subscription... subscriptions) {
         if (mPresenterSubscriptions == null) {
             throw new IllegalStateException("subscription handling doesn't work"
                     + " when the presenter has reached the DESTROYED state");
         }
 
-        if (subscription.isUnsubscribed()) {
-            return;
-        }
-        mPresenterSubscriptions.add(subscription);
+        addSubscriptions(mPresenterSubscriptions, subscriptions);
     }
 
     /**
@@ -78,11 +75,29 @@ public class RxTiPresenterSubscriptionHandler {
      *
      * @throws IllegalStateException when no view is attached
      */
-    public void manageViewSubscription(@NonNull final Subscription subscription) {
+    public void manageViewSubscription(@NonNull final Subscription... subscriptions) {
         if (mUiSubscriptions == null) {
             throw new IllegalStateException("view subscriptions can't be handled"
                     + " when there is no view");
         }
-        mUiSubscriptions.add(subscription);
+
+        addSubscriptions(mUiSubscriptions, subscriptions);
     }
+
+    /**
+     * Adds all subscriptions to the given compositeSubscription if not already unsubscribed
+     */
+    private static void addSubscriptions(final CompositeSubscription compositeSubscription,
+            final Subscription... subscriptions) {
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < subscriptions.length; i++) {
+            final Subscription subscription = subscriptions[i];
+            if (subscription.isUnsubscribed()) {
+                continue;
+            }
+
+            compositeSubscription.add(subscriptions[i]);
+        }
+    }
+
 }
