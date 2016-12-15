@@ -9,6 +9,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'bintray-release'
+apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -23,6 +24,10 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+        }
+        debug {
+            // output coverage with ./gradlew clean build createDebugCoverageReport
+            testCoverageEnabled true
         }
     }
     lintOptions {
