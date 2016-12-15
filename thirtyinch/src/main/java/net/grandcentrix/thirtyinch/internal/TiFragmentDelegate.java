@@ -1,32 +1,32 @@
 package net.grandcentrix.thirtyinch.internal;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiConfiguration;
+import net.grandcentrix.thirtyinch.TiDialogFragment;
 import net.grandcentrix.thirtyinch.TiFragment;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
-import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 import java.util.List;
 
 /**
- * This delegate allows sharing the fragment code between the {@link TiFragment} and other
- * {@link Fragment} implementations in 3rd party code.
+ * This delegate allows sharing the fragment code between the {@link TiFragment},
+ * {@link TiDialogFragment}, {@code TiFragmentPlugin} and {@code TiDialogFragmentPlugin}.
+ * <p>
+ * It also allows 3rd party developers do add this delegate to other Fragments using composition.
  */
-public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F extends Fragment & TiPresenterProvider<P>>
-        implements TiLoggingTagProvider, TiViewProvider<V>, InterceptableViewBinder<V> {
+public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
+        implements InterceptableViewBinder<V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -35,22 +35,31 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
      */
     private static final boolean ENABLE_DEBUG_LOGGING = false;
 
-    private final String TAG = this.getClass().getSimpleName()
-            + ":" + TiFragmentDelegate.class.getSimpleName()
-            + "@" + Integer.toHexString(this.hashCode());
-
     private volatile boolean mActivityStarted = false;
+
+    private final TiLoggingTagProvider mLogTag;
 
     private P mPresenter;
 
     private String mPresenterId;
 
-    private PresenterViewBinder<V> mViewBinder = new PresenterViewBinder<>(this);
+    private final TiPresenterProvider<P> mPresenterProvider;
 
-    private final F mFragment;
+    private final DelegatedTiFragment mTiFragment;
 
-    public TiFragmentDelegate(F fragment) {
-        mFragment = fragment;
+    private final PresenterViewBinder<V> mViewBinder;
+
+    private final TiViewProvider<V> mViewProvider;
+
+    public TiFragmentDelegate(final DelegatedTiFragment fragmentProvider,
+            final TiViewProvider<V> viewProvider,
+            final TiPresenterProvider<P> presenterProvider,
+            final TiLoggingTagProvider logTag) {
+        mTiFragment = fragmentProvider;
+        mViewProvider = viewProvider;
+        mPresenterProvider = presenterProvider;
+        mLogTag = logTag;
+        mViewBinder = new PresenterViewBinder<>(logTag);
     }
 
     @NonNull
@@ -70,11 +79,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
     public List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mViewBinder.getInterceptors(predicate);
-    }
-
-    @Override
-    public String getLoggingTag() {
-        return TAG;
     }
 
     public P getPresenter() {
@@ -97,7 +101,8 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
             final String recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
-                TiLog.v(TAG, "try to recover Presenter with id: " + recoveredPresenterId);
+                TiLog.v(mLogTag.getLoggingTag(),
+                        "try to recover Presenter with id: " + recoveredPresenterId);
                 //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
@@ -107,13 +112,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
                     PresenterSavior.INSTANCE.free(recoveredPresenterId);
                     mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
                 }
-                TiLog.v(TAG, "recovered Presenter " + mPresenter);
+                TiLog.v(mLogTag.getLoggingTag(), "recovered Presenter " + mPresenter);
             }
         }
 
         if (mPresenter == null) {
-            mPresenter = mFragment.providePresenter();
-            TiLog.v(TAG, "created Presenter: " + mPresenter);
+            mPresenter = mPresenterProvider.providePresenter();
+            TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
@@ -131,13 +136,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         }
 
         if (config.shouldRetainPresenter()) {
-            mFragment.setRetainInstance(true);
+            mTiFragment.setFragmentRetainInstance(true);
         }
     }
 
     @SuppressWarnings("UnusedParameters")
     public void onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
-                             @Nullable final Bundle savedInstanceState) {
+            @Nullable final Bundle savedInstanceState) {
         mViewBinder.invalidateView();
     }
 
@@ -147,11 +152,12 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         logState();
 
         boolean destroyPresenter = false;
-        if (mFragment.getActivity().isFinishing()) {
+        if (mTiFragment.isActivityFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
-            TiLog.v(TAG, "Activity is finishing, destroying presenter " + mPresenter);
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "Activity is finishing, destroying presenter " + mPresenter);
         }
 
         final TiConfiguration config = mPresenter.getConfig();
@@ -160,26 +166,28 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
             // configuration says the presenter should not be retained, a new presenter instance
             // will be created and the current presenter should be destroyed
             destroyPresenter = true;
-            TiLog.v(TAG, "presenter configured as not retaining, destroying " + mPresenter);
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "presenter configured as not retaining, destroying " + mPresenter);
         }
 
         if (!destroyPresenter &&
-                !config.useStaticSaviorToRetain()
-                && AndroidDeveloperOptions.isDontKeepActivitiesEnabled(mFragment.getActivity())) {
+                !config.useStaticSaviorToRetain() && mTiFragment.isDontKeepActivitiesEnabled()) {
             // configuration says the PresenterSavior should not be used. Retaining the presenter
             // relays on the Activity nonConfigurationInstance which is always null when
             // "don't keep activities" is enabled.
             // a new presenter instance will be created and the current presenter should be destroyed
             destroyPresenter = true;
-            TiLog.v(TAG, "the PresenterSavior is disabled and \"don\'t keep activities\" is "
-                    + "activated. The presenter can't be retained. Destroying " + mPresenter);
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "the PresenterSavior is disabled and \"don\'t keep activities\" is "
+                            + "activated. The presenter can't be retained. Destroying "
+                            + mPresenter);
         }
 
         if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
         } else {
-            TiLog.v(TAG, "not destroying " + mPresenter
+            TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
         }
     }
@@ -196,11 +204,11 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            mFragment.getActivity().getWindow().getDecorView().post(new Runnable() {
+            mTiFragment.postToMessageQueue(new Runnable() {
                 @Override
                 public void run() {
                     if (isUiPossible() && mActivityStarted) {
-                        mViewBinder.bindView(mPresenter, TiFragmentDelegate.this);
+                        mViewBinder.bindView(mPresenter, mViewProvider);
                     }
                 }
             });
@@ -210,35 +218,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
     public void onStop() {
         mActivityStarted = false;
         mPresenter.detachView();
-    }
-
-    /**
-     * the default implementation assumes that the fragment is the view and implements the {@link
-     * TiView} interface. Override this method for a different behaviour.
-     *
-     * @return the object implementing the TiView interface
-     */
-    @NonNull
-    public V provideView() {
-
-        final Class<?> foundViewInterface = AnnotationUtil
-                .getInterfaceOfClassExtendingGivenInterface(mFragment.getClass(), TiView.class);
-
-        if (foundViewInterface == null) {
-            throw new IllegalArgumentException(
-                    "This Fragment doesn't implement a TiView interface. "
-                            + "This is the default behaviour. Override provideView() to explicitly change this.");
-        } else {
-            if (foundViewInterface.getSimpleName().equals("TiView")) {
-                throw new IllegalArgumentException(
-                        "extending TiView doesn't make sense, it's an empty interface."
-                                + " This is the default behaviour. Override provideView() to explicitly change this.");
-            } else {
-                // assume that the fragment itself is the view and implements the TiView interface
-                //noinspection unchecked
-                return (V) mFragment;
-            }
-        }
     }
 
     @Override
@@ -253,32 +232,25 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView, F ex
                 + "{presenter=" + presenter + "}";
     }
 
-    public String fragmentToString() {
-        String presenter = getPresenter() == null ? "null" :
-                getPresenter().getClass().getSimpleName()
-                        + "@" + Integer.toHexString(getPresenter().hashCode());
-
-        return mFragment.getClass().getSimpleName()
-                + "@" + Integer.toHexString(hashCode())
-                + "{presenter=" + presenter + "}";
-    }
-
     private boolean isUiPossible() {
-        return mFragment.isAdded() && !mFragment.isDetached();
+        return mTiFragment.isFragmentAdded() && !mTiFragment.isFragmentDetached();
     }
 
     private void logState() {
         if (ENABLE_DEBUG_LOGGING) {
-            TiLog.v(TAG, "isChangingConfigurations = " + mFragment.getActivity().isChangingConfigurations());
-            TiLog.v(TAG, "isActivityFinishing = " + mFragment.getActivity().isFinishing());
-            TiLog.v(TAG, "isAdded = " + mFragment.isAdded());
-            TiLog.v(TAG, "isDetached = " + mFragment.isDetached());
-            TiLog.v(TAG, "isDontKeepActivitiesEnabled = " + AndroidDeveloperOptions
-                    .isDontKeepActivitiesEnabled(mFragment.getActivity()));
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "isChangingConfigurations = " + mTiFragment.isActivityChangingConfigurations());
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "isActivityFinishing = " + mTiFragment.isActivityFinishing());
+            TiLog.v(mLogTag.getLoggingTag(), "isAdded = " + mTiFragment.isFragmentAdded());
+            TiLog.v(mLogTag.getLoggingTag(), "isDetached = " + mTiFragment.isFragmentDetached());
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "isDontKeepActivitiesEnabled = " + mTiFragment.isDontKeepActivitiesEnabled());
 
             final TiConfiguration config = mPresenter.getConfig();
-            TiLog.v(TAG, "shouldRetain = " + config.shouldRetainPresenter());
-            TiLog.v(TAG, "useStaticSavior = " + config.useStaticSaviorToRetain());
+            TiLog.v(mLogTag.getLoggingTag(), "shouldRetain = " + config.shouldRetainPresenter());
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "useStaticSavior = " + config.useStaticSaviorToRetain());
         }
     }
 }

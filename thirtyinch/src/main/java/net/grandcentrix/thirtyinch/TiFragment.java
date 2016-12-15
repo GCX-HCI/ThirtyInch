@@ -15,6 +15,15 @@
 
 package net.grandcentrix.thirtyinch;
 
+import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
+import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,19 +32,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
-import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
-import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-import net.grandcentrix.thirtyinch.internal.TiViewProvider;
-
 import java.util.List;
 
-public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
-        extends Fragment implements TiPresenterProvider<P>, TiLoggingTagProvider,
+public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> extends Fragment
+        implements DelegatedTiFragment, TiPresenterProvider<P>, TiLoggingTagProvider,
         TiViewProvider<V>, InterceptableViewBinder<V> {
 
-    private final TiFragmentDelegate<P, V, ? extends TiFragment> mDelegate = new TiFragmentDelegate<>(this);
+    private final String TAG = this.getClass().getSimpleName()
+            + ":" + TiFragment.class.getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode());
+
+    private final TiFragmentDelegate<P, V> mDelegate =
+            new TiFragmentDelegate<>(this, this, this, this);
 
     @NonNull
     @Override
@@ -51,13 +59,14 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(@NonNull final Filter<BindViewInterceptor> predicate) {
+    public List<BindViewInterceptor> getInterceptors(
+            @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
 
     @Override
     public String getLoggingTag() {
-        return mDelegate.getLoggingTag();
+        return TAG;
     }
 
     public P getPresenter() {
@@ -74,6 +83,31 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
+    public boolean isActivityChangingConfigurations() {
+        return getActivity().isChangingConfigurations();
+    }
+
+    @Override
+    public boolean isActivityFinishing() {
+        return getActivity().isFinishing();
+    }
+
+    @Override
+    public boolean isDontKeepActivitiesEnabled() {
+        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
+    }
+
+    @Override
+    public boolean isFragmentAdded() {
+        return isAdded();
+    }
+
+    @Override
+    public boolean isFragmentDetached() {
+        return isDetached();
+    }
+
+    @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate(savedInstanceState);
@@ -81,11 +115,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
 
     @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
         mDelegate.onCreateView(inflater, container, savedInstanceState);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-
 
     @Override
     public void onDestroy() {
@@ -117,6 +151,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
         super.onStop();
     }
 
+    @Override
+    public boolean postToMessageQueue(final Runnable runnable) {
+        return getActivity().getWindow().getDecorView().post(runnable);
+    }
+
     /**
      * the default implementation assumes that the fragment is the view and implements the {@link
      * TiView} interface. Override this method for a different behaviour.
@@ -125,11 +164,40 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView>
      */
     @NonNull
     public V provideView() {
-        return mDelegate.provideView();
+
+        final Class<?> foundViewInterface = AnnotationUtil
+                .getInterfaceOfClassExtendingGivenInterface(getClass(), TiView.class);
+
+        if (foundViewInterface == null) {
+            throw new IllegalArgumentException(
+                    "This Fragment doesn't implement a TiView interface. "
+                            + "This is the default behaviour. Override provideView() to explicitly change this.");
+        } else {
+            if (foundViewInterface.getSimpleName().equals("TiView")) {
+                throw new IllegalArgumentException(
+                        "extending TiView doesn't make sense, it's an empty interface."
+                                + " This is the default behaviour. Override provideView() to explicitly change this.");
+            } else {
+                // assume that the fragment itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) this;
+            }
+        }
+    }
+
+    @Override
+    public void setFragmentRetainInstance(final boolean retain) {
+        setRetainInstance(retain);
     }
 
     @Override
     public String toString() {
-        return mDelegate.fragmentToString();
+        String presenter = getPresenter() == null ? "null" :
+                getPresenter().getClass().getSimpleName()
+                        + "@" + Integer.toHexString(getPresenter().hashCode());
+
+        return getClass().getSimpleName()
+                + "@" + Integer.toHexString(hashCode())
+                + "{presenter=" + presenter + "}";
     }
 }
