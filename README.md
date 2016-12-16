@@ -316,7 +316,6 @@ public class HelloWorldActivity extends CompositeActivity implements HelloWorldV
 }
 ```
 
-
 Yes you have to extends `CompositeActivity`, but that's the last level of inheritance you'll ever need.
 
 ## Versions
