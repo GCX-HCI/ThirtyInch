@@ -82,6 +82,12 @@ public class DistinctUntilChangedInvocationHandlerTest {
 
     private DistinctUntilChangedInvocationHandler<TestView> handler;
 
+    @Before
+    public void _setUp() {
+        ducView = new TestView();
+        handler = new DistinctUntilChangedInvocationHandler<>(ducView);
+    }
+
     @Test
     public void callNonTiViewMethods() throws Throwable {
 
@@ -139,12 +145,6 @@ public class DistinctUntilChangedInvocationHandlerTest {
         } catch (IllegalStateException e) {
             assertThat(e).hasMessage("Blubb123");
         }
-    }
-
-    @Before
-    public void setUp() {
-        ducView = new TestView();
-        handler = new DistinctUntilChangedInvocationHandler<>(ducView);
     }
 
     @Test

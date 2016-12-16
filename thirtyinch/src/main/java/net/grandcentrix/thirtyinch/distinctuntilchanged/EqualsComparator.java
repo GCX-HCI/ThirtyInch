@@ -20,15 +20,16 @@ import java.util.Arrays;
 /**
  * A {@link DistinctComparator} implementation which uses the {@link Object#equals(Object)}
  * method of the parameters to detect changes. It holds a strong reference to the previously used
- * parameters for a real {@link Object#equals(Object)} comparison.
+ * parameters for a real {@link Object#equals(Object)} comparison known from RxJavas {@code
+ * Observable#distinctUntilChanged()} operator.
  * <p>
- * This comparison may lead to errors when the annotated method is called with mutable objects.
- * Both, this Comparator and the Presenter hold a reference to the same object. When the Presenter
- * mutates the object and sends it to the View the comparison detects equal objects although the
- * object differs from the last received object in the View. This results in not calling the
- * annotated method.
+ * <b>Caution:</b> This comparison may lead to errors when the annotated method is called with
+ * mutable objects. Both, this Comparator and the Presenter hold a reference to the same object.
+ * When the Presenter mutates the object and sends it to the View the comparison detects equal
+ * objects although the object differs from the last received object in the View. This results in
+ * not calling the annotated method. See {@code DistinctUntilChangedEqualsProblem} for an example
  * <p>
- * The strong reference to the previous parameters could cause problems when dealing with big
+ * The strong reference to the previous parameters could also cause problems when dealing with big
  * data blobs such as bitmaps. Consider using a simpler comparator like {@link HashComparator} or
  * {@link WeakEqualsComparator}.
  */
