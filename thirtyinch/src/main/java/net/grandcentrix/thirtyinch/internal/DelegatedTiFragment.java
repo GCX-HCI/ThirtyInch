@@ -21,16 +21,6 @@ import android.support.v4.app.Fragment;
 public interface DelegatedTiFragment {
 
     /**
-     * @return {@link Activity#isChangingConfigurations()}
-     */
-    boolean isActivityChangingConfigurations();
-
-    /**
-     * @return {@link Activity#isFinishing()}
-     */
-    boolean isActivityFinishing();
-
-    /**
      * @return true when the developer option "Don't keep Activities" is enabled
      */
     boolean isDontKeepActivitiesEnabled();
@@ -44,6 +34,16 @@ public interface DelegatedTiFragment {
      * @return {@link Fragment#isDetached()}
      */
     boolean isFragmentDetached();
+
+    /**
+     * @return {@link Activity#isChangingConfigurations()}
+     */
+    boolean isHostingActivityChangingConfigurations();
+
+    /**
+     * @return {@link Activity#isFinishing()}
+     */
+    boolean isHostingActivityFinishing();
 
     /**
      * Post the runnable on the UI queue

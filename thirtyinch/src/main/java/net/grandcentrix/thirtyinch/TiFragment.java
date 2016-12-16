@@ -15,14 +15,6 @@
 
 package net.grandcentrix.thirtyinch;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
@@ -31,6 +23,14 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -83,16 +83,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
-    @Override
-    public boolean isActivityFinishing() {
-        return getActivity().isFinishing();
-    }
-
-    @Override
     public boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
@@ -105,6 +95,16 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     @Override
     public boolean isFragmentDetached() {
         return isDetached();
+    }
+
+    @Override
+    public boolean isHostingActivityChangingConfigurations() {
+        return getActivity().isChangingConfigurations();
+    }
+
+    @Override
+    public boolean isHostingActivityFinishing() {
+        return getActivity().isFinishing();
     }
 
     @Override

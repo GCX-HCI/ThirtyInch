@@ -1,11 +1,5 @@
 package net.grandcentrix.thirtyinch.internal;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiConfiguration;
@@ -16,6 +10,12 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -94,6 +94,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         mViewBinder.invalidateView();
     }
 
+    @SuppressWarnings("UnusedParameters")
+    public void onCreateView_beforeSuper(final LayoutInflater inflater,
+            @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
+        mViewBinder.invalidateView();
+    }
+
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -140,10 +147,8 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         }
     }
 
-    @SuppressWarnings("UnusedParameters")
-    public void onCreateView_beforeSuper(final LayoutInflater inflater, @Nullable final ViewGroup container,
-                                         @Nullable final Bundle savedInstanceState) {
-        mViewBinder.invalidateView();
+    public void onDestroyView_beforeSuper() {
+        mPresenter.detachView();
     }
 
     public void onDestroy_afterSuper() {
@@ -152,7 +157,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         logState();
 
         boolean destroyPresenter = false;
-        if (mTiFragment.isActivityFinishing()) {
+        if (mTiFragment.isHostingActivityFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
@@ -190,10 +195,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
         }
-    }
-
-    public void onDestroyView_beforeSuper() {
-        mPresenter.detachView();
     }
 
     public void onSaveInstanceState_afterSuper(final Bundle outState) {
@@ -238,17 +239,20 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private void logState() {
         if (ENABLE_DEBUG_LOGGING) {
+            TiLog.v(mLogTag.getLoggingTag(), "isChangingConfigurations = "
+                    + mTiFragment.isHostingActivityChangingConfigurations());
             TiLog.v(mLogTag.getLoggingTag(),
-                    "isChangingConfigurations = " + mTiFragment.isActivityChangingConfigurations());
+                    "isHostingActivityFinishing = " + mTiFragment.isHostingActivityFinishing());
             TiLog.v(mLogTag.getLoggingTag(),
-                    "isActivityFinishing = " + mTiFragment.isActivityFinishing());
-            TiLog.v(mLogTag.getLoggingTag(), "isAdded = " + mTiFragment.isFragmentAdded());
-            TiLog.v(mLogTag.getLoggingTag(), "isDetached = " + mTiFragment.isFragmentDetached());
+                    "isAdded = " + mTiFragment.isFragmentAdded());
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "isDetached = " + mTiFragment.isFragmentDetached());
             TiLog.v(mLogTag.getLoggingTag(),
                     "isDontKeepActivitiesEnabled = " + mTiFragment.isDontKeepActivitiesEnabled());
 
             final TiConfiguration config = mPresenter.getConfig();
-            TiLog.v(mLogTag.getLoggingTag(), "shouldRetain = " + config.shouldRetainPresenter());
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "shouldRetain = " + config.shouldRetainPresenter());
             TiLog.v(mLogTag.getLoggingTag(),
                     "useStaticSavior = " + config.useStaticSaviorToRetain());
         }
