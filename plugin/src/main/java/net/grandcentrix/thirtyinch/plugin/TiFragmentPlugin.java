@@ -140,44 +140,44 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDelegate.onCreate(savedInstanceState);
+        mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
-        mDelegate.onCreateView(inflater, container, savedInstanceState);
+        mDelegate.onCreateView_beforeSuper(inflater, container, savedInstanceState);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDelegate.onDestroy();
+        mDelegate.onDestroy_afterSuper();
     }
 
     @Override
     public void onDestroyView() {
-        mDelegate.onDestroyView();
+        mDelegate.onDestroyView_beforeSuper();
         super.onDestroyView();
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState(outState);
+        mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mDelegate.onStart();
+        mDelegate.onStart_afterSuper();
     }
 
     @Override
     public void onStop() {
-        mDelegate.onStop();
+        mDelegate.onStop_beforeSuper();
         super.onStop();
     }
 
