@@ -1,5 +1,11 @@
 package net.grandcentrix.thirtyinch.internal;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiConfiguration;
@@ -10,12 +16,6 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
-
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -94,7 +94,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         mViewBinder.invalidateView();
     }
 
-    public void onCreate(final Bundle savedInstanceState) {
+    public void onCreate_afterSuper(final Bundle savedInstanceState) {
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
             // this should always work.
@@ -141,12 +141,12 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     @SuppressWarnings("UnusedParameters")
-    public void onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
-            @Nullable final Bundle savedInstanceState) {
+    public void onCreateView_beforeSuper(final LayoutInflater inflater, @Nullable final ViewGroup container,
+                                         @Nullable final Bundle savedInstanceState) {
         mViewBinder.invalidateView();
     }
 
-    public void onDestroy() {
+    public void onDestroy_afterSuper() {
         //FIXME handle attach/detach state
 
         logState();
@@ -192,15 +192,15 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         }
     }
 
-    public void onDestroyView() {
+    public void onDestroyView_beforeSuper() {
         mPresenter.detachView();
     }
 
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState_afterSuper(final Bundle outState) {
         outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
     }
 
-    public void onStart() {
+    public void onStart_afterSuper() {
         mActivityStarted = true;
 
         if (isUiPossible()) {
@@ -215,7 +215,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         }
     }
 
-    public void onStop() {
+    public void onStop_beforeSuper() {
         mActivityStarted = false;
         mPresenter.detachView();
     }
