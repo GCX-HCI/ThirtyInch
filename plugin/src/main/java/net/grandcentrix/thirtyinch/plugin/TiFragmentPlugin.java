@@ -42,6 +42,13 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+/**
+ * Adds a {@link TiPresenter} to a Fragment. Can be used for both, {@link Fragment} and
+ * {@link android.support.v4.app.DialogFragment}
+ *
+ * @param <P> {@link TiPresenter} with will be attached
+ * @param <V> View, expected by the {@link TiPresenter}
+ */
 public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extends FragmentPlugin
         implements TiViewProvider<V>, DelegatedTiFragment, TiLoggingTagProvider,
         InterceptableViewBinder<V> {

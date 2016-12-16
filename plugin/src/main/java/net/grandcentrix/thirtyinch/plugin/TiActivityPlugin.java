@@ -40,6 +40,12 @@ import android.support.annotation.Nullable;
 
 import java.util.List;
 
+/**
+ * Binds a {@link TiPresenter} to an {@link Activity}
+ *
+ * @param <P> {@link TiPresenter} with will be attached
+ * @param <V> View, expected by the {@link TiPresenter}
+ */
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extends ActivityPlugin
         implements TiViewProvider<V>, DelegatedTiActivity<P>, TiLoggingTagProvider,
         InterceptableViewBinder<V> {
