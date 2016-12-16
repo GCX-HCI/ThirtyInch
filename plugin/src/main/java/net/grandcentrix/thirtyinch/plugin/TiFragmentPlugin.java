@@ -118,17 +118,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
         mDelegate.invalidateView();
     }
 
-
-    @Override
-    public boolean isActivityChangingConfigurations() {
-        return getFragment().getActivity().isChangingConfigurations();
-    }
-
-    @Override
-    public boolean isActivityFinishing() {
-        return getFragment().getActivity().isFinishing();
-    }
-
     @Override
     public boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getFragment().getActivity());
@@ -142,6 +131,16 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public boolean isFragmentDetached() {
         return getFragment().isDetached();
+    }
+
+    @Override
+    public boolean isHostingActivityChangingConfigurations() {
+        return getFragment().getActivity().isChangingConfigurations();
+    }
+
+    @Override
+    public boolean isHostingActivityFinishing() {
+        return getFragment().getActivity().isFinishing();
     }
 
     @Override
