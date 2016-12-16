@@ -105,8 +105,17 @@ public class DistinctUntilChangedEqualsProblem {
 
     private TestView wrappedView;
 
+    @Before
+    public void setUp() {
+        view = new TestViewImpl();
+        final DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
+        wrappedView = interceptor.intercept(view);
+        // check wrapping worked
+        assertThat(view).isNotEqualTo(wrappedView);
+    }
+
     @Test
-    public void mutatedObjectIsDetectedByHashCodeComparator() throws Exception {
+    public void testMutatedObjectIsDetectedByHashCodeComparator() throws Exception {
 
         // call view for the first time
         final List<Tab> list1 = Arrays.asList(tab1, tab2, tab3);
@@ -125,7 +134,7 @@ public class DistinctUntilChangedEqualsProblem {
     }
 
     @Test
-    public void mutatedObjectIsNotDetectedByEqualsComparator() throws Exception {
+    public void testMutatedObjectIsNotDetectedByEqualsComparator() throws Exception {
 
         // call view for the first time
         final List<Tab> list1 = Arrays.asList(tab1, tab2, tab3);
@@ -143,14 +152,5 @@ public class DistinctUntilChangedEqualsProblem {
         // this is expected but it's very confusing because the content has changed since the
         // last call. This happens when mutable objects are used as parameters
         assertThat(view.equalsCalled).isEqualTo(1);
-    }
-
-    @Before
-    public void _setUp() {
-        view = new TestViewImpl();
-        final DistinctUntilChangedInterceptor interceptor = new DistinctUntilChangedInterceptor();
-        wrappedView = interceptor.intercept(view);
-        // check wrapping worked
-        assertThat(view).isNotEqualTo(wrappedView);
     }
 }

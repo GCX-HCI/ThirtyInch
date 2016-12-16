@@ -7,9 +7,9 @@ import org.junit.Test;
 
 import java.lang.reflect.Method;
 
+import static junit.framework.Assert.assertEquals;
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Java6Assertions.fail;
 
 public class DistinctUntilChangedInvocationHandlerTest {
 
@@ -83,13 +83,13 @@ public class DistinctUntilChangedInvocationHandlerTest {
     private DistinctUntilChangedInvocationHandler<TestView> handler;
 
     @Before
-    public void _setUp() {
+    public void setUp() {
         ducView = new TestView();
         handler = new DistinctUntilChangedInvocationHandler<>(ducView);
     }
 
     @Test
-    public void callNonTiViewMethods() throws Throwable {
+    public void testCallNonTiViewMethods() throws Throwable {
 
         assertThat(ducView.something).isEqualTo(0);
         final Method method = ducView.getClass().getMethod("doSomething", String.class);
@@ -100,7 +100,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void directlyCallNonVoid() throws Throwable {
+    public void testDirectlyCallNonVoid() throws Throwable {
         final Method method = ducView.getClass().getMethod("returnValueOneArg", String.class);
         assertThat(handler.handleInvocation(null, method, new Object[]{"test"}))
                 .isEqualTo("success1");
@@ -109,7 +109,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void directlyCallNotAnnotatedMethods() throws Throwable {
+    public void testDirectlyCallNotAnnotatedMethods() throws Throwable {
         assertThat(ducView.notAnnotated).isEqualTo(0);
         final Method method = ducView.getClass().getMethod("notAnnotated", String.class);
         handler.handleInvocation(null, method, new Object[]{"hi"});
@@ -119,14 +119,14 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void directlyCallObjectMethods() throws Throwable {
+    public void testDirectlyCallObjectMethods() throws Throwable {
         final Method method = ducView.getClass().getMethod("toString");
         assertThat((String) handler.handleInvocation(null, method, new Object[]{}))
                 .contains(TestView.class.getSimpleName());
     }
 
     @Test
-    public void directlyForwardCallsWithZeroArguments() throws Throwable {
+    public void testDirectlyForwardCallsWithZeroArguments() throws Throwable {
         assertThat(ducView.zeroArgsCount).isEqualTo(0);
         final Method method = ducView.getClass().getMethod("zeroArgs");
         handler.handleInvocation(null, method, new Object[]{});
@@ -136,7 +136,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void methodsForwardExceptions() throws Throwable {
+    public void testMethodsForwardExceptions() throws Throwable {
         final Method method = ducView.getClass().getMethod("throwing", String.class);
 
         try {
@@ -148,7 +148,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void shouldCallMethodAfterClearCache() throws Throwable {
+    public void testShouldCallMethodAfterClearCache() throws Throwable {
         //given
         final Method method = ducView.getClass().getMethod("ducMethod", String.class);
         Object[] args = new Object[]{"p1"};
@@ -169,7 +169,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void shouldCallMethodOnce() throws Throwable {
+    public void testShouldCallMethodOnce() throws Throwable {
         //given
         final Method method = ducView.getClass().getMethod("ducMethod", String.class);
 
@@ -182,7 +182,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void shouldCallMethodTwice() throws Throwable {
+    public void testShouldCallMethodTwice() throws Throwable {
         //given
         final Method method = ducView.getClass().getMethod("ducMethod", String.class);
 
@@ -196,7 +196,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void swallowCall() throws Throwable {
+    public void testSwallowCall() throws Throwable {
         final Method method = ducView.getClass().getMethod("logDropped", String.class);
 
         assertEquals(0, ducView.callCount);
@@ -208,7 +208,7 @@ public class DistinctUntilChangedInvocationHandlerTest {
     }
 
     @Test
-    public void throwWhenInitializingABadComparator() throws Throwable {
+    public void testThrowWhenInitializingABadComparator() throws Throwable {
         final Method method = ducView.getClass().getMethod("badComparator", String.class);
 
         try {
