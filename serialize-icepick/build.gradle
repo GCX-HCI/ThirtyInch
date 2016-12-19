@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.novoda:bintray-release:$bintrayVersion"
+    }
+}
+
+repositories {
+    jcenter()
+    maven {url "https://clojars.org/repo/"}
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'bintray-release'
+apply plugin: 'jacoco-android'
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            // output coverage with ./gradlew clean build createDebugCoverageReport
+            testCoverageEnabled true
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile project(':thirtyinch')
+    provided "com.android.support:support-annotations:$supportLibraryVersion"
+
+    def icepickVersion = '3.2.0'
+    compile "frankiesardo:icepick:$icepickVersion"
+    androidTestAnnotationProcessor "frankiesardo:icepick-processor:$icepickVersion"
+
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
+}
+
+publish {
+    userOrg = 'passsy'
+    groupId = 'net.grandcentrix.thirtyinch'
+    artifactId = 'thirtyinch-serialize-icepick'
+    uploadName = 'ThirtyInch'
+    publishVersion = VERSION_NAME
+    //description = ''
+    website = 'https://github.com/grandcentrix/ThirtyInch'
+}
