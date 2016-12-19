@@ -15,13 +15,13 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.TiPresenter;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+
+import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 import java.util.HashMap;
 
@@ -52,7 +52,7 @@ public enum PresenterSavior {
     }
 
     public String safe(@NonNull final TiPresenter presenter) {
-        final String id = generateId(presenter);
+        final String id = presenter.getId();
         TiLog.v(TAG, "safe presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
@@ -61,11 +61,5 @@ public enum PresenterSavior {
     @VisibleForTesting
     void clear() {
         mPresenters.clear();
-    }
-
-    private String generateId(@NonNull final TiPresenter presenter) {
-        return presenter.getClass().getSimpleName()
-                + ":" + presenter.hashCode()
-                + ":" + System.nanoTime();
     }
 }

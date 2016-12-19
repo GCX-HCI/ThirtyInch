@@ -15,15 +15,16 @@
 
 package net.grandcentrix.thirtyinch;
 
-import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
-import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
-import net.grandcentrix.thirtyinch.internal.PresenterSavior;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
 
 /**
  * Configure how ThirtyInch should handle the {@link TiPresenter}.
@@ -198,6 +199,16 @@ public class TiConfiguration {
             return this;
         }
 
+        /**
+         * An {@link TiPresenterSerializer} instance should be provided, if the {@link TiPresenter} should
+         * be restored, after a process has died, but the UI component is being recreated. Since this is
+         * a rare use case the default value is {@code null} and presenters aren't restored.
+         * @param serializer An implementation which can serialize and deserialize any presenter.
+         */
+        public Builder setPresenterSerializer(TiPresenterSerializer serializer) {
+            mConfig.mPresenterSerializer = serializer;
+            return this;
+        }
     }
 
     public static final TiConfiguration DEFAULT = new Builder().build();
@@ -209,6 +220,8 @@ public class TiConfiguration {
     private boolean mRetainPresenter = true;
 
     private boolean mUseStaticSaviorToRetain = true;
+
+    private TiPresenterSerializer mPresenterSerializer;
 
     /**
      * use {@link Builder} to construct a configuration.
@@ -230,5 +243,9 @@ public class TiConfiguration {
 
     public boolean useStaticSaviorToRetain() {
         return mUseStaticSaviorToRetain;
+    }
+
+    public TiPresenterSerializer getPresenterSerializer() {
+        return mPresenterSerializer;
     }
 }

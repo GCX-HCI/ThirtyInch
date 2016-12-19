@@ -15,6 +15,13 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.app.Activity;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
@@ -24,13 +31,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
-
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
 
 import java.util.List;
 
@@ -137,9 +138,9 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         }
 
         // try to recover with the PresenterSavior
+        final String recoveredPresenterId;
         if (savedInstanceState != null) {
-            final String recoveredPresenterId = savedInstanceState
-                    .getString(SAVED_STATE_PRESENTER_ID);
+            recoveredPresenterId = savedInstanceState.getString(SAVED_STATE_PRESENTER_ID);
 
             if (mPresenter == null) {
                 if (recoveredPresenterId != null) {
@@ -166,7 +167,14 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // this presenter from the savior
                 PresenterSavior.INSTANCE.free(recoveredPresenterId);
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+
+                TiPresenterSerializer serializer = mPresenter.getConfig().getPresenterSerializer();
+                if (serializer != null && recoveredPresenterId != null) {
+                    serializer.cleanup(recoveredPresenterId);
+                }
             }
+        } else {
+            recoveredPresenterId = null;
         }
 
         if (mPresenter == null) {
@@ -174,6 +182,13 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             mPresenter = mPresenterProvider.providePresenter();
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
+            final TiPresenterSerializer presenterSerializer = config.getPresenterSerializer();
+
+            if (recoveredPresenterId != null && presenterSerializer != null) {
+                mPresenter = presenterSerializer.deserialize(mPresenter, recoveredPresenterId);
+                TiLog.v(mLogTag.getLoggingTag(), "deserialized Presenter: " + mPresenter);
+            }
+
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             }
@@ -228,6 +243,11 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
+            TiPresenterSerializer serializer = mPresenter.getConfig().getPresenterSerializer();
+            if (serializer != null) {
+                serializer.cleanup(mPresenterId);
+            }
+
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
@@ -236,6 +256,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onSaveInstanceState_afterSuper(final Bundle outState) {
         outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
+        mPresenter.persist();
     }
 
     public void onStart_afterSuper() {

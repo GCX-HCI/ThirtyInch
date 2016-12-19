@@ -16,14 +16,15 @@
 package net.grandcentrix.thirtyinch;
 
 
-import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
+
+import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
+import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,7 @@ public abstract class TiPresenter<V extends TiView> {
     private boolean mCalled = true;
 
     private final TiConfiguration mConfig;
+    private final String mId;
 
     private LinkedBlockingQueue<ViewAction<V>> mPostponedViewActions = new LinkedBlockingQueue<>();
 
@@ -106,6 +108,7 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public TiPresenter(final TiConfiguration config) {
         mConfig = config;
+        mId = generateId();
     }
 
     /**
@@ -520,5 +523,26 @@ public abstract class TiPresenter<V extends TiView> {
         while (!mPostponedViewActions.isEmpty()) {
             mPostponedViewActions.poll().call(view);
         }
+    }
+
+    private String generateId() {
+        return getClass().getSimpleName() + ":" + hashCode() + ":" + System.nanoTime();
+    }
+
+    /**
+     * Persists this instance if the configuration provides a {@link TiPresenterSerializer}.
+     */
+    public void persist() {
+        TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
+        if (serializer != null) {
+            serializer.serialize(this, mId);
+        }
+    }
+
+    /**
+     * @return A unique ID of this instance.
+     */
+    public final String getId() {
+        return mId;
     }
 }
