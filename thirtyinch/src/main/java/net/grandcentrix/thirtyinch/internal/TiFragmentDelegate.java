@@ -16,7 +16,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInterceptor;
-import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
+import net.grandcentrix.thirtyinch.TiPresenterSerializer;
 
 import java.util.List;
 

@@ -16,15 +16,14 @@
 package net.grandcentrix.thirtyinch;
 
 
+import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
-
-import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
-import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +84,7 @@ public abstract class TiPresenter<V extends TiView> {
     private boolean mCalled = true;
 
     private final TiConfiguration mConfig;
+
     private final String mId;
 
     private LinkedBlockingQueue<ViewAction<V>> mPostponedViewActions = new LinkedBlockingQueue<>();
@@ -240,6 +240,11 @@ public abstract class TiPresenter<V extends TiView> {
 
         // release everything, no new states will be posted
         mLifecycleObservers.clear();
+
+        final TiPresenterSerializer serializer = getConfig().getPresenterSerializer();
+        if (serializer != null) {
+            serializer.free(this);
+        }
     }
 
     /**
@@ -284,6 +289,13 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
+     * @return A unique id of this instance.
+     */
+    public final String getId() {
+        return mId;
+    }
+
+    /**
      * @return the current lifecycle state
      */
     @NonNull
@@ -318,6 +330,16 @@ public abstract class TiPresenter<V extends TiView> {
         return mState == State.VIEW_ATTACHED;
     }
 
+
+    //TODO documentation
+    public void persistState() {
+        TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
+        if (serializer != null) {
+            final byte[] data = onSavePersistentState();
+            serializer.serialize(this, data);
+        }
+    }
+
     @Override
     public String toString() {
         final String viewName;
@@ -330,6 +352,18 @@ public abstract class TiPresenter<V extends TiView> {
                 + ":" + TiPresenter.class.getSimpleName()
                 + "@" + Integer.toHexString(hashCode())
                 + "{view = " + viewName + "}";
+    }
+
+
+    //TODO documentation
+    @Nullable
+    protected byte[] getPersistentState() {
+        final TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
+        if (serializer != null) {
+            return serializer.deserialize(this);
+        }
+
+        return null;
     }
 
     /**
@@ -403,6 +437,12 @@ public abstract class TiPresenter<V extends TiView> {
         mCalled = true;
     }
 
+    //TODO documentation
+    @Nullable
+    protected byte[] onSavePersistentState() {
+        return null;
+    }
+
     /**
      * @deprecated use {@link #onDetachView()} instead
      */
@@ -455,6 +495,10 @@ public abstract class TiPresenter<V extends TiView> {
         } else {
             mPostponedViewActions.add(action);
         }
+    }
+
+    private String generateId() {
+        return getClass().getSimpleName() + ":" + hashCode() + ":" + System.nanoTime();
     }
 
     /**
@@ -523,26 +567,5 @@ public abstract class TiPresenter<V extends TiView> {
         while (!mPostponedViewActions.isEmpty()) {
             mPostponedViewActions.poll().call(view);
         }
-    }
-
-    private String generateId() {
-        return getClass().getSimpleName() + ":" + hashCode() + ":" + System.nanoTime();
-    }
-
-    /**
-     * Persists this instance if the configuration provides a {@link TiPresenterSerializer}.
-     */
-    public void persist() {
-        TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
-        if (serializer != null) {
-            serializer.serialize(this, mId);
-        }
-    }
-
-    /**
-     * @return A unique ID of this instance.
-     */
-    public final String getId() {
-        return mId;
     }
 }

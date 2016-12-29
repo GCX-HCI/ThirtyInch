@@ -15,16 +15,16 @@
 
 package net.grandcentrix.thirtyinch;
 
-import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
+
+import android.app.Activity;
+import android.app.Application;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * Configure how ThirtyInch should handle the {@link TiPresenter}.
@@ -145,6 +145,12 @@ public class TiConfiguration {
             return this;
         }
 
+        //TODO documentation
+        public Builder setPresenterSerializer(TiPresenterSerializer serializer) {
+            mConfig.mPresenterSerializer = serializer;
+            return this;
+        }
+
         /**
          * When set to <code>true</code> the {@link TiPresenter} will be restored when the {@link
          * Activity} recreates due to a configuration changes such as the orientation change.
@@ -198,17 +204,6 @@ public class TiConfiguration {
             mConfig.mUseStaticSaviorToRetain = enabled;
             return this;
         }
-
-        /**
-         * An {@link TiPresenterSerializer} instance should be provided, if the {@link TiPresenter} should
-         * be restored, after a process has died, but the UI component is being recreated. Since this is
-         * a rare use case the default value is {@code null} and presenters aren't restored.
-         * @param serializer An implementation which can serialize and deserialize any presenter.
-         */
-        public Builder setPresenterSerializer(TiPresenterSerializer serializer) {
-            mConfig.mPresenterSerializer = serializer;
-            return this;
-        }
     }
 
     public static final TiConfiguration DEFAULT = new Builder().build();
@@ -217,16 +212,21 @@ public class TiConfiguration {
 
     private boolean mDistinctUntilChangedInterceptorEnabled = true;
 
+    private TiPresenterSerializer mPresenterSerializer;
+
     private boolean mRetainPresenter = true;
 
     private boolean mUseStaticSaviorToRetain = true;
-
-    private TiPresenterSerializer mPresenterSerializer;
 
     /**
      * use {@link Builder} to construct a configuration.
      */
     private TiConfiguration() {
+    }
+
+    @Nullable
+    public TiPresenterSerializer getPresenterSerializer() {
+        return mPresenterSerializer;
     }
 
     public boolean isCallOnMainThreadInterceptorEnabled() {
@@ -243,9 +243,5 @@ public class TiConfiguration {
 
     public boolean useStaticSaviorToRetain() {
         return mUseStaticSaviorToRetain;
-    }
-
-    public TiPresenterSerializer getPresenterSerializer() {
-        return mPresenterSerializer;
     }
 }
