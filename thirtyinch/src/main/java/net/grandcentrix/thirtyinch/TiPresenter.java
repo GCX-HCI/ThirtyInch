@@ -28,6 +28,11 @@ import android.support.v4.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -85,7 +90,12 @@ public abstract class TiPresenter<V extends TiView> {
 
     private final TiConfiguration mConfig;
 
-    private final String mId;
+    private String mId;
+
+    private final ExecutorService mPersistentStateExecutorService =
+            Executors.newSingleThreadExecutor();
+
+    private Future<byte[]> mPersistentStateFuture;
 
     private LinkedBlockingQueue<ViewAction<V>> mPostponedViewActions = new LinkedBlockingQueue<>();
 
@@ -97,10 +107,10 @@ public abstract class TiPresenter<V extends TiView> {
         sDefaultConfig = config;
     }
 
-
     public TiPresenter() {
         this(sDefaultConfig);
     }
+
 
     /**
      * Constructs a presenter with a different configuration then the default one. Change the
@@ -108,7 +118,6 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public TiPresenter(final TiConfiguration config) {
         mConfig = config;
-        mId = generateId();
     }
 
     /**
@@ -137,7 +146,6 @@ public abstract class TiPresenter<V extends TiView> {
             }
         };
     }
-
 
     /**
      * bind a new view to this presenter.
@@ -280,6 +288,11 @@ public abstract class TiPresenter<V extends TiView> {
         mView = null;
     }
 
+    public void generatNewId() {
+        final String id = getClass().getSimpleName() + ":" + hashCode() + ":" + System.nanoTime();
+        setId(id);
+    }
+
     /**
      * @return the presenter configuration
      */
@@ -330,13 +343,48 @@ public abstract class TiPresenter<V extends TiView> {
         return mState == State.VIEW_ATTACHED;
     }
 
-
     //TODO documentation
     public void persistState() {
-        TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
-        if (serializer != null) {
-            final byte[] data = onSavePersistentState();
-            serializer.serialize(this, data);
+        mPersistentStateExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
+                if (serializer != null) {
+                    final byte[] data = onSavePersistentState();
+                    serializer.serialize(TiPresenter.this, data);
+                }
+            }
+        });
+    }
+
+    @NonNull
+    public Future<byte[]> prefetchPersistentState() {
+        mPersistentStateFuture = mPersistentStateExecutorService.submit(new Callable<byte[]>() {
+            @Override
+            public byte[] call() throws Exception {
+                final TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
+                if (serializer != null) {
+                    return serializer.deserialize(TiPresenter.this);
+                }
+                return null;
+            }
+        });
+
+        return mPersistentStateFuture;
+    }
+
+    /**
+     * the id can only be set once
+     */
+    public void setId(@NonNull final String id) {
+        //noinspection ConstantConditions
+        if (id == null) {
+            throw new IllegalArgumentException("the id cannot be null");
+        }
+        if (mId == null) {
+            mId = id;
+        } else {
+            throw new IllegalArgumentException("the id can only be set once");
         }
     }
 
@@ -354,15 +402,21 @@ public abstract class TiPresenter<V extends TiView> {
                 + "{view = " + viewName + "}";
     }
 
-
     //TODO documentation
     @Nullable
     protected byte[] getPersistentState() {
-        final TiPresenterSerializer serializer = mConfig.getPresenterSerializer();
-        if (serializer != null) {
-            return serializer.deserialize(this);
+        Future<byte[]> future = mPersistentStateFuture;
+        if (future == null) {
+            future = mPersistentStateFuture = prefetchPersistentState();
         }
-
+        try {
+            // wait for result even when not prefetched
+            return future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -495,10 +549,6 @@ public abstract class TiPresenter<V extends TiView> {
         } else {
             mPostponedViewActions.add(action);
         }
-    }
-
-    private String generateId() {
-        return getClass().getSimpleName() + ":" + hashCode() + ":" + System.nanoTime();
     }
 
     /**

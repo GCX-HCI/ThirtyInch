@@ -16,7 +16,10 @@
 package net.grandcentrix.thirtyinch.sample;
 
 
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.serialize.PresenterStateSerializer;
 
 import android.app.Application;
 
@@ -28,5 +31,9 @@ public class SampleApp extends Application {
 
         // log ThirtyInch output with logcat
         TiLog.setLogger(TiLog.LOGCAT);
+
+        TiPresenter.setDefaultConfig(new TiConfiguration.Builder()
+                .setPresenterSerializer(new PresenterStateSerializer(this))
+                .build());
     }
 }
