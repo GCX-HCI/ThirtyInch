@@ -223,7 +223,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public void setFragmentRetainInstance(final boolean retain) {
-        setRetainInstance(retain);
+        getFragment().setRetainInstance(retain);
     }
 
     @Override
