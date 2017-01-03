@@ -162,6 +162,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
      *
      * @return the object implementing the TiView interface
      */
+    @SuppressWarnings("unchecked")
     @NonNull
     public V provideView() {
 
@@ -179,7 +180,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
                                 + " This is the default behaviour. Override provideView() to explicitly change this.");
             } else {
                 // assume that the fragment itself is the view and implements the TiView interface
-                //noinspection unchecked
                 return (V) this;
             }
         }

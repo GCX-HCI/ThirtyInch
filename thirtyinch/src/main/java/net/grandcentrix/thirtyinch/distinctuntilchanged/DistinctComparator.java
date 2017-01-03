@@ -22,7 +22,7 @@ public interface DistinctComparator {
 
     /**
      * Checks if the arguments of a method call have changed compare to the last call of the
-     * method. This method returns {@link false} when calling it for the first time. It's the
+     * method. This method returns {@code false} when calling it for the first time. It's the
      * initialization step allowing comparisons with the next arguments.
      *
      * @param newParameters arguments of the current method call. Compare them to the last call

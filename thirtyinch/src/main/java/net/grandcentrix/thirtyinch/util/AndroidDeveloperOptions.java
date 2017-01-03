@@ -25,6 +25,7 @@ public class AndroidDeveloperOptions {
      * Returns the state of the "Don't keep activities - Destroy every activity as soon as the user
      * leaves it" developer option
      */
+    @SuppressWarnings("deprecation")
     public static boolean isDontKeepActivitiesEnabled(final Context context) {
         int alwaysFinishActivitiesInt;
         if (Build.VERSION.SDK_INT >= 17) {
