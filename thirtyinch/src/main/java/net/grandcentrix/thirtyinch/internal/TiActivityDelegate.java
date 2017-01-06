@@ -123,6 +123,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         mViewBinder.invalidateView();
     }
 
+    @SuppressWarnings("unchecked")
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
 
         // try recover presenter via lastNonConfigurationInstance
@@ -147,7 +148,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     // this should always work.
                     TiLog.v(mLogTag.getLoggingTag(),
                             "try to recover Presenter with id: " + recoveredPresenterId);
-                    //noinspection unchecked
                     mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                     TiLog.v(mLogTag.getLoggingTag(),
                             "recovered Presenter from savior " + mPresenter);

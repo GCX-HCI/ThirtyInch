@@ -76,6 +76,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return mDelegate.getPresenter();
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public P getRetainedPresenter() {
@@ -84,7 +85,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         final Object nci = getLastCustomNonConfigurationInstance();
         if (nci instanceof PresenterNonConfigurationInstance) {
             final PresenterNonConfigurationInstance pnci = (PresenterNonConfigurationInstance) nci;
-            //noinspection unchecked
             return (P) pnci.getPresenter();
         }
         return null;
@@ -141,6 +141,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return getWindow().getDecorView().post(runnable);
     }
 
+    @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public V provideView() {
@@ -158,7 +159,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
                                 + " This is the default behaviour. Override provideView() to explicitly change this.");
             } else {
                 // assume that the activity itself is the view and implements the TiView interface
-                //noinspection unchecked
                 return (V) this;
             }
         }

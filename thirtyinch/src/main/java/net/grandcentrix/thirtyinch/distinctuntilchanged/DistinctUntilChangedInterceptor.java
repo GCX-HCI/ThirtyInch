@@ -32,10 +32,10 @@ public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
 
     private static final String TAG = DistinctUntilChangedInterceptor.class.getSimpleName();
 
+    @SuppressWarnings("unchecked")
     @Nullable
     public static DistinctUntilChangedInvocationHandler<TiView> unwrap(@NonNull final TiView view) {
         try {
-            //noinspection unchecked
             return (DistinctUntilChangedInvocationHandler) Proxy.getInvocationHandler(view);
         } catch (ClassCastException e) {
             return null;
@@ -61,6 +61,7 @@ public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
         return wrapped;
     }
 
+    @SuppressWarnings("unchecked")
     @NonNull
     public <V extends TiView> V wrap(@NonNull final V view) {
 
@@ -76,11 +77,8 @@ public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
             return view;
         }
 
-        //noinspection unchecked,UnnecessaryLocalVariable
-        final V wrappedView = (V) Proxy.newProxyInstance(
+        return (V) Proxy.newProxyInstance(
                 foundInterfaceClass.getClassLoader(), new Class<?>[]{foundInterfaceClass},
                 new DistinctUntilChangedInvocationHandler<>(view));
-
-        return wrappedView;
     }
 }

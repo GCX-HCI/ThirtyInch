@@ -35,6 +35,7 @@ public class CallOnMainThreadInterceptor implements BindViewInterceptor {
         return wrapped;
     }
 
+    @SuppressWarnings("unchecked")
     private <V extends TiView> V wrap(final V view) {
 
         Class<?> foundInterfaceClass = getInterfaceOfClassExtendingGivenInterface(
@@ -49,11 +50,8 @@ public class CallOnMainThreadInterceptor implements BindViewInterceptor {
             return view;
         }
 
-        //noinspection unchecked,UnnecessaryLocalVariable
-        final V wrappedView = (V) Proxy.newProxyInstance(
+        return (V) Proxy.newProxyInstance(
                 foundInterfaceClass.getClassLoader(), new Class<?>[]{foundInterfaceClass},
                 new CallOnMainThreadInvocationHandler<>(view));
-
-        return wrappedView;
     }
 }

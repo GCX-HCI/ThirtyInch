@@ -101,6 +101,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         mViewBinder.invalidateView();
     }
 
+    @SuppressWarnings("unchecked")
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
@@ -110,7 +111,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             if (recoveredPresenterId != null) {
                 TiLog.v(mLogTag.getLoggingTag(),
                         "try to recover Presenter with id: " + recoveredPresenterId);
-                //noinspection unchecked
                 mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
