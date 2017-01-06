@@ -15,6 +15,7 @@
 
 package net.grandcentrix.thirtyinch.rx2;
 
+import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.Before;
@@ -36,13 +37,14 @@ public class RxTiPresenterDisposableHandlerTest {
 
     private RxTiPresenterDisposableHandler mDisposableHandler;
 
-    private TiMockPresenter mPresenter;
+    private TiPresenter mPresenter;
 
     private TiView mView;
 
     @Before
     public void setUp() throws Exception {
-        mPresenter = new TiMockPresenter();
+        mPresenter = new TiPresenter() {
+        };
         mDisposableHandler = new RxTiPresenterDisposableHandler(mPresenter);
         mView = mock(TiView.class);
     }
