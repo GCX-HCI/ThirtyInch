@@ -47,6 +47,15 @@ public class TestActivity extends CompositeActivity implements TestView {
 
         setContentView(R.layout.activity_test);
         mText = (TextView) findViewById(R.id.helloworld_text);
+
+        if (savedInstanceState == null) {
+
+            final TestFragment testFragment = new TestFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, testFragment)
+                    .commit();
+        }
     }
 
     @Override

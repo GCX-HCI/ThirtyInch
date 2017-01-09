@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 grandcentrix GmbH
+ * Copyright (C) 2016 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,61 +15,62 @@
 
 package net.grandcentrix.thirtyinch.plugin;
 
-import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
-import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
+
+import com.pascalwelsch.compositeandroid.fragment.FragmentPlugin;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
-import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.TiFragment;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
+import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
-import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
+import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.List;
 
 /**
- * Binds a {@link TiPresenter} to an {@link Activity}
+ * Adds a {@link TiPresenter} to a Fragment. Can be used for both, {@link Fragment} and
+ * {@link android.support.v4.app.DialogFragment}
  *
  * @param <P> {@link TiPresenter} with will be attached
  * @param <V> View, expected by the {@link TiPresenter}
  */
-public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extends ActivityPlugin
-        implements TiViewProvider<V>, DelegatedTiActivity<P>, TiLoggingTagProvider,
+public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extends FragmentPlugin
+        implements TiViewProvider<V>, DelegatedTiFragment, TiLoggingTagProvider,
         InterceptableViewBinder<V> {
-
-    public static final String NCI_KEY_PRESENTER = "presenter";
 
     private String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
 
-    private TiActivityDelegate<P, V> mDelegate;
+    private TiFragmentDelegate<P, V> mDelegate;
 
     /**
      * Binds a {@link TiPresenter} returned by the {@link TiPresenterProvider} to the {@link
-     * Activity} and all future {@link Activity} instances created due to configuration changes.
-     * The provider will be only called once during {@link TiActivityPlugin#onCreate(Bundle)}. This
+     * Fragment} and all future {@link Fragment} instances created due to configuration changes.
+     * The provider will be only called once during {@link TiFragmentPlugin#onCreate(Bundle)}. This
      * lets you inject objects which require a {@link android.content.Context} and can't be
-     * instantiated in the constructor of the {@link Activity}. Using the interface also prevents
-     * instantiating the (possibly) heavy {@link TiPresenter} which will never be used when a
-     * presenter is already created for this {@link Activity}.
+     * instantiated earlier. Using the interface also prevents instantiating the (possibly) heavy
+     * {@link TiPresenter} which will never be used when a presenter is already created for this
+     * {@link Fragment}.
      *
      * @param presenterProvider callback returning the presenter.
      */
-    public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
-        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this);
+    public TiFragmentPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
+        mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider, this);
     }
 
     @NonNull
@@ -98,6 +99,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return mDelegate.getInterceptors(predicate);
     }
 
+
     @Override
     public String getLoggingTag() {
         return TAG;
@@ -105,17 +107,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     public P getPresenter() {
         return mDelegate.getPresenter();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Nullable
-    @Override
-    public P getRetainedPresenter() {
-        final Object nci = getLastNonConfigurationInstance(NCI_KEY_PRESENTER);
-        if (nci != null) {
-            return (P) nci;
-        }
-        return null;
     }
 
     /**
@@ -128,30 +119,42 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
-    @Override
-    public boolean isActivityFinishing() {
-        return getActivity().isFinishing();
-    }
-
-    @Override
     public boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
+        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getFragment().getActivity());
     }
 
     @Override
-    public void onConfigurationChanged(final Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDelegate.onConfigurationChanged_afterSuper(newConfig);
+    public boolean isFragmentAdded() {
+        return getFragment().isAdded();
+    }
+
+    @Override
+    public boolean isFragmentDetached() {
+        return getFragment().isDetached();
+    }
+
+    @Override
+    public boolean isHostingActivityChangingConfigurations() {
+        return getFragment().getActivity().isChangingConfigurations();
+    }
+
+    @Override
+    public boolean isHostingActivityFinishing() {
+        return getFragment().getActivity().isFinishing();
     }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
+        mDelegate.onCreateView_beforeSuper(inflater, container, savedInstanceState);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -161,18 +164,9 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    @Nullable
-    public CompositeNonConfigurationInstance onRetainNonConfigurationInstance() {
-        final P presenter = mDelegate.getPresenter();
-        if (presenter == null) {
-            return null;
-        }
-
-        if (presenter.getConfig().shouldRetainPresenter()) {
-            return new CompositeNonConfigurationInstance(NCI_KEY_PRESENTER, presenter);
-        }
-
-        return null;
+    public void onDestroyView() {
+        mDelegate.onDestroyView_beforeSuper();
+        super.onDestroyView();
     }
 
     @Override
@@ -191,24 +185,28 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     public void onStop() {
         mDelegate.onStop_beforeSuper();
         super.onStop();
-        mDelegate.onStop_afterSuper();
     }
 
     @Override
     public boolean postToMessageQueue(final Runnable runnable) {
-        return getActivity().getWindow().getDecorView().post(runnable);
+        return getFragment().getActivity().getWindow().getDecorView().post(runnable);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * the default implementation assumes that the fragment is the view and implements the {@link
+     * TiView} interface. Override this method for a different behaviour.
+     *
+     * @return the object implementing the TiView interface
+     */
     @NonNull
-    @Override
     public V provideView() {
+
         final Class<?> foundViewInterface = AnnotationUtil
-                .getInterfaceOfClassExtendingGivenInterface(getActivity().getClass(), TiView.class);
+                .getInterfaceOfClassExtendingGivenInterface(getFragment().getClass(), TiView.class);
 
         if (foundViewInterface == null) {
             throw new IllegalArgumentException(
-                    "This Activity doesn't implement a TiView interface. "
+                    "This Fragment doesn't implement a TiView interface. "
                             + "This is the default behaviour. Override provideView() to explicitly change this.");
         } else {
             if (foundViewInterface.getSimpleName().equals("TiView")) {
@@ -216,10 +214,16 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
                         "extending TiView doesn't make sense, it's an empty interface."
                                 + " This is the default behaviour. Override provideView() to explicitly change this.");
             } else {
-                // assume that the activity itself is the view and implements the TiView interface
-                return (V) getActivity();
+                // assume that the fragment itself is the view and implements the TiView interface
+                //noinspection unchecked
+                return (V) getFragment();
             }
         }
+    }
+
+    @Override
+    public void setFragmentRetainInstance(final boolean retain) {
+        getFragment().setRetainInstance(retain);
     }
 
     @Override
@@ -229,7 +233,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
                         + "@" + Integer.toHexString(mDelegate.getPresenter().hashCode());
 
         return getClass().getSimpleName()
-                + ":" + TiActivity.class.getSimpleName()
+                + ":" + TiFragment.class.getSimpleName()
                 + "@" + Integer.toHexString(hashCode())
                 + "{presenter=" + presenter + "}";
     }
@@ -238,7 +242,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     protected void onAddedToDelegate() {
         super.onAddedToDelegate();
         TAG = getClass().getSimpleName()
-                + ":" + TiActivity.class.getSimpleName()
+                + ":" + TiFragment.class.getSimpleName()
                 + "@" + Integer.toHexString(this.hashCode())
                 + ":" + getOriginal().getClass().getSimpleName()
                 + "@" + Integer.toHexString(getOriginal().hashCode());
@@ -248,7 +252,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     protected void onRemovedFromDelegated() {
         super.onRemovedFromDelegated();
         TAG = getClass().getSimpleName()
-                + ":" + TiActivity.class.getSimpleName()
+                + ":" + TiFragment.class.getSimpleName()
                 + "@" + Integer.toHexString(this.hashCode());
     }
 }
