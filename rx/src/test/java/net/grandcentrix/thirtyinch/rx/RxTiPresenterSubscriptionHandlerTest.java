@@ -91,16 +91,17 @@ public class RxTiPresenterSubscriptionHandlerTest {
         testSubscriber.assertUnsubscribed();
     }
 
-    @Test(expected = AssertionError.class)
-    public void testManageViewSubscription_DetachBeforeAttach_ShouldThrowAssertError()
+    @Test
+    public void testManageViewSubscription_DetachBeforeAttach_ShouldThrowIllegalStateException()
             throws Exception {
         mPresenter.create();
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
-        mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        mPresenter.detachView();
-
-        testSubscriber.assertUnsubscribed();
+        try {
+            mSubscriptionHandler.manageViewSubscription(testSubscriber);
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("when there is no view"));
+        }
     }
 
     @Test

@@ -41,7 +41,9 @@ public class RxTiPresenterSubscriptionHandler {
                     if (mUiSubscriptions != null) {
                         mUiSubscriptions.unsubscribe();
                     }
-                    // there is no reuse possible. recreation works fine
+                }
+
+                if (state == TiPresenter.State.VIEW_ATTACHED) {
                     mUiSubscriptions = new CompositeSubscription();
                 }
 
