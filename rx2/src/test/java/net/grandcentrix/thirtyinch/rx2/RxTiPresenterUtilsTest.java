@@ -1,5 +1,6 @@
 package net.grandcentrix.thirtyinch.rx2;
 
+import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.After;
@@ -12,14 +13,15 @@ import static org.mockito.Mockito.mock;
 
 public class RxTiPresenterUtilsTest {
 
-    private TiMockPresenter mPresenter;
+    private TiPresenter mPresenter;
 
     private TiView mView;
 
     @Before
     public void setUp() throws Exception {
         mView = mock(TiView.class);
-        mPresenter = new TiMockPresenter();
+        mPresenter = new TiPresenter() {
+        };
     }
 
     @After
