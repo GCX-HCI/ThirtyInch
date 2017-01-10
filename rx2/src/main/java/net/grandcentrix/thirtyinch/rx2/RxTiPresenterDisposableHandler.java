@@ -41,7 +41,9 @@ public class RxTiPresenterDisposableHandler {
                     if (mUiDisposables != null) {
                         mUiDisposables.dispose();
                     }
-                    // there is no reuse possible. recreation works fine
+                }
+
+                if (state == TiPresenter.State.VIEW_ATTACHED) {
                     mUiDisposables = new CompositeDisposable();
                 }
 

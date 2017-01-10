@@ -102,18 +102,17 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManageViewDisposable_DetachBeforeAttach_ShouldThrowAssertError()
+    public void testManageViewDisposable_DetachBeforeAttach_ShouldThrowIllegalStateException()
             throws Exception {
         mPresenter.create();
         final TestObserver<Integer> testObserver = new TestObserver<>();
 
-        mDisposableHandler.manageViewDisposable(testObserver);
-        mPresenter.detachView();
-
-        // Think about that.
-        // Maybe this will never happen. But when! Then we have to dispose all the view disposable.
-        // Same in rx module
-        assertThat(testObserver.isDisposed(), is(false));
+        try {
+            mDisposableHandler.manageViewDisposable(testObserver);
+            fail("no exception");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("when there is no view"));
+        }
     }
 
     @Test
