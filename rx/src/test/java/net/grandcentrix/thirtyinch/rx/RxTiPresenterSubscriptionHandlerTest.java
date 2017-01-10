@@ -99,6 +99,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         try {
             mSubscriptionHandler.manageViewSubscription(testSubscriber);
+            fail("no exception");
         } catch (Exception e) {
             assertThat(e.getMessage(), containsString("when there is no view"));
         }
