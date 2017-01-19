@@ -36,14 +36,15 @@ public class RxTiPresenterSubscriptionHandler {
             public void onChange(final TiPresenter.State state,
                     final boolean beforeLifecycleEvent) {
                 if (state == TiPresenter.State.VIEW_DETACHED && beforeLifecycleEvent) {
-                    // unsubscribe all UI subscriptions created in wakeUp() and added
+                    // unsubscribe all UI subscriptions created in onAttachView() and added
                     // via manageViewSubscription(Subscription)
                     if (mUiSubscriptions != null) {
                         mUiSubscriptions.unsubscribe();
+                        mUiSubscriptions = null;
                     }
                 }
 
-                if (state == TiPresenter.State.VIEW_ATTACHED) {
+                if (state == TiPresenter.State.VIEW_ATTACHED && beforeLifecycleEvent) {
                     mUiSubscriptions = new CompositeSubscription();
                 }
 

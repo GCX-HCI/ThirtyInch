@@ -92,20 +92,6 @@ public class RxTiPresenterSubscriptionHandlerTest {
     }
 
     @Test
-    public void testManageViewSubscription_DetachBeforeAttach_ShouldThrowIllegalStateException()
-            throws Exception {
-        mPresenter.create();
-        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
-
-        try {
-            mSubscriptionHandler.manageViewSubscription(testSubscriber);
-            fail("no exception");
-        } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("when there is no view"));
-        }
-    }
-
-    @Test
     public void testManageViewSubscription_WithDetachSingleSub_ShouldUnsubscribe()
             throws Exception {
         mPresenter.create();
@@ -129,6 +115,37 @@ public class RxTiPresenterSubscriptionHandlerTest {
         mPresenter.detachView();
 
         testSubscriber.assertUnsubscribed();
+    }
+
+    @Test
+    public void testManageViewSubscription_manageBeforeViewAttached_ShouldThrowIllegalStateException()
+            throws Exception {
+        mPresenter.create();
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        try {
+            mSubscriptionHandler.manageViewSubscription(testSubscriber);
+            fail("no exception");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("when there is no view"));
+        }
+    }
+
+    @Test
+    public void testManageViewSubscription_manageAfterDetach_ShouldThrowIllegalStateException()
+            throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+
+        TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
+
+        try {
+            mSubscriptionHandler.manageViewSubscription(testSubscriber);
+            fail("no exception");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("when there is no view"));
+        }
     }
 
     @Test
