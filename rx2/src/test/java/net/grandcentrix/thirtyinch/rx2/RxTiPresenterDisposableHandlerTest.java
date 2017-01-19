@@ -102,7 +102,24 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManageViewDisposable_DetachBeforeAttach_ShouldThrowIllegalStateException()
+    public void testManageViewDisposable_manageAfterDetach_ShouldThrowIllegalStateException()
+            throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+
+        final TestObserver<Integer> testObserver = new TestObserver<>();
+
+        try {
+            mDisposableHandler.manageViewDisposable(testObserver);
+            fail("no exception");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("when there is no view"));
+        }
+    }
+
+    @Test
+    public void testManageViewDisposable_manageBeforeViewAttached_ShouldThrowIllegalStateException()
             throws Exception {
         mPresenter.create();
         final TestObserver<Integer> testObserver = new TestObserver<>();
@@ -129,7 +146,6 @@ public class RxTiPresenterDisposableHandlerTest {
         assertThat(firstTestObserver.isDisposed(), is(false));
         assertThat(secondTestObserver.isDisposed(), is(true));
     }
-
 
     @Test
     public void testManagerViewDisposable_WithDetach_ShouldDispose() throws Exception {
