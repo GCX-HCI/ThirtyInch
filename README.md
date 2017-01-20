@@ -1,4 +1,4 @@
-![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat)
+![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat) [![Gitter](https://badges.gitter.im/ThirtyInch/gitter.svg)](https://gitter.im/ThirtyInch/Lobby)
 # ThirtyInch - a MVP library for Android
 
 
