@@ -57,8 +57,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         });
 
@@ -79,8 +79,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         });
 
@@ -104,8 +104,8 @@ public class TiLifecycleObserverTest {
         final Removable removable = mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         });
 
@@ -136,8 +136,8 @@ public class TiLifecycleObserverTest {
         final TiLifecycleObserver observer = new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         };
 
@@ -161,8 +161,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent, mPresenter.getView()});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled, mPresenter.getView()});
             }
         });
 
@@ -187,8 +187,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent, mPresenter.getView()});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled, mPresenter.getView()});
             }
         });
 
