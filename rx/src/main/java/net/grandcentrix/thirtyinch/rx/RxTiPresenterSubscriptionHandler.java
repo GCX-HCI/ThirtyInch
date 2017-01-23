@@ -35,7 +35,7 @@ public class RxTiPresenterSubscriptionHandler {
             @Override
             public void onChange(final TiPresenter.State state,
                     final boolean hasLifecycleMethodBeenCalled) {
-                if (state == TiPresenter.State.VIEW_DETACHED && hasLifecycleMethodBeenCalled) {
+                if (state == TiPresenter.State.VIEW_DETACHED && !hasLifecycleMethodBeenCalled) {
                     // unsubscribe all UI subscriptions created in onAttachView() and added
                     // via manageViewSubscription(Subscription)
                     if (mUiSubscriptions != null) {
@@ -44,11 +44,11 @@ public class RxTiPresenterSubscriptionHandler {
                     }
                 }
 
-                if (state == TiPresenter.State.VIEW_ATTACHED && hasLifecycleMethodBeenCalled) {
+                if (state == TiPresenter.State.VIEW_ATTACHED && !hasLifecycleMethodBeenCalled) {
                     mUiSubscriptions = new CompositeSubscription();
                 }
 
-                if (state == TiPresenter.State.DESTROYED && hasLifecycleMethodBeenCalled) {
+                if (state == TiPresenter.State.DESTROYED && !hasLifecycleMethodBeenCalled) {
                     mPresenterSubscriptions.unsubscribe();
                     mPresenterSubscriptions = null;
                 }

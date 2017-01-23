@@ -35,7 +35,7 @@ public class RxTiPresenterDisposableHandler {
             @Override
             public void onChange(final TiPresenter.State state,
                     final boolean hasLifecycleMethodBeenCalled) {
-                if (state == TiPresenter.State.VIEW_DETACHED && hasLifecycleMethodBeenCalled) {
+                if (state == TiPresenter.State.VIEW_DETACHED && !hasLifecycleMethodBeenCalled) {
                     // dispose all UI disposable created in onAttachView(TiView) and added
                     // via manageViewDisposable(Disposable...)
                     if (mUiDisposables != null) {
@@ -44,11 +44,11 @@ public class RxTiPresenterDisposableHandler {
                     }
                 }
 
-                if (state == TiPresenter.State.VIEW_ATTACHED && hasLifecycleMethodBeenCalled) {
+                if (state == TiPresenter.State.VIEW_ATTACHED && !hasLifecycleMethodBeenCalled) {
                     mUiDisposables = new CompositeDisposable();
                 }
 
-                if (state == TiPresenter.State.DESTROYED && hasLifecycleMethodBeenCalled) {
+                if (state == TiPresenter.State.DESTROYED && !hasLifecycleMethodBeenCalled) {
                     mPresenterDisposables.dispose();
                     mPresenterDisposables = null;
                 }
