@@ -118,10 +118,11 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     @SuppressWarnings("unchecked")
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
+        final String recoveredPresenterId;
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
             // this should always work.
-            final String recoveredPresenterId = savedInstanceState
+            recoveredPresenterId = savedInstanceState
                     .getString(SAVED_STATE_PRESENTER_ID);
             if (recoveredPresenterId != null) {
                 TiLog.v(mLogTag.getLoggingTag(),
@@ -142,6 +143,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             mPresenter = mPresenterProvider.providePresenter();
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
+
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
                 mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             }
@@ -206,6 +208,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         if (destroyPresenter) {
             mPresenter.destroy();
             PresenterSavior.INSTANCE.free(mPresenterId);
+
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
@@ -214,6 +217,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onSaveInstanceState_afterSuper(final Bundle outState) {
         outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
+        mPresenter.persistState();
     }
 
     public void onStart_afterSuper() {

@@ -20,7 +20,9 @@ import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -66,7 +68,16 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     protected void onCreate() {
         super.onCreate();
 
-        mText.onNext("Hello World!");
+        final byte[] state = getPersistentState();
+        if (state != null) {
+            mCounter = new BigInteger(state).intValue();
+        }
+
+        if (mCounter == 0) {
+            mText.onNext("Click the Button");
+        } else {
+            mText.onNext("Count: " + mCounter);
+        }
 
         rxSubscriptionHelper.manageSubscription(Observable.interval(0, 1, TimeUnit.SECONDS)
                 .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
@@ -103,6 +114,13 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                     }
                 })
                 .subscribe());
+    }
+
+    @Nullable
+    @Override
+    protected byte[] onSavePersistentState() {
+        final byte[] bytes = BigInteger.valueOf(mCounter).toByteArray();
+        return bytes;
     }
 
     /**

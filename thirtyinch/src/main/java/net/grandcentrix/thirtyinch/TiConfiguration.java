@@ -23,6 +23,7 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 /**
@@ -144,6 +145,12 @@ public class TiConfiguration {
             return this;
         }
 
+        //TODO documentation
+        public Builder setPresenterSerializer(TiPresenterSerializer serializer) {
+            mConfig.mPresenterSerializer = serializer;
+            return this;
+        }
+
         /**
          * When set to <code>true</code> the {@link TiPresenter} will be restored when the {@link
          * Activity} recreates due to a configuration changes such as the orientation change.
@@ -197,7 +204,6 @@ public class TiConfiguration {
             mConfig.mUseStaticSaviorToRetain = enabled;
             return this;
         }
-
     }
 
     public static final TiConfiguration DEFAULT = new Builder().build();
@@ -205,6 +211,8 @@ public class TiConfiguration {
     private boolean mCallOnMainThreadInterceptorEnabled = true;
 
     private boolean mDistinctUntilChangedInterceptorEnabled = true;
+
+    private TiPresenterSerializer mPresenterSerializer;
 
     private boolean mRetainPresenter = true;
 
@@ -214,6 +222,11 @@ public class TiConfiguration {
      * use {@link Builder} to construct a configuration.
      */
     private TiConfiguration() {
+    }
+
+    @Nullable
+    public TiPresenterSerializer getPresenterSerializer() {
+        return mPresenterSerializer;
     }
 
     public boolean isCallOnMainThreadInterceptorEnabled() {

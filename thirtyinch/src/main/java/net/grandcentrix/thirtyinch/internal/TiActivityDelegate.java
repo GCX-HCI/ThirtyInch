@@ -61,12 +61,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      */
     private P mPresenter;
 
-    /**
-     * The id of the presenter this view got attached to. Will be stored in the savedInstanceState
-     * to find the same presenter after the Activity got recreated.
-     */
-    private String mPresenterId;
-
     private final TiPresenterProvider<P> mPresenterProvider;
 
     private final DelegatedTiActivity<P> mTiActivity;
@@ -137,10 +131,10 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
+        String recoveredPresenterId = null;
         // try to recover with the PresenterSavior
         if (savedInstanceState != null) {
-            final String recoveredPresenterId = savedInstanceState
-                    .getString(SAVED_STATE_PRESENTER_ID);
+            recoveredPresenterId = savedInstanceState.getString(SAVED_STATE_PRESENTER_ID);
 
             if (mPresenter == null) {
                 if (recoveredPresenterId != null) {
@@ -160,23 +154,26 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 TiLog.i(mLogTag.getLoggingTag(), "could not recover the Presenter "
                         + "although it's not the first start of the Activity. This is normal when "
                         + "configured as .setRetainPresenterEnabled(false).");
-            } else {
-                // save recovered presenter with new id. No other instance of this activity,
-                // holding the presenter before, is now able to remove the reference to
-                // this presenter from the savior
-                PresenterSavior.INSTANCE.free(recoveredPresenterId);
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
             }
         }
 
         if (mPresenter == null) {
             // could not recover, create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
+
+            if (recoveredPresenterId == null) {
+                mPresenter.generatNewId();
+            } else {
+                mPresenter.setId(recoveredPresenterId);
+                mPresenter.prefetchPersistentState();
+            }
+
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+                PresenterSavior.INSTANCE.safe(mPresenter);
             }
+
             mPresenter.create();
         }
 
@@ -227,7 +224,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            PresenterSavior.INSTANCE.free(mPresenterId);
+            PresenterSavior.INSTANCE.free(mPresenter.getId());
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
@@ -235,7 +232,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onSaveInstanceState_afterSuper(final Bundle outState) {
-        outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
+        outState.putString(SAVED_STATE_PRESENTER_ID, mPresenter.getId());
+        mPresenter.persistState();
     }
 
     public void onStart_afterSuper() {
