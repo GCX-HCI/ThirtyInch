@@ -69,7 +69,7 @@ public class RxTiPresenterDisposableHandler {
                     + " when the presenter has reached the DESTROYED state");
         }
 
-        addDisposables(mPresenterDisposables, disposables);
+        mPresenterDisposables.addAll(disposables);
     }
 
     /**
@@ -85,23 +85,7 @@ public class RxTiPresenterDisposableHandler {
                     + " when there is no view");
         }
 
-        addDisposables(mUiDisposables, disposables);
-    }
-
-    /**
-     * Adds all disposables to the given compositeDisposable if not already disposed
-     */
-    private static void addDisposables(final CompositeDisposable compositeDisposable,
-            final Disposable... disposables) {
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < disposables.length; i++) {
-            final Disposable disposable = disposables[i];
-            if (disposable.isDisposed()) {
-                continue;
-            }
-
-            compositeDisposable.add(disposable);
-        }
+        mUiDisposables.addAll(disposables);
     }
 
 }
