@@ -127,7 +127,7 @@ public class RxTiPresenterUtils {
                                 .addLifecycleObserver(new TiLifecycleObserver() {
                                     @Override
                                     public void onChange(final TiPresenter.State state,
-                                            final boolean beforeLifecycleEvent) {
+                                            final boolean hasLifecycleMethodBeenCalled) {
                                         if (!subscriber.isUnsubscribed()) {
                                             subscriber.onNext(state
                                                     == TiPresenter.State.VIEW_ATTACHED);
