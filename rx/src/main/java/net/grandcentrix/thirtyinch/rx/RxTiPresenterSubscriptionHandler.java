@@ -68,7 +68,7 @@ public class RxTiPresenterSubscriptionHandler {
                     + " when the presenter has reached the DESTROYED state");
         }
 
-        addSubscriptions(mPresenterSubscriptions, subscriptions);
+        mPresenterSubscriptions.addAll(subscriptions);
     }
 
     /**
@@ -84,23 +84,7 @@ public class RxTiPresenterSubscriptionHandler {
                     + " when there is no view");
         }
 
-        addSubscriptions(mUiSubscriptions, subscriptions);
-    }
-
-    /**
-     * Adds all subscriptions to the given compositeSubscription if not already unsubscribed
-     */
-    private static void addSubscriptions(final CompositeSubscription compositeSubscription,
-            final Subscription... subscriptions) {
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < subscriptions.length; i++) {
-            final Subscription subscription = subscriptions[i];
-            if (subscription.isUnsubscribed()) {
-                continue;
-            }
-
-            compositeSubscription.add(subscriptions[i]);
-        }
+        mUiSubscriptions.addAll(subscriptions);
     }
 
 }
