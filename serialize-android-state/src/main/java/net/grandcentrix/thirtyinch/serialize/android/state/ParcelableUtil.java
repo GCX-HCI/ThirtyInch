@@ -1,4 +1,4 @@
-package net.grandcentrix.thirtyinch.serialize.icepick;
+package net.grandcentrix.thirtyinch.serialize.android.state;
 
 import android.os.Parcel;
 import android.os.Parcelable;

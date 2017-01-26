@@ -1,10 +1,12 @@
-package net.grandcentrix.thirtyinch.serialize.icepick;
+package net.grandcentrix.thirtyinch.serialize.android.state;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+
+import com.evernote.android.state.StateSaver;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
@@ -16,23 +18,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import icepick.Icepick;
-
 /**
  * @author rwondratschek
  */
-public class IcepickPresenterSerializer implements TiPresenterSerializer {
+public class AndroidStatePresenterSerializer implements TiPresenterSerializer {
 
     private static final String DELIMITER = "--";
 
     private final File mFilesDir;
     private final ExecutorService mExecutorService;
 
-    public IcepickPresenterSerializer(@NonNull Context context) {
+    public AndroidStatePresenterSerializer(@NonNull Context context) {
         this(new File(context.getCacheDir(), "TiPresenter"));
     }
 
-    public IcepickPresenterSerializer(@NonNull File filesDir) {
+    public AndroidStatePresenterSerializer(@NonNull File filesDir) {
         mFilesDir = filesDir;
         mExecutorService = Executors.newSingleThreadExecutor();
         mExecutorService.execute(mCleanupRunnable); // clean up once
@@ -45,7 +45,7 @@ public class IcepickPresenterSerializer implements TiPresenterSerializer {
             public void run() {
                 try {
                     Bundle bundle = new Bundle();
-                    Icepick.saveInstanceState(presenter, bundle);
+                    StateSaver.saveInstanceState(presenter, bundle);
                     byte[] data = ParcelableUtil.marshal(bundle);
 
                     String filename = presenterId + DELIMITER + System.currentTimeMillis();
@@ -70,7 +70,7 @@ public class IcepickPresenterSerializer implements TiPresenterSerializer {
             byte[] data = FileUtils.readFile(file);
             Bundle bundle = ParcelableUtil.unmarshal(data, Bundle.CREATOR);
             bundle.setClassLoader(getClass().getClassLoader());
-            Icepick.restoreInstanceState(presenter, bundle);
+            StateSaver.restoreInstanceState(presenter, bundle);
 
         } catch (Exception ignored) {
         }
