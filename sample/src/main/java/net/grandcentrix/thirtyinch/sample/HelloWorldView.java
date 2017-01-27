@@ -25,7 +25,6 @@ public interface HelloWorldView extends TiView {
 
     Observable<Void> onButtonClicked();
 
-    @CallOnMainThread
     void showPresenterUpTime(Long uptime);
 
     @CallOnMainThread
