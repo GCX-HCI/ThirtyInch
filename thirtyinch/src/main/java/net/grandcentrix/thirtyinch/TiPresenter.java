@@ -194,6 +194,8 @@ public abstract class TiPresenter<V extends TiView> {
                     + " did not call through to super.onWakeUp()");
         }
         moveToState(State.VIEW_ATTACHED, true);
+
+        sendPostponedActionsToView(view);
     }
 
     /**
@@ -374,11 +376,6 @@ public abstract class TiPresenter<V extends TiView> {
                     "don't call #onAttachView(TiView) directly, call #attachView(TiView)");
         }
         mCalled = true;
-
-        // send all queued actions since the view was detached to the new view.
-        // It's part of the super call because there might be usecases where the implementer
-        // wants to execute actions on the view before executing the queued ones.
-        sendPostponedActionsToView(view);
     }
 
     /**
@@ -469,10 +466,15 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #sendPostponedActionsToView
      * @see #onAttachView(TiView)
      */
-    protected void sendToView(ViewAction<V> action) {
+    protected void sendToView(final ViewAction<V> action) {
         final V view = getView();
         if (view != null) {
-            action.call(view);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    action.call(view);
+                }
+            });
         } else {
             mPostponedViewActions.add(action);
         }
@@ -540,7 +542,7 @@ public abstract class TiPresenter<V extends TiView> {
      *
      * @param view where the actions will be sent to
      */
-    private void sendPostponedActionsToView(V view) {
+    private void sendPostponedActionsToView(@NonNull final V view) {
         while (!mPostponedViewActions.isEmpty()) {
             mPostponedViewActions.poll().call(view);
         }
