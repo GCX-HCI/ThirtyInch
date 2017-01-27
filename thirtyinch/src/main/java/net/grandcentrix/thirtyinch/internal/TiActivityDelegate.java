@@ -193,7 +193,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         //noinspection unchecked
         final UiThreadExecutorAutoBinder uiThreadAutoBinder =
-                new UiThreadExecutorAutoBinder(mPresenter);
+                new UiThreadExecutorAutoBinder(mPresenter, mTiActivity.getUiThreadExecutor());
 
         // bind ui thread to presenter when view is attached
         mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
@@ -257,7 +257,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onStart_afterSuper() {
         mActivityStarted = true;
-        mTiActivity.postToMessageQueue(new Runnable() {
+        // post to the UI queue to delay bindView until all queued work has finished
+        mTiActivity.getUiThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 // check if still started. It happens that onStop got already called, specially

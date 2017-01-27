@@ -19,6 +19,8 @@ package net.grandcentrix.thirtyinch;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import java.util.concurrent.Executor;
+
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -45,6 +47,12 @@ public class SendToViewTest {
     public void sendToViewInOrder() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(final Runnable action) {
+                action.run();
+            }
+        });
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         presenter.sendToView(new ViewAction<TestView>() {
@@ -82,6 +90,12 @@ public class SendToViewTest {
     public void viewAttached() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(final Runnable action) {
+                action.run();
+            }
+        });
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         final TestView view = mock(TestView.class);
@@ -101,6 +115,12 @@ public class SendToViewTest {
     public void viewDetached() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(final Runnable action) {
+                action.run();
+            }
+        });
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         presenter.sendToView(new ViewAction<TestView>() {
@@ -122,6 +142,12 @@ public class SendToViewTest {
     public void viewReceivesNoInteractionsAfterDetaching() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(final Runnable action) {
+                action.run();
+            }
+        });
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         final TestView view = mock(TestView.class);
@@ -141,7 +167,6 @@ public class SendToViewTest {
 
         verify(view).doSomething1();
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
-
 
         presenter.detachView();
 

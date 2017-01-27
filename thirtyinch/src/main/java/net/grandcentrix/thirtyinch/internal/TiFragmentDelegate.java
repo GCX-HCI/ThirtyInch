@@ -165,7 +165,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         //noinspection unchecked
         final UiThreadExecutorAutoBinder uiThreadAutoBinder =
-                new UiThreadExecutorAutoBinder(mPresenter);
+                new UiThreadExecutorAutoBinder(mPresenter, mTiFragment.getUiThreadExecutor());
 
         // bind ui thread to presenter when view is attached
         mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
@@ -235,7 +235,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            mTiFragment.postToMessageQueue(new Runnable() {
+            mTiFragment.getUiThreadExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
                     if (isUiPossible() && mActivityStarted) {

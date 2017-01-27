@@ -29,6 +29,8 @@ import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import java.util.concurrent.Executor;
+
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
@@ -239,9 +241,13 @@ public class TiActivityDelegateTest {
                     }
 
                     @Override
-                    public boolean postToMessageQueue(final Runnable action) {
-                        action.run();
-                        return true;
+                    public Executor getUiThreadExecutor() {
+                        return new Executor() {
+                            @Override
+                            public void execute(@NonNull final Runnable action) {
+                                action.run();
+                            }
+                        };
                     }
                 },
                 new TiViewProvider<TiView>() {
