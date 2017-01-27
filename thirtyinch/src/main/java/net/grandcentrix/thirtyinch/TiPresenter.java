@@ -532,8 +532,20 @@ public abstract class TiPresenter<V extends TiView> {
             mState = newState;
         }
 
-        for (int i = 0; i < mLifecycleObservers.size(); i++) {
-            mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+        switch (newState) {
+            case INITIALIZED:
+            case VIEW_ATTACHED:
+                for (int i = 0; i < mLifecycleObservers.size(); i++) {
+                    mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+                }
+                break;
+
+            case VIEW_DETACHED:
+            case DESTROYED:
+                // reverse observer order for teardown events; first in, last out
+                for (int i = mLifecycleObservers.size() - 1; i >= 0; i--) {
+                    mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+                }
         }
     }
 
