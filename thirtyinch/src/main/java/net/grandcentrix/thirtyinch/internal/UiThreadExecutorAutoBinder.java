@@ -29,13 +29,20 @@ import java.util.concurrent.Executor;
  */
 public class UiThreadExecutorAutoBinder implements TiLifecycleObserver {
 
+    /**
+     * Executes work on the UI thread. If the current thread is the UI thread, then the action is
+     * executed immediately. If the current thread is not the UI thread, the action is posted to the
+     * event queue of the UI thread.
+     */
     private static class UiThreadExecutor implements Executor {
 
         private final Handler mHandler = new Handler(Looper.getMainLooper());
 
+        private Thread mUiThread = Looper.getMainLooper().getThread();
+
         @Override
         public void execute(@NonNull Runnable command) {
-            if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            if (Thread.currentThread() == mUiThread) {
                 // already on main thread, simply execute
                 command.run();
             } else {

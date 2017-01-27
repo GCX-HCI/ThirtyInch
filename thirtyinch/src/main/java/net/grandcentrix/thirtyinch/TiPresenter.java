@@ -324,9 +324,18 @@ public abstract class TiPresenter<V extends TiView> {
         return mState == State.VIEW_ATTACHED;
     }
 
-    public void runOnUiThread(@NonNull final Runnable runnable) {
+    /**
+     * Runs the specified action on the UI thread. It only works when a view is attached
+     * <p>
+     * When you are looking for a way to execute code when the view is attached have a look
+     * at {@link #sendToView(ViewAction)}
+     *
+     * @param action the action to run on the UI thread
+     * @throws IllegalStateException when the executor is not available
+     */
+    public void runOnUiThread(@NonNull final Runnable action) {
         if (mUiThreadExecutor != null) {
-            mUiThreadExecutor.execute(runnable);
+            mUiThreadExecutor.execute(action);
         } else {
             if (getView() == null) {
                 throw new IllegalStateException("view is not attached, "
@@ -445,7 +454,7 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Executes the {@link ViewAction} when the view is available.
+     * Executes the {@link ViewAction} when the view is available on the UI thread.
      * Once a view is attached the actions get called in the same order they have been added.
      * When the view is already attached the action will be executed immediately.
      * <p>
