@@ -28,6 +28,7 @@ import android.support.v4.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -88,6 +89,12 @@ public abstract class TiPresenter<V extends TiView> {
     private LinkedBlockingQueue<ViewAction<V>> mPostponedViewActions = new LinkedBlockingQueue<>();
 
     private State mState = State.INITIALIZED;
+
+    /**
+     * Executor for UI operations, must be set by the view implementation
+     */
+    @Nullable
+    private Executor mUiThreadExecutor;
 
     private V mView;
 
@@ -313,6 +320,23 @@ public abstract class TiPresenter<V extends TiView> {
 
     public boolean isViewAttached() {
         return mState == State.VIEW_ATTACHED;
+    }
+
+    public void runOnUiThread(@NonNull final Runnable runnable) {
+        if (mUiThreadExecutor != null) {
+            mUiThreadExecutor.execute(runnable);
+        } else {
+            if (getView() == null) {
+                throw new IllegalStateException("view is not attached, "
+                        + "no executor available to run ui interactions on");
+            } else {
+                throw new IllegalStateException("no ui thread executor available");
+            }
+        }
+    }
+
+    public void setUiThreadExecutor(@Nullable final Executor uiThreadExecutor) {
+        mUiThreadExecutor = uiThreadExecutor;
     }
 
     @Override
