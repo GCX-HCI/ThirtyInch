@@ -18,6 +18,8 @@ package net.grandcentrix.thirtyinch.test;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
+import java.util.concurrent.Executor;
+
 public class TiPresenterInstructor<V extends TiView> {
 
     private TiPresenter<V> mPresenter;
@@ -32,6 +34,12 @@ public class TiPresenterInstructor<V extends TiView> {
     public void attachView(final V view) {
         detachView();
 
+        mPresenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(final Runnable action) {
+                action.run();
+            }
+        });
         mPresenter.attachView(view);
     }
 
@@ -59,6 +67,7 @@ public class TiPresenterInstructor<V extends TiView> {
                 break;
             case VIEW_ATTACHED:
                 mPresenter.detachView();
+                mPresenter.setUiThreadExecutor(null);
                 break;
             case DESTROYED:
                 throw new IllegalStateException(
