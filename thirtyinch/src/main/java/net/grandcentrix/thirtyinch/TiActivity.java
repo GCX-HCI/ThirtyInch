@@ -50,6 +50,8 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     private final TiActivityDelegate<P, V> mDelegate
             = new TiActivityDelegate<>(this, this, this, this);
 
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
+
     @NonNull
     @Override
     public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
@@ -94,7 +96,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @Override
     public Executor getUiThreadExecutor() {
-        return new UiThreadExecutor();
+        return mUiThreadExecutor;
     }
 
     /**

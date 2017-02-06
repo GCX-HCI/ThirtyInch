@@ -60,6 +60,8 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     private TiFragmentDelegate<P, V> mDelegate;
 
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
+
     /**
      * Binds a {@link TiPresenter} returned by the {@link TiPresenterProvider} to the {@link
      * Fragment} and all future {@link Fragment} instances created due to configuration changes.
@@ -112,7 +114,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public Executor getUiThreadExecutor() {
-        return new UiThreadExecutor();
+        return mUiThreadExecutor;
     }
 
     /**

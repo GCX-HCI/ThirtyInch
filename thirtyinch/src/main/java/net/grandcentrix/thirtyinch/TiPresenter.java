@@ -116,7 +116,9 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Observes the lifecycle state of this presenter.
+     * Observes the lifecycle state of this presenter. Observers get called in order they are
+     * added for constructive events and in reversed order for destructive events. First in, last
+     * out.
      *
      * @param observer called when lifecycle state changes after the lifecycle method such as
      *                 {@link
@@ -327,11 +329,12 @@ public abstract class TiPresenter<V extends TiView> {
     /**
      * Runs the specified action on the UI thread. It only works when a view is attached
      * <p>
-     * When you are looking for a way to execute code when the view is attached have a look
-     * at {@link #sendToView(ViewAction)}
+     * When you are looking for a way to execute code when the view got available in the future
+     * have a look at {@link #sendToView(ViewAction)}
      *
      * @param action the action to run on the UI thread
-     * @throws IllegalStateException when the executor is not available
+     * @throws IllegalStateException when the executor is not available (most likely because the
+     *                               view is not attached)
      */
     public void runOnUiThread(@NonNull final Runnable action) {
         if (mUiThreadExecutor != null) {
@@ -346,6 +349,16 @@ public abstract class TiPresenter<V extends TiView> {
         }
     }
 
+    /**
+     * sets the Executor used for the {@link #runOnUiThread(Runnable)} method.
+     * <p>
+     * This Executor is most likely the {@link net.grandcentrix.thirtyinch.internal.UiThreadExecutor}
+     * posting the work on the Android Main Thread.
+     * When using the {@code TiPresenterInstructor} in your tests an {@link Executor} for the
+     * current {@link Thread} is used, therefore all executed actions run synchronous.
+     *
+     * @param uiThreadExecutor executor for view interactions
+     */
     public void setUiThreadExecutor(@Nullable final Executor uiThreadExecutor) {
         mUiThreadExecutor = uiThreadExecutor;
     }
