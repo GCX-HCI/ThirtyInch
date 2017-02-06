@@ -33,7 +33,7 @@ import android.support.annotation.Nullable;
  * @param <V>  the type of the {@link TiView}
  * @param <VM> type of the view model
  */
-public final class ViewRenderer<V extends TiView, VM> implements TiLifecycleObserver {
+public class ViewRenderer<V extends TiView, VM> implements TiLifecycleObserver {
 
     public interface RenderFunc<V, VM> {
 
