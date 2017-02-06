@@ -116,7 +116,9 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Observes the lifecycle state of this presenter.
+     * Observes the lifecycle state of this presenter. Observers get called in order they are
+     * added for constructive events and in reversed order for destructive events. First in, last
+     * out.
      *
      * @param observer called when lifecycle state changes after the lifecycle method such as
      *                 {@link
