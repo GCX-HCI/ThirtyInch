@@ -59,6 +59,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     private TiActivityDelegate<P, V> mDelegate;
 
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
+
     /**
      * Binds a {@link TiPresenter} returned by the {@link TiPresenterProvider} to the {@link
      * Activity} and all future {@link Activity} instances created due to configuration changes.
@@ -122,7 +124,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public Executor getUiThreadExecutor() {
-        return new UiThreadExecutor();
+        return mUiThreadExecutor;
     }
 
     /**

@@ -47,6 +47,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     private final TiFragmentDelegate<P, V> mDelegate =
             new TiFragmentDelegate<>(this, this, this, this);
 
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
+
     @NonNull
     @Override
     public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
@@ -77,7 +79,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     @Override
     public Executor getUiThreadExecutor() {
-        return new UiThreadExecutor();
+        return mUiThreadExecutor;
     }
 
     /**
