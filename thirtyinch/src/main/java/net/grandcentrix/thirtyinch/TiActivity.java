@@ -23,6 +23,7 @@ import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
+import net.grandcentrix.thirtyinch.screen.Navigator;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -31,6 +32,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ViewGroup;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -43,9 +45,13 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
         TiLoggingTagProvider, InterceptableViewBinder<V> {
 
+    public Navigator mNavigator;
+
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiActivity.class.getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
+
+    private ViewGroup mContainer;
 
     private final TiActivityDelegate<P, V> mDelegate
             = new TiActivityDelegate<>(this, this, this, this);
@@ -74,6 +80,16 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public String getLoggingTag() {
         return TAG;
+    }
+
+    public Navigator getNavigator() {
+        if (mNavigator == null) {
+            if (mContainer == null) {
+                throw new IllegalStateException("container not set");
+            }
+            mNavigator = new Navigator(this, mContainer);
+        }
+        return mNavigator;
     }
 
     public P getPresenter() {
@@ -168,6 +184,14 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         }
     }
 
+    public void setNavigatorContainer(final ViewGroup container) {
+        if (mContainer == null) {
+            mContainer = container;
+        } else {
+            throw new IllegalStateException("container already set");
+        }
+    }
+
     @Override
     public String toString() {
         String presenter = mDelegate.getPresenter() == null ? "null" :
@@ -189,6 +213,10 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // TODO also survive orientation change
+        if (mNavigator != null) {
+            mNavigator.clear();
+        }
         mDelegate.onDestroy_afterSuper();
     }
 

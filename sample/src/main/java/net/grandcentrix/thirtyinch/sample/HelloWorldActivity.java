@@ -23,6 +23,7 @@ import net.grandcentrix.thirtyinch.TiActivity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -67,11 +68,16 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         mOutput = (TextView) findViewById(R.id.output);
         mUptime = (TextView) findViewById(R.id.uptime);
 
-        if (savedInstanceState == null) {
+        /*if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new SampleFragment())
                     .commit();
-        }
+        }*/
+        setNavigatorContainer((ViewGroup) findViewById(R.id.fragment_container));
+
+        //if (savedInstanceState == null) {
+            getNavigator().goTo(new SampleScreen(this));
+        //}
 
         findViewById(R.id.recreate).setOnClickListener(new View.OnClickListener() {
             @Override
