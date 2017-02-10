@@ -62,6 +62,8 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final DelegatedTiFragment mTiFragment;
 
+    private Removable mUiThreadBinderRemovable;
+
     private final PresenterViewBinder<V> mViewBinder;
 
     private final TiViewProvider<V> mViewProvider;
@@ -160,6 +162,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         if (config.shouldRetainPresenter()) {
             mTiFragment.setFragmentRetainInstance(true);
         }
+
+        //noinspection unchecked
+        final UiThreadExecutorAutoBinder uiThreadAutoBinder =
+                new UiThreadExecutorAutoBinder(mPresenter, mTiFragment.getUiThreadExecutor());
+
+        // bind ui thread to presenter when view is attached
+        mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
     }
 
     public void onDestroyView_beforeSuper() {
@@ -168,6 +177,12 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onDestroy_afterSuper() {
         //FIXME handle attach/detach state
+
+        // unregister observer and don't leak it
+        if (mUiThreadBinderRemovable != null) {
+            mUiThreadBinderRemovable.remove();
+            mUiThreadBinderRemovable = null;
+        }
 
         logState();
 
@@ -220,7 +235,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         mActivityStarted = true;
 
         if (isUiPossible()) {
-            mTiFragment.postToMessageQueue(new Runnable() {
+            mTiFragment.getUiThreadExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
                     if (isUiPossible() && mActivityStarted) {

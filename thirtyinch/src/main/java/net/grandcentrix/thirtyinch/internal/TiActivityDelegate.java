@@ -71,6 +71,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final DelegatedTiActivity<P> mTiActivity;
 
+    private Removable mUiThreadBinderRemovable;
+
     private final PresenterViewBinder<V> mViewBinder;
 
     private TiViewProvider<V> mViewProvider;
@@ -188,9 +190,24 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         if (config.isDistinctUntilChangedInterceptorEnabled()) {
             addBindViewInterceptor(new DistinctUntilChangedInterceptor());
         }
+
+        //noinspection unchecked
+        final UiThreadExecutorAutoBinder uiThreadAutoBinder =
+                new UiThreadExecutorAutoBinder(mPresenter, mTiActivity.getUiThreadExecutor());
+
+        // bind ui thread to presenter when view is attached
+        mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
     }
 
     public void onDestroy_afterSuper() {
+
+        // unregister observer and don't leak it
+        if (mUiThreadBinderRemovable != null) {
+            mUiThreadBinderRemovable.remove();
+            mUiThreadBinderRemovable = null;
+        }
+
+        // destroy the presenter based on configuration
         final TiConfiguration config = mPresenter.getConfig();
 
         boolean destroyPresenter = false;
@@ -240,7 +257,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onStart_afterSuper() {
         mActivityStarted = true;
-        mTiActivity.postToMessageQueue(new Runnable() {
+        // post to the UI queue to delay bindView until all queued work has finished
+        mTiActivity.getUiThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 // check if still started. It happens that onStop got already called, specially

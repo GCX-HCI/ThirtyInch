@@ -21,6 +21,7 @@ import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatDialogFragment
@@ -72,6 +74,11 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
 
     public P getPresenter() {
         return mDelegate.getPresenter();
+    }
+
+    @Override
+    public Executor getUiThreadExecutor() {
+        return new UiThreadExecutor();
     }
 
     /**
@@ -150,11 +157,6 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     public void onStop() {
         mDelegate.onStop_beforeSuper();
         super.onStop();
-    }
-
-    @Override
-    public boolean postToMessageQueue(final Runnable runnable) {
-        return getActivity().getWindow().getDecorView().post(runnable);
     }
 
     /**

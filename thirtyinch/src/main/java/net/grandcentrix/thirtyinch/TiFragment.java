@@ -21,6 +21,7 @@ import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> extends Fragment
         implements DelegatedTiFragment, TiPresenterProvider<P>, TiLoggingTagProvider,
@@ -44,6 +46,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     private final TiFragmentDelegate<P, V> mDelegate =
             new TiFragmentDelegate<>(this, this, this, this);
+
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
     @NonNull
     @Override
@@ -71,6 +75,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     public P getPresenter() {
         return mDelegate.getPresenter();
+    }
+
+    @Override
+    public Executor getUiThreadExecutor() {
+        return mUiThreadExecutor;
     }
 
     /**
@@ -149,11 +158,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     public void onStop() {
         mDelegate.onStop_beforeSuper();
         super.onStop();
-    }
-
-    @Override
-    public boolean postToMessageQueue(final Runnable runnable) {
-        return getActivity().getWindow().getDecorView().post(runnable);
     }
 
     /**

@@ -19,6 +19,8 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import java.util.concurrent.Executor;
+
 /**
  * This interface, implemented by Activities allows easy testing of the {@link TiActivityDelegate}
  * without mocking Android classes such as {@link Activity}
@@ -31,6 +33,11 @@ public interface DelegatedTiActivity<P> {
      */
     @Nullable
     P getRetainedPresenter();
+
+    /**
+     * @return {@link UiThreadExecutor}
+     */
+    Executor getUiThreadExecutor();
 
     /**
      * @return {@link Activity#isChangingConfigurations()}
@@ -46,9 +53,4 @@ public interface DelegatedTiActivity<P> {
      * @return true when the developer option "Don't keep Activities" is enabled
      */
     boolean isDontKeepActivitiesEnabled();
-
-    /**
-     * Post the runnable on the UI queue
-     */
-    boolean postToMessageQueue(Runnable runnable);
 }

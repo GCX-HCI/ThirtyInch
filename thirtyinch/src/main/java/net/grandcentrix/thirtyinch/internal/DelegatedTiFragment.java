@@ -18,7 +18,14 @@ package net.grandcentrix.thirtyinch.internal;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 
+import java.util.concurrent.Executor;
+
 public interface DelegatedTiFragment {
+
+    /**
+     * @return {@link UiThreadExecutor}
+     */
+    Executor getUiThreadExecutor();
 
     /**
      * @return true when the developer option "Don't keep Activities" is enabled
@@ -44,11 +51,6 @@ public interface DelegatedTiFragment {
      * @return {@link Activity#isFinishing()}
      */
     boolean isHostingActivityFinishing();
-
-    /**
-     * Post the runnable on the UI queue
-     */
-    boolean postToMessageQueue(Runnable runnable);
 
     /**
      * Call {@link Fragment#setRetainInstance(boolean)}

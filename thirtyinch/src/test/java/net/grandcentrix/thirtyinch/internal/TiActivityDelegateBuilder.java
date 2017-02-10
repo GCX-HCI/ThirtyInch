@@ -21,6 +21,8 @@ import net.grandcentrix.thirtyinch.TiView;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.concurrent.Executor;
+
 import static org.mockito.Mockito.mock;
 
 public class TiActivityDelegateBuilder {
@@ -60,6 +62,16 @@ public class TiActivityDelegateBuilder {
             }
 
             @Override
+            public Executor getUiThreadExecutor() {
+                return new Executor() {
+                    @Override
+                    public void execute(@NonNull final Runnable action) {
+                        action.run();
+                    }
+                };
+            }
+
+            @Override
             public boolean isActivityChangingConfigurations() {
                 return mIsChangingConfigurations;
             }
@@ -74,11 +86,6 @@ public class TiActivityDelegateBuilder {
                 return mIsDontKeepActivitiesEnabled;
             }
 
-            @Override
-            public boolean postToMessageQueue(final Runnable runnable) {
-                runnable.run();
-                return true;
-            }
         }, new TiViewProvider<TiView>() {
             @NonNull
             @Override

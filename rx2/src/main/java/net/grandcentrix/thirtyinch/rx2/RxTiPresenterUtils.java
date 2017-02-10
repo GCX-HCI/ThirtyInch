@@ -32,42 +32,39 @@ public class RxTiPresenterUtils {
      * TiPresenter#attachView(TiView)} and before calling {@link TiPresenter#detachView()}.
      */
     public static Observable<Boolean> isViewReady(final TiPresenter presenter) {
-        return Observable.create(
-                new ObservableOnSubscribe<Boolean>() {
-                    @Override
-                    public void subscribe(final ObservableEmitter<Boolean> emitter)
-                            throws Exception {
-                        if (!emitter.isDisposed()) {
-                            emitter.onNext(presenter.getState()
-                                    == TiPresenter.State.VIEW_ATTACHED);
-                        }
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> emitter)
+                    throws Exception {
+                if (!emitter.isDisposed()) {
+                    emitter.onNext(presenter.getState() == TiPresenter.State.VIEW_ATTACHED);
+                }
 
-                        final Removable removable = presenter
-                                .addLifecycleObserver(new TiLifecycleObserver() {
-                                    @Override
-                                    public void onChange(final TiPresenter.State state,
-                                            final boolean hasLifecycleMethodBeenCalled) {
-                                        if (!emitter.isDisposed()) {
-                                            emitter.onNext(state ==
-                                                    TiPresenter.State.VIEW_ATTACHED);
-                                        }
-                                    }
-                                });
-
-                        emitter.setDisposable(new Disposable() {
+                final Removable removable = presenter
+                        .addLifecycleObserver(new TiLifecycleObserver() {
                             @Override
-                            public void dispose() {
-                                removable.remove();
-                            }
-
-                            @Override
-                            public boolean isDisposed() {
-                                return removable.isRemoved();
+                            public void onChange(final TiPresenter.State state,
+                                    final boolean hasLifecycleMethodBeenCalled) {
+                                if (!emitter.isDisposed()) {
+                                    emitter.onNext(state == TiPresenter.State.VIEW_ATTACHED
+                                            && hasLifecycleMethodBeenCalled);
+                                }
                             }
                         });
+
+                emitter.setDisposable(new Disposable() {
+                    @Override
+                    public void dispose() {
+                        removable.remove();
                     }
-                })
-                .distinctUntilChanged();
+
+                    @Override
+                    public boolean isDisposed() {
+                        return removable.isRemoved();
+                    }
+                });
+            }
+        }).distinctUntilChanged();
     }
 
 }

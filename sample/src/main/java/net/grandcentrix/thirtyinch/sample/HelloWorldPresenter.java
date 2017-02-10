@@ -16,6 +16,7 @@
 package net.grandcentrix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.ViewAction;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
@@ -73,7 +74,12 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(final Long uptime) {
-                        getView().showPresenterUpTime(uptime);
+                        sendToView(new ViewAction<HelloWorldView>() {
+                            @Override
+                            public void call(final HelloWorldView view) {
+                                view.showPresenterUpTime(uptime);
+                            }
+                        });
                     }
                 }));
 

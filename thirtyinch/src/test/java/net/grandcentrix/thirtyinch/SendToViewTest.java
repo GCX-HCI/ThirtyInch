@@ -19,6 +19,17 @@ package net.grandcentrix.thirtyinch;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import android.support.annotation.NonNull;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -41,10 +52,18 @@ public class SendToViewTest {
         void doSomething3();
     }
 
+    private Executor mImmediatelySameThread = new Executor() {
+        @Override
+        public void execute(@NonNull final Runnable action) {
+            action.run();
+        }
+    };
+
     @Test
     public void sendToViewInOrder() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(mImmediatelySameThread);
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         presenter.sendToView(new ViewAction<TestView>() {
@@ -79,9 +98,48 @@ public class SendToViewTest {
     }
 
     @Test
+    public void testSendToViewRunsOnTheMainThread() throws Exception {
+
+        // Given a presenter with executor (single thread)
+        final TiPresenter<TiView> presenter = new TiPresenter<TiView>() {
+        };
+        presenter.create();
+
+        final ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(final Runnable r) {
+                return new Thread(r, "test ui thread");
+            }
+        });
+        presenter.setUiThreadExecutor(executor);
+        presenter.attachView(mock(TiView.class));
+
+        final Thread testThread = Thread.currentThread();
+
+        // When send work to the view
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        presenter.sendToView(new ViewAction<TiView>() {
+            @Override
+            public void call(final TiView tiView) {
+                // Then the work gets executed on the ui thread
+                final Thread currentThread = Thread.currentThread();
+                assertNotSame(testThread, currentThread);
+                assertTrue("executed on wrong thread",
+                        "test ui thread".equals(currentThread.getName()));
+                latch.countDown();
+            }
+        });
+
+        // wait a reasonable amount of time for the thread to execute the work
+        latch.await(5, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void viewAttached() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(mImmediatelySameThread);
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         final TestView view = mock(TestView.class);
@@ -101,6 +159,7 @@ public class SendToViewTest {
     public void viewDetached() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(mImmediatelySameThread);
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         presenter.sendToView(new ViewAction<TestView>() {
@@ -122,6 +181,7 @@ public class SendToViewTest {
     public void viewReceivesNoInteractionsAfterDetaching() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
+        presenter.setUiThreadExecutor(mImmediatelySameThread);
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
 
         final TestView view = mock(TestView.class);
@@ -141,7 +201,6 @@ public class SendToViewTest {
 
         verify(view).doSomething1();
         assertThat(presenter.getQueuedViewActions()).hasSize(0);
-
 
         presenter.detachView();
 

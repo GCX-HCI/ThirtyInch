@@ -29,6 +29,7 @@ import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -39,6 +40,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * Binds a {@link TiPresenter} to an {@link Activity}
@@ -56,6 +58,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
             + "@" + Integer.toHexString(this.hashCode());
 
     private TiActivityDelegate<P, V> mDelegate;
+
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
     /**
      * Binds a {@link TiPresenter} returned by the {@link TiPresenterProvider} to the {@link
@@ -116,6 +120,11 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
             return (P) nci;
         }
         return null;
+    }
+
+    @Override
+    public Executor getUiThreadExecutor() {
+        return mUiThreadExecutor;
     }
 
     /**
@@ -192,11 +201,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         mDelegate.onStop_beforeSuper();
         super.onStop();
         mDelegate.onStop_afterSuper();
-    }
-
-    @Override
-    public boolean postToMessageQueue(final Runnable runnable) {
-        return getActivity().getWindow().getDecorView().post(runnable);
     }
 
     @SuppressWarnings("unchecked")

@@ -29,6 +29,7 @@ import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -41,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * Adds a {@link TiPresenter} to a Fragment. Can be used for both, {@link Fragment} and
@@ -57,6 +59,8 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
             + "@" + Integer.toHexString(this.hashCode());
 
     private TiFragmentDelegate<P, V> mDelegate;
+
+    private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
     /**
      * Binds a {@link TiPresenter} returned by the {@link TiPresenterProvider} to the {@link
@@ -99,7 +103,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return mDelegate.getInterceptors(predicate);
     }
 
-
     @Override
     public String getLoggingTag() {
         return TAG;
@@ -107,6 +110,11 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     public P getPresenter() {
         return mDelegate.getPresenter();
+    }
+
+    @Override
+    public Executor getUiThreadExecutor() {
+        return mUiThreadExecutor;
     }
 
     /**
@@ -185,11 +193,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     public void onStop() {
         mDelegate.onStop_beforeSuper();
         super.onStop();
-    }
-
-    @Override
-    public boolean postToMessageQueue(final Runnable runnable) {
-        return getFragment().getActivity().getWindow().getDecorView().post(runnable);
     }
 
     /**
