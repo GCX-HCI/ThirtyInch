@@ -16,6 +16,7 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.PresenterAction;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiDialogFragment;
@@ -33,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This delegate allows sharing the fragment code between the {@link TiFragment},
@@ -41,7 +43,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Fragments using composition.
  */
 public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -53,6 +55,9 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
     private volatile boolean mActivityStarted = false;
 
     private final TiLoggingTagProvider mLogTag;
+
+    private LinkedBlockingQueue<PresenterAction<P>> mPostponedPresenterActions =
+            new LinkedBlockingQueue<>();
 
     private P mPresenter;
 
@@ -98,6 +103,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         return mViewBinder.getInterceptors(predicate);
     }
 
+    @Override
     public P getPresenter() {
         return mPresenter;
     }
@@ -169,6 +175,10 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         // bind ui thread to presenter when view is attached
         mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
+
+        // send all queued actions since the Activity got created to the presenter after it got
+        // created/reattached.
+        sendPostponedActionsToPresenter(getPresenter());
     }
 
     public void onDestroyView_beforeSuper() {
@@ -252,6 +262,16 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
+    public void sendToPresenter(final PresenterAction<P> action) {
+        final P presenter = getPresenter();
+        if (presenter != null) {
+            action.call(presenter);
+        } else {
+            mPostponedPresenterActions.add(action);
+        }
+    }
+
+    @Override
     public String toString() {
         String presenter = getPresenter() == null ? "null" :
                 getPresenter().getClass().getSimpleName()
@@ -285,6 +305,17 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
                     "shouldRetain = " + config.shouldRetainPresenter());
             TiLog.v(mLogTag.getLoggingTag(),
                     "useStaticSavior = " + config.useStaticSaviorToRetain());
+        }
+    }
+
+    /**
+     * Executes all postponed presenter actions
+     *
+     * @param presenter where the actions will be sent to
+     */
+    private void sendPostponedActionsToPresenter(final P presenter) {
+        while (!mPostponedPresenterActions.isEmpty()) {
+            mPostponedPresenterActions.poll().call(presenter);
         }
     }
 }

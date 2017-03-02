@@ -19,12 +19,14 @@ package net.grandcentrix.thirtyinch.plugin;
 import com.pascalwelsch.compositeandroid.fragment.FragmentPlugin;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.PresenterAction;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiFragment;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -53,7 +55,7 @@ import java.util.concurrent.Executor;
  */
 public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extends FragmentPlugin
         implements TiViewProvider<V>, DelegatedTiFragment, TiLoggingTagProvider,
-        InterceptableViewBinder<V> {
+        InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
@@ -108,6 +110,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return TAG;
     }
 
+    @Override
     public P getPresenter() {
         return mDelegate.getPresenter();
     }
@@ -222,6 +225,11 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
                 return (V) getFragment();
             }
         }
+    }
+
+    @Override
+    public void sendToPresenter(final PresenterAction<P> action) {
+        mDelegate.sendToPresenter(action);
     }
 
     @Override
