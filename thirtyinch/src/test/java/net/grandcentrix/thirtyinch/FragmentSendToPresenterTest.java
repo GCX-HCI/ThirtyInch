@@ -16,8 +16,6 @@
 package net.grandcentrix.thirtyinch;
 
 
-import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
-import net.grandcentrix.thirtyinch.internal.TiActivityDelegateBuilder;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegateBuilder;
 
@@ -60,8 +58,8 @@ public class FragmentSendToPresenterTest {
     public void testSendToPresenterInOrder() throws Exception {
 
         final MyPresenter presenter = Mockito.spy(new MyPresenter());
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiActivityDelegateBuilder().setPresenter(presenter).build();
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder().setPresenter(presenter).build();
 
         // presenter not attached yet
         assertThat(delegate.getPresenter()).isNull();
@@ -132,8 +130,8 @@ public class FragmentSendToPresenterTest {
     public void testSendToPresenter_BeforePresenterIsAttached() throws Exception {
 
         final MyPresenter presenter = Mockito.spy(new MyPresenter());
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiActivityDelegateBuilder().setPresenter(presenter).build();
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder().setPresenter(presenter).build();
 
         // presenter not attached yet
         assertThat(delegate.getPresenter()).isNull();
