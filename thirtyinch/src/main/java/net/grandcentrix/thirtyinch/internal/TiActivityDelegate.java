@@ -16,6 +16,7 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.PresenterAction;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiConfiguration;
@@ -33,6 +34,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This delegate allows sharing the activity code between the {@link TiActivity} and {@code
@@ -43,7 +45,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
 public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     @VisibleForTesting
     static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
@@ -55,6 +57,9 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
     private volatile boolean mActivityStarted = false;
 
     private TiLoggingTagProvider mLogTag;
+
+    private LinkedBlockingQueue<PresenterAction<P>> mPostponedPresenterActions =
+            new LinkedBlockingQueue<>();
 
     /**
      * The presenter to which this activity will be attached as view when in the right state.
@@ -107,6 +112,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         return mViewBinder.getInterceptors(predicate);
     }
 
+    @Override
     public P getPresenter() {
         return mPresenter;
     }
@@ -197,6 +203,10 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         // bind ui thread to presenter when view is attached
         mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
+
+        // send all queued actions since the Activity got created to the presenter after it got
+        // created/reattached.
+        sendPostponedActionsToPresenter(getPresenter());
     }
 
     public void onDestroy_afterSuper() {
@@ -276,5 +286,26 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onStop_beforeSuper() {
         mActivityStarted = false;
+    }
+
+    @Override
+    public void sendToPresenter(final PresenterAction<P> action) {
+        final P presenter = getPresenter();
+        if (presenter != null) {
+            action.call(presenter);
+        } else {
+            mPostponedPresenterActions.add(action);
+        }
+    }
+
+    /**
+     * Executes all postponed presenter actions
+     *
+     * @param presenter where the actions will be sent to
+     */
+    private void sendPostponedActionsToPresenter(final P presenter) {
+        while (!mPostponedPresenterActions.isEmpty()) {
+            mPostponedPresenterActions.poll().call(presenter);
+        }
     }
 }

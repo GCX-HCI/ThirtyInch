@@ -19,12 +19,14 @@ import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
 
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.PresenterAction;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -50,7 +52,7 @@ import java.util.concurrent.Executor;
  */
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extends ActivityPlugin
         implements TiViewProvider<V>, DelegatedTiActivity<P>, TiLoggingTagProvider,
-        InterceptableViewBinder<V> {
+        InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     public static final String NCI_KEY_PRESENTER = "presenter";
 
@@ -107,6 +109,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return TAG;
     }
 
+    @Override
     public P getPresenter() {
         return mDelegate.getPresenter();
     }
@@ -224,6 +227,11 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
                 return (V) getActivity();
             }
         }
+    }
+
+    @Override
+    public void sendToPresenter(final PresenterAction<P> action) {
+        mDelegate.sendToPresenter(action);
     }
 
     @Override
