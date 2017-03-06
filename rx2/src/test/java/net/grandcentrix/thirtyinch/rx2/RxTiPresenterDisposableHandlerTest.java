@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -37,13 +38,13 @@ public class RxTiPresenterDisposableHandlerTest {
 
     private RxTiPresenterDisposableHandler mDisposableHandler;
 
-    private TiPresenter mPresenter;
+    private TiPresenter<TiView> mPresenter;
 
     private TiView mView;
 
     @Before
     public void setUp() throws Exception {
-        mPresenter = new TiPresenter() {
+        mPresenter = new TiPresenter<TiView>() {
         };
         mDisposableHandler = new RxTiPresenterDisposableHandler(mPresenter);
         mView = mock(TiView.class);
@@ -61,6 +62,17 @@ public class RxTiPresenterDisposableHandlerTest {
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), containsString("DESTROYED"));
         }
+    }
+
+    @Test
+    public void testManageDisposable_ShouldReturnSameDisposable() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestObserver<Integer> testObserver = new TestObserver<>();
+
+        final Disposable disposable = mDisposableHandler.manageDisposable(testObserver);
+
+        assertThat(testObserver, is(equalTo(disposable)));
     }
 
     @Test
@@ -99,6 +111,17 @@ public class RxTiPresenterDisposableHandlerTest {
 
         mPresenter.detachView();
         assertThat(testObserver.isDisposed(), is(true));
+    }
+
+    @Test
+    public void testManageViewDisposable_ShouldReturnSameDisposable() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestObserver<Integer> testObserver = new TestObserver<>();
+
+        final Disposable disposable = mDisposableHandler.manageViewDisposable(testObserver);
+
+        assertThat(testObserver, is(equalTo(disposable)));
     }
 
     @Test
@@ -141,7 +164,7 @@ public class RxTiPresenterDisposableHandlerTest {
         final TestObserver<Integer> secondTestObserver = new TestObserver<>();
         secondTestObserver.dispose();
 
-        mDisposableHandler.manageViewDisposable(firstTestObserver, secondTestObserver);
+        mDisposableHandler.manageViewDisposables(firstTestObserver, secondTestObserver);
 
         assertThat(firstTestObserver.isDisposed(), is(false));
         assertThat(secondTestObserver.isDisposed(), is(true));
@@ -156,7 +179,7 @@ public class RxTiPresenterDisposableHandlerTest {
         final TestObserver<Integer> thirdTestObserver = new TestObserver<>();
 
         mDisposableHandler
-                .manageViewDisposable(firstTestObserver, secondTestObserver, thirdTestObserver);
+                .manageViewDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
         assertThat(firstTestObserver.isDisposed(), equalTo(false));
         assertThat(secondTestObserver.isDisposed(), equalTo(false));
         assertThat(thirdTestObserver.isDisposed(), equalTo(false));
