@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -44,13 +45,13 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     protected void onAttachView(@NonNull final HelloWorldView view) {
         super.onAttachView(view);
 
-        rxSubscriptionHelper.manageViewSubscription(mText.asObservable()
-                .subscribe(view::showText));
-
-        rxSubscriptionHelper.manageViewSubscription(view.onButtonClicked()
+        final Subscription showTextSub = mText.asObservable().subscribe(view::showText);
+        final Subscription onButtonClickSub = view.onButtonClicked()
                 .subscribe(aVoid -> {
                     triggerHeavyCalculation.onNext(null);
-                }));
+                });
+
+        rxSubscriptionHelper.manageViewSubscriptions(showTextSub, onButtonClickSub);
     }
 
     @Override
