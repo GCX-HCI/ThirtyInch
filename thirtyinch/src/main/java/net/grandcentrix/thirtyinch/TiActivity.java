@@ -17,6 +17,7 @@ package net.grandcentrix.thirtyinch;
 
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
 import net.grandcentrix.thirtyinch.internal.PresenterNonConfigurationInstance;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
@@ -41,7 +42,7 @@ import java.util.concurrent.Executor;
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
         implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
-        TiLoggingTagProvider, InterceptableViewBinder<V> {
+        TiLoggingTagProvider, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiActivity.class.getSimpleName()
@@ -76,6 +77,10 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return TAG;
     }
 
+    /**
+     * is {@code null} before {@link #onCreate(Bundle)}
+     */
+    @Override
     public P getPresenter() {
         return mDelegate.getPresenter();
     }

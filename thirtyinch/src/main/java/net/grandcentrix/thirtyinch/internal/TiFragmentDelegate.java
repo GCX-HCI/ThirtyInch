@@ -41,7 +41,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Fragments using composition.
  */
 public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
@@ -98,6 +98,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         return mViewBinder.getInterceptors(predicate);
     }
 
+    @Override
     public P getPresenter() {
         return mPresenter;
     }
