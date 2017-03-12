@@ -29,6 +29,7 @@ import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInte
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -43,7 +44,8 @@ import java.util.List;
 public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         implements InterceptableViewBinder<V> {
 
-    private static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
+    @VisibleForTesting
+    static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
 
     /**
      * enables debug logging during development
