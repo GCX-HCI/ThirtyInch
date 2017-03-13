@@ -66,7 +66,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final PresenterViewBinder<V> mViewBinder;
 
-    private TiPresenterSavior mSavior;
+    private final TiPresenterSavior mSavior;
 
     private final TiViewProvider<V> mViewProvider;
 

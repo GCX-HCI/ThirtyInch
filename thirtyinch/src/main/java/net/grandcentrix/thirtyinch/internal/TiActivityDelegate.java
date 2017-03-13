@@ -54,7 +54,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      */
     private volatile boolean mActivityStarted = false;
 
-    private TiLoggingTagProvider mLogTag;
+    private final TiLoggingTagProvider mLogTag;
 
     /**
      * The presenter to which this activity will be attached as view when in the right state.
@@ -75,15 +75,15 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final PresenterViewBinder<V> mViewBinder;
 
-    private TiPresenterSavior mSavior;
+    private final TiPresenterSavior mSavior;
 
-    private TiViewProvider<V> mViewProvider;
+    private final TiViewProvider<V> mViewProvider;
 
     public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
             final TiViewProvider<V> viewProvider,
             final TiPresenterProvider<P> presenterProvider,
             final TiLoggingTagProvider logTag,
-            TiPresenterSavior savior) {
+            final TiPresenterSavior savior) {
         mTiActivity = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
