@@ -25,6 +25,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -74,7 +75,8 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      * @param presenterProvider callback returning the presenter.
      */
     public TiFragmentPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
-        mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider, this);
+        mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider, this,
+                PresenterSavior.INSTANCE);
     }
 
     @NonNull

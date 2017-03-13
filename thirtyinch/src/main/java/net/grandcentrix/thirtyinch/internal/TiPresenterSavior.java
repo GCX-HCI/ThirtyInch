@@ -15,25 +15,21 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+
 import net.grandcentrix.thirtyinch.TiPresenter;
 
-import java.util.HashMap;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
- * helper to clear the savior in the test environment without exposing this to the public API
+ * store for presenters to survive when Activities get destroyed.
  */
-public class PresenterSaviorTestHelper {
+public interface TiPresenterSavior {
 
-    public static void clear() {
-        PresenterSavior.INSTANCE.clear();
-    }
+    void free(String presenterId);
 
-    public static int presenterCount() {
-        return presenters().entrySet().size();
-    }
+    @Nullable
+    TiPresenter recover(String id);
 
-    public static HashMap<String, TiPresenter> presenters() {
-        return PresenterSavior.INSTANCE.mPresenters;
-    }
-
+    String safe(@NonNull TiPresenter presenter);
 }

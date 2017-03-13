@@ -17,6 +17,7 @@ package net.grandcentrix.thirtyinch;
 
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -45,7 +46,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiFragmentDelegate<P, V> mDelegate =
-            new TiFragmentDelegate<>(this, this, this, this);
+            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
