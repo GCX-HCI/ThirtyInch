@@ -38,7 +38,7 @@ public enum PresenterSavior implements TiPresenterSavior {
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
 
-    private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
+    private final HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
     @Override
     public void free(final String presenterId) {
@@ -47,14 +47,14 @@ public enum PresenterSavior implements TiPresenterSavior {
 
     @Override
     @Nullable
-    public TiPresenter recover(final String id) {
-        return mPresenters.get(id);
+    public TiPresenter recover(final String presenterId) {
+        return mPresenters.get(presenterId);
     }
 
     @Override
-    public String safe(@NonNull final TiPresenter presenter) {
+    public String save(@NonNull final TiPresenter presenter) {
         final String id = generateId(presenter);
-        TiLog.v(TAG, "safe presenter with id " + id + " " + presenter);
+        TiLog.v(TAG, "save presenter with id " + id + " " + presenter);
         mPresenters.put(id, presenter);
         return id;
     }

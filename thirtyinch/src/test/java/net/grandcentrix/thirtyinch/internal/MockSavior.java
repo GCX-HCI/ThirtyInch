@@ -42,12 +42,12 @@ public class MockSavior implements TiPresenterSavior {
 
     @Nullable
     @Override
-    public TiPresenter recover(final String id) {
-        return mPresenters.get(id);
+    public TiPresenter recover(final String presenterId) {
+        return mPresenters.get(presenterId);
     }
 
     @Override
-    public String safe(@NonNull final TiPresenter presenter) {
+    public String save(@NonNull final TiPresenter presenter) {
         final String id = presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();

@@ -22,14 +22,32 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * store for presenters to survive when Activities get destroyed.
+ * Store for presenters to survive when their associated context gets destroyed (e.g. Activity or
+ * Fragment).
  */
 public interface TiPresenterSavior {
 
+    /**
+     * Frees a certain presenter from the store.
+     *
+     * @param presenterId the id of the presenter
+     */
     void free(String presenterId);
 
+    /**
+     * Gets a presenter from the store.
+     *
+     * @param presenterId the id of the presenter
+     * @return the presenter of {@code null} if no presenter could be found
+     */
     @Nullable
-    TiPresenter recover(String id);
+    TiPresenter recover(String presenterId);
 
-    String safe(@NonNull TiPresenter presenter);
+    /**
+     * Stores a presenter in the store.
+     *
+     * @param presenter the presenter that should be stored
+     * @return the id of the stored presenter
+     */
+    String save(@NonNull TiPresenter presenter);
 }

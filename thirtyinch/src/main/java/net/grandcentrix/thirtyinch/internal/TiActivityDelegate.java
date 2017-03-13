@@ -171,7 +171,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // holding the presenter before, is now able to remove the reference to
                 // this presenter from the savior
                 mSavior.free(recoveredPresenterId);
-                mPresenterId = mSavior.safe(mPresenter);
+                mPresenterId = mSavior.save(mPresenter);
             }
         }
 
@@ -181,7 +181,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
-                mPresenterId = mSavior.safe(mPresenter);
+                mPresenterId = mSavior.save(mPresenter);
             }
             mPresenter.create();
         }
