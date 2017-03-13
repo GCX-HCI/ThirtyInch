@@ -270,6 +270,7 @@ public class TiActivityDelegateTest {
                     public String getLoggingTag() {
                         return "TestTag";
                     }
-                });
+                },
+        PresenterSavior.INSTANCE);
     }
 }
