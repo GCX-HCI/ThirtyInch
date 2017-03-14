@@ -43,7 +43,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
 public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     @VisibleForTesting
     static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
@@ -107,6 +107,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         return mViewBinder.getInterceptors(predicate);
     }
 
+    @Override
     public P getPresenter() {
         return mPresenter;
     }
