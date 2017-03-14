@@ -19,6 +19,7 @@ import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
 import net.grandcentrix.thirtyinch.internal.PresenterNonConfigurationInstance;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -49,7 +50,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiActivityDelegate<P, V> mDelegate
-            = new TiActivityDelegate<>(this, this, this, this);
+            = new TiActivityDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 

@@ -26,6 +26,7 @@ import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -74,7 +75,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      * @param presenterProvider callback returning the presenter.
      */
     public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
-        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this);
+        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this,
+                PresenterSavior.INSTANCE);
     }
 
     @NonNull

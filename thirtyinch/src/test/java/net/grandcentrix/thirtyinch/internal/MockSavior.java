@@ -15,8 +15,7 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.TiLog;
+
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import android.support.annotation.NonNull;
@@ -24,44 +23,35 @@ import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 
-/**
- * Activities can be destroyed when the device runs out of memory. Sometimes it doesn't work to
- * save objects via {@code Activity#onRetainNonConfigurationInstance()} for example when the user
- * has enabled "Do not keep activities" in the developer options. This singleton holds strong
- * references to those presenters and returns them when needed.
- *
- * {@link TiActivity} is responsible to manage the references
- */
-public enum PresenterSavior implements TiPresenterSavior {
+public class MockSavior implements TiPresenterSavior {
 
-    INSTANCE;
+    private HashMap<String, TiPresenter> mPresenters = new HashMap<>();
 
-    private static final String TAG = PresenterSavior.class.getSimpleName();
-
-    private final HashMap<String, TiPresenter> mPresenters = new HashMap<>();
+    public void clear() {
+        mPresenters.clear();
+    }
 
     @Override
     public void free(final String presenterId) {
         mPresenters.remove(presenterId);
     }
 
-    @Override
+    public int presenterCount() {
+        return mPresenters.size();
+    }
+
     @Nullable
+    @Override
     public TiPresenter recover(final String presenterId) {
         return mPresenters.get(presenterId);
     }
 
     @Override
     public String save(@NonNull final TiPresenter presenter) {
-        final String id = generateId(presenter);
-        TiLog.v(TAG, "save presenter with id " + id + " " + presenter);
-        mPresenters.put(id, presenter);
-        return id;
-    }
-
-    private String generateId(@NonNull final TiPresenter presenter) {
-        return presenter.getClass().getSimpleName()
+        final String id = presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();
+        mPresenters.put(id, presenter);
+        return id;
     }
 }

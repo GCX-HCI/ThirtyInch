@@ -54,7 +54,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      */
     private volatile boolean mActivityStarted = false;
 
-    private TiLoggingTagProvider mLogTag;
+    private final TiLoggingTagProvider mLogTag;
 
     /**
      * The presenter to which this activity will be attached as view when in the right state.
@@ -75,17 +75,21 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final PresenterViewBinder<V> mViewBinder;
 
-    private TiViewProvider<V> mViewProvider;
+    private final TiPresenterSavior mSavior;
+
+    private final TiViewProvider<V> mViewProvider;
 
     public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
             final TiViewProvider<V> viewProvider,
             final TiPresenterProvider<P> presenterProvider,
-            final TiLoggingTagProvider logTag) {
+            final TiLoggingTagProvider logTag,
+            final TiPresenterSavior savior) {
         mTiActivity = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
         mLogTag = logTag;
         mViewBinder = new PresenterViewBinder<>(logTag);
+        mSavior = savior;
     }
 
     @NonNull
@@ -151,7 +155,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     // this should always work.
                     TiLog.v(mLogTag.getLoggingTag(),
                             "try to recover Presenter with id: " + recoveredPresenterId);
-                    mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                    mPresenter = (P) mSavior.recover(recoveredPresenterId);
                     TiLog.v(mLogTag.getLoggingTag(),
                             "recovered Presenter from savior " + mPresenter);
                 } else {
@@ -167,8 +171,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // save recovered presenter with new id. No other instance of this activity,
                 // holding the presenter before, is now able to remove the reference to
                 // this presenter from the savior
-                PresenterSavior.INSTANCE.free(recoveredPresenterId);
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+                mSavior.free(recoveredPresenterId);
+                mPresenterId = mSavior.save(mPresenter);
             }
         }
 
@@ -178,7 +182,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+                mPresenterId = mSavior.save(mPresenter);
             }
             mPresenter.create();
         }
@@ -245,7 +249,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            PresenterSavior.INSTANCE.free(mPresenterId);
+            mSavior.free(mPresenterId);
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
