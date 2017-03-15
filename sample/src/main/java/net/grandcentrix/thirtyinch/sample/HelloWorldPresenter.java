@@ -16,6 +16,7 @@
 package net.grandcentrix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.rx.RxTiObservableUtils;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
@@ -61,7 +62,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
         mText.onNext("Hello World!");
 
         rxSubscriptionHelper.manageSubscription(Observable.interval(0, 1, TimeUnit.SECONDS)
-                .compose(RxTiPresenterUtils.deliverLatestToView(this))
+                .compose(RxTiObservableUtils.deliverLatestToView(this))
                 .subscribe(uptime -> {
                     sendToView(view -> view.showPresenterUpTime(uptime));
                 }));
