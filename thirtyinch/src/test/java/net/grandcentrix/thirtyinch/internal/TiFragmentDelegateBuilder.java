@@ -40,6 +40,8 @@ public class TiFragmentDelegateBuilder {
 
     private TiPresenterProvider<TiPresenter<TiView>> mPresenterProvider;
 
+    private TiPresenterSavior mSavior = new MockSavior();
+
     public TiFragmentDelegate<TiPresenter<TiView>, TiView> build() {
         TiPresenterProvider<TiPresenter<TiView>> presenterProvider = mPresenterProvider;
         if (presenterProvider == null) {
@@ -104,7 +106,7 @@ public class TiFragmentDelegateBuilder {
             public String getLoggingTag() {
                 return "TestLogTag";
             }
-        });
+        }, mSavior);
     }
 
     public TiFragmentDelegateBuilder setDontKeepActivitiesEnabled(final boolean enabled) {
@@ -140,6 +142,12 @@ public class TiFragmentDelegateBuilder {
     public TiFragmentDelegateBuilder setPresenterProvider(
             TiPresenterProvider<TiPresenter<TiView>> provider) {
         mPresenterProvider = provider;
+        return this;
+    }
+
+
+    public TiFragmentDelegateBuilder setSavior(final TiPresenterSavior savior) {
+        mSavior = savior;
         return this;
     }
 }

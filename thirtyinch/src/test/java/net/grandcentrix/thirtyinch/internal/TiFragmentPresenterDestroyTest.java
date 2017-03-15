@@ -19,6 +19,7 @@ import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -56,6 +57,8 @@ public class TiFragmentPresenterDestroyTest {
         }
     }
 
+    private MockSavior mSavior;
+
     @Test
     public void saviorTrue_retainTrue_dontKeepActivitiesTrue_fragmentAttached_activityFinish() {
 
@@ -70,6 +73,7 @@ public class TiFragmentPresenterDestroyTest {
                 .setIsAdded(true)
                 .setIsFinishing(true)
                 .setIsChangingConfigurations(false)
+                .setSavior(mSavior)
                 .setPresenter(presenter)
                 .build();
 
@@ -78,6 +82,8 @@ public class TiFragmentPresenterDestroyTest {
         doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
 
         delegate.onCreate_afterSuper(null);
+
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
 
         assertThat(delegate.getPresenter().isInitialized()).isTrue();
 
@@ -97,12 +103,17 @@ public class TiFragmentPresenterDestroyTest {
         delegate.onDestroy_afterSuper();
 
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
     @Before
     public void setUp() throws Exception {
-        PresenterSaviorTestHelper.clear();
+        mSavior = new MockSavior();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        mSavior.clear();
     }
 
     @NonNull
