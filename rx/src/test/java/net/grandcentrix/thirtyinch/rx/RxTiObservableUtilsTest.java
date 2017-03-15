@@ -32,7 +32,7 @@ import rx.observers.TestSubscriber;
 import static org.mockito.Mockito.mock;
 
 @RunWith(JUnit4.class)
-public class RxTiPresenterUtilsTest {
+public class RxTiObservableUtilsTest {
 
     private TiMockPresenter mPresenter;
 
@@ -56,7 +56,7 @@ public class RxTiPresenterUtilsTest {
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestCacheToView(mPresenter))
+                .compose(RxTiObservableUtils.<Integer>deliverLatestCacheToView(mPresenter))
                 .subscribe(testSubscriber);
 
         mPresenter.attachView(mView);
@@ -73,7 +73,7 @@ public class RxTiPresenterUtilsTest {
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestCacheToView(mPresenter))
+                .compose(RxTiObservableUtils.<Integer>deliverLatestCacheToView(mPresenter))
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNotCompleted();
@@ -87,7 +87,7 @@ public class RxTiPresenterUtilsTest {
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .compose(RxTiObservableUtils.<Integer>deliverLatestToView(mPresenter))
                 .subscribe(testSubscriber);
 
         mPresenter.attachView(mView);
@@ -104,7 +104,7 @@ public class RxTiPresenterUtilsTest {
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .compose(RxTiObservableUtils.<Integer>deliverLatestToView(mPresenter))
                 .subscribe(testSubscriber);
 
         testSubscriber.assertCompleted();
@@ -119,7 +119,7 @@ public class RxTiPresenterUtilsTest {
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverToView(mPresenter))
+                .compose(RxTiObservableUtils.<Integer>deliverToView(mPresenter))
                 .subscribe(testSubscriber);
 
         testSubscriber.assertCompleted();
@@ -134,7 +134,7 @@ public class RxTiPresenterUtilsTest {
 
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
         Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverToView(mPresenter))
+                .compose(RxTiObservableUtils.<Integer>deliverToView(mPresenter))
                 .subscribe(testSubscriber);
 
         testSubscriber.assertCompleted();
