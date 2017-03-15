@@ -20,6 +20,7 @@ import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -57,6 +58,8 @@ public class TiActivityPresenterDestroyTest {
         }
     }
 
+    private MockSavior mSavior;
+
     @Test
     public void saviorFalse_dontKeepActivitiesFalse_configurationChange() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -68,6 +71,7 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(true)
                 .setDontKeepActivitiesEnabled(false)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
@@ -80,7 +84,7 @@ public class TiActivityPresenterDestroyTest {
         assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).isNull();
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         delegate.onCreate_afterSuper(savedState);
     }
@@ -96,13 +100,14 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(true)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(false)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
 
         assertThat(presenter.isDestroyed()).isTrue();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         try {
             // presenter is destroyed and cannot be recreated
@@ -125,12 +130,13 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(false)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         delegate.onCreate_afterSuper(null);
         // savior is disabled
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         assertThat(delegate.getPresenter().isInitialized()).isTrue();
 
@@ -145,7 +151,7 @@ public class TiActivityPresenterDestroyTest {
         delegate.onStart_afterSuper();
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -159,6 +165,7 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(true)
                 .setDontKeepActivitiesEnabled(true)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
@@ -171,7 +178,7 @@ public class TiActivityPresenterDestroyTest {
         assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).isNull();
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         delegate.onCreate_afterSuper(null);
     }
@@ -187,13 +194,14 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(true)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(true)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
 
         assertThat(presenter.isDestroyed()).isTrue();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         try {
             // presenter is destroyed and cannot be recreated
@@ -216,12 +224,13 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(true)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         delegate.onCreate_afterSuper(null);
         // savior is disabled
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         assertThat(delegate.getPresenter().isInitialized()).isTrue();
 
@@ -236,7 +245,7 @@ public class TiActivityPresenterDestroyTest {
         delegate.onStart_afterSuper();
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         delegate.onCreate_afterSuper(null);
     }
@@ -253,6 +262,7 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(true)
                 .setDontKeepActivitiesEnabled(false)
+                .setSavior(mSavior)
                 .setRetainedPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
                     @NonNull
                     @Override
@@ -273,7 +283,7 @@ public class TiActivityPresenterDestroyTest {
                 .contains("TestPresenter");
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
 
         retainedPresenter[0] = presenter;
         delegate.onCreate_afterSuper(savedState);
@@ -290,13 +300,14 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(true)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(false)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
 
         assertThat(presenter.isDestroyed()).isTrue();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         try {
             // presenter is destroyed and cannot be recreated
@@ -320,6 +331,7 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(false)
+                .setSavior(mSavior)
                 .setRetainedPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
                     @NonNull
                     @Override
@@ -331,7 +343,7 @@ public class TiActivityPresenterDestroyTest {
 
         final Bundle savedState = mock(Bundle.class);
         delegate.onCreate_afterSuper(null);
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
 
         assertThat(delegate.getPresenter().isInitialized()).isTrue();
 
@@ -346,7 +358,7 @@ public class TiActivityPresenterDestroyTest {
         delegate.onStart_afterSuper();
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
 
         retainedPresenter[0] = presenter;
         delegate.onCreate_afterSuper(savedState);
@@ -363,6 +375,7 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(true)
                 .setDontKeepActivitiesEnabled(true)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
@@ -376,7 +389,7 @@ public class TiActivityPresenterDestroyTest {
                 .contains("TestPresenter");
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
     }
 
     @Test
@@ -390,13 +403,14 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(true)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(true)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
 
         assertThat(presenter.isDestroyed()).isTrue();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         try {
             // presenter is destroyed and cannot be recreated
@@ -419,18 +433,24 @@ public class TiActivityPresenterDestroyTest {
                 .setIsFinishing(false)
                 .setIsChangingConfigurations(false)
                 .setDontKeepActivitiesEnabled(true)
+                .setSavior(mSavior)
                 .build();
 
         final Bundle savedState = mock(Bundle.class);
         doFullLifecycleAndDestroy(delegate, savedState);
 
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(PresenterSaviorTestHelper.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
     }
 
     @Before
     public void setUp() throws Exception {
-        PresenterSaviorTestHelper.clear();
+        mSavior = new MockSavior();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        mSavior.clear();
     }
 
     private void doFullLifecycleAndDestroy(final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate,

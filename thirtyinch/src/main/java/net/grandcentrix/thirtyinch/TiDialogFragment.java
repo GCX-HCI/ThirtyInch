@@ -17,6 +17,8 @@ package net.grandcentrix.thirtyinch;
 
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
@@ -39,14 +41,14 @@ import java.util.concurrent.Executor;
 public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatDialogFragment
         implements DelegatedTiFragment, TiPresenterProvider<P>, TiLoggingTagProvider,
-        TiViewProvider<V>, InterceptableViewBinder<V> {
+        TiViewProvider<V>, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiDialogFragment.class.getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiFragmentDelegate<P, V> mDelegate =
-            new TiFragmentDelegate<>(this, this, this, this);
+            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
 
     @NonNull
     @Override
@@ -72,6 +74,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         return TAG;
     }
 
+    @Override
     public P getPresenter() {
         return mDelegate.getPresenter();
     }

@@ -42,7 +42,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Fragments using composition.
  */
 public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     @VisibleForTesting
     static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
@@ -68,17 +68,21 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final PresenterViewBinder<V> mViewBinder;
 
+    private final TiPresenterSavior mSavior;
+
     private final TiViewProvider<V> mViewProvider;
 
     public TiFragmentDelegate(final DelegatedTiFragment fragmentProvider,
             final TiViewProvider<V> viewProvider,
             final TiPresenterProvider<P> presenterProvider,
-            final TiLoggingTagProvider logTag) {
+            final TiLoggingTagProvider logTag,
+            final TiPresenterSavior savior) {
         mTiFragment = fragmentProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
         mLogTag = logTag;
         mViewBinder = new PresenterViewBinder<>(logTag);
+        mSavior = savior;
     }
 
     @NonNull
@@ -100,6 +104,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         return mViewBinder.getInterceptors(predicate);
     }
 
+    @Override
     public P getPresenter() {
         return mPresenter;
     }
@@ -130,13 +135,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             if (recoveredPresenterId != null) {
                 TiLog.v(mLogTag.getLoggingTag(),
                         "try to recover Presenter with id: " + recoveredPresenterId);
-                mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                mPresenter = (P) mSavior.recover(recoveredPresenterId);
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
                     // this presenter from the savior
-                    PresenterSavior.INSTANCE.free(recoveredPresenterId);
-                    mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+                    mSavior.free(recoveredPresenterId);
+                    mPresenterId = mSavior.save(mPresenter);
                 }
                 TiLog.v(mLogTag.getLoggingTag(), "recovered Presenter " + mPresenter);
             }
@@ -147,7 +152,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+                mPresenterId = mSavior.save(mPresenter);
             }
             mPresenter.create();
         }
@@ -222,7 +227,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            PresenterSavior.INSTANCE.free(mPresenterId);
+            mSavior.free(mPresenterId);
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");

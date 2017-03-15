@@ -39,6 +39,8 @@ public class TiActivityDelegateBuilder {
 
     private TiPresenterProvider<TiPresenter<TiView>> mRetainedPresenterProvider;
 
+    private TiPresenterSavior mSavior = new MockSavior();
+
     public TiActivityDelegate<TiPresenter<TiView>, TiView> build() {
         TiPresenterProvider<TiPresenter<TiView>> presenterProvider = mPresenterProvider;
         if (presenterProvider == null) {
@@ -97,7 +99,7 @@ public class TiActivityDelegateBuilder {
             public String getLoggingTag() {
                 return "TestLogTag";
             }
-        });
+        }, mSavior);
     }
 
     public TiActivityDelegateBuilder setDontKeepActivitiesEnabled(final boolean enabled) {
@@ -129,6 +131,11 @@ public class TiActivityDelegateBuilder {
     public TiActivityDelegateBuilder setRetainedPresenterProvider(
             TiPresenterProvider<TiPresenter<TiView>> retainedPresenterProvider) {
         mRetainedPresenterProvider = retainedPresenterProvider;
+        return this;
+    }
+
+    public TiActivityDelegateBuilder setSavior(final TiPresenterSavior savior) {
+        mSavior = savior;
         return this;
     }
 }

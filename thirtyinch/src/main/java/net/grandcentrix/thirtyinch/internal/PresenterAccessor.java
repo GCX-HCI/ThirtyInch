@@ -15,25 +15,18 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
 
-import java.util.HashMap;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 /**
- * helper to clear the savior in the test environment without exposing this to the public API
+ * Gives access to the attached presenter
  */
-public class PresenterSaviorTestHelper {
+public interface PresenterAccessor<P extends TiPresenter<V>, V extends TiView> {
 
-    public static void clear() {
-        PresenterSavior.INSTANCE.clear();
-    }
-
-    public static int presenterCount() {
-        return presenters().entrySet().size();
-    }
-
-    public static HashMap<String, TiPresenter> presenters() {
-        return PresenterSavior.INSTANCE.mPresenters;
-    }
+    /**
+     * @return the attached presenter
+     */
+    P getPresenter();
 
 }
