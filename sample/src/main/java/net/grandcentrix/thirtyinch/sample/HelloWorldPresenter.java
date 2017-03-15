@@ -18,14 +18,16 @@ package net.grandcentrix.thirtyinch.sample;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.rx.RxTiObservableUtils;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
-import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
+import net.grandcentrix.thirtyinch.rx.RxTiSingleUtils;
 
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Single;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -78,6 +80,10 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                 }, 1)
                 .doOnNext(integer -> mText.onNext("Count: " + mCounter))
                 .subscribe());
+
+        rxSubscriptionHelper.manageSubscription(Single.just("This is a Toast")
+                .compose(RxTiSingleUtils.deliverToView(this))
+                .subscribe(s -> getView().showToast(s)));
     }
 
     /**
