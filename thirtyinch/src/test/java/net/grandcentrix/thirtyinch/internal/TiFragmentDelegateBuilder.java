@@ -28,13 +28,13 @@ public class TiFragmentDelegateBuilder {
 
     private boolean mIsAdded;
 
-    private boolean mIsChangingConfigurations = false;
-
     private boolean mIsDetached;
 
     private boolean mIsDontKeepActivitiesEnabled = false;
 
-    private boolean mIsFinishing = false;
+    private boolean mIsHostingActivityChangingConfiguration = false;
+
+    private boolean mIsHostingActivityFinishing = false;
 
     private TiPresenter<TiView> mPresenter;
 
@@ -82,12 +82,12 @@ public class TiFragmentDelegateBuilder {
 
             @Override
             public boolean isHostingActivityChangingConfigurations() {
-                return mIsChangingConfigurations;
+                return mIsHostingActivityChangingConfiguration;
             }
 
             @Override
             public boolean isHostingActivityFinishing() {
-                return mIsFinishing;
+                return mIsHostingActivityFinishing;
             }
 
             @Override
@@ -119,18 +119,19 @@ public class TiFragmentDelegateBuilder {
         return this;
     }
 
-    public TiFragmentDelegateBuilder setIsChangingConfigurations(final boolean changing) {
-        mIsChangingConfigurations = changing;
-        return this;
-    }
-
     public TiFragmentDelegateBuilder setIsDetached(boolean isDetached) {
         mIsDetached = isDetached;
         return this;
     }
 
-    public TiFragmentDelegateBuilder setIsFinishing(final boolean finishing) {
-        mIsFinishing = finishing;
+    public TiFragmentDelegateBuilder setIsHostingActivityChangingConfiguration(
+            final boolean isChangingConfiguration) {
+        mIsHostingActivityChangingConfiguration = isChangingConfiguration;
+        return this;
+    }
+
+    public TiFragmentDelegateBuilder setIsHostingActivityFinishing(final boolean isFinishing) {
+        mIsHostingActivityFinishing = isFinishing;
         return this;
     }
 

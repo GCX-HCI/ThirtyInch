@@ -73,8 +73,8 @@ public class TiFragmentPresenterDestroyTest {
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(false)
                 .setIsAdded(true)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
                 .build();
@@ -130,8 +130,8 @@ public class TiFragmentPresenterDestroyTest {
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(false)
                 .setIsAdded(true)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
                 .build();
@@ -177,8 +177,8 @@ public class TiFragmentPresenterDestroyTest {
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(false)
                 .setIsAdded(true)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
                 .build();
@@ -223,8 +223,8 @@ public class TiFragmentPresenterDestroyTest {
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(true)
                 .setIsAdded(true)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
                 .build();
