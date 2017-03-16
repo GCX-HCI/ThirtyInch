@@ -145,7 +145,6 @@ public class TiFragmentDelegateBuilder {
         return this;
     }
 
-
     public TiFragmentDelegateBuilder setSavior(final TiPresenterSavior savior) {
         mSavior = savior;
         return this;
