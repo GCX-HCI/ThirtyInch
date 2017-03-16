@@ -60,7 +60,7 @@ public class TiFragmentPresenterDestroyTest {
     private MockSavior mSavior;
 
     @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_backStackFalse_activityChangingConfiguration() {
+    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
         // Given a Presenter that does not use a static savior and does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -117,7 +117,7 @@ public class TiFragmentPresenterDestroyTest {
     }
 
     @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_backStackFalse_activityFinishing() {
+    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_activityFinishing() {
 
         // Given a Presenter that does not use a static savior and does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -164,7 +164,7 @@ public class TiFragmentPresenterDestroyTest {
     }
 
     @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_backStackTrue_activityFinishing() {
+    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_backStack() {
 
         // Given a Presenter that does not use a static savior and does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -201,13 +201,13 @@ public class TiFragmentPresenterDestroyTest {
 
         delegate.onDestroyView_beforeSuper();
 
-        // And when the activity is finishing.
-        delegate.onDestroy_afterSuper();
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
-        // TODO: rberghegger 16.03.17 call onDetach()?
+        delegate.onStart_afterSuper();
 
         // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
