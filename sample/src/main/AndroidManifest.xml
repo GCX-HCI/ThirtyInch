@@ -16,6 +16,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".fragmentlifecycle.FragmentLifecycleActivity" />
+
     </application>
 
 </manifest>

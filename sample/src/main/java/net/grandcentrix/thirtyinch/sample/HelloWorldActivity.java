@@ -19,9 +19,13 @@ package net.grandcentrix.thirtyinch.sample;
 import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -42,6 +46,12 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         return RxView.clicks(mButton);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_hello_world, menu);
+        return true;
+    }
+
     @NonNull
     @Override
     public HelloWorldPresenter providePresenter() {
@@ -56,6 +66,11 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     @Override
     public void showText(final String text) {
         mOutput.setText(text);
+    }
+
+    public void startFragmentLifecycleTest(MenuItem item) {
+        final Intent intent = new Intent(this, FragmentLifecycleActivity.class);
+        startActivity(intent);
     }
 
     @Override
