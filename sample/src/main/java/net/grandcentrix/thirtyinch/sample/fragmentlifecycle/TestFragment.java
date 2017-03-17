@@ -67,6 +67,8 @@ public abstract class TestFragment extends Fragment {
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(getFragmentTag(), "onCreate");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onCreate_afterSuper(null);");
     }
 
     @Override
@@ -93,6 +95,8 @@ public abstract class TestFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
         Log.d(getFragmentTag(), "onCreateView");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onCreateView_beforeSuper(null, null, null);");
         return inflater.inflate(getLayoutResId(), container, false);
     }
 
@@ -100,6 +104,8 @@ public abstract class TestFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d(getFragmentTag(), "onDestroy");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onDestroy_afterSuper();");
     }
 
     @Override
@@ -112,6 +118,8 @@ public abstract class TestFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.d(getFragmentTag(), "onDestroyView");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onDestroyView_beforeSuper();");
     }
 
     @Override
@@ -193,18 +201,24 @@ public abstract class TestFragment extends Fragment {
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(getFragmentTag(), "onSaveInstanceState");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onSaveInstanceState_afterSuper(null);");
     }
 
     @Override
     public void onStart() {
         super.onStart();
         Log.d(getFragmentTag(), "onStart");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onStart_afterSuper();");
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(getFragmentTag(), "onStop");
+        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
+        Log.v(getFragmentTag(), "mDelegate.onStop_beforeSuper();");
     }
 
     @Override
