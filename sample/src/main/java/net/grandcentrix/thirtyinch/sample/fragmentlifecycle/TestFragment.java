@@ -67,8 +67,13 @@ public abstract class TestFragment extends Fragment {
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(getFragmentTag(), "onCreate");
+
         // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
-        Log.v(getFragmentTag(), "mDelegate.onCreate_afterSuper(null);");
+        if (savedInstanceState == null) {
+            Log.v(getFragmentTag(), "mDelegate.onCreate_afterSuper(null);");
+        } else {
+            Log.v(getFragmentTag(), "mDelegate.onCreate_afterSuper(savedInstanceState);");
+        }
     }
 
     @Override
