@@ -100,8 +100,14 @@ public abstract class TestFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
         Log.d(getFragmentTag(), "onCreateView");
+
         // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
-        Log.v(getFragmentTag(), "mDelegate.onCreateView_beforeSuper(null, null, null);");
+        if (savedInstanceState == null) {
+            Log.v(getFragmentTag(), "mDelegate.onCreateView_beforeSuper(inflater, null, null);");
+        } else {
+            Log.v(getFragmentTag(), "mDelegate.onCreateView_beforeSuper(inflater, null, savedInstanceState);");
+        }
+
         return inflater.inflate(getLayoutResId(), container, false);
     }
 
@@ -207,7 +213,7 @@ public abstract class TestFragment extends Fragment {
         super.onSaveInstanceState(outState);
         Log.d(getFragmentTag(), "onSaveInstanceState");
         // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
-        Log.v(getFragmentTag(), "mDelegate.onSaveInstanceState_afterSuper(null);");
+        Log.v(getFragmentTag(), "mDelegate.onSaveInstanceState_afterSuper(outState);");
     }
 
     @Override
