@@ -60,6 +60,8 @@ public class TiFragmentPresenterDestroyTest {
 
     private MockSavior mSavior;
 
+    private Bundle mSavedState;
+
     @Test
     public void saviorFalse_retainFalse_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
@@ -80,19 +82,15 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
         delegate.onStart_afterSuper();
 
         // And when the activity is changing configurations.
-        delegate.onSaveInstanceState_afterSuper(savedState);
+        delegate.onSaveInstanceState_afterSuper(mSavedState);
 
         delegate.onStop_beforeSuper();
 
@@ -111,7 +109,7 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        delegate2.onCreate_afterSuper(savedState);
+        delegate2.onCreate_afterSuper(mSavedState);
 
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -142,12 +140,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -206,12 +200,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -249,12 +239,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -266,7 +252,7 @@ public class TiFragmentPresenterDestroyTest {
         delegate.onDestroyView_beforeSuper();
 
         // And when the Activity is changing configuration.
-        delegate.onSaveInstanceState_afterSuper(savedState);
+        delegate.onSaveInstanceState_afterSuper(mSavedState);
 
         delegate.onDestroy_afterSuper();
 
@@ -281,7 +267,7 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        delegate2.onCreate_afterSuper(savedState);
+        delegate2.onCreate_afterSuper(mSavedState);
 
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -333,12 +319,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -462,12 +444,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -526,12 +504,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -716,12 +690,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -780,12 +750,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -970,12 +936,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -1034,12 +996,8 @@ public class TiFragmentPresenterDestroyTest {
                 .setPresenter(presenter)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
         // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
+        delegate.onCreate_afterSuper(mSavedState);
 
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
 
@@ -1237,11 +1195,15 @@ public class TiFragmentPresenterDestroyTest {
     @Before
     public void setUp() throws Exception {
         mSavior = new MockSavior();
+        mSavedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(mSavedState).putString(anyString(), anyString());
     }
 
     @After
     public void tearDown() throws Exception {
         mSavior.clear();
+        mSavedState = null;
     }
 
     @NonNull
