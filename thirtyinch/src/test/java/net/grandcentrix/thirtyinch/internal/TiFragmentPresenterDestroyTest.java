@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 
 import java.util.HashMap;
 
+import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -60,7 +61,7 @@ public class TiFragmentPresenterDestroyTest {
     private MockSavior mSavior;
 
     @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
+    public void saviorFalse_retainFalse_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
         // Given a Presenter that does not use a static savior and does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -122,7 +123,7 @@ public class TiFragmentPresenterDestroyTest {
     }
 
     @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_activityFinishing() {
+    public void saviorFalse_retainFalse_backstackFalse_dontKeepActivitiesFalse_activityFinishing() {
 
         // Given a Presenter that does not use a static savior and does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -165,321 +166,41 @@ public class TiFragmentPresenterDestroyTest {
     }
 
     @Test
-    public void saviorFalse_retainTrue_dontKeepActivitiesFalse_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorTrue_retainTrue_dontKeepActivitiesFalse_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorTrue_retainFalse_dontKeepActivitiesFalse_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesTrue_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
+    public void saviorFalse_retainFalse_backstackFalse_dontKeepActivitiesTrue_activityChangingConfiguration() {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(false)
                 .setRetainPresenterEnabled(false)
                 .build());
 
-        // And given a Fragment.
         final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(true)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainTrue_dontKeepActivitiesTrue_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(true)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorTrue_retainTrue_dontKeepActivitiesTrue_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(true)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorTrue_retainFalse_dontKeepActivitiesTrue_activityFinishing() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(true)
-                .setIsAdded(true)
-                .setIsHostingActivityFinishing(true)
-                .setIsHostingActivityChangingConfiguration(false)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(savedState);
-
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-
-        delegate.onStart_afterSuper();
-
-        // And when the activity is finishing.
-        delegate.onStop_beforeSuper();
-
-        delegate.onDestroyView_beforeSuper();
-
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_backStack() {
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
                 .setIsAdded(true)
                 .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainFalse_backstackFalse_dontKeepActivitiesTrue_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
                 .setIsHostingActivityChangingConfiguration(false)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -496,23 +217,20 @@ public class TiFragmentPresenterDestroyTest {
 
         delegate.onStart_afterSuper();
 
-        // And when it is replaced by another Fragment.
+        // And when the activity is finishing.
         delegate.onStop_beforeSuper();
 
         delegate.onDestroyView_beforeSuper();
 
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onDestroy_afterSuper();
 
-        delegate.onStart_afterSuper();
-
-        // Then assert that the presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
     @Test
-    public void saviorFalse_retainFalse_dontKeepActivitiesFalse_backStack_activityChangingConfiguration() {
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
         // Given a Presenter that does not use a static savior and does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
@@ -575,13 +293,779 @@ public class TiFragmentPresenterDestroyTest {
     }
 
     @Test
-    public void saviorTrue_retainTrue_dontKeepActivitiesTrue_fragmentAttached_activityFinishing() {
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesFalse_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
 
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when it is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // Then assert that the presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesTrue_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    public void saviorFalse_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when the activity is finishing.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        delegate.onDestroy_afterSuper();
+
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackFalse_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackFalse_dontKeepActivitiesTrue_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when the activity is finishing.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        delegate.onDestroy_afterSuper();
+
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesTrue_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackFalse_dontKeepActivitiesFalse_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when the activity is finishing.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        delegate.onDestroy_afterSuper();
+
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackFalse_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackFalse_dontKeepActivitiesTrue_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when the activity is finishing.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        delegate.onDestroy_afterSuper();
+
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesFalse_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesTrue_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when the activity is finishing.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        delegate.onDestroy_afterSuper();
+
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesTrue_activityFinishing() {
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        final Bundle savedState = mock(Bundle.class);
+        final TiFragmentPresenterDestroyTest.PutInMapAnswer putInMap = putInMap();
+        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+
+        // When the fragment is added to the activity.
+        delegate.onCreate_afterSuper(savedState);
+
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+
+        delegate.onStart_afterSuper();
+
+        // And when the activity is finishing.
+        delegate.onStop_beforeSuper();
+
+        delegate.onDestroyView_beforeSuper();
+
+        delegate.onDestroy_afterSuper();
+
+        // Then assert that the presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesTrue_activityFinishing2() {
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
         final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(true)
@@ -619,6 +1103,135 @@ public class TiFragmentPresenterDestroyTest {
 
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        //TODO check if this or impl #1 is correct
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(true)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesTrue_activityFinishing() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(true)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
+    }
+
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setIsAdded(true)
+                .setIsHostingActivityFinishing(false)
+                .setIsHostingActivityChangingConfiguration(false)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // TODO implement testcase
+        fail();
     }
 
     @Before
