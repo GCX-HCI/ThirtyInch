@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sample</string>
+    <string name="app_name">ThirtyInch Sample</string>
 
     <!-- Fragment lifecycle -->
     <string name="start_fragment_lifecycle_test">Start fragment lifecycle test</string>
