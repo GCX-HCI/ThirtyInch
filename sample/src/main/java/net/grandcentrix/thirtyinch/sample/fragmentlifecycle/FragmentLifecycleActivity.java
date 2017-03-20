@@ -21,6 +21,8 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
 
     private SwitchCompat mSwitchAddToBackStack;
 
+    private SwitchCompat mSwitchRetainFragmentInstance;
+
     public void addFragmentA(View view) {
         final TestFragmentA fragment = new TestFragmentA();
         Log.v(TAG, "adding FragmentA");
@@ -57,6 +59,8 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fragment_lifecycle);
 
         mSwitchAddToBackStack = (SwitchCompat) findViewById(R.id.switch_add_back_stack);
+        mSwitchRetainFragmentInstance = (SwitchCompat) findViewById(
+                R.id.switch_retain_fragment_instance);
         final TextView textDontKeepActivities = (TextView) findViewById(
                 R.id.text_dont_keep_activities);
         textDontKeepActivities.setText(
@@ -67,6 +71,10 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     private void addFragment(final Fragment fragment) {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (isRetainFragmentInstance()) {
+            Log.v(TAG, "retaining fragment instance");
+            fragment.setRetainInstance(true);
+        }
         fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
         if (isAddToBackStack()) {
             Log.v(TAG, "adding transaction to the back stack");
@@ -92,5 +100,9 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return dontKeepActivities != 0;
+    }
+
+    private boolean isRetainFragmentInstance() {
+        return mSwitchRetainFragmentInstance.isChecked();
     }
 }
