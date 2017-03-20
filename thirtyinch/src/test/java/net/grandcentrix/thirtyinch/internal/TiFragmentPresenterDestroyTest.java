@@ -93,7 +93,15 @@ public class TiFragmentPresenterDestroyTest {
         delegate.onDestroyView_beforeSuper();
         delegate.onDestroy_afterSuper();
 
-        // Than a new Fragment instance is created by the framework.
+        // Then assert that the Presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // When a new Fragment instance is created by the framework.
+        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
         final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate2
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(false)
@@ -101,16 +109,15 @@ public class TiFragmentPresenterDestroyTest {
                 .setIsHostingActivityFinishing(false)
                 .setIsHostingActivityChangingConfiguration(true)
                 .setSavior(mSavior)
-                .setPresenter(presenter)
+                .setPresenter(presenter2)
                 .build();
 
         delegate2.onCreate_afterSuper(mSavedState);
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
         delegate2.onStart_afterSuper();
 
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        // Then assert that the new Presenter does not equals the previous presenter.
+        assertThat(delegate2.getPresenter()).isNotEqualTo(presenter);
     }
 
     @Test
@@ -179,7 +186,15 @@ public class TiFragmentPresenterDestroyTest {
         delegate.onDestroyView_beforeSuper();
         delegate.onDestroy_afterSuper();
 
-        // Than a new Fragment instance is created by the framework.
+        // Then assert that the Presenter is destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // When a new Fragment instance is created by the framework.
+        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
         final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate2
                 = new TiFragmentDelegateBuilder()
                 .setDontKeepActivitiesEnabled(true)
@@ -187,16 +202,15 @@ public class TiFragmentPresenterDestroyTest {
                 .setIsHostingActivityFinishing(false)
                 .setIsHostingActivityChangingConfiguration(true)
                 .setSavior(mSavior)
-                .setPresenter(presenter)
+                .setPresenter(presenter2)
                 .build();
 
         delegate2.onCreate_afterSuper(mSavedState);
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
         delegate2.onStart_afterSuper();
 
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        // Then assert that the new Presenter does not equals the previous presenter.
+        assertThat(delegate2.getPresenter()).isNotEqualTo(presenter);
     }
 
     @Test
@@ -342,8 +356,9 @@ public class TiFragmentPresenterDestroyTest {
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
 
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
@@ -455,8 +470,9 @@ public class TiFragmentPresenterDestroyTest {
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
 
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
