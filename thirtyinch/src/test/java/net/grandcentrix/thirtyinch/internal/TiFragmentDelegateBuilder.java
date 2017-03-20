@@ -26,15 +26,45 @@ import static org.mockito.Mockito.mock;
 
 public class TiFragmentDelegateBuilder {
 
+    /**
+     * mutable object mocking the hosting activity and their state
+     */
+    public static class HostingActivity {
+
+        private boolean mIsChangingConfiguration;
+
+        private boolean mIsFinishing;
+
+        public HostingActivity(final boolean isFinishing, final boolean isChangingConfiguration) {
+            mIsFinishing = isFinishing;
+            mIsChangingConfiguration = isChangingConfiguration;
+        }
+
+        public HostingActivity() {
+            resetToDefault();
+        }
+
+        public void setChangingConfiguration(final boolean changingConfiguration) {
+            mIsChangingConfiguration = changingConfiguration;
+        }
+
+        public void setFinishing(final boolean finishing) {
+            mIsFinishing = finishing;
+        }
+
+        public void resetToDefault() {
+            mIsChangingConfiguration = false;
+            mIsFinishing = false;
+        }
+    }
+
+    private HostingActivity mHostingActivity = new HostingActivity(false, false);
+
     private boolean mIsAdded;
 
     private boolean mIsDetached;
 
     private boolean mIsDontKeepActivitiesEnabled = false;
-
-    private boolean mIsHostingActivityChangingConfiguration = false;
-
-    private boolean mIsHostingActivityFinishing = false;
 
     private TiPresenter<TiView> mPresenter;
 
@@ -82,12 +112,12 @@ public class TiFragmentDelegateBuilder {
 
             @Override
             public boolean isHostingActivityChangingConfigurations() {
-                return mIsHostingActivityChangingConfiguration;
+                return mHostingActivity.mIsChangingConfiguration;
             }
 
             @Override
             public boolean isHostingActivityFinishing() {
-                return mIsHostingActivityFinishing;
+                return mHostingActivity.mIsFinishing;
             }
 
             @Override
@@ -114,24 +144,8 @@ public class TiFragmentDelegateBuilder {
         return this;
     }
 
-    public TiFragmentDelegateBuilder setIsAdded(boolean isAdded) {
-        mIsAdded = isAdded;
-        return this;
-    }
-
-    public TiFragmentDelegateBuilder setIsDetached(boolean isDetached) {
-        mIsDetached = isDetached;
-        return this;
-    }
-
-    public TiFragmentDelegateBuilder setIsHostingActivityChangingConfiguration(
-            final boolean isChangingConfiguration) {
-        mIsHostingActivityChangingConfiguration = isChangingConfiguration;
-        return this;
-    }
-
-    public TiFragmentDelegateBuilder setIsHostingActivityFinishing(final boolean isFinishing) {
-        mIsHostingActivityFinishing = isFinishing;
+    public TiFragmentDelegateBuilder setHostingActivity(final HostingActivity hostingActivity) {
+        mHostingActivity = hostingActivity;
         return this;
     }
 
@@ -148,6 +162,18 @@ public class TiFragmentDelegateBuilder {
 
     public TiFragmentDelegateBuilder setSavior(final TiPresenterSavior savior) {
         mSavior = savior;
+        return this;
+    }
+
+    // not required right now
+    private TiFragmentDelegateBuilder setIsAdded(boolean isAdded) {
+        mIsAdded = isAdded;
+        return this;
+    }
+
+    // not required right now
+    private TiFragmentDelegateBuilder setIsDetached(boolean isDetached) {
+        mIsDetached = isDetached;
         return this;
     }
 }

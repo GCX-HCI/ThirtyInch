@@ -68,6 +68,14 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
                         : R.string.dont_keep_activities_disabled);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.v(TAG, "hostingActivity.setChangingConfiguration(" + isChangingConfigurations() + ");");
+        Log.v(TAG, "hostingActivity.setFinishing(" + isFinishing() + ");");
+    }
+
     private void addFragment(final Fragment fragment) {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
