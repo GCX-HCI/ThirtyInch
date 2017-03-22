@@ -152,6 +152,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
     }
 
+    /**
+     * no retain
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorFalse_retainFalse_dontKeepActivitiesFalse_activityFinishing() {
 
@@ -177,6 +183,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the activity is finishing.
         hostingActivity.setFinishing(true);
@@ -310,6 +319,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Without savior
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorFalse_retainTrue_dontKeepActivitiesFalse_activityFinishing() {
 
@@ -335,6 +350,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
