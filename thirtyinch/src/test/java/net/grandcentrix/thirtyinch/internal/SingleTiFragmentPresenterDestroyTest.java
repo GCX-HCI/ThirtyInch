@@ -28,6 +28,12 @@ import static org.mockito.Mockito.mock;
 
 public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDestroyTest {
 
+    /**
+     * no retain
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorFalse_retainFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
@@ -53,6 +59,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is changing configurations.
         hostingActivity.setChangingConfiguration(true);
@@ -86,7 +95,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
         delegate2.onStart_afterSuper();
 
-        // Then assert that the new Presenter does not equal the previous presenter.
+        // Then a new Presenter will be attached and the previous presenter doesn't get reattached.
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
     }
 
