@@ -98,7 +98,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         // Then a new Presenter will be attached and the previous presenter doesn't get reattached.
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
     }
-
+    /**
+     * Activity changing configuration without retain (don't keep Activities)
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorFalse_retainFalse_dontKeepActivitiesTrue_activityChangingConfiguration() {
 
@@ -124,6 +129,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is changing configurations.
         hostingActivity.setChangingConfiguration(true);
@@ -157,7 +165,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
         delegate2.onStart_afterSuper();
 
-        // Then assert that the new Presenter does not equals the previous presenter.
+        // Then a new Presenter will be attached and the previous presenter doesn't get reattached.
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
     }
 
@@ -207,6 +215,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Activity finish without retain  (don't keep Activities)
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorFalse_retainFalse_dontKeepActivitiesTrue_activityFinishing() {
 
@@ -232,6 +246,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
