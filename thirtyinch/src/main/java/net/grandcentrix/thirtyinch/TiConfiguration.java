@@ -231,4 +231,38 @@ public class TiConfiguration {
     public boolean useStaticSaviorToRetain() {
         return mUseStaticSaviorToRetain;
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TiConfiguration)) {
+            return false;
+        }
+
+        final TiConfiguration that = (TiConfiguration) o;
+
+        if (mCallOnMainThreadInterceptorEnabled != that.mCallOnMainThreadInterceptorEnabled) {
+            return false;
+        }
+        if (mDistinctUntilChangedInterceptorEnabled
+                != that.mDistinctUntilChangedInterceptorEnabled) {
+            return false;
+        }
+        if (mRetainPresenter != that.mRetainPresenter) {
+            return false;
+        }
+        return mUseStaticSaviorToRetain == that.mUseStaticSaviorToRetain;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (mCallOnMainThreadInterceptorEnabled ? 1 : 0);
+        result = 31 * result + (mDistinctUntilChangedInterceptorEnabled ? 1 : 0);
+        result = 31 * result + (mRetainPresenter ? 1 : 0);
+        result = 31 * result + (mUseStaticSaviorToRetain ? 1 : 0);
+        return result;
+    }
 }
