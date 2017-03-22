@@ -25,6 +25,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
@@ -33,18 +34,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 public abstract class TiFragmentPresenterDestroyTest {
-
-    private class PutInMapAnswer implements Answer<Void> {
-
-        final HashMap<String, String> map = new HashMap<>();
-
-        @Override
-        public Void answer(InvocationOnMock invocation) throws Throwable {
-            final Object[] args = invocation.getArguments();
-            map.put((String) args[0], (String) args[1]);
-            return null;
-        }
-    }
 
     class TestPresenter extends TiPresenter<TiView> {
 
@@ -57,17 +46,43 @@ public abstract class TiFragmentPresenterDestroyTest {
 
     MockSavior mSavior;
 
+    private final HashMap<String, String> fakeBundle = new HashMap<>();
+
     @Before
     public void setUp() throws Exception {
         mSavior = new MockSavior();
         mSavedState = mock(Bundle.class);
-        final PutInMapAnswer putInMap = new PutInMapAnswer();
-        doAnswer(putInMap).when(mSavedState).putString(anyString(), anyString());
+        doAnswer(saveInMap()).when(mSavedState).putString(anyString(), anyString());
+        doAnswer(getFromMap()).when(mSavedState).getString(anyString());
     }
 
     @After
     public void tearDown() throws Exception {
         mSavior.clear();
         mSavedState = null;
+    }
+
+    @NonNull
+    private Answer getFromMap() {
+        return new Answer() {
+            @Override
+            public String answer(final InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                //noinspection RedundantCast
+                return fakeBundle.get((String) args[0]);
+            }
+        };
+    }
+
+    @NonNull
+    private Answer saveInMap() {
+        return new Answer() {
+            @Override
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                fakeBundle.put((String) args[0], (String) args[1]);
+                return null;
+            }
+        };
     }
 }

@@ -41,7 +41,7 @@ public class TiFragmentDelegateBuilder {
         }
 
         public HostingActivity() {
-            recreateInstance();
+            resetToDefault();
         }
 
         public void setChangingConfiguration(final boolean changingConfiguration) {
@@ -57,6 +57,10 @@ public class TiFragmentDelegateBuilder {
          * Resets to default values
          */
         public void recreateInstance() {
+            resetToDefault();
+        }
+
+        public void resetToDefault() {
             mIsChangingConfiguration = false;
             mIsFinishing = false;
         }
