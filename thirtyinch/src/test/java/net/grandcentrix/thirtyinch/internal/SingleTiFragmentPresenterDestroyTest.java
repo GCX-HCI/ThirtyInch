@@ -384,6 +384,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Retain false, the savior should be ignored
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorTrue_retainFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
@@ -409,6 +415,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will *not* be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
@@ -442,7 +451,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
         delegate2.onStart_afterSuper();
 
-        // Then assert that the new Presenter does not equals the previous presenter.
+        // Then a new Presenter instance will be generated and the old presenter isn't used
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
@@ -506,6 +515,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Retain false, the savior should be ignored
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorTrue_retainFalse_dontKeepActivitiesFalse_activityFinishing() {
 
@@ -531,6 +546,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreate_afterSuper(null);
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
+
+        // Then the presenter will *not* be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
