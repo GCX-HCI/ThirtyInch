@@ -62,6 +62,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     }
 
     public void recreateActivity(View view) {
+        Log.v(TAG, "// And when the Activity is changing its configurations.");
         recreate();
     }
 
@@ -101,6 +102,16 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState(Bundle)");
+        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
+        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                + ".setFinishing(" + isFinishing() + ");");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
                 + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
