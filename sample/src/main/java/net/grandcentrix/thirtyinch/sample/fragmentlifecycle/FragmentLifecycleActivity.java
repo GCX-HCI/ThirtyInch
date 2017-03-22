@@ -14,10 +14,14 @@ import android.view.View;
 import android.widget.TextView;
 
 import static android.provider.Settings.Global.ALWAYS_FINISH_ACTIVITIES;
+import static net.grandcentrix.thirtyinch.sample.fragmentlifecycle.TestFragment.testFragmentInstanceCount;
 
 public class FragmentLifecycleActivity extends AppCompatActivity {
 
-    private static final String TAG = FragmentLifecycleActivity.class.getSimpleName();
+    static int fragmentLifecycleActivityInstanceCount = -1;
+
+    private final String TAG = this.getClass().getSimpleName()
+            + "@" + Integer.toHexString(this.hashCode());
 
     private SwitchCompat mSwitchAddToBackStack;
 
@@ -35,12 +39,20 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         addFragment(fragment);
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        Log.v(TAG, "// When the Activity finishes");
+    }
+
     public void finishActivity(View view) {
         finish();
     }
 
     @Override
     public void onBackPressed() {
+        Log.v(TAG, "// When the back button gets pressed");
+        Log.v(TAG, "// When the top most fragment gets popped");
         final FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
@@ -56,6 +68,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fragmentLifecycleActivityInstanceCount++;
         setContentView(R.layout.activity_fragment_lifecycle);
 
         mSwitchAddToBackStack = (SwitchCompat) findViewById(R.id.switch_add_back_stack);
@@ -66,14 +79,32 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         textDontKeepActivities.setText(
                 isDontKeepActivities() ? R.string.dont_keep_activities_enabled
                         : R.string.dont_keep_activities_disabled);
+
+        Log.v(TAG, "// A new Activity gets created by the Android Framework.");
+        Log.v(TAG, "final HostingActivity hostingActivity" + fragmentLifecycleActivityInstanceCount
+                + " = new HostingActivity();");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        Log.v(TAG, "hostingActivity.setChangingConfiguration(" + isChangingConfigurations() + ");");
-        Log.v(TAG, "hostingActivity.setFinishing(" + isFinishing() + ");");
+        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount
+                + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
+        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount
+                + ".setFinishing(" + isFinishing() + ");");
+        Log.v(TAG, "// hostingActivity" + fragmentLifecycleActivityInstanceCount
+                + " got destroyed.");
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState(Bundle)");
+        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
+        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                + ".setFinishing(" + isFinishing() + ");");
     }
 
     private void addFragment(final Fragment fragment) {
@@ -89,6 +120,24 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
             fragmentTransaction.addToBackStack(null);
         }
         final int backStackId = fragmentTransaction.commit();
+        Log.v(TAG, "\n// Given a Presenter ...");
+        // (testFragmentInstanceCount + 1) because it will be created after executing this code
+        Log.v(TAG, "final TestPresenter presenter" + (testFragmentInstanceCount + 1) + " ="
+                + " new TestPresenter(new TiConfiguration.Builder()\n"
+                + "                .setUseStaticSaviorToRetain(/*TODO set*/)\n"
+                + "                .setRetainPresenterEnabled(" + isRetainFragmentInstance() + ")\n"
+                + "                .build());");
+
+        Log.v(TAG, "\n// And given a Fragment.");
+        Log.v(TAG, "final TiFragmentDelegate<TiPresenter<TiView>, TiView> "
+                + "delegate" + (testFragmentInstanceCount + 1) + "\n"
+                + "                = new TiFragmentDelegateBuilder()\n"
+                + "                .setDontKeepActivitiesEnabled(" + isDontKeepActivities() + ")\n"
+                + "                .setHostingActivity(hostingActivity)\n"
+                + "                .setSavior(mSavior)\n"
+                + "                .setPresenter(presenter" + (testFragmentInstanceCount + 1) + ")\n"
+                + "                .build();");
+
         if (backStackId >= 0) {
             Log.v(TAG, "Back stack ID: " + String.valueOf(backStackId));
         }
