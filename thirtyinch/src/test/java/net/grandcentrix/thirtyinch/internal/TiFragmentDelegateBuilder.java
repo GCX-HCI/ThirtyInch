@@ -41,7 +41,7 @@ public class TiFragmentDelegateBuilder {
         }
 
         public HostingActivity() {
-            resetToDefault();
+            recreateInstance();
         }
 
         public void setChangingConfiguration(final boolean changingConfiguration) {
@@ -52,7 +52,11 @@ public class TiFragmentDelegateBuilder {
             mIsFinishing = finishing;
         }
 
-        public void resetToDefault() {
+        /**
+         * like when the Activity gets recreated by the Android Framework.
+         * Resets to default values
+         */
+        public void recreateInstance() {
             mIsChangingConfiguration = false;
             mIsFinishing = false;
         }

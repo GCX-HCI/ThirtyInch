@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDestroyTest {
 
     /**
-     * no retain
+     * Activity changing configuration without retain
      *
      * verified by:
      * - pascal
@@ -162,7 +162,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * no retain
+     * Activity finish without retain
      *
      * verified by:
      * - pascal
@@ -244,6 +244,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Activity changing configuration without savior
+     *
+     * verified by:
+     * - pascal
+     */
     @Test
     public void saviorFalse_retainTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
@@ -270,11 +276,21 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
         delegate.onStart_afterSuper();
 
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
         delegate.onSaveInstanceState_afterSuper(mSavedState);
         delegate.onStop_beforeSuper();
         delegate.onDestroyView_beforeSuper();
+
+        // Then the presenter will be retained but not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // When new Activity instance gets created by the Android Framework.
+        hostingActivity.recreateInstance();
 
         // And the Fragment is retained.
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
@@ -329,7 +345,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Without savior
+     * Activity finish without savior
      *
      * verified by:
      * - pascal
@@ -412,7 +428,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Retain false, the savior should be ignored
+     * Activity changing configuration without retain, the savior should be ignored although enabled
      *
      * verified by:
      * - pascal
@@ -543,7 +559,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Retain false, the savior should be ignored
+     * Activity finishing without retain, the savior should be ignored although enabled
      *
      * verified by:
      * - pascal
@@ -626,7 +642,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Default case
+     * Activity changing configuration Default case
      *
      * verified by:
      * - pascal
@@ -675,7 +691,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(1);
 
         // When new Activity instance gets created by the Android Framework.
-        hostingActivity.resetToDefault();
+        hostingActivity.recreateInstance();
 
         // And the Fragment gets automatically retained.
         delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
@@ -730,7 +746,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Default case
+     * Activity finish Default case
      *
      * verified by:
      * - pascal
