@@ -82,8 +82,7 @@ public abstract class TestFragment extends Fragment {
                 + "                = new TiFragmentDelegateBuilder()...\n");
 
         if (savedInstanceState == null) {
-            Log.v(getFragmentTag(), "delegate" + instanceNum
-                    + ".onCreate_afterSuper(null);");
+            Log.v(getFragmentTag(), "delegate" + instanceNum + ".onCreate_afterSuper(null);");
         } else {
             Log.v(getFragmentTag(), "delegate" + instanceNum
                     + ".onCreate_afterSuper(savedInstanceState);");
@@ -115,7 +114,6 @@ public abstract class TestFragment extends Fragment {
             @Nullable final Bundle savedInstanceState) {
         Log.d(getFragmentTag(), "onCreateView");
 
-        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
         if (savedInstanceState == null) {
             Log.v(getFragmentTag(), "delegate" + instanceNum
                     + ".onCreateView_beforeSuper(inflater, null, null);");
@@ -131,9 +129,7 @@ public abstract class TestFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d(getFragmentTag(), "onDestroy");
-        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
-        Log.v(getFragmentTag(), "delegate" + instanceNum
-                + ".onDestroy_afterSuper();");
+        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onDestroy_afterSuper();");
     }
 
     @Override
@@ -146,9 +142,7 @@ public abstract class TestFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.d(getFragmentTag(), "onDestroyView");
-        // TODO: rberghegger 17.03.17 find a smarter way to log what would be called on the delegate
-        Log.v(getFragmentTag(), "delegate" + instanceNum
-                + ".onDestroyView_beforeSuper();");
+        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onDestroyView_beforeSuper();");
     }
 
     @Override
@@ -198,6 +192,13 @@ public abstract class TestFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Log.d(getFragmentTag(), "onPause");
+
+        final FragmentLifecycleActivity activity = (FragmentLifecycleActivity) getActivity();
+
+        Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                + ".setChangingConfiguration(" + activity.isChangingConfigurations() + ");");
+        Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                + ".setFinishing(" + activity.isFinishing() + ");");
     }
 
     @Override
@@ -231,8 +232,7 @@ public abstract class TestFragment extends Fragment {
         super.onSaveInstanceState(outState);
         Log.d(getFragmentTag(), "onSaveInstanceState");
 
-        final FragmentLifecycleActivity activity =
-                (FragmentLifecycleActivity) getActivity();
+        final FragmentLifecycleActivity activity = (FragmentLifecycleActivity) getActivity();
 
         Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
                 + ".setChangingConfiguration(" + activity.isChangingConfigurations() + ");");
@@ -247,16 +247,14 @@ public abstract class TestFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(getFragmentTag(), "onStart");
-        Log.v(getFragmentTag(), "delegate" + instanceNum
-                + ".onStart_afterSuper();");
+        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onStart_afterSuper();");
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(getFragmentTag(), "onStop");
-        Log.v(getFragmentTag(), "delegate" + instanceNum
-                + ".onStop_beforeSuper();");
+        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onStop_beforeSuper();");
     }
 
     @Override
