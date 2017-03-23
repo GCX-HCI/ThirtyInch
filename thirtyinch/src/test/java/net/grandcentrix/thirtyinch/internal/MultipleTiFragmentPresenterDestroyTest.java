@@ -1019,6 +1019,9 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Default case
+     */
     @Test
     public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
@@ -1055,6 +1058,9 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Default case
+     */
     @Test
     public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityFinishing() {
 
@@ -1163,8 +1169,9 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
-
-
+    /**
+     * Default case
+     */
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
 
@@ -1227,6 +1234,9 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         assertThat(delegate2.getPresenter()).isEqualTo(presenter);*/
     }
 
+    /**
+     * Default case
+     */
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityFinishing() {
 
@@ -1599,6 +1609,9 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Default case
+     */
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
 
