@@ -1020,7 +1020,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     /**
-     * Default case
+     * Default config
      */
     @Test
     public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityChangingConfiguration() {
@@ -1059,7 +1059,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     /**
-     * Default case
+     * Default config
      */
     @Test
     public void saviorTrue_retainTrue_backstackFalse_dontKeepActivitiesFalse_activityFinishing() {
@@ -1170,7 +1170,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     /**
-     * Default case
+     * Default config
      */
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityChangingConfiguration() {
@@ -1235,7 +1235,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     /**
-     * Default case
+     * Default config
      */
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_activityFinishing() {
@@ -1610,7 +1610,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     /**
-     * Default case
+     * Default config
      */
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {

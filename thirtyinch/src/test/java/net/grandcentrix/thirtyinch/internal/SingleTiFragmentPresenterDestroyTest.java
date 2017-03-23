@@ -1080,7 +1080,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity changing configuration Default case
+     * Activity changing configuration Default config
      *
      * verified by:
      * - pascal
@@ -1142,7 +1142,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity move to background -> move to foreground Default case (don't keep Activities)
+     * Activity move to background -> move to foreground Default config (don't keep Activities)
      *
      * verified by:
      * - pascal
@@ -1219,7 +1219,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity move to background -> move to foreground Default case
+     * Activity move to background -> move to foreground Default config
      *
      * verified by:
      * - pascal
@@ -1278,7 +1278,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity changing configuration Default case (don't keep Activities)
+     * Activity changing configuration Default config (don't keep Activities)
      *
      * verified by:
      * - pascal
@@ -1336,7 +1336,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity finish Default case
+     * Activity finish Default config
      *
      * verified by:
      * - pascal
@@ -1386,7 +1386,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity finish Default case  (don't keep Activities)
+     * Activity finish Default config  (don't keep Activities)
      *
      * verified by:
      * - pascal
