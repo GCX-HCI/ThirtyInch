@@ -278,6 +278,45 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     @Test
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when it is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
     public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
 
         final HostingActivity hostingActivity = new HostingActivity();
@@ -374,6 +413,45 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the Presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does not use a static savior and does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when it is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
@@ -622,6 +700,45 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does not use a static savior but does retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when it is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
     public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
 
         final HostingActivity hostingActivity = new HostingActivity();
@@ -718,6 +835,45 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then assert that the presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does not use a static savior but does retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(false)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when the Fragment is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
@@ -943,6 +1099,45 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does use a static savior but does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when the Fragment is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
     public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
 
         final HostingActivity hostingActivity = new HostingActivity();
@@ -1016,6 +1211,45 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does use a static savior but does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(true)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when the Fragment is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and not saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
@@ -1275,6 +1509,48 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * Default config
+     */
+    @Test
+    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that uses a static savior to retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
+                = new TiFragmentDelegateBuilder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        delegate.onCreate_afterSuper(null);
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // And when the Fragment is replaced by another Fragment.
+        delegate.onStop_beforeSuper();
+        delegate.onDestroyView_beforeSuper();
+
+        // And when the back stack is popped.
+        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
+        delegate.onStart_afterSuper();
+
+        // Then assert that the Presenter is not destroyed and saved in the savior.
+        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(delegate.getPresenter()).isEqualTo(presenter);
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
+    }
+
     @Test
     public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesTrue_activityChangingConfiguration() {
 
@@ -1373,282 +1649,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when it is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainFalse_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(true)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when it is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that does not use a static savior but does retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when it is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_retainTrue_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that does not use a static savior but does retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(true)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when the Fragment is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that does use a static savior but does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when the Fragment is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorTrue_retainFalse_backstackTrue_dontKeepActivitiesTrue_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that does use a static savior but does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(true)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when the Fragment is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    /**
-     * Default config
-     */
-    @Test
-    public void saviorTrue_retainTrue_backstackTrue_dontKeepActivitiesFalse_popBackstack() {
-
-        final HostingActivity hostingActivity = new HostingActivity();
-
-        // Given a Presenter that uses a static savior to retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // And when the Fragment is replaced by another Fragment.
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // And when the back stack is popped.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
     }
 
     @Test
