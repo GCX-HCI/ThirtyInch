@@ -53,19 +53,19 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -79,12 +79,12 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
      * is {@code null} before {@link #onCreate(Bundle)}
      */
     @Override
-    public P getPresenter() {
+    public final P getPresenter() {
         return mDelegate.getPresenter();
     }
 
     @Override
-    public Executor getUiThreadExecutor() {
+    public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
     }
 
@@ -93,32 +93,32 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
+    public final boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
 
     @Override
-    public boolean isFragmentAdded() {
+    public final boolean isFragmentAdded() {
         return isAdded();
     }
 
     @Override
-    public boolean isFragmentDetached() {
+    public final boolean isFragmentDetached() {
         return isDetached();
     }
 
     @Override
-    public boolean isHostingActivityChangingConfigurations() {
+    public final boolean isHostingActivityChangingConfigurations() {
         return getActivity().isChangingConfigurations();
     }
 
     @Override
-    public boolean isHostingActivityFinishing() {
+    public final boolean isHostingActivityFinishing() {
         return getActivity().isFinishing();
     }
 
@@ -196,7 +196,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
-    public void setFragmentRetainInstance(final boolean retain) {
+    public final void setFragmentRetainInstance(final boolean retain) {
         setRetainInstance(retain);
     }
 
