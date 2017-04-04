@@ -30,6 +30,7 @@ import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -56,19 +57,19 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -82,14 +83,14 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
      * is {@code null} before {@link #onCreate(Bundle)}
      */
     @Override
-    public P getPresenter() {
+    public final P getPresenter() {
         return mDelegate.getPresenter();
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public P getRetainedPresenter() {
+    public final P getRetainedPresenter() {
         // try recover presenter via lastNonConfigurationInstance
         // this works most of the time
         final Object nci = getLastCustomNonConfigurationInstance();
@@ -101,7 +102,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public Executor getUiThreadExecutor() {
+    public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
     }
 
@@ -110,25 +111,26 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
+    public final boolean isActivityChangingConfigurations() {
         return isChangingConfigurations();
     }
 
     @Override
-    public boolean isActivityFinishing() {
+    public final boolean isActivityFinishing() {
         return isFinishing();
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
+    public final boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
     }
 
+    @CallSuper
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -186,30 +188,35 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
                 + "{presenter = " + presenter + "}";
     }
 
+    @CallSuper
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @CallSuper
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mDelegate.onDestroy_afterSuper();
     }
 
+    @CallSuper
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
+    @CallSuper
     @Override
     protected void onStart() {
         super.onStart();
         mDelegate.onStart_afterSuper();
     }
 
+    @CallSuper
     @Override
     protected void onStop() {
         mDelegate.onStop_beforeSuper();
