@@ -138,6 +138,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Nullable
+    @CallSuper
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
         final P presenter = mDelegate.getPresenter();
