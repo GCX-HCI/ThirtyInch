@@ -19,12 +19,13 @@ import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
-import static android.content.ContentValues.TAG;
 import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 
 /**
@@ -34,10 +35,19 @@ public class LoggingInterceptor implements BindViewInterceptor {
 
     private final static class MethodLoggingInvocationHandler<V> extends AbstractInvocationHandler {
 
+        /**
+         * limit each argument instead of the complete string. This should limit the overall
+         * output to a reasonable length.
+         */
+        public static final int MAX_LEN_OF_PARAM = 240;
+
+        private TiLog.Logger mLogger;
+
         private final V mView;
 
-        private MethodLoggingInvocationHandler(V view) {
+        private MethodLoggingInvocationHandler(V view, @NonNull TiLog.Logger logger) {
             mView = view;
+            mLogger = logger;
         }
 
         @Override
@@ -52,15 +62,8 @@ public class LoggingInterceptor implements BindViewInterceptor {
                 throws Throwable {
 
             try {
-                // If the method is a method from Object then defer to normal invocation.
-                final Class<?> declaringClass = method.getDeclaringClass();
-                if (declaringClass == Object.class) {
-                    return method.invoke(this, args);
-                }
-
-                TiLog.v(TAG, toString(method, args));
+                mLogger.log(Log.VERBOSE, TAG, toString(method, args));
                 return method.invoke(mView, args);
-
             } catch (InvocationTargetException e) {
                 throw e.getCause();
             }
@@ -68,28 +71,45 @@ public class LoggingInterceptor implements BindViewInterceptor {
 
         private static String toString(@NonNull final Method method,
                 @Nullable final Object[] args) {
-            if (args == null || args.length == 0) {
-                return "";
-            }
-            final String paramsString = parseParams(args, 240);
-            //noinspection StringBufferReplaceableByString
             final StringBuilder sb = new StringBuilder(method.getName());
             sb.append("(");
-            sb.append(paramsString);
+            if (args != null && args.length > 0) {
+                final String paramsString = parseParams(args, MAX_LEN_OF_PARAM);
+                sb.append(paramsString);
+            }
             sb.append(")");
             return sb.toString();
         }
     }
 
-    private final boolean mEnableLogging;
+    private static final String TAG = MethodLoggingInvocationHandler.class.getSimpleName();
 
-    public LoggingInterceptor(final boolean enableLogging) {
-        mEnableLogging = enableLogging;
+    private final TiLog.Logger mLogger;
+
+    /**
+     * Logs all view interface method invocations to {@link TiLog}. You may have to enable
+     * logging from {@link TiLog} or set your own logger with {@link LoggingInterceptor#LoggingInterceptor(TiLog.Logger)}
+     */
+    public LoggingInterceptor() {
+        this(TiLog.TI_LOG);
+    }
+
+    /**
+     * Logs all view interface method invocations to the provided {@link TiLog.Logger} interface
+     *
+     * @param logger custom logger, {@link TiLog#LOGCAT} or {@link TiLog#NOOP} to disable logging.
+     */
+    public LoggingInterceptor(@Nullable final TiLog.Logger logger) {
+        if (logger == null) {
+            mLogger = TiLog.NOOP;
+        } else {
+            mLogger = logger;
+        }
     }
 
     @Override
     public <V extends TiView> V intercept(final V view) {
-        if (mEnableLogging) {
+        if (mLogger != TiLog.NOOP) {
             final V wrapped = wrap(view);
             TiLog.v(TAG, "wrapping View " + view + " in " + wrapped);
             return wrapped;
@@ -103,36 +123,62 @@ public class LoggingInterceptor implements BindViewInterceptor {
         Class<?> foundInterfaceClass = getInterfaceOfClassExtendingGivenInterface(
                 view.getClass(), TiView.class);
         if (foundInterfaceClass == null) {
-            throw new IllegalStateException("the interface extending View could not be found");
+            throw new IllegalStateException("the interface extending TiView could not be found");
         }
 
         final V wrappedView = (V) Proxy.newProxyInstance(
                 foundInterfaceClass.getClassLoader(), new Class<?>[]{foundInterfaceClass},
-                new MethodLoggingInvocationHandler<>(view));
+                new MethodLoggingInvocationHandler<>(view, mLogger));
 
         return wrappedView;
     }
 
-    private static String parseParams(Object[] a, int maxLenOfParam) {
-        if (a == null) {
-            return "null";
-        }
-
-        int iMax = a.length - 1;
-        if (iMax == -1) {
-            return "[]";
-        }
+    private static String parseParams(Object[] methodParams, int maxLenOfParam) {
+        int iMax = methodParams.length - 1;
 
         StringBuilder b = new StringBuilder();
         for (int i = 0; ; i++) {
-            final String param = String.valueOf(a[i]);
+            final Object arg = methodParams[i];
+
+            final String param;
+            if (arg instanceof List) {
+                final int size = ((List) arg).size();
+                final String stringPresentation = String.valueOf(arg);
+                param = "{" + arg.getClass().getSimpleName()
+                        + "[" + size + "]"
+                        + "@" + Integer.toHexString(arg.hashCode()) + "}"
+                        + " " + stringPresentation;
+            } else if (arg instanceof Object[]) {
+                final Object[] args = ((Object[]) arg);
+                final int size = args.length;
+
+                final StringBuilder sb = new StringBuilder();
+                sb.append("[");
+                for (int j = 0; j < args.length; j++) {
+                    sb.append(String.valueOf(args[j]));
+                    if (j + 1 < args.length) {
+                        sb.append(", ");
+                    }
+                }
+                sb.append("]");
+
+                param = "{" + arg.getClass().getSimpleName()
+                        + "[" + size + "]"
+                        + "@" + Integer.toHexString(arg.hashCode()) + "}"
+                        + " " + sb;
+            } else {
+                param = String.valueOf(arg);
+            }
+
             if (param.length() <= maxLenOfParam) {
                 b.append(param);
             } else {
                 final String shortParam =
                         param.substring(0, Math.min(param.length(), maxLenOfParam));
                 b.append(shortParam);
-                b.append("...");
+                // trim remaining whitespace at the end before appending ellipsis
+                b = new StringBuilder(b.toString().trim());
+                b.append("…");
             }
             if (i == iMax) {
                 return b.toString();
