@@ -108,6 +108,7 @@ public class LoggingInterceptorTest {
                 .isEqualTo("twoArgs(" + maxArg + "…, B)");
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     public void dontLogObjectInvocations() throws Exception {
 
@@ -229,7 +230,7 @@ public class LoggingInterceptorTest {
 
         final ArgumentCaptor<String> msgCaptor = ArgumentCaptor.forClass(String.class);
 
-        view.varargs(null);
+        view.varargs((Object[]) null);
         verify(logger).log(anyInt(), anyString(), msgCaptor.capture());
 
         assertThat(msgCaptor.getValue())
