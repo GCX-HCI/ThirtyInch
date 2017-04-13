@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.TextView;
 
+import java.util.UUID;
+
 import static net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity.fragmentLifecycleActivityInstanceCount;
 
 public abstract class TestFragment extends Fragment {
@@ -31,7 +33,21 @@ public abstract class TestFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
 
+    private final Object instanceData = new Object() {
+        @Override
+        protected void finalize() throws Throwable {
+            super.finalize();
+            Log.v(getFragmentTag(), "FINALIZE");
+        }
+    };
+
     private int instanceNum = Integer.MIN_VALUE;
+
+    private String mUuid;
+
+    public TestFragment() {
+        Log.v("FragmentManager", this + " constructor called");
+    }
 
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
@@ -48,7 +64,7 @@ public abstract class TestFragment extends Fragment {
     @Override
     public void onAttach(final Context context) {
         super.onAttach(context);
-        Log.d(getFragmentTag(), "onAttach");
+        Log.d(getFragmentTag(), "onAttach(" + context + ")");
     }
 
     @Override
@@ -74,7 +90,16 @@ public abstract class TestFragment extends Fragment {
         super.onCreate(savedInstanceState);
         testFragmentInstanceCount++;
         instanceNum = testFragmentInstanceCount;
-        Log.d(getFragmentTag(), "onCreate");
+        Log.d(getFragmentTag(), "onCreate(" + savedInstanceState + ")");
+
+        if (savedInstanceState != null) {
+            mUuid = savedInstanceState.getString("uuid");
+            Log.v("FragmentManager", "RESTORED " + mUuid);
+        }
+        if (mUuid == null) {
+            mUuid = UUID.randomUUID().toString();
+            Log.v("FragmentManager", "CREATED " + mUuid);
+        }
 
         Log.v(getFragmentTag(), "// TODO generate a new TiFragmentDelegate instance");
         Log.v(TAG, "final TiFragmentDelegate<TiPresenter<TiView>, TiView> "
@@ -87,6 +112,8 @@ public abstract class TestFragment extends Fragment {
             Log.v(getFragmentTag(), "delegate" + instanceNum
                     + ".onCreate_afterSuper(savedInstanceState);");
         }
+
+        Log.v(getFragmentTag(), "instance Data: " + instanceData);
     }
 
     @Override
@@ -122,6 +149,8 @@ public abstract class TestFragment extends Fragment {
                     + ".onCreateView_beforeSuper(inflater, null, savedInstanceState);");
         }
 
+        Log.v(getFragmentTag(), "instance Data: " + instanceData);
+
         return inflater.inflate(getLayoutResId(), container, false);
     }
 
@@ -130,6 +159,11 @@ public abstract class TestFragment extends Fragment {
         super.onDestroy();
         Log.d(getFragmentTag(), "onDestroy");
         Log.v(getFragmentTag(), "delegate" + instanceNum + ".onDestroy_afterSuper();");
+        Log.v(getFragmentTag(), "added " + isAdded());
+        Log.v(getFragmentTag(), "removing " + isRemoving());
+        Log.v(getFragmentTag(), "detached " + isDetached());
+        Log.v(getFragmentTag(), "instance Data: " + instanceData);
+        Log.v("FragmentManager", "DESTROYED " + mUuid);
     }
 
     @Override
@@ -143,12 +177,16 @@ public abstract class TestFragment extends Fragment {
         super.onDestroyView();
         Log.d(getFragmentTag(), "onDestroyView");
         Log.v(getFragmentTag(), "delegate" + instanceNum + ".onDestroyView_beforeSuper();");
+
+        Log.v(getFragmentTag(), "instance Data: " + instanceData);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         Log.d(getFragmentTag(), "onDetach");
+
+        Log.v(getFragmentTag(), "instance Data: " + instanceData);
     }
 
     @Override
@@ -225,12 +263,15 @@ public abstract class TestFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(getFragmentTag(), "onResume");
+        Log.d(getFragmentTag(), "isAdded=" + isAdded() + ", isAttached= " + !isDetached());
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(getFragmentTag(), "onSaveInstanceState");
+
+        outState.putString("uuid", mUuid);
 
         final FragmentLifecycleActivity activity = (FragmentLifecycleActivity) getActivity();
 
@@ -270,6 +311,12 @@ public abstract class TestFragment extends Fragment {
     public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         Log.d(getFragmentTag(), "onViewStateRestored");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        Log.i("FragmentManager", "GCed " + this + ", uuid: " + this.mUuid);
     }
 
     @LayoutRes

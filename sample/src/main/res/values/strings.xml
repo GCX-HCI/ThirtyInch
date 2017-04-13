@@ -4,6 +4,7 @@
     <!-- Fragment lifecycle -->
     <string name="start_fragment_lifecycle_test">Start fragment lifecycle test</string>
     <string name="add_fragment_a">Add Fragment A</string>
+    <string name="remove_fragment_a">Remove Fragment A</string>
     <string name="add_fragment_b">Add Fragment B</string>
     <string name="recreate_activity">Recreate Activity</string>
     <string name="finish_activity">Finish Activity</string>

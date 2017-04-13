@@ -66,11 +66,23 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         recreate();
     }
 
+    public void removeFragmentA(View view) {
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_placeholder);
+        if (fragment instanceof TestFragmentA) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragment)
+                    .commitNow();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentLifecycleActivityInstanceCount++;
         setContentView(R.layout.activity_fragment_lifecycle);
+        FragmentManager.enableDebugLogging(true);
+        Log.v(TAG, "onCreate of " + this);
 
         mSwitchAddToBackStack = (SwitchCompat) findViewById(R.id.switch_add_back_stack);
         mSwitchRetainFragmentInstance = (SwitchCompat) findViewById(
@@ -90,6 +102,8 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        Log.v(TAG, "onDestroy of " + this);
+
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount
                 + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount
@@ -99,9 +113,9 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState(Bundle)");
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
                 + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
@@ -109,9 +123,9 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause()");
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState(Bundle)");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
                 + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
         Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
@@ -146,7 +160,8 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
                 + "                .setDontKeepActivitiesEnabled(" + isDontKeepActivities() + ")\n"
                 + "                .setHostingActivity(hostingActivity)\n"
                 + "                .setSavior(mSavior)\n"
-                + "                .setPresenter(presenter" + (testFragmentInstanceCount + 1) + ")\n"
+                + "                .setPresenter(presenter" + (testFragmentInstanceCount + 1)
+                + ")\n"
                 + "                .build();");
 
         if (backStackId >= 0) {
