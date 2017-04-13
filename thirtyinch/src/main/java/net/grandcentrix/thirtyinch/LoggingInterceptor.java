@@ -37,7 +37,7 @@ public class LoggingInterceptor implements BindViewInterceptor {
 
         /**
          * limit each argument instead of the complete string. This should limit the overall
-         * output to a reasonable length.
+         * output to a reasonable length while showing all params
          */
         public static final int MAX_LEN_OF_PARAM = 240;
 
