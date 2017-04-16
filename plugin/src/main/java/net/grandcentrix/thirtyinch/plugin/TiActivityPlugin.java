@@ -38,6 +38,7 @@ import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -54,7 +55,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         implements TiViewProvider<V>, DelegatedTiActivity<P>, TiLoggingTagProvider,
         InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
-    public static final String NCI_KEY_PRESENTER = "presenter";
+    private static final String NCI_KEY_PRESENTER = "presenter";
 
     private String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
@@ -81,7 +82,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
@@ -90,7 +91,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
@@ -100,7 +101,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -111,14 +112,14 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public P getPresenter() {
+    public final P getPresenter() {
         return mDelegate.getPresenter();
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public P getRetainedPresenter() {
+    public final P getRetainedPresenter() {
         final Object nci = getLastNonConfigurationInstance(NCI_KEY_PRESENTER);
         if (nci != null) {
             return (P) nci;
@@ -127,7 +128,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public Executor getUiThreadExecutor() {
+    public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
     }
 
@@ -136,7 +137,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
@@ -146,33 +147,37 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public boolean isActivityFinishing() {
+    public final boolean isActivityFinishing() {
         return getActivity().isFinishing();
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
+    public final boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
 
+    @CallSuper
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDelegate.onConfigurationChanged_afterSuper(newConfig);
     }
 
+    @CallSuper
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @CallSuper
     @Override
     public void onDestroy() {
         super.onDestroy();
         mDelegate.onDestroy_afterSuper();
     }
 
+    @CallSuper
     @Override
     @Nullable
     public CompositeNonConfigurationInstance onRetainNonConfigurationInstance() {
@@ -188,18 +193,21 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return null;
     }
 
+    @CallSuper
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
+    @CallSuper
     @Override
     public void onStart() {
         super.onStart();
         mDelegate.onStart_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onStop() {
         mDelegate.onStop_beforeSuper();

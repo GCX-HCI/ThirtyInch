@@ -28,6 +28,7 @@ import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -52,19 +53,19 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -75,12 +76,12 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     }
 
     @Override
-    public P getPresenter() {
+    public final P getPresenter() {
         return mDelegate.getPresenter();
     }
 
     @Override
-    public Executor getUiThreadExecutor() {
+    public final Executor getUiThreadExecutor() {
         return new UiThreadExecutor();
     }
 
@@ -89,41 +90,43 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
+    public final boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
 
     @Override
-    public boolean isFragmentAdded() {
+    public final boolean isFragmentAdded() {
         return isAdded();
     }
 
     @Override
-    public boolean isFragmentDetached() {
+    public final boolean isFragmentDetached() {
         return isDetached();
     }
 
     @Override
-    public boolean isHostingActivityChangingConfigurations() {
+    public final boolean isHostingActivityChangingConfigurations() {
         return getActivity().isChangingConfigurations();
     }
 
     @Override
-    public boolean isHostingActivityFinishing() {
+    public final boolean isHostingActivityFinishing() {
         return getActivity().isFinishing();
     }
 
+    @CallSuper
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @CallSuper
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
@@ -132,30 +135,35 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    @CallSuper
     @Override
     public void onDestroy() {
         super.onDestroy();
         mDelegate.onDestroy_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onDestroyView() {
         mDelegate.onDestroyView_beforeSuper();
         super.onDestroyView();
     }
 
+    @CallSuper
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
+    @CallSuper
     @Override
     public void onStart() {
         super.onStart();
         mDelegate.onStart_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onStop() {
         mDelegate.onStop_beforeSuper();
@@ -192,7 +200,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     }
 
     @Override
-    public void setFragmentRetainInstance(final boolean retain) {
+    public final void setFragmentRetainInstance(final boolean retain) {
         setRetainInstance(retain);
     }
 
