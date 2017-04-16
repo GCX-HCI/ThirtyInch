@@ -30,9 +30,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity changing configuration without retain
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainFalse_activityChangingConfiguration() {
@@ -101,9 +98,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity finish without retain
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainFalse_activityFinishing() {
@@ -147,9 +141,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity move to background -> move to foreground without retain
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainFalse_moveToBackground_moveToForeground() {
@@ -199,9 +190,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity changing configuration without savior
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainTrue_activityChangingConfiguration() {
@@ -257,9 +245,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity finish without savior
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainTrue_activityFinishing() {
@@ -303,9 +288,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity move to background -> move to foreground without savior
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainTrue_moveToBackground_moveToForeground() {
@@ -355,9 +337,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity changing configuration without retain, the savior should be ignored although enabled
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainFalse_activityChangingConfiguration() {
@@ -427,9 +406,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity finishing without retain, the savior should be ignored although enabled
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainFalse_activityFinishing() {
@@ -474,9 +450,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     /**
      * Activity move to background -> move to foreground without retain, the savior should be
      * ignored although enabled
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainFalse_moveToBackground_moveToForeground() {
@@ -525,9 +498,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity changing configuration Default config
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainTrue_activityChangingConfiguration() {
@@ -587,9 +557,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity finish Default config
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainTrue_activityFinishing() {
@@ -637,9 +604,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
     /**
      * Activity move to background -> move to foreground Default config
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainTrue_moveToBackground_moveToForeground() {

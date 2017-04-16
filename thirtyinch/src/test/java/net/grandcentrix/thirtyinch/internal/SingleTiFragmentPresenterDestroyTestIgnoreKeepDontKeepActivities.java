@@ -31,9 +31,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity changing configuration without retain (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainFalse_activityChangingConfiguration() {
@@ -102,9 +99,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity finish without retain  (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainFalse_activityFinishing() {
@@ -148,9 +142,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity move to background -> move to foreground without retain (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainFalse_moveToBackground_moveToForeground() {
@@ -221,9 +212,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity changing configuration without savior (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainTrue_activityChangingConfiguration() {
@@ -279,9 +267,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity finish without savior (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainTrue_activityFinishing() {
@@ -325,9 +310,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity move to background -> move to foreground without savior (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorFalse_retainTrue_moveToBackground_moveToForeground() {
@@ -399,9 +381,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
     /**
      * Activity changing configuration without retain, the savior should be ignored although enabled
      * (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainFalse_activityChangingConfiguration() {
@@ -472,9 +451,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
     /**
      * Activity finishing without retain, the savior should be ignored although enabled (don't keep
      * Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainFalse_activityFinishing() {
@@ -519,9 +495,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
     /**
      * Activity move to background -> move to foreground without retain, the savior should be
      * ignored although enabled (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainFalse_moveToBackground_moveToForeground() {
@@ -590,9 +563,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity changing configuration Default config (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainTrue_activityChangingConfiguration() {
@@ -648,9 +618,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity finish Default config  (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainTrue_activityFinishing() {
@@ -694,9 +661,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
     /**
      * Activity move to background -> move to foreground Default config (don't keep Activities)
-     *
-     * verified by:
-     * - pascal
      */
     @Test
     public void saviorTrue_retainTrue_moveToBackground_moveToForeground() {
