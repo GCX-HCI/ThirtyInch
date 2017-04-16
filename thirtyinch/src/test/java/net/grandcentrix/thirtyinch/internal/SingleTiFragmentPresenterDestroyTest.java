@@ -31,7 +31,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     /**
      * Activity changing configuration without retain
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainFalse_activityChangingConfiguration() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -94,12 +94,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Then a new Presenter will be attached and the previous presenter doesn't get reattached.
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
-    }
+    }*/
 
     /**
      * Activity finish without retain
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainFalse_activityFinishing() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -137,12 +137,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity move to background -> move to foreground without retain
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainFalse_moveToBackground_moveToForeground() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -186,12 +186,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
         assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-    }
+    }*/
 
     /**
      * Activity changing configuration without savior
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainTrue_activityChangingConfiguration() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -241,12 +241,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(delegate.getPresenter().isDestroyed()).isFalse();
         assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity finish without savior
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainTrue_activityFinishing() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -284,12 +284,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity move to background -> move to foreground without savior
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainTrue_moveToBackground_moveToForeground() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -333,7 +333,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(delegate.getPresenter().isDestroyed()).isFalse();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity changing configuration without retain, the savior should be ignored although enabled

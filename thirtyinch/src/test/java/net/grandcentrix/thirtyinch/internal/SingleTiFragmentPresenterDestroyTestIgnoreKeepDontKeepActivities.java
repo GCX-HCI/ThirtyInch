@@ -26,13 +26,18 @@ import android.view.LayoutInflater;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+/**
+ * Same test cases as {@link SingleTiFragmentPresenterDestroyTest} but with the "don't keep
+ * Activities option enabled". This means that the lifecycle may be different but the final
+ * assertions must be identical
+ */
 public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         extends TiFragmentPresenterDestroyTest {
 
     /**
      * Activity changing configuration without retain (don't keep Activities)
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainFalse_activityChangingConfiguration() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -95,12 +100,12 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then a new Presenter will be attached and the previous presenter doesn't get reattached.
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
-    }
+    }*/
 
     /**
      * Activity finish without retain  (don't keep Activities)
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainFalse_activityFinishing() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -138,12 +143,12 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity move to background -> move to foreground without retain (don't keep Activities)
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainFalse_moveToBackground_moveToForeground() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -208,12 +213,12 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
         assertThat(delegate2.getPresenter().isDestroyed()).isEqualTo(false);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity changing configuration without savior (don't keep Activities)
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainTrue_activityChangingConfiguration() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -263,12 +268,12 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         assertThat(delegate.getPresenter().isDestroyed()).isFalse();
         assertThat(delegate.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity finish without savior (don't keep Activities)
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainTrue_activityFinishing() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -306,12 +311,12 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         // Then assert that the presenter is destroyed and not saved in the savior.
         assertThat(delegate.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity move to background -> move to foreground without savior (don't keep Activities)
      */
-    @Test
+    /*@Test
     public void saviorFalse_retainTrue_moveToBackground_moveToForeground() {
 
         final TiFragmentDelegateBuilder.HostingActivity
@@ -376,7 +381,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
         assertThat(delegate2.getPresenter().isDestroyed()).isEqualTo(false);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
+    }*/
 
     /**
      * Activity changing configuration without retain, the savior should be ignored although enabled
