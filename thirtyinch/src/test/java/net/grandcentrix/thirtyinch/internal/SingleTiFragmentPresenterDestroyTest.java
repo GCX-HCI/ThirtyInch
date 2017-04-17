@@ -175,7 +175,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         final HostingActivity hostingActivity = new HostingActivity();
 
-        // Given a Presenter that does use a static savior but does not retain itself.
+        // Given a Presenter without retain.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
@@ -263,7 +263,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         final HostingActivity hostingActivity = new HostingActivity();
 
-        // Given a Presenter that does use a static savior but does not retain itself.
+        // Given a Presenter that does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
@@ -353,6 +353,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(1);
     }
 
+    /**
+     * removed the added fragment from the Activity without retain
+     */
     @Test
     public void remove_fragment_retainFalse() {
 
@@ -392,6 +395,10 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+
+    /**
+     * removed the added fragment from the Activity Default config
+     */
     @Test
     public void remove_fragment_retainTrue() {
 
