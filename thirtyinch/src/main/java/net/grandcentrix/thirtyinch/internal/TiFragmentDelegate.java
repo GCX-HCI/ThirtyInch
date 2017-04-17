@@ -62,13 +62,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final TiPresenterProvider<P> mPresenterProvider;
 
+    private final TiPresenterSavior mSavior;
+
     private final DelegatedTiFragment mTiFragment;
 
     private Removable mUiThreadBinderRemovable;
 
     private final PresenterViewBinder<V> mViewBinder;
-
-    private final TiPresenterSavior mSavior;
 
     private final TiViewProvider<V> mViewProvider;
 
@@ -151,7 +151,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             mPresenter = mPresenterProvider.providePresenter();
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
-            if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
+            if (config.shouldRetainPresenter()) {
                 mPresenterId = mSavior.save(mPresenter);
             }
             mPresenter.create();
@@ -164,10 +164,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (config.isDistinctUntilChangedInterceptorEnabled()) {
             addBindViewInterceptor(new DistinctUntilChangedInterceptor());
-        }
-
-        if (config.shouldRetainPresenter()) {
-            mTiFragment.setFragmentRetainInstance(true);
         }
 
         //noinspection unchecked
@@ -193,7 +189,8 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         logState();
 
-        boolean destroyPresenter = false;
+
+        boolean destroyPresenter = mTiFragment.isFragmentRemoving();
         if (mTiFragment.isHostingActivityFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter

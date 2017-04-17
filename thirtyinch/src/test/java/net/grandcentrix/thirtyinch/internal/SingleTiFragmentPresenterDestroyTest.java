@@ -16,8 +16,6 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiConfiguration;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.Test;
 
@@ -31,328 +29,19 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     /**
      * Activity changing configuration without retain
      */
-    /*@Test
-    public void saviorFalse_retainFalse_activityChangingConfiguration() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // And when the Activity is changing configurations.
-        hostingActivity.setChangingConfiguration(true);
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // When the Activity gets recreated.
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity2 = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // And generates a new Fragment instance.
-        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate2
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity2)
-                .setSavior(mSavior)
-                .setPresenter(presenter2)
-                .build();
-
-        delegate2.onCreate_afterSuper(mSavedState);
-        delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
-        delegate2.onStart_afterSuper();
-
-        // Then a new Presenter will be attached and the previous presenter doesn't get reattached.
-        assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
-    }*/
-
-    /**
-     * Activity finish without retain
-     */
-    /*@Test
-    public void saviorFalse_retainFalse_activityFinishing() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // And when the activity is finishing.
-        hostingActivity.setFinishing(true);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }*/
-
-    /**
-     * Activity move to background -> move to foreground without retain
-     */
-    /*@Test
-    public void saviorFalse_retainFalse_moveToBackground_moveToForeground() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does not use a static savior and does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the Presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // When the Activity is moved to background
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-
-        // Then the Presenter gets not destroyed and is not saved in savior
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // When the Activity gets moved to foreground
-        delegate.onStart_afterSuper();
-
-        // Then the Presenter stays the same
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-    }*/
-
-    /**
-     * Activity changing configuration without savior
-     */
-    /*@Test
-    public void saviorFalse_retainTrue_activityChangingConfiguration() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does not use a static savior but does retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // And when the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-
-        // Then the presenter will be retained but not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // When new Activity instance gets created by the Android Framework.
-        hostingActivity.recreateInstance();
-
-        // And the Fragment is retained.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
-        delegate.onStart_afterSuper();
-
-        // Then assert that the Presenter is not destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }*/
-
-    /**
-     * Activity finish without savior
-     */
-    /*@Test
-    public void saviorFalse_retainTrue_activityFinishing() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does not use a static savior but does retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // And when the Activity is finishing.
-        hostingActivity.setFinishing(true);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }*/
-
-    /**
-     * Activity move to background -> move to foreground without savior
-     */
-    /*@Test
-    public void saviorFalse_retainTrue_moveToBackground_moveToForeground() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does not use a static savior but does retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the Presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // When the Activity gets moved to background
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-
-        // Then the presenter is not destroyed and not saved in the savior
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // When the Activity moves to foreground again
-        delegate.onStart_afterSuper();
-
-        // Then the Presenter stays the same
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }*/
-
-    /**
-     * Activity changing configuration without retain, the savior should be ignored although enabled
-     */
     @Test
-    public void saviorTrue_retainFalse_activityChangingConfiguration() {
+    public void activityChangingConfiguration_retainFalse() {
 
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
+        final HostingActivity hostingActivity = new HostingActivity();
 
-        // Given a Presenter that does use a static savior but does not retain itself.
+        // Given a Presenter that does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
         // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
+        final TestTiFragment fragment = new TestTiFragment.Builder()
                 .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
@@ -360,150 +49,58 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
                 .build();
 
         // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
 
         // Then the presenter will *not* be stored in the savior
         assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-        delegate.onDestroy_afterSuper();
+        fragment.onSaveInstanceState(mSavedState);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
 
         // Then assert that the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
 
         // When the Activity is recreated.
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity2 = new TiFragmentDelegateBuilder.HostingActivity();
+        final HostingActivity hostingActivity2 = new HostingActivity();
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate2
-                = new TiFragmentDelegateBuilder()
+        final TestTiFragment fragment2 = new TestTiFragment.Builder()
                 .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity2)
                 .setSavior(mSavior)
                 .setPresenter(presenter2)
                 .build();
 
-        delegate2.onCreate_afterSuper(mSavedState);
-        delegate2.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
-        delegate2.onStart_afterSuper();
+        // And the fragment will be resumed
+        fragment2.setAdded(true);
+        fragment2.onCreate(mSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onStart();
 
         // Then a new Presenter instance will be generated and the old presenter isn't used
-        assertThat(delegate2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
+        assertThat(fragment2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
         assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    /**
-     * Activity finishing without retain, the savior should be ignored although enabled
-     */
-    @Test
-    public void saviorTrue_retainFalse_activityFinishing() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does use a static savior but does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // And when the Activity is finishing.
-        hostingActivity.setFinishing(true);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-        delegate.onDestroy_afterSuper();
-
-        // Then assert that the Presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    /**
-     * Activity move to background -> move to foreground without retain, the savior should be
-     * ignored although enabled
-     */
-    @Test
-    public void saviorTrue_retainFalse_moveToBackground_moveToForeground() {
-
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
-
-        // Given a Presenter that does use a static savior but does not retain itself.
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(false)
-                .build());
-
-        // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
-                .setDontKeepActivitiesEnabled(false)
-                .setHostingActivity(hostingActivity)
-                .setSavior(mSavior)
-                .setPresenter(presenter)
-                .build();
-
-        // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
-
-        // Then the Presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        // And when the Activity is moved to background
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-
-        // Then the Presenter is not destroyed
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-
-        // And when the Activity moves to foreground again
-        delegate.onStart_afterSuper();
-
-        // Then the Presenter is still alive and not saved in savior
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
     }
 
     /**
      * Activity changing configuration Default config
      */
     @Test
-    public void saviorTrue_retainTrue_activityChangingConfiguration() {
+    public void activityChangingConfiguration_retainTrue() {
 
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
+        final HostingActivity hostingActivity = new HostingActivity();
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
@@ -516,8 +113,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         final TestPresenter presenter = new TestPresenter(config);
 
         // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
+        final TestTiFragment fragment = new TestTiFragment.Builder()
                 .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
@@ -525,44 +121,101 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
                 .build();
 
         // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
 
         // Then the presenter will be stored in the savior
         assertThat(mSavior.presenterCount()).isEqualTo(1);
 
         // And when the Activity is changing its configurations.
         hostingActivity.setChangingConfiguration(true);
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
+        fragment.onSaveInstanceState(mSavedState);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
 
         // Then the presenter will be retained and saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(mSavior.presenterCount()).isEqualTo(1);
 
-        // When new Activity instance gets created by the Android Framework.
-        hostingActivity.recreateInstance();
+        // When the Activity is recreated.
+        final HostingActivity hostingActivity2 = new HostingActivity();
 
-        // And the Fragment gets automatically retained.
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, mSavedState);
-        delegate.onStart_afterSuper();
+        // And generates a new Fragment instance.
+        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+        final TestTiFragment fragment2 = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity2)
+                .setSavior(mSavior)
+                .setPresenter(presenter2)
+                .build();
+
+        // And the fragment will be resumed
+        fragment2.setAdded(true);
+        fragment2.onCreate(mSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onStart();
 
         // Then the Presenter is the same
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(delegate.getPresenter().isDestroyed()).isEqualTo(false);
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(fragment.getPresenter()).isEqualTo(presenter);
         assertThat(mSavior.presenterCount()).isEqualTo(1);
+    }
+
+    /**
+     * Activity finishing without retain
+     */
+    @Test
+    public void activityFinishing_retainFalse() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does use a static savior but does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will *not* be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // And when the Activity is finishing.
+        hostingActivity.setFinishing(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
+
+        // Then assert that the Presenter is destroyed and not saved in the savior.
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
     /**
      * Activity finish Default config
      */
     @Test
-    public void saviorTrue_retainTrue_activityFinishing() {
+    public void activityFinishing_retainTrue() {
 
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
+        final HostingActivity hostingActivity = new HostingActivity();
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
@@ -575,30 +228,76 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         final TestPresenter presenter = new TestPresenter(config);
 
         // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
+        final TestTiFragment fragment = new TestTiFragment.Builder()
                 .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
                 .build();
 
-        // When the fragment is added to the activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
 
         // Then the presenter will be stored in the savior
         assertThat(mSavior.presenterCount()).isEqualTo(1);
 
-        // When the activity is finishing.
+        // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
-        delegate.onStop_beforeSuper();
-        delegate.onDestroyView_beforeSuper();
-        delegate.onDestroy_afterSuper();
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
 
         // Then the presenter is destroyed and not saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isTrue();
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    /**
+     * Activity move to background -> move to foreground without retain
+     */
+    @Test
+    public void moveToBackground_moveToForeground_retainFalse() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that does use a static savior but does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the Presenter will *not* be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // And when the Activity is moved to background
+        fragment.onSaveInstanceState(mSavedState);
+        fragment.onStop();
+
+        // Then the Presenter is not destroyed
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+
+        // And when the Activity moves to foreground again
+        fragment.onStart();
+
+        // Then the Presenter is still alive and not saved in savior
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
@@ -606,10 +305,9 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
      * Activity move to background -> move to foreground Default config
      */
     @Test
-    public void saviorTrue_retainTrue_moveToBackground_moveToForeground() {
+    public void moveToBackground_moveToForeground_retainTrue() {
 
-        final TiFragmentDelegateBuilder.HostingActivity
-                hostingActivity = new TiFragmentDelegateBuilder.HostingActivity();
+        final HostingActivity hostingActivity = new HostingActivity();
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
@@ -622,8 +320,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         final TestPresenter presenter = new TestPresenter(config);
 
         // And given a Fragment.
-        final TiFragmentDelegate<TiPresenter<TiView>, TiView> delegate
-                = new TiFragmentDelegateBuilder()
+        final TestTiFragment fragment = new TestTiFragment.Builder()
                 .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
@@ -631,30 +328,106 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
                 .build();
 
         // When the Fragment is added to the Activity.
-        delegate.onCreate_afterSuper(null);
-        delegate.onCreateView_beforeSuper(mock(LayoutInflater.class), null, null);
-        delegate.onStart_afterSuper();
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
 
         // Then the presenter will be stored in the savior
         assertThat(mSavior.presenterCount()).isEqualTo(1);
 
-        // When the Activity gets moved to background
-        delegate.onSaveInstanceState_afterSuper(mSavedState);
-        delegate.onStop_beforeSuper();
+        // And when the Activity is moved to background
+        fragment.onSaveInstanceState(mSavedState);
+        fragment.onStop();
 
         // Then the presenter stays alive and is saved in the savior.
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(mSavior.presenterCount()).isEqualTo(1);
-
-        // When the Activity moves to foreground again
-        hostingActivity.resetToDefault();
 
         // And the Fragment gets automatically retained.
-        delegate.onStart_afterSuper();
+        fragment.onStart();
 
         // Then the Presenter is the same
-        assertThat(delegate.getPresenter()).isEqualTo(presenter);
-        assertThat(delegate.getPresenter().isDestroyed()).isEqualTo(false);
+        assertThat(fragment.getPresenter()).isEqualTo(presenter);
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(mSavior.presenterCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void remove_fragment_retainFalse() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will not be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // When the fragment will be removed
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
+
+        // Then the presenter is destroyed and not saved
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void remove_fragment_retainTrue() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
+
+        // When the fragment will be removed
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
+
+        // Then the presenter is destroyed and not saved
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 }

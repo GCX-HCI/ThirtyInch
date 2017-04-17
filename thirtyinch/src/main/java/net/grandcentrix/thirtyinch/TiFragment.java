@@ -114,6 +114,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
+    public boolean isFragmentRemoving() {
+        return isRemoving();
+    }
+
+    @Override
     public final boolean isHostingActivityChangingConfigurations() {
         return getActivity().isChangingConfigurations();
     }
@@ -201,11 +206,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
                 return (V) this;
             }
         }
-    }
-
-    @Override
-    public final void setFragmentRetainInstance(final boolean retain) {
-        setRetainInstance(retain);
     }
 
     @Override

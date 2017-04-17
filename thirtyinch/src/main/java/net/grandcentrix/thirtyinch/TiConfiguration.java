@@ -23,7 +23,6 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 /**
  * Configure how ThirtyInch should handle the {@link TiPresenter}.
@@ -174,27 +173,15 @@ public class TiConfiguration {
 
         /**
          * Sets whether the {@link PresenterSavior} singleton should be used to restore the {@link
-         * TiPresenter}. This was a workaround targeting the "Don't keep
-         * activities" option in the Android Developer options destroying every activity as soon as
-         * the user leaves it.
-         * The "good" android way of saving the {@link TiPresenter} with {@link
-         * AppCompatActivity#onRetainCustomNonConfigurationInstance()} does not work when the
-         * option is enabled.
-         * The {@link PresenterSavior} works even if the option is enabled.
+         * TiPresenter}.
          * <p>
-         * Some people argue that singletons are bad and want to be a good android citizen. This
-         * method is for you.
-         * Set it to <code>false</code> and the singleton will not be used. You
-         * are responsible when you lose data because a new {@link TiPresenter} instance will be
-         * created.
-         * <p>
-         * This option will not be used when {@link #setRetainPresenterEnabled(boolean)} is set to
-         * <code>false</code>.
-         * <p>
-         * default <code>true</code>
+         * Deprecated:
+         *
+         * The savior will be always used
+         * </p>
          */
+        @Deprecated
         public Builder setUseStaticSaviorToRetain(final boolean enabled) {
-            mConfig.mUseStaticSaviorToRetain = enabled;
             return this;
         }
 
@@ -214,22 +201,6 @@ public class TiConfiguration {
      * use {@link Builder} to construct a configuration.
      */
     private TiConfiguration() {
-    }
-
-    public boolean isCallOnMainThreadInterceptorEnabled() {
-        return mCallOnMainThreadInterceptorEnabled;
-    }
-
-    public boolean isDistinctUntilChangedInterceptorEnabled() {
-        return mDistinctUntilChangedInterceptorEnabled;
-    }
-
-    public boolean shouldRetainPresenter() {
-        return mRetainPresenter;
-    }
-
-    public boolean useStaticSaviorToRetain() {
-        return mUseStaticSaviorToRetain;
     }
 
     @Override
@@ -264,5 +235,25 @@ public class TiConfiguration {
         result = 31 * result + (mRetainPresenter ? 1 : 0);
         result = 31 * result + (mUseStaticSaviorToRetain ? 1 : 0);
         return result;
+    }
+
+    public boolean isCallOnMainThreadInterceptorEnabled() {
+        return mCallOnMainThreadInterceptorEnabled;
+    }
+
+    public boolean isDistinctUntilChangedInterceptorEnabled() {
+        return mDistinctUntilChangedInterceptorEnabled;
+    }
+
+    public boolean shouldRetainPresenter() {
+        return mRetainPresenter;
+    }
+
+    /**
+     * @return always true
+     */
+    @Deprecated
+    public boolean useStaticSaviorToRetain() {
+        return mUseStaticSaviorToRetain;
     }
 }

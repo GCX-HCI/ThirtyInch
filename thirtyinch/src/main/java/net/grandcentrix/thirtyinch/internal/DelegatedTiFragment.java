@@ -43,6 +43,11 @@ public interface DelegatedTiFragment {
     boolean isFragmentDetached();
 
     /**
+     * @return {@link Fragment#isRemoving()}
+     */
+    boolean isFragmentRemoving();
+
+    /**
      * @return {@link Activity#isChangingConfigurations()}
      */
     boolean isHostingActivityChangingConfigurations();
@@ -52,8 +57,4 @@ public interface DelegatedTiFragment {
      */
     boolean isHostingActivityFinishing();
 
-    /**
-     * Call {@link Fragment#setRetainInstance(boolean)}
-     */
-    void setFragmentRetainInstance(final boolean retain);
 }

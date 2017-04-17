@@ -200,11 +200,6 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     }
 
     @Override
-    public final void setFragmentRetainInstance(final boolean retain) {
-        setRetainInstance(retain);
-    }
-
-    @Override
     public String toString() {
         String presenter = getPresenter() == null ? "null" :
                 getPresenter().getClass().getSimpleName()

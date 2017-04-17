@@ -10,6 +10,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -23,6 +24,8 @@ import android.view.animation.Animation;
 import android.widget.TextView;
 
 import java.util.UUID;
+
+import rx.subjects.PublishSubject;
 
 import static net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity.fragmentLifecycleActivityInstanceCount;
 
@@ -43,55 +46,88 @@ public abstract class TestFragment extends Fragment {
 
     private int instanceNum = Integer.MIN_VALUE;
 
+    private PublishSubject<Boolean> mAddedState = PublishSubject.create();
+
+    private PublishSubject<Boolean> mDetachedState = PublishSubject.create();
+
+    private PublishSubject<Boolean> mIsActivityChangingConfigState = PublishSubject.create();
+
+    private PublishSubject<Boolean> mIsActivityFinishingState = PublishSubject.create();
+
+    private PublishSubject<Boolean> mRemovingState = PublishSubject.create();
+
     private String mUuid;
 
     public TestFragment() {
         Log.v("FragmentManager", this + " constructor called");
+
+        testFragmentInstanceCount++;
+        instanceNum = testFragmentInstanceCount;
     }
 
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(getFragmentTag(), "onViewCreated");
+        Log.v(getFragmentTag(), "onViewCreated");
     }
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(getFragmentTag(), "onActivityResult");
+        Log.v(getFragmentTag(), "onActivityResult");
     }
 
     @Override
     public void onAttach(final Context context) {
+        mAddedState.distinctUntilChanged().subscribe(added -> {
+            Log.d(getFragmentTag(), "fragment" + instanceNum + ".setAdded(" + added + ")");
+        });
+        mDetachedState.distinctUntilChanged().subscribe(detached -> {
+            Log.d(getFragmentTag(), "fragment" + instanceNum + ".setDetached(" + detached + ")");
+        });
+        mRemovingState.distinctUntilChanged().subscribe(removing -> {
+            Log.d(getFragmentTag(), "fragment" + instanceNum + ".setRemoving(" + removing + ")");
+        });
+
+        mIsActivityChangingConfigState.distinctUntilChanged().subscribe(changing -> {
+            Log.d(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                    + ".setChangingConfiguration(" + changing + ");");
+        });
+        mIsActivityFinishingState.distinctUntilChanged().subscribe(finishing -> {
+            Log.d(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                    + ".setFinishing(" + finishing + ");");
+        });
+        printState();
         super.onAttach(context);
-        Log.d(getFragmentTag(), "onAttach(" + context + ")");
+        Log.v(getFragmentTag(), "onAttach(" + context + ")");
+        printState();
     }
 
     @Override
     public void onAttachFragment(final Fragment childFragment) {
         super.onAttachFragment(childFragment);
-        Log.d(getFragmentTag(), "onAttachFragment");
+        printState();
+        Log.v(getFragmentTag(), "onAttachFragment");
     }
 
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.d(getFragmentTag(), "onConfigurationChanged");
+        Log.v(getFragmentTag(), "onConfigurationChanged");
     }
 
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
-        Log.d(getFragmentTag(), "onContextItemSelected");
+        Log.v(getFragmentTag(), "onContextItemSelected");
         return super.onContextItemSelected(item);
     }
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
+        printState();
         super.onCreate(savedInstanceState);
-        testFragmentInstanceCount++;
-        instanceNum = testFragmentInstanceCount;
-        Log.d(getFragmentTag(), "onCreate(" + savedInstanceState + ")");
-
+        Log.v(getFragmentTag(), "onCreate(" + savedInstanceState + ")");
+        printState();
         if (savedInstanceState != null) {
             mUuid = savedInstanceState.getString("uuid");
             Log.v("FragmentManager", "RESTORED " + mUuid);
@@ -103,14 +139,14 @@ public abstract class TestFragment extends Fragment {
 
         Log.v(getFragmentTag(), "// TODO generate a new TiFragmentDelegate instance");
         Log.v(TAG, "final TiFragmentDelegate<TiPresenter<TiView>, TiView> "
-                + "delegate" + instanceNum + "\n"
+                + "fragment" + instanceNum + "\n"
                 + "                = new TiFragmentDelegateBuilder()...\n");
 
         if (savedInstanceState == null) {
-            Log.v(getFragmentTag(), "delegate" + instanceNum + ".onCreate_afterSuper(null);");
+            Log.d(getFragmentTag(), "fragment" + instanceNum + ".onCreate(null);");
         } else {
-            Log.v(getFragmentTag(), "delegate" + instanceNum
-                    + ".onCreate_afterSuper(savedInstanceState);");
+            Log.d(getFragmentTag(), "fragment" + instanceNum
+                    + ".onCreate(savedInstanceState);");
         }
 
         Log.v(getFragmentTag(), "instance Data: " + instanceData);
@@ -118,7 +154,7 @@ public abstract class TestFragment extends Fragment {
 
     @Override
     public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
-        Log.d(getFragmentTag(), "onCreateAnimation");
+        Log.v(getFragmentTag(), "onCreateAnimation");
         return super.onCreateAnimation(transit, enter, nextAnim);
     }
 
@@ -126,27 +162,29 @@ public abstract class TestFragment extends Fragment {
     public void onCreateContextMenu(final ContextMenu menu, final View v,
             final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        Log.d(getFragmentTag(), "onCreateContextMenu");
+        Log.v(getFragmentTag(), "onCreateContextMenu");
     }
 
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        Log.d(getFragmentTag(), "onCreateOptionsMenu");
+        Log.v(getFragmentTag(), "onCreateOptionsMenu");
     }
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
-        Log.d(getFragmentTag(), "onCreateView");
-
+        printState();
+        Log.v(getFragmentTag(),
+                "onCreateView() called with: inflater = [" + inflater + "], container = ["
+                        + container + "], savedInstanceState = [" + savedInstanceState + "]");
         if (savedInstanceState == null) {
-            Log.v(getFragmentTag(), "delegate" + instanceNum
-                    + ".onCreateView_beforeSuper(inflater, null, null);");
+            Log.d(getFragmentTag(), "fragment" + instanceNum
+                    + ".onCreateView(inflater, null, null);");
         } else {
-            Log.v(getFragmentTag(), "delegate" + instanceNum
-                    + ".onCreateView_beforeSuper(inflater, null, savedInstanceState);");
+            Log.d(getFragmentTag(), "fragment" + instanceNum
+                    + ".onCreateView(inflater, null, savedInstanceState);");
         }
 
         Log.v(getFragmentTag(), "instance Data: " + instanceData);
@@ -156,12 +194,11 @@ public abstract class TestFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        printState();
         super.onDestroy();
-        Log.d(getFragmentTag(), "onDestroy");
-        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onDestroy_afterSuper();");
-        Log.v(getFragmentTag(), "added " + isAdded());
-        Log.v(getFragmentTag(), "removing " + isRemoving());
-        Log.v(getFragmentTag(), "detached " + isDetached());
+        Log.v(getFragmentTag(), "onDestroy");
+        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onDestroy();");
+        printState();
         Log.v(getFragmentTag(), "instance Data: " + instanceData);
         Log.v("FragmentManager", "DESTROYED " + mUuid);
     }
@@ -169,14 +206,17 @@ public abstract class TestFragment extends Fragment {
     @Override
     public void onDestroyOptionsMenu() {
         super.onDestroyOptionsMenu();
-        Log.d(getFragmentTag(), "onDestroyOptionsMenu");
+        Log.v(getFragmentTag(), "onDestroyOptionsMenu");
     }
 
     @Override
     public void onDestroyView() {
+        printState();
         super.onDestroyView();
-        Log.d(getFragmentTag(), "onDestroyView");
-        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onDestroyView_beforeSuper();");
+        Log.v(getFragmentTag(), "onDestroyView");
+        printState();
+
+        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onDestroyView();");
 
         Log.v(getFragmentTag(), "instance Data: " + instanceData);
     }
@@ -184,71 +224,75 @@ public abstract class TestFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(getFragmentTag(), "onDetach");
+        printState();
+        Log.v(getFragmentTag(), "onDetach");
+        printState();
 
-        Log.v(getFragmentTag(), "instance Data: " + instanceData);
+        mAddedState.onCompleted();
+        mDetachedState.onCompleted();
+        mRemovingState.onCompleted();
+        mIsActivityChangingConfigState.onCompleted();
+        mIsActivityFinishingState.onCompleted();
     }
 
     @Override
     public void onHiddenChanged(final boolean hidden) {
         super.onHiddenChanged(hidden);
-        Log.d(getFragmentTag(), "onHiddenChanged");
+        Log.v(getFragmentTag(), "onHiddenChanged");
     }
 
     @Override
     public void onInflate(final Context context, final AttributeSet attrs,
             final Bundle savedInstanceState) {
         super.onInflate(context, attrs, savedInstanceState);
-        Log.d(getFragmentTag(), "onInflate");
+        Log.v(getFragmentTag(), "onInflate");
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        Log.d(getFragmentTag(), "onLowMemory");
+        Log.v(getFragmentTag(), "onLowMemory");
+        printState();
     }
 
     @Override
     public void onMultiWindowModeChanged(final boolean isInMultiWindowMode) {
         super.onMultiWindowModeChanged(isInMultiWindowMode);
-        Log.d(getFragmentTag(), "onMultiWindowModeChanged");
+        Log.v(getFragmentTag(), "onMultiWindowModeChanged");
+        printState();
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        Log.d(getFragmentTag(), "onOptionsItemSelected");
+        Log.v(getFragmentTag(), "onOptionsItemSelected");
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onOptionsMenuClosed(final Menu menu) {
         super.onOptionsMenuClosed(menu);
-        Log.d(getFragmentTag(), "onOptionsMenuClosed");
+        Log.v(getFragmentTag(), "onOptionsMenuClosed");
     }
 
     @Override
     public void onPause() {
+        printState();
         super.onPause();
-        Log.d(getFragmentTag(), "onPause");
-
-        final FragmentLifecycleActivity activity = (FragmentLifecycleActivity) getActivity();
-
-        Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setChangingConfiguration(" + activity.isChangingConfigurations() + ");");
-        Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setFinishing(" + activity.isFinishing() + ");");
+        Log.v(getFragmentTag(), "onPause()");
+        printState();
     }
 
     @Override
     public void onPictureInPictureModeChanged(final boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
-        Log.d(getFragmentTag(), "onPictureInPictureModeChanged");
+        Log.v(getFragmentTag(), "onPictureInPictureModeChanged");
+        printState();
     }
 
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        Log.d(getFragmentTag(), "onPrepareOptionsMenu");
+        Log.v(getFragmentTag(), "onPrepareOptionsMenu");
     }
 
     @Override
@@ -256,52 +300,54 @@ public abstract class TestFragment extends Fragment {
             @NonNull final String[] permissions,
             @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(getFragmentTag(), "onRequestPermissionsResult");
+        Log.v(getFragmentTag(), "onRequestPermissionsResult");
+        printState();
     }
 
     @Override
     public void onResume() {
+        printState();
         super.onResume();
-        Log.d(getFragmentTag(), "onResume");
-        Log.d(getFragmentTag(), "isAdded=" + isAdded() + ", isAttached= " + !isDetached());
+        Log.v(getFragmentTag(), "onResume");
+        printState();
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(getFragmentTag(), "onSaveInstanceState");
+        printState();
+        Log.v(getFragmentTag(), "onSaveInstanceState");
 
         outState.putString("uuid", mUuid);
 
-        final FragmentLifecycleActivity activity = (FragmentLifecycleActivity) getActivity();
-
-        Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setChangingConfiguration(" + activity.isChangingConfigurations() + ");");
-        Log.v(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setFinishing(" + activity.isFinishing() + ");");
-
-        Log.v(getFragmentTag(), "delegate" + instanceNum
-                + ".onSaveInstanceState_afterSuper(outState);");
+        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onSaveInstanceState(outState);");
+        printState();
     }
 
     @Override
     public void onStart() {
+        printState();
         super.onStart();
-        Log.d(getFragmentTag(), "onStart");
-        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onStart_afterSuper();");
+        Log.v(getFragmentTag(), "onStart");
+        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onStart();");
+        printState();
     }
 
     @Override
     public void onStop() {
+        printState();
         super.onStop();
-        Log.d(getFragmentTag(), "onStop");
-        Log.v(getFragmentTag(), "delegate" + instanceNum + ".onStop_beforeSuper();");
+        Log.v(getFragmentTag(), "onStop");
+        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onStop();");
+        printState();
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+        printState();
         super.onViewCreated(view, savedInstanceState);
-        Log.d(getFragmentTag(), "onViewCreated");
+        Log.v(getFragmentTag(), "onViewCreated");
+        printState();
 
         final TextView fragmentTag = (TextView) view.findViewById(R.id.sample_text);
         fragmentTag.setText(TAG);
@@ -310,7 +356,7 @@ public abstract class TestFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.d(getFragmentTag(), "onViewStateRestored");
+        Log.v(getFragmentTag(), "onViewStateRestored");
     }
 
     @Override
@@ -324,5 +370,17 @@ public abstract class TestFragment extends Fragment {
 
     private String getFragmentTag() {
         return TAG;
+    }
+
+    private void printState() {
+        mAddedState.onNext(isAdded());
+        mDetachedState.onNext(isDetached());
+        mRemovingState.onNext(isRemoving());
+
+        final FragmentActivity activity = getActivity();
+        if (activity != null) {
+            mIsActivityFinishingState.onNext(activity.isFinishing());
+            mIsActivityChangingConfigState.onNext(activity.isChangingConfigurations());
+        }
     }
 }
