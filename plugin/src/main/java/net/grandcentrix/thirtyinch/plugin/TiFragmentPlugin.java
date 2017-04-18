@@ -89,6 +89,11 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
+    @Override
+    public Activity getHostingActivity() {
+        return getFragment().getActivity();
+    }
+
     /**
      * @return the cached result of {@link BindViewInterceptor#intercept(TiView)}
      */
@@ -150,7 +155,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
 
     @Override
     public boolean isFragmentRemoving() {
-        return isFragmentRemoving();
+        return getFragment().isRemoving();
     }
 
     @Override
@@ -166,11 +171,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public boolean isInBackstack() {
         return BackstackReader.isInBackStack(getFragment());
-    }
-
-    @Override
-    public Activity getHostingActivity() {
-        return getFragment().getActivity();
     }
 
     @CallSuper
