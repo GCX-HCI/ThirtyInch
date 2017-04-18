@@ -192,6 +192,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         boolean destroyPresenter = false;
 
         if (!mTiFragment.isInBackstack()) {
+
             if (mTiFragment.isFragmentRemoving()) {
                 // fragment was removed with remove() or replace()
                 destroyPresenter = true;
@@ -221,8 +222,9 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
                     "presenter configured as not retaining, destroying " + mPresenter);
         }
 
-        if (!destroyPresenter &&
-                !config.useStaticSaviorToRetain() && mTiFragment.isDontKeepActivitiesEnabled()) {
+        if (!destroyPresenter
+                && !config.shouldRetainPresenter()
+                && mTiFragment.isDontKeepActivitiesEnabled()) {
             // configuration says the PresenterSavior should not be used. Retaining the presenter
             // relays on the Activity nonConfigurationInstance which is always null when
             // "don't keep activities" is enabled.
@@ -299,8 +301,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             final TiConfiguration config = mPresenter.getConfig();
             TiLog.v(mLogTag.getLoggingTag(),
                     "shouldRetain = " + config.shouldRetainPresenter());
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "useStaticSavior = " + config.useStaticSaviorToRetain());
         }
     }
 }

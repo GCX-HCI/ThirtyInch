@@ -36,7 +36,6 @@ import android.os.Bundle;
  *     super(new TiConfiguration.Builder()
  *     .setCallOnMainThreadInterceptorEnabled(true)
  *     .setDistinctUntilChangedInterceptorEnabled(true)
- *     .setUseStaticSaviorToRetain(true)
  *     .setRetainPresenterEnabled(true)
  *     .build());
  * }
@@ -172,12 +171,11 @@ public class TiConfiguration {
         }
 
         /**
-         * Sets whether the {@link PresenterSavior} singleton should be used to restore the {@link
-         * TiPresenter}.
+         * Deprecated: The savior will be always used when {@code setRetainPresenterEnabled(true)}.
+         * Setting this property has no effect and will removed in the next version
          * <p>
-         * Deprecated:
-         *
-         * The savior will be always used
+         * Was  whether the {@link PresenterSavior} singleton should be used to restore the {@link
+         * TiPresenter}.
          * </p>
          */
         @Deprecated
@@ -194,8 +192,6 @@ public class TiConfiguration {
     private boolean mDistinctUntilChangedInterceptorEnabled = true;
 
     private boolean mRetainPresenter = true;
-
-    private boolean mUseStaticSaviorToRetain = true;
 
     /**
      * use {@link Builder} to construct a configuration.
@@ -221,10 +217,7 @@ public class TiConfiguration {
                 != that.mDistinctUntilChangedInterceptorEnabled) {
             return false;
         }
-        if (mRetainPresenter != that.mRetainPresenter) {
-            return false;
-        }
-        return mUseStaticSaviorToRetain == that.mUseStaticSaviorToRetain;
+        return mRetainPresenter == that.mRetainPresenter;
 
     }
 
@@ -233,7 +226,6 @@ public class TiConfiguration {
         int result = (mCallOnMainThreadInterceptorEnabled ? 1 : 0);
         result = 31 * result + (mDistinctUntilChangedInterceptorEnabled ? 1 : 0);
         result = 31 * result + (mRetainPresenter ? 1 : 0);
-        result = 31 * result + (mUseStaticSaviorToRetain ? 1 : 0);
         return result;
     }
 
@@ -247,13 +239,5 @@ public class TiConfiguration {
 
     public boolean shouldRetainPresenter() {
         return mRetainPresenter;
-    }
-
-    /**
-     * @return always true
-     */
-    @Deprecated
-    public boolean useStaticSaviorToRetain() {
-        return mUseStaticSaviorToRetain;
     }
 }

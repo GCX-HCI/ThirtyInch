@@ -61,197 +61,7 @@ public class TiActivityPresenterDestroyTest {
     private MockSavior mSavior;
 
     @Test
-    public void saviorFalse_dontKeepActivitiesFalse_configurationChange() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(true)
-                .setDontKeepActivitiesEnabled(false)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        doFullLifecycleAndDestroy(delegate, savedState);
-
-        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
-        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).isNull();
-
-        assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        delegate.onCreate_afterSuper(savedState);
-    }
-
-    @Test
-    public void saviorFalse_dontKeepActivitiesFalse_finish() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(false)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        doFullLifecycleAndDestroy(delegate, savedState);
-
-        assertThat(presenter.isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        try {
-            // presenter is destroyed and cannot be recreated
-            delegate.onCreate_afterSuper(savedState);
-            fail("did not throw");
-        } catch (Exception e) {
-            assertThat(e).hasMessageContaining("destroyed");
-        }
-    }
-
-    @Test
-    public void saviorFalse_dontKeepActivitiesFalse_moveToBackground_moveToForeground()
-            throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(false)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        delegate.onCreate_afterSuper(null);
-        // savior is disabled
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        assertThat(delegate.getPresenter().isInitialized()).isTrue();
-
-        delegate.onStart_afterSuper();
-
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-
-        delegate.onStop_beforeSuper();
-        delegate.onStop_afterSuper();
-        delegate.onSaveInstanceState_afterSuper(savedState);
-
-        delegate.onStart_afterSuper();
-
-        assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void saviorFalse_dontKeepActivitiesTrue_configurationChange() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(true)
-                .setDontKeepActivitiesEnabled(true)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        doFullLifecycleAndDestroy(delegate, savedState);
-
-        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
-        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID)).isNull();
-
-        assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        delegate.onCreate_afterSuper(null);
-    }
-
-    @Test
-    public void saviorFalse_dontKeepActivitiesTrue_finish() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(true)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        doFullLifecycleAndDestroy(delegate, savedState);
-
-        assertThat(presenter.isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        try {
-            // presenter is destroyed and cannot be recreated
-            delegate.onCreate_afterSuper(null);
-            fail("did not throw");
-        } catch (Exception e) {
-            assertThat(e).hasMessageContaining("destroyed");
-        }
-    }
-
-    @Test
-    public void saviorFalse_dontKeepActivitiesTrue_moveToBackground_moveToForeground()
-            throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(false)
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(true)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        delegate.onCreate_afterSuper(null);
-        // savior is disabled
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        assertThat(delegate.getPresenter().isInitialized()).isTrue();
-
-        delegate.onStart_afterSuper();
-
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-
-        delegate.onStop_beforeSuper();
-        delegate.onStop_afterSuper();
-        delegate.onSaveInstanceState_afterSuper(savedState);
-
-        delegate.onStart_afterSuper();
-
-        assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
-
-        delegate.onCreate_afterSuper(null);
-    }
-
-    @Test
-    public void saviorTrue_dontKeepActivitiesFalse_configurationChange() throws Exception {
+    public void dontKeepActivitiesFalse_configurationChange() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .build());
@@ -290,7 +100,7 @@ public class TiActivityPresenterDestroyTest {
     }
 
     @Test
-    public void saviorTrue_dontKeepActivitiesFalse_finish() throws Exception {
+    public void dontKeepActivitiesFalse_finish() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .build());
@@ -319,7 +129,7 @@ public class TiActivityPresenterDestroyTest {
     }
 
     @Test
-    public void saviorTrue_dontKeepActivitiesFalse_moveToBackground_moveToForeground()
+    public void dontKeepActivitiesFalse_moveToBackground_moveToForeground()
             throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
@@ -365,7 +175,7 @@ public class TiActivityPresenterDestroyTest {
     }
 
     @Test
-    public void saviorTrue_dontKeepActivitiesTrue_configurationChange() throws Exception {
+    public void dontKeepActivitiesTrue_configurationChange() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .build());
@@ -393,7 +203,7 @@ public class TiActivityPresenterDestroyTest {
     }
 
     @Test
-    public void saviorTrue_dontKeepActivitiesTrue_finish() throws Exception {
+    public void dontKeepActivitiesTrue_finish() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)
                 .build());
@@ -422,7 +232,7 @@ public class TiActivityPresenterDestroyTest {
     }
 
     @Test
-    public void saviorTrue_dontKeepActivitiesTrue_moveToBackground_moveToForeground()
+    public void dontKeepActivitiesTrue_moveToBackground_moveToForeground()
             throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
                 .setUseStaticSaviorToRetain(true)

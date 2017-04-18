@@ -181,7 +181,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             mPresenter = mPresenterProvider.providePresenter();
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
-            if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
+            if (config.shouldRetainPresenter()) {
                 mPresenterId = mSavior.save(mPresenter);
             }
             mPresenter.create();
@@ -234,7 +234,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         }
 
         if (!destroyPresenter
-                && !config.useStaticSaviorToRetain()
+                && !config.shouldRetainPresenter()
                 && !mTiActivity.isActivityChangingConfigurations()
                 && mTiActivity.isDontKeepActivitiesEnabled()) {
             // configuration says the PresenterSavior should not be used. Retaining the presenter
