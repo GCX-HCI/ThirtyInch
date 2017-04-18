@@ -79,6 +79,12 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            //started for the first time, reset all counters
+            fragmentLifecycleActivityInstanceCount = -1;
+            TestFragment.testFragmentInstanceCount = -1;
+        }
+
         fragmentLifecycleActivityInstanceCount++;
         setContentView(R.layout.activity_fragment_lifecycle);
         FragmentManager.enableDebugLogging(true);

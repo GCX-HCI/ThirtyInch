@@ -95,7 +95,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity changing configuration Default config
+     * Activity changing configuration
+     * Default config
      */
     @Test
     public void activityChangingConfiguration_retainTrue() {
@@ -210,7 +211,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity finish Default config
+     * Activity finish
+     * Default config
      */
     @Test
     public void activityFinishing_retainTrue() {
@@ -302,7 +304,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
     }
 
     /**
-     * Activity move to background -> move to foreground Default config
+     * Activity move to background -> move to foreground
+     * Default config
      */
     @Test
     public void moveToBackground_moveToForeground_retainTrue() {
@@ -395,9 +398,62 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.presenterCount()).isEqualTo(0);
     }
 
+    /**
+     * add fragment (with backstack) press back button to pop the back stack and the remove it
+     * without retain
+     */
+    @Test
+    public void remove_fragment_retainFalse_backstackTrue() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.setInBackstack(true);
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will not be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // When the back button is pressed and the fragment will be removed
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+
+        // Then the presenter is destroyed and not saved
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+
+        // When the back button is pressed again the fragment will be removed from the backstack
+        // and destroyed
+        fragment.setInBackstack(false);
+        fragment.onDestroy();
+
+        // Then the presenter is destroyed and not saved
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
 
     /**
-     * removed the added fragment from the Activity Default config
+     * removed the added fragment from the Activity
+     * Default config
      */
     @Test
     public void remove_fragment_retainTrue() {
@@ -431,6 +487,58 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         fragment.setRemoving(true);
         fragment.onStop();
         fragment.onDestroyView();
+        fragment.onDestroy();
+
+        // Then the presenter is destroyed and not saved
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.presenterCount()).isEqualTo(0);
+    }
+
+    /**
+     * add fragment (with backstack) press back button to pop the back stack and the remove it
+     * Default config
+     */
+    @Test
+    public void remove_fragment_retainTrue_backstackTrue() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter does not retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.setInBackstack(true);
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
+
+        // When the back button is pressed and the fragment will be removed
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+
+        // Then the presenter kept alive as long as the fragment is managed by the FragmentManager
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(mSavior.presenterCount()).isEqualTo(1);
+
+        // When the back button is pressed again the fragment will be removed from the backstack
+        // and destroyed
+        fragment.setInBackstack(false);
         fragment.onDestroy();
 
         // Then the presenter is destroyed and not saved

@@ -95,6 +95,8 @@ public class TestTiFragment
 
     private final HostingActivity mHostingActivity;
 
+    private boolean mInBackstack;
+
     private boolean mIsDontKeepActivitiesEnabled;
 
     private boolean mRemoving;
@@ -161,6 +163,11 @@ public class TestTiFragment
         return mHostingActivity.isFinishing();
     }
 
+    @Override
+    public boolean isInBackstack() {
+        return mInBackstack;
+    }
+
     public void onCreate(final Bundle saveInstanceState) {
         mDelegate.onCreate_afterSuper(saveInstanceState);
     }
@@ -202,6 +209,10 @@ public class TestTiFragment
 
     public void setDetached(final boolean detached) {
         mDetached = detached;
+    }
+
+    public void setInBackstack(final boolean inBackstack) {
+        mInBackstack = inBackstack;
     }
 
     public void setRemoving(final boolean removing) {

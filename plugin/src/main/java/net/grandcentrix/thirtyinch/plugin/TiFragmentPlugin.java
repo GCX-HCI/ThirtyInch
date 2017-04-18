@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.BackstackReader;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,7 +93,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     @Nullable
     @Override
-    public final  V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
@@ -147,6 +148,11 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
+    public boolean isFragmentRemoving() {
+        return isFragmentRemoving();
+    }
+
+    @Override
     public final boolean isHostingActivityChangingConfigurations() {
         return getFragment().getActivity().isChangingConfigurations();
     }
@@ -154,6 +160,11 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public final boolean isHostingActivityFinishing() {
         return getFragment().getActivity().isFinishing();
+    }
+
+    @Override
+    public boolean isInBackstack() {
+        return BackstackReader.isInBackStack(getFragment());
     }
 
     @CallSuper
@@ -234,11 +245,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
                 return (V) getFragment();
             }
         }
-    }
-
-    @Override
-    public final void setFragmentRetainInstance(final boolean retain) {
-        getFragment().setRetainInstance(retain);
     }
 
     @Override

@@ -189,8 +189,20 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         logState();
 
+        boolean destroyPresenter = false;
 
-        boolean destroyPresenter = mTiFragment.isFragmentRemoving();
+        if (!mTiFragment.isInBackstack()) {
+            if (mTiFragment.isFragmentRemoving()) {
+                // fragment was removed with remove() or replace()
+                destroyPresenter = true;
+                TiLog.v(mLogTag.getLoggingTag(),
+                        "Fragment was removed and is not managed by the FragmentManager anymore."
+                                + " Also destroy " + mPresenter);
+            }
+        } else {
+            TiLog.v(mLogTag.getLoggingTag(), "fragment is in backstack");
+        }
+
         if (mTiFragment.isHostingActivityFinishing()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
@@ -227,7 +239,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             mSavior.free(mPresenterId);
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
-                    + " which will be reused by the next Activity instance, recreating...");
+                    + " which will be reused by a future Fragment instance");
         }
     }
 

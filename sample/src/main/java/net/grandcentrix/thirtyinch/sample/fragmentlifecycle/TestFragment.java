@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.BackstackReader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.AttributeSet;
@@ -50,6 +51,8 @@ public abstract class TestFragment extends Fragment {
 
     private PublishSubject<Boolean> mDetachedState = PublishSubject.create();
 
+    private PublishSubject<Boolean> mInBackstackState = PublishSubject.create();
+
     private PublishSubject<Boolean> mIsActivityChangingConfigState = PublishSubject.create();
 
     private PublishSubject<Boolean> mIsActivityFinishingState = PublishSubject.create();
@@ -79,24 +82,33 @@ public abstract class TestFragment extends Fragment {
 
     @Override
     public void onAttach(final Context context) {
-        mAddedState.distinctUntilChanged().subscribe(added -> {
+        mAddedState.startWith(false).distinctUntilChanged().skip(1).subscribe(added -> {
             Log.d(getFragmentTag(), "fragment" + instanceNum + ".setAdded(" + added + ")");
         });
-        mDetachedState.distinctUntilChanged().subscribe(detached -> {
+        mDetachedState.startWith(false).distinctUntilChanged().skip(1).subscribe(detached -> {
             Log.d(getFragmentTag(), "fragment" + instanceNum + ".setDetached(" + detached + ")");
         });
-        mRemovingState.distinctUntilChanged().subscribe(removing -> {
+        mRemovingState.startWith(false).distinctUntilChanged().skip(1).subscribe(removing -> {
             Log.d(getFragmentTag(), "fragment" + instanceNum + ".setRemoving(" + removing + ")");
         });
+        mInBackstackState.startWith(false).distinctUntilChanged().skip(1).subscribe(inBackstack -> {
+            Log.d(getFragmentTag(),
+                    "fragment" + instanceNum + ".setInBackstack(" + inBackstack + ")");
+        });
 
-        mIsActivityChangingConfigState.distinctUntilChanged().subscribe(changing -> {
-            Log.d(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                    + ".setChangingConfiguration(" + changing + ");");
-        });
-        mIsActivityFinishingState.distinctUntilChanged().subscribe(finishing -> {
-            Log.d(getFragmentTag(), "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                    + ".setFinishing(" + finishing + ");");
-        });
+        mIsActivityChangingConfigState.startWith(false).distinctUntilChanged().skip(1)
+                .subscribe(changing -> {
+                    Log.d(getFragmentTag(),
+                            "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                                    + ".setChangingConfiguration(" + changing + ");");
+                });
+        mIsActivityFinishingState.startWith(false).distinctUntilChanged().skip(1)
+                .subscribe(finishing -> {
+                    Log.d(getFragmentTag(),
+                            "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
+                                    + ".setFinishing(" + finishing + ");");
+                });
+
         printState();
         super.onAttach(context);
         Log.v(getFragmentTag(), "onAttach(" + context + ")");
@@ -376,6 +388,7 @@ public abstract class TestFragment extends Fragment {
         mAddedState.onNext(isAdded());
         mDetachedState.onNext(isDetached());
         mRemovingState.onNext(isRemoving());
+        mInBackstackState.onNext(BackstackReader.isInBackStack(this));
 
         final FragmentActivity activity = getActivity();
         if (activity != null) {

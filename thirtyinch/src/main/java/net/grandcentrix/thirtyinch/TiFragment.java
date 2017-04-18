@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.BackstackReader;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +52,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
             new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
+
+    @Override
+    public boolean isInBackstack() {
+        return BackstackReader.isInBackStack(this);
+    }
 
     @NonNull
     @Override
