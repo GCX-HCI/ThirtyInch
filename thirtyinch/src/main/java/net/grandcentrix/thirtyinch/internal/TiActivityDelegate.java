@@ -144,6 +144,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
         }
 
+        final TiActivity activity = (TiActivity) mTiActivity;
         // try to recover with the PresenterSavior
         if (savedInstanceState != null) {
             final String recoveredPresenterId = savedInstanceState
@@ -155,7 +156,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     // this should always work.
                     TiLog.v(mLogTag.getLoggingTag(),
                             "try to recover Presenter with id: " + recoveredPresenterId);
-                    mPresenter = (P) mSavior.recover(recoveredPresenterId);
+                    mPresenter = (P) mSavior.recover(recoveredPresenterId, activity);
                     TiLog.v(mLogTag.getLoggingTag(),
                             "recovered Presenter from savior " + mPresenter);
                 } else {
@@ -171,8 +172,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // save recovered presenter with new id. No other instance of this activity,
                 // holding the presenter before, is now able to remove the reference to
                 // this presenter from the savior
-                mSavior.free(recoveredPresenterId);
-                mPresenterId = mSavior.save(mPresenter);
+                mSavior.free(recoveredPresenterId, activity);
+                mPresenterId = mSavior.save(mPresenter, activity);
             }
         }
 
@@ -182,7 +183,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter()) {
-                mPresenterId = mSavior.save(mPresenter);
+                mPresenterId = mSavior.save(mPresenter, activity);
             }
             mPresenter.create();
         }
@@ -249,7 +250,9 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            mSavior.free(mPresenterId);
+
+            final TiActivity activity = (TiActivity) mTiActivity;
+            mSavior.free(mPresenterId, activity);
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");

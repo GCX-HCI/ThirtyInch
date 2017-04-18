@@ -1,5 +1,6 @@
 package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
+import net.grandcentrix.thirtyinch.TiFragment;
 import net.grandcentrix.thirtyinch.sample.R;
 
 import android.content.Context;
@@ -30,7 +31,9 @@ import rx.subjects.PublishSubject;
 
 import static net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity.fragmentLifecycleActivityInstanceCount;
 
-public abstract class TestFragment extends Fragment {
+public abstract class TestFragment
+        extends TiFragment<TestPresenter, TestPresenter.TestView>
+        implements TestPresenter.TestView {
 
     static int testFragmentInstanceCount = -1;
 
@@ -187,6 +190,7 @@ public abstract class TestFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         printState();
         Log.v(getFragmentTag(),
                 "onCreateView() called with: inflater = [" + inflater + "], container = ["
@@ -369,6 +373,12 @@ public abstract class TestFragment extends Fragment {
     public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         Log.v(getFragmentTag(), "onViewStateRestored");
+    }
+
+    @NonNull
+    @Override
+    public TestPresenter providePresenter() {
+        return new TestPresenter(getClass().getSimpleName());
     }
 
     @Override

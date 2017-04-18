@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -32,7 +33,7 @@ public class MockSavior implements TiPresenterSavior {
     }
 
     @Override
-    public void free(final String presenterId) {
+    public void free(final String presenterId, @NonNull Activity activity) {
         mPresenters.remove(presenterId);
     }
 
@@ -42,12 +43,12 @@ public class MockSavior implements TiPresenterSavior {
 
     @Nullable
     @Override
-    public TiPresenter recover(final String presenterId) {
+    public TiPresenter recover(final String presenterId, @NonNull Activity activity) {
         return mPresenters.get(presenterId);
     }
 
     @Override
-    public String save(@NonNull final TiPresenter presenter) {
+    public String save(@NonNull final TiPresenter presenter, @NonNull Activity activity) {
         final String id = presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();

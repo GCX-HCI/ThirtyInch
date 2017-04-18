@@ -53,11 +53,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
-    @Override
-    public boolean isInBackstack() {
-        return BackstackReader.isInBackStack(this);
-    }
-
     @NonNull
     @Override
     public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
@@ -132,6 +127,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     @Override
     public final boolean isHostingActivityFinishing() {
         return getActivity().isFinishing();
+    }
+
+    @Override
+    public boolean isInBackstack() {
+        return BackstackReader.isInBackStack(this);
     }
 
     @CallSuper

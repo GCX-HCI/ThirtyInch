@@ -127,6 +127,8 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     @SuppressWarnings("unchecked")
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
+
+        final TiFragment fragment = (TiFragment) mTiFragment;
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
             // this should always work.
@@ -135,13 +137,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             if (recoveredPresenterId != null) {
                 TiLog.v(mLogTag.getLoggingTag(),
                         "try to recover Presenter with id: " + recoveredPresenterId);
-                mPresenter = (P) mSavior.recover(recoveredPresenterId);
+                mPresenter = (P) mSavior.recover(recoveredPresenterId, fragment.getActivity());
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
                     // this presenter from the savior
-                    mSavior.free(recoveredPresenterId);
-                    mPresenterId = mSavior.save(mPresenter);
+                    mSavior.free(recoveredPresenterId, fragment.getActivity());
+                    mPresenterId = mSavior.save(mPresenter, fragment.getActivity());
                 }
                 TiLog.v(mLogTag.getLoggingTag(), "recovered Presenter " + mPresenter);
             }
@@ -152,7 +154,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter()) {
-                mPresenterId = mSavior.save(mPresenter);
+                mPresenterId = mSavior.save(mPresenter, fragment.getActivity());
             }
             mPresenter.create();
         }
@@ -238,7 +240,9 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            mSavior.free(mPresenterId);
+
+            final TiFragment fragment = (TiFragment) mTiFragment;
+            mSavior.free(mPresenterId, fragment.getActivity());
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by a future Fragment instance");
