@@ -42,45 +42,53 @@ public abstract class TiFragmentPresenterDestroyTest {
         }
     }
 
+    Bundle mActivitySavedState;
+
     Bundle mSavedState;
 
-    MockSavior mSavior;
+    PresenterSavior mSavior;
+
+    private final HashMap<String, String> activityHostBundle = new HashMap<>();
 
     private final HashMap<String, String> fakeBundle = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
-        mSavior = new MockSavior();
+        mSavior = new PresenterSavior();
         mSavedState = mock(Bundle.class);
-        doAnswer(saveInMap()).when(mSavedState).putString(anyString(), anyString());
-        doAnswer(getFromMap()).when(mSavedState).getString(anyString());
+        doAnswer(saveInMap(fakeBundle)).when(mSavedState).putString(anyString(), anyString());
+        doAnswer(getFromMap(fakeBundle)).when(mSavedState).getString(anyString());
+
+        mActivitySavedState = mock(Bundle.class);
+        doAnswer(saveInMap(activityHostBundle)).when(mActivitySavedState)
+                .putString(anyString(), anyString());
+        doAnswer(getFromMap(activityHostBundle)).when(mActivitySavedState).getString(anyString());
     }
 
     @After
     public void tearDown() throws Exception {
-        mSavior.clear();
         mSavedState = null;
     }
 
     @NonNull
-    private Answer getFromMap() {
+    private Answer getFromMap(final HashMap<String, String> store) {
         return new Answer() {
             @Override
             public String answer(final InvocationOnMock invocation) throws Throwable {
                 final Object[] args = invocation.getArguments();
                 //noinspection RedundantCast
-                return fakeBundle.get((String) args[0]);
+                return store.get((String) args[0]);
             }
         };
     }
 
     @NonNull
-    private Answer saveInMap() {
+    private Answer saveInMap(final HashMap<String, String> store) {
         return new Answer() {
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
                 final Object[] args = invocation.getArguments();
-                fakeBundle.put((String) args[0], (String) args[1]);
+                store.put((String) args[0], (String) args[1]);
                 return null;
             }
         };

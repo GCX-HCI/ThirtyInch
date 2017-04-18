@@ -19,6 +19,7 @@ package net.grandcentrix.thirtyinch.internal;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -34,7 +35,7 @@ public class TestTiFragment
 
     public static class Builder {
 
-        private HostingActivity mHostingActivity = new HostingActivity(false, false);
+        private HostingActivity mHostingActivity = new HostingActivity();
 
         private boolean mIsDontKeepActivitiesEnabled = false;
 
@@ -42,7 +43,7 @@ public class TestTiFragment
 
         private TiPresenterProvider<TiPresenter<TiView>> mPresenterProvider;
 
-        private TiPresenterSavior mSavior = new MockSavior();
+        private TiPresenterSavior mSavior = new PresenterSavior();
 
         public TestTiFragment build() {
             TiPresenterProvider<TiPresenter<TiView>> presenterProvider = mPresenterProvider;
@@ -166,6 +167,11 @@ public class TestTiFragment
     @Override
     public boolean isInBackstack() {
         return mInBackstack;
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return mHostingActivity.getMockActivityInstance();
     }
 
     public void onCreate(final Bundle saveInstanceState) {

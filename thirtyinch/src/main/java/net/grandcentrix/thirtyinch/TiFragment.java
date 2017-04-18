@@ -27,6 +27,7 @@ import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -49,7 +50,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiFragmentDelegate<P, V> mDelegate =
-            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
+            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.getInstance());
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
@@ -57,6 +58,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     @Override
     public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return getActivity();
     }
 
     @Nullable

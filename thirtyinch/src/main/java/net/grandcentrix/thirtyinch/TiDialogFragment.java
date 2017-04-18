@@ -49,7 +49,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiFragmentDelegate<P, V> mDelegate =
-            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
+            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.getInstance());
 
     @NonNull
     @Override

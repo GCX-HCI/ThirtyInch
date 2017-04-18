@@ -61,10 +61,11 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -72,10 +73,11 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then assert that the presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -97,7 +99,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then a new Presenter instance will be generated and the old presenter isn't used
         assertThat(fragment2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -129,10 +131,11 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -140,10 +143,11 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the presenter will be retained and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -166,7 +170,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         // Then the Presenter is the same
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(fragment.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
     }
 
     /**
@@ -198,7 +202,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
@@ -208,7 +212,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -243,7 +247,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
@@ -253,7 +257,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -286,9 +290,10 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the Presenter will *not* be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is moved to background
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -296,10 +301,11 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the Presenter gets destroyed.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -320,7 +326,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the new Presenter does not equals the previous Presenter.
         assertThat(fragment2.getPresenter()).isNotEqualTo(presenter).isEqualTo(presenter2);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -353,9 +359,10 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity gets moved to background
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -363,11 +370,12 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the presenter stays alive and is saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity moves to foreground again
         // A new Activity gets created by the Android Framework.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -389,7 +397,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         // Then the Presenter is the same as in the previous fragment instance
         assertThat(fragment2.getPresenter()).isNotEqualTo(presenter2).isEqualTo(presenter);
         assertThat(fragment2.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
     }
 
 
@@ -422,7 +430,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will not be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the fragment will be removed
         fragment.setRemoving(true);
@@ -432,7 +440,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the presenter is destroyed and not saved
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
 
@@ -465,7 +473,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         fragment.onStart();
 
         // Then the presenter will be stored in the savior
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the fragment will be removed
         fragment.setRemoving(true);
@@ -475,6 +483,6 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // Then the presenter is destroyed and not saved
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 }

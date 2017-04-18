@@ -18,15 +18,19 @@ package net.grandcentrix.thirtyinch.internal;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
+import android.app.Activity;
+import android.app.Application;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.concurrent.Executor;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TiActivityDelegateBuilder {
 
+    // TODO make dynamic
     private boolean mIsChangingConfigurations = false;
 
     private boolean mIsDontKeepActivitiesEnabled = false;
@@ -39,7 +43,7 @@ public class TiActivityDelegateBuilder {
 
     private TiPresenterProvider<TiPresenter<TiView>> mRetainedPresenterProvider;
 
-    private TiPresenterSavior mSavior = new MockSavior();
+    private TiPresenterSavior mSavior = new PresenterSavior();
 
     public TiActivityDelegate<TiPresenter<TiView>, TiView> build() {
         TiPresenterProvider<TiPresenter<TiView>> presenterProvider = mPresenterProvider;
@@ -52,6 +56,8 @@ public class TiActivityDelegateBuilder {
                 }
             };
         }
+        final Activity activityMock = mock(Activity.class);
+        when(activityMock.getApplication()).thenReturn(mock(Application.class));
 
         return new TiActivityDelegate<>(new DelegatedTiActivity<TiPresenter<TiView>>() {
             @Nullable
@@ -86,6 +92,14 @@ public class TiActivityDelegateBuilder {
             @Override
             public boolean isDontKeepActivitiesEnabled() {
                 return mIsDontKeepActivitiesEnabled;
+            }
+
+            @Override
+            public Activity getHostingActivity() {
+                // always update with latest data
+                when(activityMock.isChangingConfigurations()).thenReturn(mIsChangingConfigurations);
+                when(activityMock.isFinishing()).thenReturn(mIsFinishing);
+                return activityMock;
             }
 
         }, new TiViewProvider<TiView>() {

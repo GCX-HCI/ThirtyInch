@@ -77,7 +77,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
         mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this,
-                PresenterSavior.INSTANCE);
+                PresenterSavior.getInstance());
     }
 
     @NonNull
@@ -154,6 +154,11 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public final boolean isDontKeepActivitiesEnabled() {
         return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return getActivity();
     }
 
     @CallSuper

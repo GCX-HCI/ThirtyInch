@@ -60,14 +60,14 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // The Presenter is destroyed and not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
 
         // Then nothing happens with the fragment, not managed anymore
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // The presenter is not destroyed and not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
@@ -113,7 +113,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -153,14 +153,14 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // The Presenter is destroyed and not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
 
         // Then nothing happens with the fragment, not managed anymore
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -200,19 +200,21 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the presenter is not destroyed and saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // Then the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the back stack is popped a new Fragment instance is created.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -266,7 +268,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the presenter is not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // And when the Fragment is replaced by another Fragment.
         fragment.setAdded(false);
@@ -278,7 +280,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         // Then assert that the Presenter is destroyed and not saved in the savior
         // because there is no way to bring the Fragment back.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the activity finishes
         // nothing happens because the presenter is already destroyed
@@ -313,7 +315,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the presenter is not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // And when the Fragment is replaced by another Fragment.
         fragment.setAdded(false);
@@ -327,7 +329,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -360,7 +362,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the presenter is saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // And when the Fragment is replaced by another Fragment.
         fragment.setAdded(false);
@@ -372,7 +374,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         // Then assert that the Presenter is destroyed and not saved in the savior
         // because there is no way the Fragment can be brought back.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the activity finishes
         // nothing happens because the presenter is already destroyed
@@ -410,7 +412,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then the presenter is saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // And when it is replaced by another Fragment.
         fragment.setAdded(false);
@@ -424,7 +426,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -468,7 +470,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         // Then assert that the Presenter is not destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(fragment.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     /**
@@ -513,7 +515,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         // Then assert that the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(fragment.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
     }
 
 }

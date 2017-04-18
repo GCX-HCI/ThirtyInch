@@ -35,6 +35,7 @@ import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -79,7 +80,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     public TiFragmentPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
         mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider, this,
-                PresenterSavior.INSTANCE);
+                PresenterSavior.getInstance());
     }
 
     @NonNull
@@ -165,6 +166,11 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public boolean isInBackstack() {
         return BackstackReader.isInBackStack(getFragment());
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return getFragment().getActivity();
     }
 
     @CallSuper

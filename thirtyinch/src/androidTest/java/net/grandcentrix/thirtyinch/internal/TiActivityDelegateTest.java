@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +33,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import java.util.concurrent.Executor;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
@@ -219,10 +221,25 @@ public class TiActivityDelegateTest {
         return new TiActivityDelegate<>(
                 new DelegatedTiActivity<TiPresenter<TiView>>() {
 
+                    @Override
+                    public Activity getHostingActivity() {
+                        return mock(Activity.class);
+                    }
+
                     @Nullable
                     @Override
                     public TiPresenter<TiView> getRetainedPresenter() {
                         return mRetainedPresenter;
+                    }
+
+                    @Override
+                    public Executor getUiThreadExecutor() {
+                        return new Executor() {
+                            @Override
+                            public void execute(@NonNull final Runnable action) {
+                                action.run();
+                            }
+                        };
                     }
 
                     @Override
@@ -238,16 +255,6 @@ public class TiActivityDelegateTest {
                     @Override
                     public boolean isDontKeepActivitiesEnabled() {
                         return mIsDontKeepActivitiesEnabled;
-                    }
-
-                    @Override
-                    public Executor getUiThreadExecutor() {
-                        return new Executor() {
-                            @Override
-                            public void execute(@NonNull final Runnable action) {
-                                action.run();
-                            }
-                        };
                     }
                 },
                 new TiViewProvider<TiView>() {
@@ -271,6 +278,6 @@ public class TiActivityDelegateTest {
                         return "TestTag";
                     }
                 },
-        PresenterSavior.INSTANCE);
+                new PresenterSavior());
     }
 }

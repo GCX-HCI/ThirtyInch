@@ -53,4 +53,9 @@ public interface DelegatedTiActivity<P> {
      * @return true when the developer option "Don't keep Activities" is enabled
      */
     boolean isDontKeepActivitiesEnabled();
+
+    /**
+     * @return the Activity itself instance
+     */
+    Activity getHostingActivity();
 }

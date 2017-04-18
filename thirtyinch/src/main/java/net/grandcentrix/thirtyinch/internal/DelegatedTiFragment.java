@@ -62,4 +62,9 @@ public interface DelegatedTiFragment {
      */
     boolean isInBackstack();
 
+    /**
+     * @return the hosting Activity
+     */
+    Activity getHostingActivity();
+
 }

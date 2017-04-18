@@ -18,17 +18,16 @@ package net.grandcentrix.thirtyinch.internal;
 import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,121 +39,237 @@ import java.util.UUID;
  *
  * {@link TiActivity} is responsible to manage the references
  */
-public enum PresenterSavior implements TiPresenterSavior {
+public class PresenterSavior implements TiPresenterSavior {
 
-    INSTANCE;
+    private static PresenterSavior INSTANCE;
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
 
-    private static final String TI_ACTIVITY_ID_KEY = "ThirtyInch_activity_id";
+    static final String TI_ACTIVITY_PRESENTER_SCOPE_KEY = "ThirtyInch_presenter_scope_id";
 
-    private HashMap<String, Activity> mActivitys = new HashMap<>();
+    @VisibleForTesting
+    Application.ActivityLifecycleCallbacks mLifecycleCallbacks;
 
-    private Application.ActivityLifecycleCallbacks mLifecycleCallbacks;
+    @VisibleForTesting
+    final HashMap<String, ActivityScopedPresenters> mScopes = new HashMap<>();
 
-    private HashMap<Activity, String> mScopeIds = new HashMap<>();
+    private final HashMap<Activity, String> mScopeIdForActivity = new HashMap<>();
 
-    private HashMap<String, ActivityScopedPresenters> mScopes = new HashMap<>();
+    public static synchronized PresenterSavior getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new PresenterSavior();
+        }
+        return INSTANCE;
+    }
+
+    @VisibleForTesting
+    /*package*/ PresenterSavior() {
+
+    }
+
+    public void detectNewActivity(final Activity activity, final Bundle savedInstanceState) {
+        TiLog.d(TAG, "detectNewActivity() called with: activity = [" + activity
+                + "], savedInstanceState = [" + savedInstanceState + "]");
+        if (savedInstanceState != null) {
+            final String id = savedInstanceState.getString(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
+            if (id != null) {
+                // refresh mapping
+                mScopeIdForActivity.put(activity, id);
+            }
+        }
+    }
 
     @Override
-    public void free(final String presenterId, final Activity activity) {
+    public void free(final String presenterId, @NonNull final Activity activity) {
         final ActivityScopedPresenters scope = getScope(activity);
-        scope.remove(presenterId);
+        if (scope != null) {
+            scope.remove(presenterId);
+            clearScopeWhenPossible(activity);
+        }
 
         printRemainingStore();
     }
 
-    public synchronized ActivityScopedPresenters getScope(final Activity activity) {
+    @Override
+    @Nullable
+    public TiPresenter recover(final String presenterId, @NonNull final Activity activity) {
+        final ActivityScopedPresenters scope = getScope(activity);
+        if (scope == null) {
+            return null;
+        }
+        return scope.get(presenterId);
+    }
 
-        if (mLifecycleCallbacks == null) {
-            mLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
-                @Override
-                public void onActivityCreated(final Activity activity,
-                        final Bundle savedInstanceState) {
-                    String activityId = null;
-                    if (savedInstanceState != null) {
-                        final String id = savedInstanceState.getString(TI_ACTIVITY_ID_KEY);
-                        if (id != null) {
-                            activityId = id;
-                        }
-                    }
+    @Override
+    public String save(@NonNull final TiPresenter presenter, @NonNull final Activity activity) {
+        final String id = generateId(presenter);
+        TiLog.v(TAG, "save presenter with id " + id + " " + presenter);
 
-                    if (activityId == null) {
-                        activityId = UUID.randomUUID().toString();
-                    }
+        final ActivityScopedPresenters scope = getScopeOrCreate(activity);
+        scope.save(id, presenter);
+        printRemainingStore();
 
-                    mActivitys.put(activityId, activity);
-                    mScopeIds.put(activity, activityId);
-                }
+        return id;
+    }
 
-                @Override
-                public void onActivityDestroyed(final Activity activity) {
+    /**
+     * the {@link Activity} is in terminal state and got finished. cleanup all presenters
+     */
+    void cleanupAfterFinish(@NonNull final Activity activity) {
+        TiLog.d(TAG, "cleanupAfterFinish() called with: activity = [" + activity + "]");
 
-                    final String scopeId = mScopeIds.remove(activity);
-                    if (scopeId != null) {
-                        mActivitys.remove(scopeId);
-                    }
+        final String scopeId = mScopeIdForActivity.remove(activity);
+        final ActivityScopedPresenters scope = mScopes.remove(scopeId);
 
-                    TiLog.v(TAG, "destroying " + activity);
-                    TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
-                    TiLog.v(TAG,
-                            "isChangingConfigurations = " + activity.isChangingConfigurations());
-                    TiLog.v(TAG, "dontKeepActivities = " + AndroidDeveloperOptions
-                            .isDontKeepActivitiesEnabled(activity));
-
-                    if (activity.isFinishing() && !activity.isChangingConfigurations()) {
-                        TiLog.d(TAG, "Activity is really finishing!");
-                        final ActivityScopedPresenters scope = mScopes.remove(scopeId);
-                        if (scope != null) {
-                            scope.clear();
-                        }
-
-                        printRemainingStore();
-                    }
-                }
-
-                @Override
-                public void onActivityPaused(final Activity activity) {
-
-                }
-
-                @Override
-                public void onActivityResumed(final Activity activity) {
-
-                }
-
-                @Override
-                public void onActivitySaveInstanceState(final Activity activity,
-                        final Bundle outState) {
-                    String id = mScopeIds.get(activity);
-                    if (id == null) {
-                        id = UUID.randomUUID().toString();
-                        mActivitys.put(id, activity);
-                        mScopeIds.put(activity, id);
-                    }
-                    outState.putString(TI_ACTIVITY_ID_KEY, id);
-                }
-
-                @Override
-                public void onActivityStarted(final Activity activity) {
-
-                }
-
-                @Override
-                public void onActivityStopped(final Activity activity) {
-
-                }
-            };
-            activity.getApplication().registerActivityLifecycleCallbacks(mLifecycleCallbacks);
+        if (mScopeIdForActivity.isEmpty()) {
+            TiLog.v(TAG, "unregistering lifecycle callback");
+            if (mLifecycleCallbacks != null) {
+                activity.getApplication().unregisterActivityLifecycleCallbacks(mLifecycleCallbacks);
+            }
         }
 
-        final String scopeId = mScopeIds.get(activity);
+        TiLog.d(TAG, "Activity is really finishing!");
+        if (scope != null) {
+            for (final Map.Entry<String, TiPresenter> entry : scope.getAllMappings()) {
+                final String key = entry.getKey();
+                final TiPresenter presenter = entry.getValue();
+                if (!presenter.isDestroyed()) {
+                    presenter.destroy();
+                }
+                scope.remove(key);
+            }
+        }
+
+        printRemainingStore();
+    }
+
+    @VisibleForTesting
+    /*package*/ int getPresenterCount() {
+
+        final ArrayList<TiPresenter> presenters = new ArrayList<>();
+        for (final Map.Entry<String, ActivityScopedPresenters> entry : mScopes.entrySet()) {
+            presenters.addAll(entry.getValue().getAll());
+        }
+        return presenters.size();
+    }
+
+    private synchronized void clearScopeWhenPossible(@NonNull final Activity activity) {
+        final String scopeId = mScopeIdForActivity.get(activity);
+        if (scopeId == null) {
+            return;
+        }
+        final ActivityScopedPresenters scope = mScopes.get(scopeId);
+        if (scope == null) {
+            return;
+        }
+        if (scope.getAll().isEmpty()) {
+            // remove empty scope
+            mScopes.remove(mScopeIdForActivity.remove(activity));
+
+            if (mScopes.isEmpty()) {
+                if (mLifecycleCallbacks != null) {
+                    activity.getApplication()
+                            .unregisterActivityLifecycleCallbacks(mLifecycleCallbacks);
+                    mLifecycleCallbacks = null;
+                }
+            }
+        }
+    }
+
+    private String generateId(@NonNull final TiPresenter presenter) {
+        return presenter.getClass().getSimpleName()
+                + ":" + presenter.hashCode()
+                + ":" + System.nanoTime();
+    }
+
+    @NonNull
+    private Application.ActivityLifecycleCallbacks getActivityLifecycleCallbacks() {
+        return new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(final Activity activity,
+                    final Bundle savedInstanceState) {
+                detectNewActivity(activity, savedInstanceState);
+            }
+
+            @Override
+            public void onActivityDestroyed(final Activity activity) {
+
+                TiLog.v(TAG, "destroying " + activity);
+                TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
+                TiLog.v(TAG,
+                        "isChangingConfigurations = " + activity.isChangingConfigurations());
+
+                if (activity.isFinishing() && !activity.isChangingConfigurations()) {
+                    // detected Activity finish, no new Activity instance will be created
+                    // with savedInstanceState, clear saved presenters
+                    cleanupAfterFinish(activity);
+                } else {
+                    // don't leak old activity instances
+                    // scopeId is saved in savedInstanceState of finishing Activity.
+                    mScopeIdForActivity.remove(activity);
+                }
+            }
+
+            @Override
+            public void onActivityPaused(final Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(final Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(final Activity activity,
+                    final Bundle outState) {
+                saveScopeId(activity, outState);
+            }
+
+            @Override
+            public void onActivityStarted(final Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(final Activity activity) {
+
+            }
+        };
+    }
+
+    public void saveScopeId(final Activity activity, final Bundle outState) {
+        String id = mScopeIdForActivity.get(activity);
+        if (id == null) {
+            id = UUID.randomUUID().toString();
+            mScopeIdForActivity.put(activity, id);
+        }
+        outState.putString(TI_ACTIVITY_PRESENTER_SCOPE_KEY, id);
+    }
+
+    private synchronized ActivityScopedPresenters getScope(final Activity activity) {
+        final String id = mScopeIdForActivity.get(activity);
+        if (id != null) {
+            return mScopes.get(id);
+        }
+
+        return null;
+    }
+
+    private synchronized ActivityScopedPresenters getScopeOrCreate(final Activity activity) {
+        if (mLifecycleCallbacks == null) {
+            mLifecycleCallbacks = getActivityLifecycleCallbacks();
+            TiLog.v(TAG, "registering lifecycle callback");
+            final Application application = activity.getApplication();
+            application.registerActivityLifecycleCallbacks(mLifecycleCallbacks);
+        }
+
+        final String scopeId = mScopeIdForActivity.get(activity);
         final ActivityScopedPresenters scope;
 
         if (scopeId == null) {
             final String id = UUID.randomUUID().toString();
-            mActivitys.put(id, activity);
-            mScopeIds.put(activity, id);
+            mScopeIdForActivity.put(activity, id);
             scope = new ActivityScopedPresenters();
             mScopes.put(id, scope);
         } else {
@@ -170,37 +285,9 @@ public enum PresenterSavior implements TiPresenterSavior {
         return scope;
     }
 
-    @Override
-    @Nullable
-    public TiPresenter recover(final String presenterId, final Activity activity) {
-        final ActivityScopedPresenters scope = getScope(activity);
-        return scope.get(presenterId);
-    }
-
-    @Override
-    public String save(@NonNull final TiPresenter presenter, final Activity activity) {
-        final String id = generateId(presenter);
-        TiLog.v(TAG, "save presenter with id " + id + " " + presenter);
-
-        final ActivityScopedPresenters scope = getScope(activity);
-        scope.save(id, presenter);
-        printRemainingStore();
-
-        return id;
-    }
-
-    private String generateId(@NonNull final TiPresenter presenter) {
-        return presenter.getClass().getSimpleName()
-                + ":" + presenter.hashCode()
-                + ":" + System.nanoTime();
-    }
-
     private void printRemainingStore() {
         final ArrayList<TiPresenter> presenters = new ArrayList<>();
-        final Iterator<Map.Entry<String, ActivityScopedPresenters>> iterator =
-                mScopes.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Map.Entry<String, ActivityScopedPresenters> entry = iterator.next();
+        for (final Map.Entry<String, ActivityScopedPresenters> entry : mScopes.entrySet()) {
             presenters.addAll(entry.getValue().getAll());
         }
 

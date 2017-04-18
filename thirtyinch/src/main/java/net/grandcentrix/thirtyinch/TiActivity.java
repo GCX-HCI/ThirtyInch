@@ -28,6 +28,7 @@ import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -51,7 +52,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiActivityDelegate<P, V> mDelegate
-            = new TiActivityDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
+            = new TiActivityDelegate<>(this, this, this, this, PresenterSavior.getInstance());
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
@@ -59,6 +60,11 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return this;
     }
 
     @Nullable

@@ -16,12 +16,36 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
+import android.app.Activity;
+import android.app.Application;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * mutable object mocking the hosting activity and their state
  */
 public class HostingActivity {
 
+    private static Application mApplication = mock(Application.class);
+
+    private final Activity mActivityMock;
+
     private boolean mIsChangingConfiguration;
+
+    private boolean mIsFinishing;
+
+    public HostingActivity() {
+        mActivityMock = mock(Activity.class);
+        when(mActivityMock.getApplication()).thenReturn(mApplication);
+    }
+
+    public Activity getMockActivityInstance() {
+        // always update with latest data
+        when(mActivityMock.isChangingConfigurations()).thenReturn(mIsChangingConfiguration);
+        when(mActivityMock.isFinishing()).thenReturn(mIsFinishing);
+        return mActivityMock;
+    }
 
     public boolean isChangingConfiguration() {
         return mIsChangingConfiguration;
@@ -29,30 +53,6 @@ public class HostingActivity {
 
     public boolean isFinishing() {
         return mIsFinishing;
-    }
-
-    private boolean mIsFinishing;
-
-    public HostingActivity(final boolean isFinishing, final boolean isChangingConfiguration) {
-        mIsFinishing = isFinishing;
-        mIsChangingConfiguration = isChangingConfiguration;
-    }
-
-    public HostingActivity() {
-        resetToDefault();
-    }
-
-    /**
-     * like when the Activity gets recreated by the Android Framework.
-     * Resets to default values
-     */
-    public void recreateInstance() {
-        resetToDefault();
-    }
-
-    public void resetToDefault() {
-        mIsChangingConfiguration = false;
-        mIsFinishing = false;
     }
 
     public void setChangingConfiguration(final boolean changingConfiguration) {

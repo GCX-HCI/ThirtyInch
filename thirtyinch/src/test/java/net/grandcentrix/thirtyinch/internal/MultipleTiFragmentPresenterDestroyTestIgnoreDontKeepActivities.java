@@ -64,7 +64,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
         // Then assert that the Presenter is destroyed and not saved in the savior
         // because there is no way to bring the Fragment back.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -143,14 +143,14 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // The Presenter is destroyed and not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
 
         // Then nothing happens with the fragment, not managed anymore
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -187,19 +187,21 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // Then the presenter is not destroyed and saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // Then the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the back stack is popped a new Fragment instance is created.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -261,46 +263,28 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // Then the presenter is not destroyed and saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
+        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // Then the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity gets finished
         hostingActivity2.setFinishing(true);
+        mSavior.cleanupAfterFinish(hostingActivity2.getMockActivityInstance());
 
-
-       /* // When the back stack is popped a new Fragment instance is created.
-        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
-                .setRetainPresenterEnabled(true)
-                .build());
-
-        final TestTiFragment fragment2 = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(true)
-                .setHostingActivity(hostingActivity2)
-                .setSavior(mSavior)
-                .setPresenter(presenter2)
-                .build();
-
-        // And the instance will be created with the saved instance state
-        fragment2.setInBackstack(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.setAdded(true);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
-        fragment2.onStart();*/
-
-        // Then the same presenter gets recovered
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        // Then the same presenter is destroyed
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
         assertThat(presenter.isDestroyed()).isTrue();
     }
 
@@ -331,7 +315,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // Then the presenter is not saved in the savior
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // And when the Fragment is replaced by another Fragment.
         fragment.setAdded(false);
@@ -343,7 +327,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
         // Then assert that the Presenter is destroyed and not saved in the savior
         // because there is no way to bring the Fragment back.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the activity finishes
         // nothing happens because the presenter is already destroyed
@@ -388,7 +372,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -426,7 +410,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
         // Then assert that the Presenter is destroyed and not saved in the savior
         // because there is no way the Fragment can be brought back.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the activity finishes
         // nothing happens because the presenter is already destroyed
@@ -471,7 +455,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -515,7 +499,7 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
         // Then assert that the Presenter is not destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(fragment.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(0);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
     @Test
@@ -559,6 +543,6 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
         // Then assert that the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
         assertThat(fragment.getPresenter()).isEqualTo(presenter);
-        assertThat(mSavior.presenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
     }
 }

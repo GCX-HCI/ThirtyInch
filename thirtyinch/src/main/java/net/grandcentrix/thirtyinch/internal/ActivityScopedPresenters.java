@@ -20,30 +20,28 @@ import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ActivityScopedPresenters {
 
+    private final String TAG = ActivityScopedPresenters.class.getSimpleName() + "@" + Integer
+            .toHexString(hashCode());
+
     private final HashMap<String, TiPresenter> store = new HashMap<>();
-
-    private final String TAG = ActivityScopedPresenters.class.getSimpleName() + "@" + Integer.toHexString(hashCode());
-
-    public void clear() {
-        final ArrayList<Map.Entry<String, TiPresenter>> entries = new ArrayList<>(store.entrySet());
-        for (final Map.Entry<String, TiPresenter> entry : entries) {
-            entry.getValue().destroy();
-            store.remove(entry.getKey());
-        }
-    }
 
     public TiPresenter get(final String id) {
         return store.get(id);
     }
 
+    public List<Map.Entry<String, TiPresenter>> getAllMappings() {
+        return Collections.unmodifiableList(new ArrayList<>(store.entrySet()));
+    }
+
     public List<TiPresenter> getAll() {
-        return new ArrayList<>(store.values());
+        return Collections.unmodifiableList(new ArrayList<>(store.values()));
     }
 
     public TiPresenter remove(final String id) {
