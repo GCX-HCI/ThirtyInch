@@ -128,6 +128,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
     @SuppressWarnings("unchecked")
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
 
+        if (mPresenter != null && mPresenter.isDestroyed()) {
+            // let a new Presenter be created
+            TiLog.v(mLogTag.getLoggingTag(),
+                    "detected destroyed presenter, discard it " + mPresenter);
+            mPresenter = null;
+        }
+
         if (mPresenter == null && savedInstanceState != null) {
             // recover with Savior
             // this should always work.
