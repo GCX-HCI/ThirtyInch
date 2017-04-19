@@ -182,6 +182,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
             mPresenter = mPresenterProvider.providePresenter();
             if (mPresenter.getState() != TiPresenter.State.INITIALIZED) {
                 throw new IllegalStateException("Presenter not in initialized state. "
+                        + "Current state is " + mPresenter.getState() + ". "
                         + "Presenter provided with #providePresenter() cannot be reused. "
                         + "Always return a fresh instance!");
             }

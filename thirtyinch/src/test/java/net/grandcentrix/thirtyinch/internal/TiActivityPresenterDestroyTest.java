@@ -123,7 +123,7 @@ public class TiActivityPresenterDestroyTest {
             delegate.onCreate_afterSuper(savedState);
             fail("did not throw");
         } catch (Exception e) {
-            assertThat(e).hasMessageContaining("destroyed");
+            assertThat(e).hasMessageContaining("DESTROYED");
         }
     }
 
@@ -226,7 +226,7 @@ public class TiActivityPresenterDestroyTest {
             delegate.onCreate_afterSuper(savedState);
             fail("did not throw");
         } catch (Exception e) {
-            assertThat(e).hasMessageContaining("destroyed");
+            assertThat(e).hasMessageContaining("DESTROYED");
         }
     }
 
