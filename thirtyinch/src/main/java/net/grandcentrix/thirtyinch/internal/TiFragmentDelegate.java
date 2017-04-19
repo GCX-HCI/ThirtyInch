@@ -136,7 +136,8 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             if (recoveredPresenterId != null) {
                 TiLog.v(mLogTag.getLoggingTag(),
                         "try to recover Presenter with id: " + recoveredPresenterId);
-                mPresenter = (P) mSavior.recover(recoveredPresenterId, mTiFragment.getHostingActivity());
+                mPresenter = (P) mSavior
+                        .recover(recoveredPresenterId, mTiFragment.getHostingActivity());
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
@@ -150,6 +151,11 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (mPresenter == null) {
             mPresenter = mPresenterProvider.providePresenter();
+            if (mPresenter.getState() != TiPresenter.State.INITIALIZED) {
+                throw new IllegalStateException("Presenter not in initialized state. "
+                        + "Presenter provided with #providePresenter() cannot be reused. "
+                        + "Always return a fresh instance!");
+            }
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter()) {

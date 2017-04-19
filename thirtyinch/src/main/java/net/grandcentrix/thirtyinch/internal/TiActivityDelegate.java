@@ -180,6 +180,11 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         if (mPresenter == null) {
             // could not recover, create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
+            if (mPresenter.getState() != TiPresenter.State.INITIALIZED) {
+                throw new IllegalStateException("Presenter not in initialized state. "
+                        + "Presenter provided with #providePresenter() cannot be reused. "
+                        + "Always return a fresh instance!");
+            }
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter()) {

@@ -20,37 +20,41 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.support.annotation.Nullable;
 
 import java.util.concurrent.Executor;
 
 import static org.mockito.Mockito.mock;
 
-
 /**
- * mock implementation of a {@link android.support.v4.app.Fragment} with all relevant lifecycle
- * methods instructing the {@link TiFragmentDelegate} for testing
+ * mock implementation of a {@link Activity} with all relevant lifecycle methods instructing the
+ * {@link TiActivityDelegate} for testing
  */
-public class TestTiFragment
-        implements DelegatedTiFragment, TiViewProvider<TiView>,
+public class TestTiActivity
+        implements DelegatedTiActivity<TiPresenter<TiView>>, TiViewProvider<TiView>,
         PresenterAccessor<TiPresenter<TiView>, TiView> {
 
-    public static class Builder {
+    public static final class Builder {
 
-        private HostingActivity mHostingActivity = new HostingActivity();
-
-        private boolean mIsDontKeepActivitiesEnabled = false;
+        private boolean mIsDontKeepActivitiesEnabled;
 
         private TiPresenter<TiView> mPresenter;
 
         private TiPresenterProvider<TiPresenter<TiView>> mPresenterProvider;
 
+        private TiPresenterProvider<TiPresenter<TiView>> mRetainedInstanceProvider;
+
+        private TiPresenter<TiView> mRetainedPresenter;
+
         private TiPresenterSavior mSavior = new PresenterSavior();
 
-        public TestTiFragment build() {
+        public Builder() {
+        }
+
+        public TestTiActivity build() {
             TiPresenterProvider<TiPresenter<TiView>> presenterProvider = mPresenterProvider;
             if (presenterProvider == null) {
                 presenterProvider = new TiPresenterProvider<TiPresenter<TiView>>() {
@@ -62,17 +66,23 @@ public class TestTiFragment
                 };
             }
 
-            return new TestTiFragment(presenterProvider, mIsDontKeepActivitiesEnabled, mSavior,
-                    mHostingActivity);
+            TiPresenterProvider<TiPresenter<TiView>> retainedPresenterProvider
+                    = mRetainedInstanceProvider;
+            if (retainedPresenterProvider == null) {
+                retainedPresenterProvider = new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
+                    @Override
+                    public TiPresenter<TiView> providePresenter() {
+                        return mRetainedPresenter;
+                    }
+                };
+            }
+            return new TestTiActivity(presenterProvider, mIsDontKeepActivitiesEnabled, mSavior,
+                    retainedPresenterProvider);
         }
 
-        public Builder setDontKeepActivitiesEnabled(final boolean enabled) {
-            mIsDontKeepActivitiesEnabled = enabled;
-            return this;
-        }
-
-        public Builder setHostingActivity(final HostingActivity hostingActivity) {
-            mHostingActivity = hostingActivity;
+        public Builder setDontKeepActivitiesEnabled(final boolean val) {
+            mIsDontKeepActivitiesEnabled = val;
             return this;
         }
 
@@ -87,32 +97,38 @@ public class TestTiFragment
             return this;
         }
 
+        public Builder setRetainedPresenter(TiPresenter<TiView> presenter) {
+            mRetainedPresenter = presenter;
+            return this;
+        }
+
+        public Builder setRetainedPresenterProvider(
+                final TiPresenterProvider<TiPresenter<TiView>> val) {
+            mRetainedInstanceProvider = val;
+            return this;
+        }
+
         public Builder setSavior(final TiPresenterSavior savior) {
             mSavior = savior;
             return this;
         }
     }
 
-    private boolean mAdded = false;
+    private final TiActivityDelegate<TiPresenter<TiView>, TiView> mDelegate;
 
-    private final TiFragmentDelegate mDelegate;
+    private final HostingActivity mHostingActivity = new HostingActivity();
 
-    private boolean mDetached = false;
+    private final boolean mIsDontKeepActivitiesEnabled;
 
-    private final HostingActivity mHostingActivity;
+    private final TiPresenterProvider<TiPresenter<TiView>> mRetainedInstanceProvider;
 
-    private boolean mInBackstack;
-
-    private boolean mIsDontKeepActivitiesEnabled;
-
-    private boolean mRemoving;
-
-    private TestTiFragment(final TiPresenterProvider<TiPresenter<TiView>> presenterProvider,
+    private TestTiActivity(final TiPresenterProvider<TiPresenter<TiView>> presenterProvider,
             final boolean isDontKeepActivitiesEnabled,
             final TiPresenterSavior savior,
-            final HostingActivity hostingActivity) {
+            final TiPresenterProvider<TiPresenter<TiView>> retainedInstanceProvider) {
+        mRetainedInstanceProvider = retainedInstanceProvider;
 
-        mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider,
+        mDelegate = new TiActivityDelegate<>(this, this, presenterProvider,
                 new TiLoggingTagProvider() {
                     @Override
                     public String getLoggingTag() {
@@ -121,7 +137,6 @@ public class TestTiFragment
                 }, savior);
 
         mIsDontKeepActivitiesEnabled = isDontKeepActivitiesEnabled;
-        mHostingActivity = hostingActivity;
     }
 
     @Override
@@ -132,6 +147,12 @@ public class TestTiFragment
     @Override
     public TiPresenter<TiView> getPresenter() {
         return mDelegate.getPresenter();
+    }
+
+    @Nullable
+    @Override
+    public TiPresenter<TiView> getRetainedPresenter() {
+        return mRetainedInstanceProvider.providePresenter();
     }
 
     @Override
@@ -145,55 +166,30 @@ public class TestTiFragment
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return mIsDontKeepActivitiesEnabled;
-    }
-
-    @Override
-    public boolean isFragmentAdded() {
-        return mAdded;
-    }
-
-    @Override
-    public boolean isFragmentDetached() {
-        return mDetached;
-    }
-
-    @Override
-    public boolean isFragmentRemoving() {
-        return mRemoving;
-    }
-
-    @Override
-    public boolean isHostingActivityChangingConfigurations() {
+    public boolean isActivityChangingConfigurations() {
         return mHostingActivity.isChangingConfiguration();
     }
 
     @Override
-    public boolean isHostingActivityFinishing() {
+    public boolean isActivityFinishing() {
         return mHostingActivity.isFinishing();
     }
 
     @Override
-    public boolean isInBackstack() {
-        return mInBackstack;
+    public boolean isDontKeepActivitiesEnabled() {
+        return mIsDontKeepActivitiesEnabled;
+    }
+
+    public void onConfigurationChanged() {
+        mDelegate.onConfigurationChanged_afterSuper(mock(Configuration.class));
     }
 
     public void onCreate(final Bundle saveInstanceState) {
         mDelegate.onCreate_afterSuper(saveInstanceState);
     }
 
-    public void onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
-        mDelegate.onCreateView_beforeSuper(inflater, container, savedInstanceState);
-    }
-
     public void onDestroy() {
         mDelegate.onDestroy_afterSuper();
-    }
-
-    public void onDestroyView() {
-        mDelegate.onDestroyView_beforeSuper();
     }
 
     public void onSaveInstanceState(final Bundle outState) {
@@ -206,6 +202,7 @@ public class TestTiFragment
 
     public void onStop() {
         mDelegate.onStop_beforeSuper();
+        mDelegate.onStop_afterSuper();
     }
 
     @NonNull
@@ -214,19 +211,12 @@ public class TestTiFragment
         return mock(TiView.class);
     }
 
-    public void setAdded(final boolean added) {
-        mAdded = added;
+    public void setChangingConfiguration(final boolean changingConfiguration) {
+        mHostingActivity.setChangingConfiguration(changingConfiguration);
     }
 
-    public void setDetached(final boolean detached) {
-        mDetached = detached;
+    public void setFinishing(final boolean finishing) {
+        mHostingActivity.setFinishing(finishing);
     }
 
-    public void setInBackstack(final boolean inBackstack) {
-        mInBackstack = inBackstack;
-    }
-
-    public void setRemoving(final boolean removing) {
-        mRemoving = removing;
-    }
 }
