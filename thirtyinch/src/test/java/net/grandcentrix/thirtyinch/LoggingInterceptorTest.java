@@ -16,6 +16,8 @@
 package net.grandcentrix.thirtyinch;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+@RunWith(JUnit4.class)
 public class LoggingInterceptorTest {
 
     private class BaseActivity implements MyView {
@@ -87,7 +90,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void cropLongParams() throws Exception {
+    public void testCropLongParams() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -110,7 +113,7 @@ public class LoggingInterceptorTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
-    public void dontLogObjectInvocations() throws Exception {
+    public void testDontLogObjectInvocations() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -123,7 +126,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void findTiViewInterfaceInComplexStructure() throws Exception {
+    public void testFindTiViewInterfaceInComplexStructure() throws Exception {
         final LoggingInterceptor interceptor = new LoggingInterceptor();
         final TiView interceptView = interceptor.intercept(new MyActivity());
         assertThat(interceptView)
@@ -134,7 +137,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logArray() throws Exception {
+    public void testLogArray() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -152,7 +155,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logEmptyList() throws Exception {
+    public void testLogEmptyList() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -171,7 +174,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logLists() throws Exception {
+    public void testLogLists() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -191,7 +194,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logMultipleArguments() throws Exception {
+    public void testLogMultipleArguments() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -206,7 +209,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logNull() throws Exception {
+    public void testLogNull() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -222,7 +225,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logNullVarargs() throws Exception {
+    public void testLogNullVarargs() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -238,7 +241,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logVarargs() throws Exception {
+    public void testLogVarargs() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -255,7 +258,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void logVoidMethods() throws Exception {
+    public void testLogVoidMethods() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
@@ -270,7 +273,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void loggerNoop_dontWrap() throws Exception {
+    public void testLoggerNoop_dontWrap() throws Exception {
         final LoggingInterceptor interceptor = new LoggingInterceptor(TiLog.NOOP);
         final TiView view = mock(TiView.class);
         final TiView interceptView = interceptor.intercept(view);
@@ -278,7 +281,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void loggerNull_dontWrap() throws Exception {
+    public void testLoggerNull_dontWrap() throws Exception {
         final LoggingInterceptor interceptor = new LoggingInterceptor(null);
         final TiView view = mock(TiView.class);
         final TiView interceptView = interceptor.intercept(view);
@@ -286,7 +289,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void loggingDisabled_wrap() throws Exception {
+    public void testLoggingDisabled_wrap() throws Exception {
         final LoggingInterceptor interceptor = new LoggingInterceptor();
         final TiView view = mock(TiView.class);
         final TiView interceptView = interceptor.intercept(view);
@@ -294,7 +297,7 @@ public class LoggingInterceptorTest {
     }
 
     @Test
-    public void reportErrorsCorrectly() throws Exception {
+    public void testReportErrorsCorrectly() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
         final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
