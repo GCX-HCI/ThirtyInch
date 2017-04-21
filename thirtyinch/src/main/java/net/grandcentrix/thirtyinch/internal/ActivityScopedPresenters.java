@@ -25,34 +25,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Simple wrapper around a {@link HashMap} to save {@link TiPresenter} by id. For every {@link
+ * android.app.Activity} containing a {@link TiPresenter} a corresponding {@link
+ * ActivityScopedPresenters} will be created
+ */
 public class ActivityScopedPresenters {
 
-    private final String TAG = ActivityScopedPresenters.class.getSimpleName() + "@" + Integer
-            .toHexString(hashCode());
+    private final String TAG = ActivityScopedPresenters.class.getSimpleName()
+            + "@" + Integer.toHexString(hashCode());
 
-    private final HashMap<String, TiPresenter> store = new HashMap<>();
+    private final HashMap<String, TiPresenter> mStore = new HashMap<>();
 
     public TiPresenter get(final String id) {
-        return store.get(id);
-    }
-
-    public List<Map.Entry<String, TiPresenter>> getAllMappings() {
-        return Collections.unmodifiableList(new ArrayList<>(store.entrySet()));
+        return mStore.get(id);
     }
 
     public List<TiPresenter> getAll() {
-        return Collections.unmodifiableList(new ArrayList<>(store.values()));
+        return Collections.unmodifiableList(new ArrayList<>(mStore.values()));
+    }
+
+    public List<Map.Entry<String, TiPresenter>> getAllMappings() {
+        return Collections.unmodifiableList(new ArrayList<>(mStore.entrySet()));
+    }
+
+    public boolean isEmpty() {
+        return mStore.isEmpty();
     }
 
     public TiPresenter remove(final String id) {
-        final TiPresenter presenter = store.remove(id);
+        final TiPresenter presenter = mStore.remove(id);
         TiLog.d(TAG, "remove " + id + " " + presenter);
         return presenter;
     }
 
     public void save(final String id, final TiPresenter presenter) {
         TiLog.d(TAG, "save " + id + " " + presenter);
-        store.put(id, presenter);
+        mStore.put(id, presenter);
+    }
+
+    public int size() {
+        return mStore.size();
     }
 
 }

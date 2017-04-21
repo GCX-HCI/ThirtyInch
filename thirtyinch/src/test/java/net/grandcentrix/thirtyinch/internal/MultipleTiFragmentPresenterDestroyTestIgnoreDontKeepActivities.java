@@ -191,13 +191,15 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
-        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // Then the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
@@ -267,13 +269,15 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
-        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // Then the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();
@@ -281,7 +285,8 @@ public class MultipleTiFragmentPresenterDestroyTestIgnoreDontKeepActivities
 
         // When the Activity gets finished
         hostingActivity2.setFinishing(true);
-        mSavior.cleanupAfterFinish(hostingActivity2.getMockActivityInstance());
+        mSavior.mActivityInstanceObserver.onActivityDestroyed(
+                hostingActivity2.getMockActivityInstance());
 
         // Then the same presenter is destroyed
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);

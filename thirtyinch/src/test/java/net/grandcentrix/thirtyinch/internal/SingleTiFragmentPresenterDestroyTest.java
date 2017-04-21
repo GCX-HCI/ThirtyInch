@@ -55,11 +55,12 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         fragment.onStart();
 
         // Then the presenter will *not* be stored in the savior
+        // and the savior has no detector initialized
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -68,10 +69,10 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         // Then assert that the presenter is destroyed and not saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
 
         // When the Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
-        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
@@ -134,7 +135,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // And when the Activity is changing its configurations.
         hostingActivity.setChangingConfiguration(true);
-        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -146,7 +148,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // When the Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
-        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()

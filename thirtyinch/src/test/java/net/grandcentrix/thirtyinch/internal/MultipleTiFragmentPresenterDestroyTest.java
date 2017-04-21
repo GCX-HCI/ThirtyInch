@@ -204,13 +204,15 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        mSavior.saveScopeId(hostingActivity.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
         final HostingActivity hostingActivity2 = new HostingActivity();
-        mSavior.detectNewActivity(hostingActivity2.getMockActivityInstance(), mActivitySavedState);
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                hostingActivity2.getMockActivityInstance(), mActivitySavedState);
 
         // Then the Presenter is not destroyed and saved in the savior.
         assertThat(fragment.getPresenter().isDestroyed()).isFalse();

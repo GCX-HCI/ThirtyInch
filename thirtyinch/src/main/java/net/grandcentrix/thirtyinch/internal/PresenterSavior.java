@@ -15,13 +15,10 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -29,32 +26,51 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
- * Activities can be destroyed when the device runs out of memory. Sometimes it doesn't work to
- * save objects via {@code Activity#onRetainNonConfigurationInstance()} for example when the user
- * has enabled "Do not keep activities" in the developer options. This singleton holds strong
- * references to those presenters and returns them when needed.
- *
- * {@link TiActivity} is responsible to manage the references
+ * When a {@link TiPresenter} is created with
+ * {@link net.grandcentrix.thirtyinch.TiConfiguration.Builder#setRetainPresenterEnabled(boolean)}
+ * set to {@code true} this singleton is responsible to save the presenter across orientation
+ * changes. This works far better than {@link Activity#onRetainNonConfigurationInstance()} which
+ * doesn't work when "Don't keep Activities" is on.
+ * <p>
+ * {@link net.grandcentrix.thirtyinch.TiActivity} is able to detect when its presenter should be
+ * destroyed and tells this savior when to free a presenter instance.
+ * </p>
+ * <p>
+ * {@link net.grandcentrix.thirtyinch.TiFragment} can't detect on its own when its hosting Activity
+ * is about to finish to free its presenter. For example when the Presenter is in the backstack.
+ * This savior uses {@link android.app.Application.ActivityLifecycleCallbacks} to detect those
+ * cases
+ * and destroys and cleans the presenters to prevents leaks.
+ * </p>
  */
-public class PresenterSavior implements TiPresenterSavior {
+public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObserver.Listener {
 
     private static PresenterSavior INSTANCE;
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
 
+    @VisibleForTesting
     static final String TI_ACTIVITY_PRESENTER_SCOPE_KEY = "ThirtyInch_presenter_scope_id";
 
     @VisibleForTesting
-    Application.ActivityLifecycleCallbacks mLifecycleCallbacks;
+    ActivityInstanceObserver mActivityInstanceObserver;
 
+    /**
+     * Holds a scope for every Activity with one or more presenters. There is no direct mapping for
+     * {@link Activity} to {@link ActivityScopedPresenters} because Activity instances can be
+     * destroyed. The {@link ActivityInstanceObserver} takes care to manage unique Ids for each
+     * Activity which are used as keys here.
+     */
     @VisibleForTesting
     final HashMap<String, ActivityScopedPresenters> mScopes = new HashMap<>();
 
-    private final HashMap<Activity, String> mScopeIdForActivity = new HashMap<>();
-
+    /**
+     * Access to the {@link PresenterSavior} singleton to save presenters across orientation changes
+     *
+     * @return singleton for
+     */
     public static synchronized PresenterSavior getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new PresenterSavior();
@@ -63,20 +79,8 @@ public class PresenterSavior implements TiPresenterSavior {
     }
 
     @VisibleForTesting
-    /*package*/ PresenterSavior() {
+    PresenterSavior() {
 
-    }
-
-    public void detectNewActivity(final Activity activity, final Bundle savedInstanceState) {
-        TiLog.d(TAG, "detectNewActivity() called with: activity = [" + activity
-                + "], savedInstanceState = [" + savedInstanceState + "]");
-        if (savedInstanceState != null) {
-            final String id = savedInstanceState.getString(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
-            if (id != null) {
-                // refresh mapping
-                mScopeIdForActivity.put(activity, id);
-            }
-        }
     }
 
     @Override
@@ -84,7 +88,50 @@ public class PresenterSavior implements TiPresenterSavior {
         final ActivityScopedPresenters scope = getScope(activity);
         if (scope != null) {
             scope.remove(presenterId);
-            clearScopeWhenPossible(activity);
+            if (scope.isEmpty()) {
+                String scopeId = mActivityInstanceObserver.getActivityId(activity);
+                if (scopeId != null) {
+                    mScopes.remove(scopeId);
+                }
+            }
+        }
+        if (mScopes.isEmpty()) {
+            if (mActivityInstanceObserver != null) {
+                activity.getApplication()
+                        .unregisterActivityLifecycleCallbacks(mActivityInstanceObserver);
+                mActivityInstanceObserver = null;
+            }
+        }
+
+        printRemainingStore();
+    }
+
+    @Override
+    public void onActivityFinished(final Activity activity, final String activityId) {
+        final ActivityScopedPresenters scope = mScopes.remove(activityId);
+
+        if (mScopes.isEmpty()) {
+            // unregister detector because there are no presenters which could be recovered.
+            // next #save call will create a new one
+            if (mActivityInstanceObserver != null) {
+                TiLog.v(TAG, "unregistering lifecycle callback");
+                activity.getApplication()
+                        .unregisterActivityLifecycleCallbacks(mActivityInstanceObserver);
+                mActivityInstanceObserver = null;
+            }
+        }
+        TiLog.d(TAG, "Activity is really finishing!");
+        if (scope != null) {
+            for (final Map.Entry<String, TiPresenter> entry : scope.getAllMappings()) {
+                final String presenterId = entry.getKey();
+                final TiPresenter presenter = entry.getValue();
+
+                // when the presenter is not destroyed yet, destroy it.
+                if (!presenter.isDestroyed()) {
+                    presenter.destroy();
+                }
+                scope.remove(presenterId);
+            }
         }
 
         printRemainingStore();
@@ -102,7 +149,7 @@ public class PresenterSavior implements TiPresenterSavior {
 
     @Override
     public String save(@NonNull final TiPresenter presenter, @NonNull final Activity activity) {
-        final String id = generateId(presenter);
+        final String id = generatePresenterId(presenter);
         TiLog.v(TAG, "save presenter with id " + id + " " + presenter);
 
         final ActivityScopedPresenters scope = getScopeOrCreate(activity);
@@ -112,173 +159,68 @@ public class PresenterSavior implements TiPresenterSavior {
         return id;
     }
 
-    /**
-     * the {@link Activity} is in terminal state and got finished. cleanup all presenters
-     */
-    void cleanupAfterFinish(@NonNull final Activity activity) {
-        TiLog.d(TAG, "cleanupAfterFinish() called with: activity = [" + activity + "]");
-
-        final String scopeId = mScopeIdForActivity.remove(activity);
-        final ActivityScopedPresenters scope = mScopes.remove(scopeId);
-
-        if (mScopeIdForActivity.isEmpty()) {
-            TiLog.v(TAG, "unregistering lifecycle callback");
-            if (mLifecycleCallbacks != null) {
-                activity.getApplication().unregisterActivityLifecycleCallbacks(mLifecycleCallbacks);
-            }
-        }
-
-        TiLog.d(TAG, "Activity is really finishing!");
-        if (scope != null) {
-            for (final Map.Entry<String, TiPresenter> entry : scope.getAllMappings()) {
-                final String key = entry.getKey();
-                final TiPresenter presenter = entry.getValue();
-                if (!presenter.isDestroyed()) {
-                    presenter.destroy();
-                }
-                scope.remove(key);
-            }
-        }
-
-        printRemainingStore();
-    }
-
     @VisibleForTesting
-    /*package*/ int getPresenterCount() {
-
-        final ArrayList<TiPresenter> presenters = new ArrayList<>();
-        for (final Map.Entry<String, ActivityScopedPresenters> entry : mScopes.entrySet()) {
-            presenters.addAll(entry.getValue().getAll());
+    int getPresenterCount() {
+        if (mScopes.isEmpty()) {
+            return 0;
         }
-        return presenters.size();
+
+        int size = 0;
+        for (final ActivityScopedPresenters scope : mScopes.values()) {
+            size += scope.size();
+        }
+        return size;
     }
 
-    private synchronized void clearScopeWhenPossible(@NonNull final Activity activity) {
-        final String scopeId = mScopeIdForActivity.get(activity);
-        if (scopeId == null) {
-            return;
-        }
-        final ActivityScopedPresenters scope = mScopes.get(scopeId);
-        if (scope == null) {
-            return;
-        }
-        if (scope.getAll().isEmpty()) {
-            // remove empty scope
-            mScopes.remove(mScopeIdForActivity.remove(activity));
-
-            if (mScopes.isEmpty()) {
-                if (mLifecycleCallbacks != null) {
-                    activity.getApplication()
-                            .unregisterActivityLifecycleCallbacks(mLifecycleCallbacks);
-                    mLifecycleCallbacks = null;
-                }
-            }
-        }
-    }
-
-    private String generateId(@NonNull final TiPresenter presenter) {
+    private String generatePresenterId(@NonNull final TiPresenter presenter) {
         return presenter.getClass().getSimpleName()
                 + ":" + presenter.hashCode()
                 + ":" + System.nanoTime();
     }
 
-    @NonNull
-    private Application.ActivityLifecycleCallbacks getActivityLifecycleCallbacks() {
-        return new Application.ActivityLifecycleCallbacks() {
-            @Override
-            public void onActivityCreated(final Activity activity,
-                    final Bundle savedInstanceState) {
-                detectNewActivity(activity, savedInstanceState);
-            }
-
-            @Override
-            public void onActivityDestroyed(final Activity activity) {
-
-                TiLog.v(TAG, "destroying " + activity);
-                TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
-                TiLog.v(TAG,
-                        "isChangingConfigurations = " + activity.isChangingConfigurations());
-
-                if (activity.isFinishing() && !activity.isChangingConfigurations()) {
-                    // detected Activity finish, no new Activity instance will be created
-                    // with savedInstanceState, clear saved presenters
-                    cleanupAfterFinish(activity);
-                } else {
-                    // don't leak old activity instances
-                    // scopeId is saved in savedInstanceState of finishing Activity.
-                    mScopeIdForActivity.remove(activity);
-                }
-            }
-
-            @Override
-            public void onActivityPaused(final Activity activity) {
-
-            }
-
-            @Override
-            public void onActivityResumed(final Activity activity) {
-
-            }
-
-            @Override
-            public void onActivitySaveInstanceState(final Activity activity,
-                    final Bundle outState) {
-                saveScopeId(activity, outState);
-            }
-
-            @Override
-            public void onActivityStarted(final Activity activity) {
-
-            }
-
-            @Override
-            public void onActivityStopped(final Activity activity) {
-
-            }
-        };
-    }
-
-    public void saveScopeId(final Activity activity, final Bundle outState) {
-        String id = mScopeIdForActivity.get(activity);
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-            mScopeIdForActivity.put(activity, id);
-        }
-        outState.putString(TI_ACTIVITY_PRESENTER_SCOPE_KEY, id);
-    }
-
+    @Nullable
     private synchronized ActivityScopedPresenters getScope(final Activity activity) {
-        final String id = mScopeIdForActivity.get(activity);
-        if (id != null) {
-            return mScopes.get(id);
+        final ActivityInstanceObserver detector = mActivityInstanceObserver;
+        if (detector == null) {
+            return null;
         }
 
-        return null;
+        final String scopeId = detector.getActivityId(activity);
+        if (scopeId == null) {
+            return null;
+        }
+
+        return mScopes.get(scopeId);
     }
 
+    /**
+     * Returns an existing scope or creates a new one for the given Activity. Registers a callback
+     * so the scope will be cleaned up when the Activity finishes
+     *
+     * @return an existing or new created scope for presenters
+     */
+    @NonNull
     private synchronized ActivityScopedPresenters getScopeOrCreate(final Activity activity) {
-        if (mLifecycleCallbacks == null) {
-            mLifecycleCallbacks = getActivityLifecycleCallbacks();
+        if (mActivityInstanceObserver == null) {
+            mActivityInstanceObserver = new ActivityInstanceObserver(this);
             TiLog.v(TAG, "registering lifecycle callback");
-            final Application application = activity.getApplication();
-            application.registerActivityLifecycleCallbacks(mLifecycleCallbacks);
+            activity.getApplication().registerActivityLifecycleCallbacks(mActivityInstanceObserver);
         }
 
-        final String scopeId = mScopeIdForActivity.get(activity);
+        final String scopeId = mActivityInstanceObserver.getActivityId(activity);
         final ActivityScopedPresenters scope;
 
         if (scopeId == null) {
-            final String id = UUID.randomUUID().toString();
-            mScopeIdForActivity.put(activity, id);
+            final String newScopeId = mActivityInstanceObserver.startTracking(activity);
             scope = new ActivityScopedPresenters();
-            mScopes.put(id, scope);
+            mScopes.put(newScopeId, scope);
         } else {
-            final ActivityScopedPresenters gotScope = mScopes.get(scopeId);
-            if (gotScope == null) {
+            final ActivityScopedPresenters savedScope = mScopes.get(scopeId);
+            if (savedScope == null) {
                 scope = new ActivityScopedPresenters();
                 mScopes.put(scopeId, scope);
             } else {
-                scope = gotScope;
+                scope = savedScope;
             }
         }
 

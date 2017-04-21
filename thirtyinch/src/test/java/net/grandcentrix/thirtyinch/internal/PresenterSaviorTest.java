@@ -55,7 +55,7 @@ public class PresenterSaviorTest {
 
         // some random Activity was created
         final HostingActivity hostingActivity2 = new HostingActivity();
-        savior.mLifecycleCallbacks.onActivityCreated(
+        savior.mActivityInstanceObserver.onActivityCreated(
                 hostingActivity2.getMockActivityInstance(), mSavedState);
 
         // no second scope was created
@@ -67,19 +67,33 @@ public class PresenterSaviorTest {
         final PresenterSavior savior = new PresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given two presenters saved in savior
         final TiPresenter presenter = new TiPresenter() {
         };
+        final TiPresenter presenter2 = new TiPresenter() {
+        };
+
+        // When both are saved in savior
         final String id = savior.save(presenter, hostingActivity.getMockActivityInstance());
         assertThat(savior.getPresenterCount()).isEqualTo(1);
 
-        final String id2 = savior.save(presenter, hostingActivity.getMockActivityInstance());
+        final String id2 = savior.save(presenter2, hostingActivity.getMockActivityInstance());
+
+        // Then the ids are different
         assertThat(id2).isNotEqualTo(id);
         assertThat(savior.getPresenterCount()).isEqualTo(2);
+
+        // and both share the same scope
         assertThat(savior.mScopes).hasSize(1);
+
+        // When the Activity finishes
+        hostingActivity.setFinishing(true);
 
         // fragments are in backstack and can't report Activity finish
         // ActivityLifecycleCallbacks observe activity finish
-        savior.cleanupAfterFinish(hostingActivity.getMockActivityInstance());
+        savior.mActivityInstanceObserver.onActivityDestroyed(
+                hostingActivity.getMockActivityInstance());
 
         assertThat(savior.getPresenterCount()).isEqualTo(0);
         assertThat(savior.mScopes).isEmpty();
@@ -89,6 +103,7 @@ public class PresenterSaviorTest {
     public void clearScopeWhenActivityFinishes() throws Exception {
         final PresenterSavior savior = new PresenterSavior();
 
+        // Save two presenters in two activities in savior
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
         };
@@ -96,6 +111,7 @@ public class PresenterSaviorTest {
         assertThat(savior.getPresenterCount()).isEqualTo(1);
         assertThat(savior.mScopes).hasSize(1);
 
+        // save second
         final HostingActivity hostingActivity2 = new HostingActivity();
         final TiPresenter presenter2 = new TiPresenter() {
         };
@@ -103,13 +119,22 @@ public class PresenterSaviorTest {
         assertThat(savior.getPresenterCount()).isEqualTo(2);
         assertThat(savior.mScopes).hasSize(2);
 
+        // When removing the first
         savior.free(id, hostingActivity.getMockActivityInstance());
         assertThat(savior.getPresenterCount()).isEqualTo(1);
+
+        // Then only 1 scope is left, the other got removed
         assertThat(savior.mScopes).hasSize(1);
 
+        // When removing the second
         savior.free(id2, hostingActivity2.getMockActivityInstance());
+
+        // Then no scopes are left
         assertThat(savior.getPresenterCount()).isEqualTo(0);
         assertThat(savior.mScopes).isEmpty();
+
+        // the observer is also cleaned up
+        assertThat(savior.mActivityInstanceObserver).isNull();
     }
 
     @Test
@@ -124,7 +149,8 @@ public class PresenterSaviorTest {
         assertThat(id).isNotEmpty().isNotNull();
 
         hostingActivity.setFinishing(true);
-        savior.mLifecycleCallbacks.onActivityDestroyed(hostingActivity.getMockActivityInstance());
+        savior.mActivityInstanceObserver
+                .onActivityDestroyed(hostingActivity.getMockActivityInstance());
 
         assertThat(savior.getPresenterCount()).isEqualTo(0);
         assertThat(savior.mScopes).isEmpty();
@@ -214,7 +240,8 @@ public class PresenterSaviorTest {
         assertThat(id).isNotEmpty().isNotNull();
 
         hostingActivity.setChangingConfiguration(true);
-        savior.mLifecycleCallbacks.onActivityDestroyed(hostingActivity.getMockActivityInstance());
+        savior.mActivityInstanceObserver
+                .onActivityDestroyed(hostingActivity.getMockActivityInstance());
 
         assertThat(savior.getPresenterCount()).isEqualTo(1);
     }
@@ -230,7 +257,8 @@ public class PresenterSaviorTest {
         assertThat(savior.getPresenterCount()).isEqualTo(1);
         assertThat(id).isNotEmpty().isNotNull();
 
-        savior.mLifecycleCallbacks.onActivityDestroyed(hostingActivity.getMockActivityInstance());
+        savior.mActivityInstanceObserver
+                .onActivityDestroyed(hostingActivity.getMockActivityInstance());
 
         assertThat(savior.getPresenterCount()).isEqualTo(1);
     }
@@ -246,16 +274,17 @@ public class PresenterSaviorTest {
 
         // Activity changes configuration
         hostingActivity.isChangingConfiguration();
-        savior.mLifecycleCallbacks.onActivitySaveInstanceState(
+        savior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mSavedState);
         final String scopeId = fakeBundle.get(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
         assertThat(scopeId).isNotNull();
-        savior.mLifecycleCallbacks.onActivityDestroyed(hostingActivity.getMockActivityInstance());
+        savior.mActivityInstanceObserver
+                .onActivityDestroyed(hostingActivity.getMockActivityInstance());
         assertThat(savior.getPresenterCount()).isEqualTo(1);
 
         // new Activity instance gets created
         final HostingActivity hostingActivity2 = new HostingActivity();
-        savior.mLifecycleCallbacks.onActivityCreated(
+        savior.mActivityInstanceObserver.onActivityCreated(
                 hostingActivity2.getMockActivityInstance(), mSavedState);
 
         // recover with new Activity

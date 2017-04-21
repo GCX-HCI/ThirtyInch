@@ -74,7 +74,7 @@ public abstract class TestFragment
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v(getFragmentTag(), "onViewCreated");
+        Log.v(getFragmentTag(), "onActivityCreated");
     }
 
     @Override
