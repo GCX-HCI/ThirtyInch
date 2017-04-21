@@ -19,6 +19,7 @@ package net.grandcentrix.thirtyinch.sample;
 import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.logginginterceptor.LoggingInterceptor;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -36,6 +37,10 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     private TextView mOutput;
 
     private TextView mUptime;
+
+    public HelloWorldActivity() {
+        addBindViewInterceptor(new LoggingInterceptor());
+    }
 
     @Override
     public Observable<Void> onButtonClicked() {
