@@ -17,14 +17,16 @@ android {
     }
     buildTypes {
         debug {
-            // for testing proguard
-            //
-            // minifyEnabled true
-            // useProguard true
-            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // remove unused classes and to make sure the proguard config is correct
+            // https://developer.android.com/studio/build/shrink-code.html#shrink-code
+            minifyEnabled true
+            // don't enable proguard, it doesn't work with instant run
+            // https://developer.android.com/studio/build/shrink-code.html#gradle-shrinker
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
