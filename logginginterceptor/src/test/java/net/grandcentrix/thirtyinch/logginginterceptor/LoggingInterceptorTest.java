@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch;
+package net.grandcentrix.thirtyinch.logginginterceptor;
+
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

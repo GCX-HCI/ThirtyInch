@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch;
+package net.grandcentrix.thirtyinch.logginginterceptor;
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 import android.support.annotation.NonNull;
