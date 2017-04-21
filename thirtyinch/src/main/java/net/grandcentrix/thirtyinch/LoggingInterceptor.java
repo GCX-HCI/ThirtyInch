@@ -69,6 +69,61 @@ public class LoggingInterceptor implements BindViewInterceptor {
             }
         }
 
+        private static String parseParams(Object[] methodParams, int maxLenOfParam) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < methodParams.length; i++) {
+                final Object param = methodParams[i];
+
+                final String paramString;
+                if (param instanceof List) {
+                    final int size = ((List) param).size();
+                    final String stringPresentation = String.valueOf(param);
+                    paramString = "{" + param.getClass().getSimpleName()
+                            + "[" + size + "]"
+                            + "@" + Integer.toHexString(param.hashCode()) + "}"
+                            + " " + stringPresentation;
+                } else if (param instanceof Object[]) {
+                    final Object[] args = ((Object[]) param);
+                    final int size = args.length;
+
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append("[");
+                    for (int j = 0; j < args.length; j++) {
+                        sb.append(String.valueOf(args[j]));
+                        if (j + 1 < args.length) {
+                            sb.append(", ");
+                        }
+                    }
+                    sb.append("]");
+
+                    paramString = "{" + param.getClass().getSimpleName()
+                            + "[" + size + "]"
+                            + "@" + Integer.toHexString(param.hashCode()) + "}"
+                            + " " + sb;
+                } else {
+                    paramString = String.valueOf(param);
+                }
+
+                if (paramString.length() <= maxLenOfParam) {
+                    builder.append(paramString);
+                } else {
+                    final String shortParam = paramString.substring(0,
+                            Math.min(paramString.length(), maxLenOfParam));
+                    builder.append(shortParam);
+                    // trim remaining whitespace at the end before appending ellipsis
+                    builder = new StringBuilder(builder.toString().trim());
+                    builder.append("…");
+                }
+                builder.append(", ");
+            }
+
+            // remove last ", "
+            int length = builder.length();
+            builder.delete(length - 2, length);
+
+            return builder.toString();
+        }
+
         private static String toString(@NonNull final Method method,
                 @Nullable final Object[] args) {
             final StringBuilder sb = new StringBuilder(method.getName());
@@ -82,7 +137,7 @@ public class LoggingInterceptor implements BindViewInterceptor {
         }
     }
 
-    private static final String TAG = MethodLoggingInvocationHandler.class.getSimpleName();
+    private static final String TAG = LoggingInterceptor.class.getSimpleName();
 
     private final TiLog.Logger mLogger;
 
@@ -131,59 +186,5 @@ public class LoggingInterceptor implements BindViewInterceptor {
                 new MethodLoggingInvocationHandler<>(view, mLogger));
 
         return wrappedView;
-    }
-
-    private static String parseParams(Object[] methodParams, int maxLenOfParam) {
-        int iMax = methodParams.length - 1;
-
-        StringBuilder b = new StringBuilder();
-        for (int i = 0; ; i++) {
-            final Object arg = methodParams[i];
-
-            final String param;
-            if (arg instanceof List) {
-                final int size = ((List) arg).size();
-                final String stringPresentation = String.valueOf(arg);
-                param = "{" + arg.getClass().getSimpleName()
-                        + "[" + size + "]"
-                        + "@" + Integer.toHexString(arg.hashCode()) + "}"
-                        + " " + stringPresentation;
-            } else if (arg instanceof Object[]) {
-                final Object[] args = ((Object[]) arg);
-                final int size = args.length;
-
-                final StringBuilder sb = new StringBuilder();
-                sb.append("[");
-                for (int j = 0; j < args.length; j++) {
-                    sb.append(String.valueOf(args[j]));
-                    if (j + 1 < args.length) {
-                        sb.append(", ");
-                    }
-                }
-                sb.append("]");
-
-                param = "{" + arg.getClass().getSimpleName()
-                        + "[" + size + "]"
-                        + "@" + Integer.toHexString(arg.hashCode()) + "}"
-                        + " " + sb;
-            } else {
-                param = String.valueOf(arg);
-            }
-
-            if (param.length() <= maxLenOfParam) {
-                b.append(param);
-            } else {
-                final String shortParam =
-                        param.substring(0, Math.min(param.length(), maxLenOfParam));
-                b.append(shortParam);
-                // trim remaining whitespace at the end before appending ellipsis
-                b = new StringBuilder(b.toString().trim());
-                b.append("…");
-            }
-            if (i == iMax) {
-                return b.toString();
-            }
-            b.append(", ");
-        }
     }
 }
