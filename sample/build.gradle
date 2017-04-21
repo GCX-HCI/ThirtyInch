@@ -38,5 +38,6 @@ dependencies {
 
     compile project(':thirtyinch')
     compile project(':rx')
+    compile project(':logginginterceptor')
     testCompile "junit:junit:$junitVersion"
 }

@@ -18,8 +18,8 @@ package net.grandcentrix.thirtyinch.sample;
 
 import com.jakewharton.rxbinding.view.RxView;
 
-import net.grandcentrix.thirtyinch.LoggingInterceptor;
 import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.logginginterceptor.LoggingInterceptor;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
