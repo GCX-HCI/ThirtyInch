@@ -46,7 +46,7 @@ public abstract class TiFragmentPresenterDestroyTest {
 
     Bundle mSavedState;
 
-    PresenterSavior mSavior;
+    TestPresenterSavior mSavior;
 
     private final HashMap<String, String> activityHostBundle = new HashMap<>();
 
@@ -54,7 +54,7 @@ public abstract class TiFragmentPresenterDestroyTest {
 
     @Before
     public void setUp() throws Exception {
-        mSavior = new PresenterSavior();
+        mSavior = new TestPresenterSavior();
         mSavedState = mock(Bundle.class);
         doAnswer(saveInMap(fakeBundle)).when(mSavedState).putString(anyString(), anyString());
         doAnswer(getFromMap(fakeBundle)).when(mSavedState).getString(anyString());

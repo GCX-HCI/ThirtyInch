@@ -253,7 +253,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-
             mSavior.free(mPresenterId, mTiFragment.getHostingActivity());
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter

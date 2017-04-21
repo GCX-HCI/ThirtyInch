@@ -57,7 +57,7 @@ public class TiActivityPresenterDestroyTest {
         }
     }
 
-    private PresenterSavior mSavior;
+    private TestPresenterSavior mSavior;
 
     @Test
     public void dontKeepActivitiesFalse_configurationChange() throws Exception {
@@ -254,7 +254,7 @@ public class TiActivityPresenterDestroyTest {
 
     @Before
     public void setUp() throws Exception {
-        mSavior = new PresenterSavior();
+        mSavior = new TestPresenterSavior();
     }
 
     private void doFullLifecycleAndDestroy(final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate,

@@ -256,7 +256,6 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-
             mSavior.free(mPresenterId, mTiActivity.getHostingActivity());
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter

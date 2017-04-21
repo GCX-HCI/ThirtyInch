@@ -54,6 +54,11 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
     @VisibleForTesting
     static final String TI_ACTIVITY_PRESENTER_SCOPE_KEY = "ThirtyInch_presenter_scope_id";
 
+    /**
+     * enable debug logging for testing
+     */
+    private static final boolean DEBUG = false;
+
     @VisibleForTesting
     ActivityInstanceObserver mActivityInstanceObserver;
 
@@ -103,7 +108,7 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
             }
         }
 
-        printRemainingStore();
+        printRemainingPresenter();
     }
 
     @Override
@@ -114,13 +119,15 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
             // unregister detector because there are no presenters which could be recovered.
             // next #save call will create a new one
             if (mActivityInstanceObserver != null) {
-                TiLog.v(TAG, "unregistering lifecycle callback");
+                if (DEBUG) {
+                    TiLog.v(TAG, "unregistering lifecycle callback");
+                }
                 activity.getApplication()
                         .unregisterActivityLifecycleCallbacks(mActivityInstanceObserver);
                 mActivityInstanceObserver = null;
             }
         }
-        TiLog.d(TAG, "Activity is really finishing!");
+        TiLog.d(TAG, "Activity is finishing, free remaining presenters " + activity);
         if (scope != null) {
             for (final Map.Entry<String, TiPresenter> entry : scope.getAllMappings()) {
                 final String presenterId = entry.getKey();
@@ -134,7 +141,7 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
             }
         }
 
-        printRemainingStore();
+        printRemainingPresenter();
     }
 
     @Override
@@ -150,26 +157,12 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
     @Override
     public String save(@NonNull final TiPresenter presenter, @NonNull final Activity activity) {
         final String id = generatePresenterId(presenter);
-        TiLog.v(TAG, "save presenter with id " + id + " " + presenter);
 
         final ActivityScopedPresenters scope = getScopeOrCreate(activity);
         scope.save(id, presenter);
-        printRemainingStore();
+        printRemainingPresenter();
 
         return id;
-    }
-
-    @VisibleForTesting
-    int getPresenterCount() {
-        if (mScopes.isEmpty()) {
-            return 0;
-        }
-
-        int size = 0;
-        for (final ActivityScopedPresenters scope : mScopes.values()) {
-            size += scope.size();
-        }
-        return size;
     }
 
     private String generatePresenterId(@NonNull final TiPresenter presenter) {
@@ -178,6 +171,10 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
                 + ":" + System.nanoTime();
     }
 
+    /**
+     * retrieves an existing scope for a {@link Activity} but doesn't create on when the scope
+     * doesn't exist
+     */
     @Nullable
     private synchronized ActivityScopedPresenters getScope(final Activity activity) {
         final ActivityInstanceObserver detector = mActivityInstanceObserver;
@@ -227,15 +224,17 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
         return scope;
     }
 
-    private void printRemainingStore() {
-        final ArrayList<TiPresenter> presenters = new ArrayList<>();
-        for (final Map.Entry<String, ActivityScopedPresenters> entry : mScopes.entrySet()) {
-            presenters.addAll(entry.getValue().getAll());
-        }
+    private void printRemainingPresenter() {
+        if (DEBUG) {
+            final ArrayList<TiPresenter> presenters = new ArrayList<>();
+            for (final Map.Entry<String, ActivityScopedPresenters> entry : mScopes.entrySet()) {
+                presenters.addAll(entry.getValue().getAll());
+            }
 
-        TiLog.d(TAG, "presenter count " + presenters.size());
-        for (final TiPresenter presenter : presenters) {
-            TiLog.v(TAG, " - " + presenter);
+            TiLog.d(TAG, "presenter count: " + presenters.size());
+            for (final TiPresenter presenter : presenters) {
+                TiLog.v(TAG, " - " + presenter);
+            }
         }
     }
 }

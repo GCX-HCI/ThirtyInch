@@ -42,7 +42,7 @@ public class PresenterSaviorTest {
     @Test
     public void activityAddedWithoutPresenters() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
         final HostingActivity hostingActivity = new HostingActivity();
 
         // create lifecycle callbacks with different scope
@@ -64,7 +64,7 @@ public class PresenterSaviorTest {
 
     @Test
     public void cleanupAfterActivityFinish() throws Exception {
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
 
@@ -101,7 +101,7 @@ public class PresenterSaviorTest {
 
     @Test
     public void clearScopeWhenActivityFinishes() throws Exception {
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         // Save two presenters in two activities in savior
         final HostingActivity hostingActivity = new HostingActivity();
@@ -139,7 +139,7 @@ public class PresenterSaviorTest {
 
     @Test
     public void detectFinishingActivity() throws Exception {
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -159,7 +159,7 @@ public class PresenterSaviorTest {
     @Test
     public void freePresenter() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -174,7 +174,7 @@ public class PresenterSaviorTest {
     @Test
     public void freePresenterSaveAgain() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -194,7 +194,7 @@ public class PresenterSaviorTest {
     @Test
     public void freePresenterTwice() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -215,7 +215,7 @@ public class PresenterSaviorTest {
     @Test
     public void freePresenterWithDifferentActivity() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -230,7 +230,7 @@ public class PresenterSaviorTest {
 
     @Test
     public void ignoreWhenActivityChangesConfiguration() throws Exception {
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -248,7 +248,7 @@ public class PresenterSaviorTest {
 
     @Test
     public void ignoreWhenActivityRecreates() throws Exception {
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -265,7 +265,7 @@ public class PresenterSaviorTest {
 
     @Test
     public void recoverKeyWithNewActivity() throws Exception {
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -295,7 +295,7 @@ public class PresenterSaviorTest {
     @Test
     public void restoreFailWithDifferentActivity() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -313,7 +313,7 @@ public class PresenterSaviorTest {
     @Test
     public void restoreFromSavior() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {
@@ -329,7 +329,7 @@ public class PresenterSaviorTest {
     @Test
     public void saveToSavior() throws Exception {
 
-        final PresenterSavior savior = new PresenterSavior();
+        final TestPresenterSavior savior = new TestPresenterSavior();
 
         final HostingActivity hostingActivity = new HostingActivity();
         final TiPresenter presenter = new TiPresenter() {

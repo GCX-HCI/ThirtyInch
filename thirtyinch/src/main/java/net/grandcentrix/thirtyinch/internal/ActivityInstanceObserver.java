@@ -27,7 +27,6 @@ import android.support.annotation.Nullable;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static android.content.ContentValues.TAG;
 import static net.grandcentrix.thirtyinch.internal.PresenterSavior.TI_ACTIVITY_PRESENTER_SCOPE_KEY;
 
 /**
@@ -48,6 +47,8 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
          */
         void onActivityFinished(final Activity activity, final String activityId);
     }
+
+    private static final String TAG = ActivityInstanceObserver.class.getSimpleName();
 
     private Listener mListener;
 
@@ -80,11 +81,12 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     @Override
     public void onActivityDestroyed(final Activity activity) {
 
+        // TODO check if "Don't keep Activities" case is handled correctly
+        // and remove logging
+
         TiLog.v(TAG, "destroying " + activity);
         TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
         TiLog.v(TAG, "isChangingConfigurations = " + activity.isChangingConfigurations());
-
-        // TODO check if "Don't keep Activities" case is handled correctly
 
         if (activity.isFinishing() && !activity.isChangingConfigurations()) {
             // detected Activity finish, no new Activity instance will be created
