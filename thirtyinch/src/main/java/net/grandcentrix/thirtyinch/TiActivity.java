@@ -40,7 +40,53 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 /**
- * Created by pascalwelsch on 9/8/15.
+ * An Activity which has a {@link TiPresenter} to build the Model View Presenter architecture on
+ * Android.
+ *
+ * <p>
+ * The {@link TiPresenter} will be created in {@link #providePresenter()} called in
+ * {@link #onCreate(Bundle)}. Depending on the {@link TiConfiguration} passed into the
+ * {@link TiPresenter#TiPresenter(TiConfiguration)} constructor the {@link TiPresenter} survives
+ * orientation changes (default).
+ * </p>
+ * <p>
+ * The {@link TiPresenter} requires a interface to communicate with the View. Normally the Activity
+ * implements the View interface (which must extend {@link TiView}) and is returned by default
+ * from {@link #provideView()}.
+ * </p>
+ *
+ * <p>
+ * Example:
+ * <code>
+ * <pre>
+ * public class MyActivity extends TiActivity&lt;MyPresenter, MyView&gt; implements MyView {
+ *
+ *     &#064;Override
+ *     public MyPresenter providePresenter() {
+ *         return new MyPresenter();
+ *     }
+ * }
+ *
+ * public class MyPresenter extends TiPresenter&lt;MyView&gt; {
+ *
+ *     &#064;Override
+ *     protected void onCreate() {
+ *         super.onCreate();
+ *     }
+ * }
+ *
+ * public interface MyView extends TiView {
+ *
+ *     // void showItems(List&lt;Item&gt; items);
+ *
+ *     // Observable&lt;Item&gt; onItemClicked();
+ * }
+ * </pre>
+ * </code>
+ * </p>
+ *
+ * @param <V> the View type, must implement {@link TiView}
+ * @param <P> the Presenter type, must extend {@link TiPresenter<V>}
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
