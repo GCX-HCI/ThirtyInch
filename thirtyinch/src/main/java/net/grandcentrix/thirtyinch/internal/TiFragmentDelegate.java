@@ -194,7 +194,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
     }
 
     public void onDestroy_afterSuper() {
-        //FIXME handle attach/detach state
 
         // unregister observer and don't leak it
         if (mUiThreadBinderRemovable != null) {
