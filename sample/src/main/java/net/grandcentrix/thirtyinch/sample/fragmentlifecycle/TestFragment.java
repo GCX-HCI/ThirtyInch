@@ -1,5 +1,6 @@
 package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiFragment;
 import net.grandcentrix.thirtyinch.sample.R;
 
@@ -34,6 +35,8 @@ import static net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifec
 public abstract class TestFragment
         extends TiFragment<TestPresenter, TestPresenter.TestView>
         implements TestPresenter.TestView {
+
+    public static final String RETAIN_PRESENTER = "retain";
 
     static int testFragmentInstanceCount = -1;
 
@@ -378,7 +381,17 @@ public abstract class TestFragment
     @NonNull
     @Override
     public TestPresenter providePresenter() {
-        return new TestPresenter(getClass().getSimpleName());
+        final boolean retain = getArguments().getBoolean(RETAIN_PRESENTER, false);
+
+        final TiConfiguration config = new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(retain)
+                .build();
+
+        final TestPresenter presenter = new TestPresenter(config, getClass().getSimpleName());
+        Log.d(getFragmentTag(), "created " + presenter);
+        Log.v(getFragmentTag(), "retain presenter " + retain + ", " + presenter);
+
+        return presenter;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
 
     private SwitchCompat mSwitchAddToBackStack;
 
-    private SwitchCompat mSwitchRetainFragmentInstance;
+    private SwitchCompat mSwitchRetainPresenterInstance;
 
     public void addFragmentA(View view) {
         final TestFragmentA fragment = new TestFragmentA();
@@ -91,8 +91,8 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         Log.v(TAG, "onCreate of " + this);
 
         mSwitchAddToBackStack = (SwitchCompat) findViewById(R.id.switch_add_back_stack);
-        mSwitchRetainFragmentInstance = (SwitchCompat) findViewById(
-                R.id.switch_retain_fragment_instance);
+        mSwitchRetainPresenterInstance = (SwitchCompat) findViewById(
+                R.id.switch_retain_presenter_instance);
         final TextView textDontKeepActivities = (TextView) findViewById(
                 R.id.text_dont_keep_activities);
         textDontKeepActivities.setText(
@@ -141,10 +141,14 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     private void addFragment(final Fragment fragment) {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if (isRetainFragmentInstance()) {
-            Log.v(TAG, "retaining fragment instance");
-            fragment.setRetainInstance(true);
+        boolean retain = isRetainPresenterInstance();
+        if (retain) {
+            Log.v(TAG, "retaining presenter");
         }
+        final Bundle bundle = new Bundle();
+        bundle.putBoolean(TestFragment.RETAIN_PRESENTER, retain);
+        fragment.setArguments(bundle);
+
         fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
         if (isAddToBackStack()) {
             Log.v(TAG, "adding transaction to the back stack");
@@ -155,8 +159,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         // (testFragmentInstanceCount + 1) because it will be created after executing this code
         Log.v(TAG, "final TestPresenter presenter" + (testFragmentInstanceCount + 1) + " ="
                 + " new TestPresenter(new TiConfiguration.Builder()\n"
-                + "                .setUseStaticSaviorToRetain(/*TODO set*/)\n"
-                + "                .setRetainPresenterEnabled(" + isRetainFragmentInstance() + ")\n"
+                + "                .setRetainPresenterEnabled(" + retain + ")\n"
                 + "                .build());");
 
         Log.v(TAG, "\n// And given a Fragment.");
@@ -191,7 +194,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         return dontKeepActivities != 0;
     }
 
-    private boolean isRetainFragmentInstance() {
-        return mSwitchRetainFragmentInstance.isChecked();
+    private boolean isRetainPresenterInstance() {
+        return mSwitchRetainPresenterInstance.isChecked();
     }
 }
