@@ -71,6 +71,10 @@ import java.util.concurrent.Executor;
  * {@link FragmentManager} backstack. When the hosting Activity gets finished the
  * {@link TiPresenter} will be destroyed accordingly.
  * </p>
+ * <p>
+ * Using {@code setRetainInstance(true)} is now allowed as it causes many troubles. You should favor
+ * the dumb view pattern and move all your state into the {@link TiPresenter}.
+ * </p>
  * 
  * <p>
  * Example:
@@ -282,6 +286,19 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
                 return (V) this;
             }
         }
+    }
+
+    /**
+     * Don't use <code>setRetainInstance(true)</code>, it's designed for headless Fragments only.
+     */
+    @Override
+    public void setRetainInstance(final boolean retain) {
+        if (retain) {
+            throw new IllegalStateException("Retaining TiFragment is not allowed. "
+                    + "setRetainInstance(true) should only be used for headless Fragments. "
+                    + "Move your state into the TiPresenter which survives recreation of TiFragment");
+        }
+        super.setRetainInstance(retain);
     }
 
     @Override
