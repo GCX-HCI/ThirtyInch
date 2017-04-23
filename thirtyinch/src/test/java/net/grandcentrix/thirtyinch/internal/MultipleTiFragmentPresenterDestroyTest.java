@@ -244,6 +244,132 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
     }
 
     @Test
+    public void activityChangingConfiguration_thenFinish_retainFalse_backstackTrue() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that uses a static savior to retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.setInBackstack(true);
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // And when the Fragment is replaced by another Fragment.
+        fragment.setAdded(false);
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+
+        // Then the presenter is not destroyed
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+
+        // Then the presenter is not saved in the savior
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+
+        // When the Activity is changing its configuration.
+        hostingActivity.setChangingConfiguration(true);
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        fragment.onSaveInstanceState(mSavedState);
+        fragment.onDestroy();
+
+        // Then the Presenter is destroyed and not saved in the savior.
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+
+        // Then a new Activity is recreated.
+        final HostingActivity hostingActivity2 = new HostingActivity();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+
+        // When the Activity gets finished
+        hostingActivity2.setFinishing(true);
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+
+        // Then nothing happens, the presenter is already destroyed
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        assertThat(presenter.isDestroyed()).isTrue();
+    }
+
+    /**
+     * Default config
+     */
+    @Test
+    public void activityChangingConfiguration_thenFinish_retainTrue_backstackTrue() {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Given a Presenter that uses a static savior to retain itself.
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(false)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenter(presenter)
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.setInBackstack(true);
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // And when the Fragment is replaced by another Fragment.
+        fragment.setAdded(false);
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+
+        // Then the presenter is not destroyed and saved in the savior
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity is changing its configuration.
+        hostingActivity.setChangingConfiguration(true);
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                hostingActivity.getMockActivityInstance(), mActivitySavedState);
+        fragment.onSaveInstanceState(mSavedState);
+        fragment.onDestroy();
+
+        // Then a new Activity is recreated.
+        final HostingActivity hostingActivity2 = new HostingActivity();
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                hostingActivity2.getMockActivityInstance(), mActivitySavedState);
+
+        // Then the Presenter is not destroyed and saved in the savior.
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity gets finished
+        hostingActivity2.setFinishing(true);
+        mSavior.mActivityInstanceObserver.onActivityDestroyed(
+                hostingActivity2.getMockActivityInstance());
+
+        // Then the same presenter is destroyed
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        assertThat(presenter.isDestroyed()).isTrue();
+    }
+
+    @Test
     public void activityFinishing_retainFalse_backstackFalse() {
 
         final HostingActivity hostingActivity = new HostingActivity();
