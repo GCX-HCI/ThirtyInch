@@ -43,14 +43,6 @@ public abstract class TestFragment
     private final String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
 
-    private final Object instanceData = new Object() {
-        @Override
-        protected void finalize() throws Throwable {
-            super.finalize();
-            Log.v(getFragmentTag(), "FINALIZE");
-        }
-    };
-
     private int instanceNum = Integer.MIN_VALUE;
 
     private PublishSubject<Boolean> mAddedState = PublishSubject.create();
@@ -68,7 +60,7 @@ public abstract class TestFragment
     private String mUuid;
 
     public TestFragment() {
-        Log.v("FragmentManager", this + " constructor called");
+        Log.v(TAG, this + " constructor called");
 
         testFragmentInstanceCount++;
         instanceNum = testFragmentInstanceCount;
@@ -77,47 +69,47 @@ public abstract class TestFragment
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v(getFragmentTag(), "onActivityCreated");
+        Log.v(TAG, "onActivityCreated");
     }
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.v(getFragmentTag(), "onActivityResult");
+        Log.v(TAG, "onActivityResult");
     }
 
     @Override
     public void onAttach(final Context context) {
         mAddedState.startWith(false).distinctUntilChanged().skip(1).subscribe(added -> {
-            Log.d(getFragmentTag(), "fragment" + instanceNum + ".setAdded(" + added + ")");
+            Log.d(TAG, "fragment" + instanceNum + ".setAdded(" + added + ")");
         });
         mDetachedState.startWith(false).distinctUntilChanged().skip(1).subscribe(detached -> {
-            Log.d(getFragmentTag(), "fragment" + instanceNum + ".setDetached(" + detached + ")");
+            Log.d(TAG, "fragment" + instanceNum + ".setDetached(" + detached + ")");
         });
         mRemovingState.startWith(false).distinctUntilChanged().skip(1).subscribe(removing -> {
-            Log.d(getFragmentTag(), "fragment" + instanceNum + ".setRemoving(" + removing + ")");
+            Log.d(TAG, "fragment" + instanceNum + ".setRemoving(" + removing + ")");
         });
         mInBackstackState.startWith(false).distinctUntilChanged().skip(1).subscribe(inBackstack -> {
-            Log.d(getFragmentTag(),
+            Log.d(TAG,
                     "fragment" + instanceNum + ".setInBackstack(" + inBackstack + ")");
         });
 
         mIsActivityChangingConfigState.startWith(false).distinctUntilChanged().skip(1)
                 .subscribe(changing -> {
-                    Log.d(getFragmentTag(),
+                    Log.d(TAG,
                             "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
                                     + ".setChangingConfiguration(" + changing + ");");
                 });
         mIsActivityFinishingState.startWith(false).distinctUntilChanged().skip(1)
                 .subscribe(finishing -> {
-                    Log.d(getFragmentTag(),
+                    Log.d(TAG,
                             "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
                                     + ".setFinishing(" + finishing + ");");
                 });
 
         printState();
         super.onAttach(context);
-        Log.v(getFragmentTag(), "onAttach(" + context + ")");
+        Log.v(TAG, "onAttach(" + context + ")");
         printState();
     }
 
@@ -125,18 +117,18 @@ public abstract class TestFragment
     public void onAttachFragment(final Fragment childFragment) {
         super.onAttachFragment(childFragment);
         printState();
-        Log.v(getFragmentTag(), "onAttachFragment");
+        Log.v(TAG, "onAttachFragment");
     }
 
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.v(getFragmentTag(), "onConfigurationChanged");
+        Log.v(TAG, "onConfigurationChanged");
     }
 
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
-        Log.v(getFragmentTag(), "onContextItemSelected");
+        Log.v(TAG, "onContextItemSelected");
         return super.onContextItemSelected(item);
     }
 
@@ -144,35 +136,28 @@ public abstract class TestFragment
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         printState();
         super.onCreate(savedInstanceState);
-        Log.v(getFragmentTag(), "onCreate(" + savedInstanceState + ")");
+        Log.v(TAG, "onCreate(" + savedInstanceState + ")");
         printState();
         if (savedInstanceState != null) {
             mUuid = savedInstanceState.getString("uuid");
-            Log.v("FragmentManager", "RESTORED " + mUuid);
+            Log.v(TAG, "RESTORED " + mUuid);
         }
         if (mUuid == null) {
             mUuid = UUID.randomUUID().toString();
-            Log.v("FragmentManager", "CREATED " + mUuid);
+            Log.v(TAG, "CREATED " + mUuid);
         }
-
-        Log.v(getFragmentTag(), "// TODO generate a new TiFragmentDelegate instance");
-        Log.v(TAG, "final TiFragmentDelegate<TiPresenter<TiView>, TiView> "
-                + "fragment" + instanceNum + "\n"
-                + "                = new TiFragmentDelegateBuilder()...\n");
 
         if (savedInstanceState == null) {
-            Log.d(getFragmentTag(), "fragment" + instanceNum + ".onCreate(null);");
+            Log.d(TAG, "fragment" + instanceNum + ".onCreate(null);");
         } else {
-            Log.d(getFragmentTag(), "fragment" + instanceNum
+            Log.d(TAG, "fragment" + instanceNum
                     + ".onCreate(savedInstanceState);");
         }
-
-        Log.v(getFragmentTag(), "instance Data: " + instanceData);
     }
 
     @Override
     public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
-        Log.v(getFragmentTag(), "onCreateAnimation");
+        Log.v(TAG, "onCreateAnimation");
         return super.onCreateAnimation(transit, enter, nextAnim);
     }
 
@@ -180,13 +165,13 @@ public abstract class TestFragment
     public void onCreateContextMenu(final ContextMenu menu, final View v,
             final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        Log.v(getFragmentTag(), "onCreateContextMenu");
+        Log.v(TAG, "onCreateContextMenu");
     }
 
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        Log.v(getFragmentTag(), "onCreateOptionsMenu");
+        Log.v(TAG, "onCreateOptionsMenu");
     }
 
     @Nullable
@@ -195,18 +180,16 @@ public abstract class TestFragment
             @Nullable final Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         printState();
-        Log.v(getFragmentTag(),
+        Log.v(TAG,
                 "onCreateView() called with: inflater = [" + inflater + "], container = ["
                         + container + "], savedInstanceState = [" + savedInstanceState + "]");
         if (savedInstanceState == null) {
-            Log.d(getFragmentTag(), "fragment" + instanceNum
+            Log.d(TAG, "fragment" + instanceNum
                     + ".onCreateView(inflater, null, null);");
         } else {
-            Log.d(getFragmentTag(), "fragment" + instanceNum
+            Log.d(TAG, "fragment" + instanceNum
                     + ".onCreateView(inflater, null, savedInstanceState);");
         }
-
-        Log.v(getFragmentTag(), "instance Data: " + instanceData);
 
         return inflater.inflate(getLayoutResId(), container, false);
     }
@@ -215,36 +198,33 @@ public abstract class TestFragment
     public void onDestroy() {
         printState();
         super.onDestroy();
-        Log.v(getFragmentTag(), "onDestroy");
-        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onDestroy();");
+        Log.v(TAG, "onDestroy");
+        Log.d(TAG, "fragment" + instanceNum + ".onDestroy();");
         printState();
-        Log.v(getFragmentTag(), "instance Data: " + instanceData);
         Log.v("FragmentManager", "DESTROYED " + mUuid);
     }
 
     @Override
     public void onDestroyOptionsMenu() {
         super.onDestroyOptionsMenu();
-        Log.v(getFragmentTag(), "onDestroyOptionsMenu");
+        Log.v(TAG, "onDestroyOptionsMenu");
     }
 
     @Override
     public void onDestroyView() {
         printState();
         super.onDestroyView();
-        Log.v(getFragmentTag(), "onDestroyView");
+        Log.v(TAG, "onDestroyView");
         printState();
 
-        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onDestroyView();");
-
-        Log.v(getFragmentTag(), "instance Data: " + instanceData);
+        Log.d(TAG, "fragment" + instanceNum + ".onDestroyView();");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         printState();
-        Log.v(getFragmentTag(), "onDetach");
+        Log.v(TAG, "onDetach");
         printState();
 
         mAddedState.onCompleted();
@@ -257,61 +237,61 @@ public abstract class TestFragment
     @Override
     public void onHiddenChanged(final boolean hidden) {
         super.onHiddenChanged(hidden);
-        Log.v(getFragmentTag(), "onHiddenChanged");
+        Log.v(TAG, "onHiddenChanged");
     }
 
     @Override
     public void onInflate(final Context context, final AttributeSet attrs,
             final Bundle savedInstanceState) {
         super.onInflate(context, attrs, savedInstanceState);
-        Log.v(getFragmentTag(), "onInflate");
+        Log.v(TAG, "onInflate");
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        Log.v(getFragmentTag(), "onLowMemory");
+        Log.v(TAG, "onLowMemory");
         printState();
     }
 
     @Override
     public void onMultiWindowModeChanged(final boolean isInMultiWindowMode) {
         super.onMultiWindowModeChanged(isInMultiWindowMode);
-        Log.v(getFragmentTag(), "onMultiWindowModeChanged");
+        Log.v(TAG, "onMultiWindowModeChanged");
         printState();
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        Log.v(getFragmentTag(), "onOptionsItemSelected");
+        Log.v(TAG, "onOptionsItemSelected");
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onOptionsMenuClosed(final Menu menu) {
         super.onOptionsMenuClosed(menu);
-        Log.v(getFragmentTag(), "onOptionsMenuClosed");
+        Log.v(TAG, "onOptionsMenuClosed");
     }
 
     @Override
     public void onPause() {
         printState();
         super.onPause();
-        Log.v(getFragmentTag(), "onPause()");
+        Log.v(TAG, "onPause()");
         printState();
     }
 
     @Override
     public void onPictureInPictureModeChanged(final boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
-        Log.v(getFragmentTag(), "onPictureInPictureModeChanged");
+        Log.v(TAG, "onPictureInPictureModeChanged");
         printState();
     }
 
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        Log.v(getFragmentTag(), "onPrepareOptionsMenu");
+        Log.v(TAG, "onPrepareOptionsMenu");
     }
 
     @Override
@@ -319,7 +299,7 @@ public abstract class TestFragment
             @NonNull final String[] permissions,
             @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.v(getFragmentTag(), "onRequestPermissionsResult");
+        Log.v(TAG, "onRequestPermissionsResult");
         printState();
     }
 
@@ -327,7 +307,7 @@ public abstract class TestFragment
     public void onResume() {
         printState();
         super.onResume();
-        Log.v(getFragmentTag(), "onResume");
+        Log.v(TAG, "onResume");
         printState();
     }
 
@@ -335,11 +315,10 @@ public abstract class TestFragment
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         printState();
-        Log.v(getFragmentTag(), "onSaveInstanceState");
 
         outState.putString("uuid", mUuid);
 
-        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onSaveInstanceState(outState);");
+        Log.d(TAG, "fragment" + instanceNum + ".onSaveInstanceState(outState);");
         printState();
     }
 
@@ -347,8 +326,7 @@ public abstract class TestFragment
     public void onStart() {
         printState();
         super.onStart();
-        Log.v(getFragmentTag(), "onStart");
-        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onStart();");
+        Log.d(TAG, "fragment" + instanceNum + ".onStart();");
         printState();
     }
 
@@ -356,8 +334,7 @@ public abstract class TestFragment
     public void onStop() {
         printState();
         super.onStop();
-        Log.v(getFragmentTag(), "onStop");
-        Log.d(getFragmentTag(), "fragment" + instanceNum + ".onStop();");
+        Log.d(TAG, "fragment" + instanceNum + ".onStop();");
         printState();
     }
 
@@ -365,7 +342,7 @@ public abstract class TestFragment
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
         printState();
         super.onViewCreated(view, savedInstanceState);
-        Log.v(getFragmentTag(), "onViewCreated");
+        Log.v(TAG, "onViewCreated");
         printState();
 
         final TextView fragmentTag = (TextView) view.findViewById(R.id.sample_text);
@@ -375,7 +352,7 @@ public abstract class TestFragment
     @Override
     public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.v(getFragmentTag(), "onViewStateRestored");
+        Log.v(TAG, "onViewStateRestored");
     }
 
     @NonNull
@@ -388,8 +365,8 @@ public abstract class TestFragment
                 .build();
 
         final TestPresenter presenter = new TestPresenter(config, getClass().getSimpleName());
-        Log.d(getFragmentTag(), "created " + presenter);
-        Log.v(getFragmentTag(), "retain presenter " + retain + ", " + presenter);
+        Log.d(TAG, "created " + presenter);
+        Log.v(TAG, "retain presenter " + retain + ", " + presenter);
 
         return presenter;
     }
@@ -397,15 +374,11 @@ public abstract class TestFragment
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        Log.i("FragmentManager", "GCed " + this + ", uuid: " + this.mUuid);
+        Log.v(TAG, "GCed " + this + ", uuid: " + this.mUuid);
     }
 
     @LayoutRes
     abstract int getLayoutResId();
-
-    private String getFragmentTag() {
-        return TAG;
-    }
 
     private void printState() {
         mAddedState.onNext(isAdded());

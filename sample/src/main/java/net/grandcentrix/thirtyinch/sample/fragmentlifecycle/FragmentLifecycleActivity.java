@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import static android.provider.Settings.Global.ALWAYS_FINISH_ACTIVITIES;
-import static net.grandcentrix.thirtyinch.sample.fragmentlifecycle.TestFragment.testFragmentInstanceCount;
 
 public class FragmentLifecycleActivity extends AppCompatActivity {
 
@@ -42,19 +41,20 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        Log.v(TAG, "// When the Activity finishes");
+        Log.v(TAG, "// When the Activity gets finished");
     }
 
     public void finishActivity(View view) {
+        Log.v(TAG, "finishing Activity");
         finish();
     }
 
     @Override
     public void onBackPressed() {
         Log.v(TAG, "// When the back button gets pressed");
-        Log.v(TAG, "// When the top most fragment gets popped");
         final FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
+            Log.v(TAG, "// When the top most fragment gets popped");
             fragmentManager.popBackStack();
         } else {
             super.onBackPressed();
@@ -70,6 +70,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         final Fragment fragment = getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_placeholder);
         if (fragment instanceof TestFragmentA) {
+            Log.v(TAG, "remove FragmentA");
             getSupportFragmentManager().beginTransaction()
                     .remove(fragment)
                     .commitNow();
@@ -108,12 +109,8 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        Log.v(TAG, "onDestroy of " + this);
+        Log.v(TAG, "onDestroy");
 
-        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount
-                + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
-        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount
-                + ".setFinishing(" + isFinishing() + ");");
         Log.v(TAG, "// hostingActivity" + fragmentLifecycleActivityInstanceCount
                 + " got destroyed.");
     }
@@ -122,20 +119,12 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause()");
-        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
-        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setFinishing(" + isFinishing() + ");");
     }
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState(Bundle)");
-        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setChangingConfiguration(" + isChangingConfigurations() + ");");
-        Log.v(TAG, "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                + ".setFinishing(" + isFinishing() + ");");
     }
 
     private void addFragment(final Fragment fragment) {
@@ -155,24 +144,6 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
             fragmentTransaction.addToBackStack(null);
         }
         final int backStackId = fragmentTransaction.commit();
-        Log.v(TAG, "\n// Given a Presenter ...");
-        // (testFragmentInstanceCount + 1) because it will be created after executing this code
-        Log.v(TAG, "final TestPresenter presenter" + (testFragmentInstanceCount + 1) + " ="
-                + " new TestPresenter(new TiConfiguration.Builder()\n"
-                + "                .setRetainPresenterEnabled(" + retain + ")\n"
-                + "                .build());");
-
-        Log.v(TAG, "\n// And given a Fragment.");
-        Log.v(TAG, "final TiFragmentDelegate<TiPresenter<TiView>, TiView> "
-                + "delegate" + (testFragmentInstanceCount + 1) + "\n"
-                + "                = new TiFragmentDelegateBuilder()\n"
-                + "                .setDontKeepActivitiesEnabled(" + isDontKeepActivities() + ")\n"
-                + "                .setHostingActivity(hostingActivity)\n"
-                + "                .setSavior(mSavior)\n"
-                + "                .setPresenter(presenter" + (testFragmentInstanceCount + 1)
-                + ")\n"
-                + "                .build();");
-
         if (backStackId >= 0) {
             Log.v(TAG, "Back stack ID: " + String.valueOf(backStackId));
         }
