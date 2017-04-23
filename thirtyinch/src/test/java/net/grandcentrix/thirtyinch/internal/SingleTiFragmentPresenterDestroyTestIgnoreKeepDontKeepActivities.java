@@ -16,9 +16,12 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiConfiguration;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.Test;
 
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -487,5 +490,127 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         // Then the presenter is destroyed and not saved
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+    }
+
+    /**
+     * A fragment will be added to UI, then removed and added again resulting in two provideView
+     * calls
+     */
+    @Test
+    public void reuse_fragment_retainFalse() throws Exception {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Check that the default config matches this test case
+        final TiConfiguration config = new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(false)
+                .build();
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(true)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
+                    @Override
+                    public TiPresenter<TiView> providePresenter() {
+                        return new TestPresenter(config);
+                    }
+                })
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will not stored in the savior
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        final TiPresenter<TiView> firstPresenter = fragment.getPresenter();
+
+        // When the fragment will be removed from the Activity.
+        fragment.setAdded(false);
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
+
+        // Then the presenter is removed from the savior and the presenter gets destroyed
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+
+        // When the same fragment instance is added again
+        fragment.onCreate(null);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // A new presenter is generated.
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(fragment.getPresenter()).isNotEqualTo(firstPresenter);
+    }
+
+    /**
+     * A fragment will be added to UI, then removed and added again resulting in two provideView
+     * calls
+     * Default config
+     */
+    @Test
+    public void reuse_fragment_retainTrue() throws Exception {
+
+        final HostingActivity hostingActivity = new HostingActivity();
+
+        // Check that the default config matches this test case
+        final TiConfiguration config = new TiConfiguration.Builder()
+                .setUseStaticSaviorToRetain(true)
+                .setRetainPresenterEnabled(true)
+                .build();
+        assertThat(TiConfiguration.DEFAULT).isEqualTo(config);
+
+        // And given a Fragment.
+        final TestTiFragment fragment = new TestTiFragment.Builder()
+                .setDontKeepActivitiesEnabled(true)
+                .setHostingActivity(hostingActivity)
+                .setSavior(mSavior)
+                .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
+                    @Override
+                    public TiPresenter<TiView> providePresenter() {
+                        return new TestPresenter(config);
+                    }
+                })
+                .build();
+
+        // When the Fragment is added to the Activity.
+        fragment.onCreate(null);
+        fragment.setAdded(true);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // Then the presenter will be stored in the savior
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+        final TiPresenter<TiView> firstPresenter = fragment.getPresenter();
+
+        // When the fragment will be removed from the Activity.
+        fragment.setAdded(false);
+        fragment.setRemoving(true);
+        fragment.onStop();
+        fragment.onDestroyView();
+        fragment.onDestroy();
+
+        // Then the presenter is removed from the savior and the presenter gets destroyed
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+        assertThat(fragment.getPresenter().isDestroyed()).isTrue();
+
+        // When the same fragment instance is added again
+        fragment.onCreate(null);
+        fragment.onCreateView(mock(LayoutInflater.class), null, null);
+        fragment.onStart();
+
+        // A new presenter is generated.
+        assertThat(fragment.getPresenter().isDestroyed()).isFalse();
+        assertThat(fragment.getPresenter()).isNotEqualTo(firstPresenter);
     }
 }
