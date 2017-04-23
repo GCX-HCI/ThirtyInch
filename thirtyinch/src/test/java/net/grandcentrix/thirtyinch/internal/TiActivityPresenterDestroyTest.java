@@ -62,7 +62,6 @@ public class TiActivityPresenterDestroyTest {
     @Test
     public void dontKeepActivitiesFalse_configurationChange() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .build());
 
         final TestPresenter[] retainedPresenter = new TestPresenter[]{null};
@@ -101,7 +100,6 @@ public class TiActivityPresenterDestroyTest {
     @Test
     public void dontKeepActivitiesFalse_finish() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .build());
 
         final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
@@ -131,7 +129,6 @@ public class TiActivityPresenterDestroyTest {
     public void dontKeepActivitiesFalse_moveToBackground_moveToForeground()
             throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .build());
 
         final TestPresenter[] retainedPresenter = new TestPresenter[]{null};
@@ -176,7 +173,6 @@ public class TiActivityPresenterDestroyTest {
     @Test
     public void dontKeepActivitiesTrue_configurationChange() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .build());
 
         final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
@@ -204,7 +200,6 @@ public class TiActivityPresenterDestroyTest {
     @Test
     public void dontKeepActivitiesTrue_finish() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .build());
 
         final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
@@ -234,7 +229,6 @@ public class TiActivityPresenterDestroyTest {
     public void dontKeepActivitiesTrue_moveToBackground_moveToForeground()
             throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .build());
 
         final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()

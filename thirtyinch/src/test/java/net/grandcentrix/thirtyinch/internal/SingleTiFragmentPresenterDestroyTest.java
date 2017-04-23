@@ -39,7 +39,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter that does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -79,7 +78,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
         final TestTiFragment fragment2 = new TestTiFragment.Builder()
@@ -111,7 +109,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build();
         assertThat(TiConfiguration.DEFAULT).isEqualTo(config);
@@ -156,7 +153,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // And generates a new Fragment instance.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
         final TestTiFragment fragment2 = new TestTiFragment.Builder()
@@ -188,7 +184,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter without retain.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -231,7 +226,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build();
         assertThat(TiConfiguration.DEFAULT).isEqualTo(config);
@@ -277,7 +271,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter that does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -324,7 +317,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build();
         assertThat(TiConfiguration.DEFAULT).isEqualTo(config);
@@ -376,7 +368,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -419,7 +410,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -471,7 +461,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -514,7 +503,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Given a Presenter does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -566,7 +554,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build();
 
@@ -627,7 +614,6 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // Check that the default config matches this test case
         final TiConfiguration config = new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build();
         assertThat(TiConfiguration.DEFAULT).isEqualTo(config);

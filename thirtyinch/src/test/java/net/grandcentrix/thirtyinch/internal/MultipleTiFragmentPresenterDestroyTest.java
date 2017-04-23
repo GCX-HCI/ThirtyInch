@@ -33,7 +33,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -77,7 +76,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -126,7 +124,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does use a static savior and does retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -173,7 +170,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that uses a static savior to retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -220,7 +216,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // When the back stack is popped a new Fragment instance is created.
         final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -250,7 +245,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that uses a static savior to retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -314,7 +308,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that uses a static savior to retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -376,7 +369,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does use a static savior but does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -422,7 +414,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does use a static savior but does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -470,7 +461,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does use a static savior and does retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -519,7 +509,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that uses a static savior to retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 
@@ -564,7 +553,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that does use a static savior but does not retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(false)
                 .build());
 
@@ -611,7 +599,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // Given a Presenter that uses a static savior to retain itself.
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .setUseStaticSaviorToRetain(true)
                 .setRetainPresenterEnabled(true)
                 .build());
 

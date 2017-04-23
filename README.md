@@ -172,7 +172,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     public static final TiConfiguration PRESENTER_CONFIG = 
             new TiConfiguration.Builder()
                 .setRetainPresenterEnabled(true) 
-                .setUseStaticSaviorToRetain(true)
                 .setCallOnMainThreadInterceptorEnabled(true)
                 .setDistinctUntilChangedInterceptorEnabled(true)
                 .build();
