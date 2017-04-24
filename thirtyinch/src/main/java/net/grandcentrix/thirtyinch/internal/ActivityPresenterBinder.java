@@ -46,16 +46,20 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
 
     public ActivityPresenterBinder(@NonNull final Activity activity,
             final Bundle savedInstanceState,
-            final TiPresenterProvider<P> provider) {
+            final TiPresenterProvider<P> presenterProvider,
+            final TiViewProvider<V> viewProvider) {
         mActivity = activity;
 
         TAG = mActivity.getClass().getSimpleName()
                 + "@" + Integer.toHexString(mActivity.hashCode());
 
-        mDelegate = new TiActivityDelegate<>(this, this, provider, this,
-                PresenterSavior.getInstance());
+        mDelegate = new TiActivityDelegate<>(this, viewProvider != null ? viewProvider : this,
+                presenterProvider, this, PresenterSavior.getInstance());
 
-        // no callback available before onCreate() :(
+        // There is no onPreActivityCreate(Bundle) callback to execute code as code in
+        // super.onCreate(Bundle) would be executed. Therefore this class must be initialized in
+        // Activity#onCreate(Bundle) where this method will be called directly.
+        // The presenter is available immediately with #getPresenter()
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 

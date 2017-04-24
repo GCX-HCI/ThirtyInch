@@ -20,10 +20,13 @@ import net.grandcentrix.thirtyinch.internal.ActivityPresenterBinder;
 import net.grandcentrix.thirtyinch.internal.FragmentPresenterBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
@@ -33,11 +36,29 @@ public class TiPresenterBinders {
      * must be called in {@link Activity#onCreate(Bundle)}
      */
     public static <P extends TiPresenter<V>, V extends TiView> TiPresenterBinder<P, V> attachPresenter(
-            final Activity activity, final Bundle savedInstanceState,
-            final TiPresenterProvider<P> provider) {
+            @NonNull final Activity activity,
+            @Nullable final Bundle savedInstanceState,
+            @NonNull final TiPresenterProvider<P> presenterProvider) {
 
-        final ActivityPresenterBinder<P, V> binder =
-                new ActivityPresenterBinder<>(activity, savedInstanceState, provider);
+        return attachPresenter(activity, savedInstanceState, presenterProvider, null);
+    }
+
+    /**
+     * must be called in {@link Activity#onCreate(Bundle)}
+     */
+    public static <P extends TiPresenter<V>, V extends TiView> TiPresenterBinder<P, V> attachPresenter(
+            @NonNull final Activity activity,
+            @Nullable final Bundle savedInstanceState,
+            @NonNull final TiPresenterProvider<P> presenterProvider,
+            @Nullable final TiViewProvider<V> viewProvider) {
+
+        if (activity instanceof TiActivity) {
+            throw new IllegalStateException(
+                    "Can't attach a TiPresenter to a TiActivity which already has a TiPresenter");
+        }
+
+        final ActivityPresenterBinder<P, V> binder = new ActivityPresenterBinder<>(activity,
+                savedInstanceState, presenterProvider, viewProvider);
 
         Application app = activity.getApplication();
         app.registerActivityLifecycleCallbacks(binder);
@@ -49,20 +70,33 @@ public class TiPresenterBinders {
      * must be called in {@link Fragment#onCreate(Bundle)}
      */
     public static <P extends TiPresenter<V>, V extends TiView> PresenterAccessor<P, V> attachPresenter(
-            final Fragment fragment, final Bundle savedInstanceState,
-            final TiPresenterProvider<P> provider) {
+            @NonNull final Fragment fragment,
+            @Nullable final Bundle savedInstanceState,
+            @NonNull final TiPresenterProvider<P> presenterProvider,
+            @Nullable final TiViewProvider<V> viewProvider) {
 
         if (fragment instanceof TiFragment) {
             throw new IllegalStateException(
-                    "Can't attach a TiPresenter to a Fragment which already has a TiPresenter");
+                    "Can't attach a TiPresenter to a TiFragment which already has a TiPresenter");
         }
 
-        final FragmentPresenterBinder<P, V> binder =
-                new FragmentPresenterBinder<>(fragment, savedInstanceState, provider);
+        final FragmentPresenterBinder<P, V> binder = new FragmentPresenterBinder<>(fragment,
+                savedInstanceState, presenterProvider, viewProvider);
 
         FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
         fragmentManager.registerFragmentLifecycleCallbacks(binder, false);
 
         return binder;
+    }
+
+    /**
+     * must be called in {@link Fragment#onCreate(Bundle)}
+     */
+    public static <P extends TiPresenter<V>, V extends TiView> PresenterAccessor<P, V> attachPresenter(
+            @NonNull final Fragment fragment,
+            @Nullable final Bundle savedInstanceState,
+            @NonNull final TiPresenterProvider<P> presenterProvider) {
+
+        return attachPresenter(fragment, savedInstanceState, presenterProvider, null);
     }
 }

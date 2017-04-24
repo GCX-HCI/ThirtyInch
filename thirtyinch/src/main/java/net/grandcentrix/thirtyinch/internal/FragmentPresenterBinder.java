@@ -51,22 +51,23 @@ public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
-    // TODO create override with TiViewProvider
     public FragmentPresenterBinder(final Fragment fragment,
             final Bundle savedInstanceState,
-            final TiPresenterProvider<P> provider) {
+            final TiPresenterProvider<P> presenterProvider,
+            final TiViewProvider<V> viewProvider) {
         mFragment = fragment;
         mActivity = fragment.getActivity();
 
         TAG = mActivity.getClass().getSimpleName()
                 + "@" + Integer.toHexString(mActivity.hashCode());
 
-        mDelegate = new TiFragmentDelegate<>(this, this, provider, this,
-                PresenterSavior.getInstance());
+        mDelegate = new TiFragmentDelegate<>(this, viewProvider != null ? viewProvider : this,
+                presenterProvider, this, PresenterSavior.getInstance());
 
-        // sadly there is no FragmentLifecycleCallback which executes before Fragment#onCreate
-        // containing the saved instance state. So this FragmentPresenterBinder must be initialized
-        // in Fragment#onCreate(Bundle)
+        // There is no onFragmentPreCreated(Bundle) callback to execute code as code in
+        // super.onCreate(Bundle) would be executed. Therefore this class must be initialized in
+        // Fragment#onCreate(Bundle) where this method will be called directly.
+        // The presenter is available immediately with #getPresenter()
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
