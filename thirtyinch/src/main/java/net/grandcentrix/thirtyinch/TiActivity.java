@@ -18,14 +18,12 @@ package net.grandcentrix.thirtyinch;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
-import net.grandcentrix.thirtyinch.internal.PresenterNonConfigurationInstance;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -139,20 +137,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return mDelegate.getPresenter();
     }
 
-    @SuppressWarnings("unchecked")
-    @Nullable
-    @Override
-    public final P getRetainedPresenter() {
-        // try recover presenter via lastNonConfigurationInstance
-        // this works most of the time
-        final Object nci = getLastCustomNonConfigurationInstance();
-        if (nci instanceof PresenterNonConfigurationInstance) {
-            final PresenterNonConfigurationInstance pnci = (PresenterNonConfigurationInstance) nci;
-            return (P) pnci.getPresenter();
-        }
-        return null;
-    }
-
     @Override
     public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
@@ -177,33 +161,11 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return isFinishing();
     }
 
-    @Override
-    public final boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
-    }
-
     @CallSuper
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDelegate.onConfigurationChanged_afterSuper(newConfig);
-    }
-
-    @Nullable
-    @CallSuper
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        final P presenter = mDelegate.getPresenter();
-        if (presenter == null) {
-            return null;
-        }
-
-        if (presenter.getConfig().shouldRetainPresenter()) {
-            return new PresenterNonConfigurationInstance<>(presenter,
-                    super.onRetainCustomNonConfigurationInstance());
-        }
-
-        return null;
     }
 
     @SuppressWarnings("unchecked")

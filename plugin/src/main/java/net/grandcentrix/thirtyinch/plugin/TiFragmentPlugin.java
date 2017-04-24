@@ -139,11 +139,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public final boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getFragment().getActivity());
-    }
-
-    @Override
     public final boolean isFragmentAdded() {
         return getFragment().isAdded();
     }

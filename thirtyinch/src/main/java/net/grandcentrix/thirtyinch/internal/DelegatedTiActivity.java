@@ -16,8 +16,6 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import android.app.Activity;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 import java.util.concurrent.Executor;
 
@@ -26,13 +24,6 @@ import java.util.concurrent.Executor;
  * without mocking Android classes such as {@link Activity}
  */
 public interface DelegatedTiActivity<P> {
-
-    /**
-     * @return the retained presenter from {@link AppCompatActivity#getLastCustomNonConfigurationInstance()}
-     * or equivalent implementations
-     */
-    @Nullable
-    P getRetainedPresenter();
 
     /**
      * @return {@link UiThreadExecutor}
@@ -48,11 +39,6 @@ public interface DelegatedTiActivity<P> {
      * @return {@link Activity#isFinishing()}
      */
     boolean isActivityFinishing();
-
-    /**
-     * @return true when the developer option "Don't keep Activities" is enabled
-     */
-    boolean isDontKeepActivitiesEnabled();
 
     /**
      * @return the Activity itself instance

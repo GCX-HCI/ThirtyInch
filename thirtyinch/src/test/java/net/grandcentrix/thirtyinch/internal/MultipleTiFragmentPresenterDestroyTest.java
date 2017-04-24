@@ -24,7 +24,7 @@ import android.view.LayoutInflater;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDestroyTest {
+public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDestroyTest {
 
     @Test
     public void activityChangingConfiguration_retainFalse_backstackFalse() {
@@ -106,7 +106,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onDestroy();
 
         // Then assert that the Presenter is destroyed and not saved in the savior.
@@ -202,7 +202,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.
@@ -228,9 +228,9 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
 
         // And the instance will be created with the saved instance state
         fragment2.setInBackstack(true);
-        fragment2.onCreate(mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
         fragment2.setAdded(true);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then the same presenter gets recovered
@@ -278,7 +278,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         // When the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
         assertThat(mSavior.mActivityInstanceObserver).isNull();
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onDestroy();
 
         // Then the Presenter is destroyed and not saved in the savior.
@@ -340,7 +340,7 @@ public class MultipleTiFragmentPresenterDestroyTest extends TiFragmentPresenterD
         hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onDestroy();
 
         // Then a new Activity is recreated.

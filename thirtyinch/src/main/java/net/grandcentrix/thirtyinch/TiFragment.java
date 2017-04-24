@@ -24,7 +24,6 @@ import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -75,7 +74,7 @@ import java.util.concurrent.Executor;
  * Using {@code setRetainInstance(true)} is now allowed as it causes many troubles. You should favor
  * the dumb view pattern and move all your state into the {@link TiPresenter}.
  * </p>
- * 
+ *
  * <p>
  * Example:
  * <code>
@@ -171,11 +170,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     @Override
     public final void invalidateView() {
         mDelegate.invalidateView();
-    }
-
-    @Override
-    public final boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
 
     @Override

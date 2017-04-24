@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock;
  * assertions must be identical
  */
 public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
-        extends TiFragmentPresenterDestroyTest {
+        extends AbstractPresenterDestroyTest {
 
     /**
      * Activity changing configuration without retain (don't keep Activities enabled)
@@ -68,7 +68,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -94,8 +94,8 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // And the fragment will be resumed
         fragment2.setAdded(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then a new Presenter instance will be generated and the old presenter isn't used
@@ -137,7 +137,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -164,8 +164,8 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
 
         // And the fragment will be resumed
         fragment2.setAdded(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then the Presenter is the same
@@ -292,7 +292,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         assertThat(mSavior.mActivityInstanceObserver).isNull();
 
         // When the Activity is moved to background
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -316,8 +316,8 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
                 .build();
 
         fragment2.setAdded(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then the new Presenter does not equals the previous Presenter.
@@ -359,7 +359,7 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
         // When the Activity gets moved to background
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -386,8 +386,8 @@ public class SingleTiFragmentPresenterDestroyTestIgnoreKeepDontKeepActivities
                 .build();
 
         fragment2.setAdded(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then the Presenter is the same as in the previous fragment instance

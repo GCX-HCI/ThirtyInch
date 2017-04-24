@@ -33,7 +33,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-public abstract class TiFragmentPresenterDestroyTest {
+public abstract class AbstractPresenterDestroyTest {
 
     class TestPresenter extends TiPresenter<TiView> {
 
@@ -44,7 +44,7 @@ public abstract class TiFragmentPresenterDestroyTest {
 
     Bundle mActivitySavedState;
 
-    Bundle mSavedState;
+    Bundle mFragmentSavedState;
 
     TestPresenterSavior mSavior;
 
@@ -55,9 +55,9 @@ public abstract class TiFragmentPresenterDestroyTest {
     @Before
     public void setUp() throws Exception {
         mSavior = new TestPresenterSavior();
-        mSavedState = mock(Bundle.class);
-        doAnswer(saveInMap(fakeBundle)).when(mSavedState).putString(anyString(), anyString());
-        doAnswer(getFromMap(fakeBundle)).when(mSavedState).getString(anyString());
+        mFragmentSavedState = mock(Bundle.class);
+        doAnswer(saveInMap(fakeBundle)).when(mFragmentSavedState).putString(anyString(), anyString());
+        doAnswer(getFromMap(fakeBundle)).when(mFragmentSavedState).getString(anyString());
 
         mActivitySavedState = mock(Bundle.class);
         doAnswer(saveInMap(activityHostBundle)).when(mActivitySavedState)
@@ -67,7 +67,7 @@ public abstract class TiFragmentPresenterDestroyTest {
 
     @After
     public void tearDown() throws Exception {
-        mSavedState = null;
+        mFragmentSavedState = null;
     }
 
     @NonNull

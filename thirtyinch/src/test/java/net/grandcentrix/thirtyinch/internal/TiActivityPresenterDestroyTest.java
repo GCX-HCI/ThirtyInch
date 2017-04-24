@@ -17,258 +17,526 @@ package net.grandcentrix.thirtyinch.internal;
 
 
 import net.grandcentrix.thirtyinch.TiConfiguration;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-
-import java.util.HashMap;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 
-public class TiActivityPresenterDestroyTest {
-
-    private class PutInMapAnswer implements Answer<Void> {
-
-        final HashMap<String, String> map = new HashMap<>();
-
-        @Override
-        public Void answer(InvocationOnMock invocation) throws Throwable {
-            final Object[] args = invocation.getArguments();
-            map.put((String) args[0], (String) args[1]);
-            return null;
-        }
-    }
-
-    private class TestPresenter extends TiPresenter<TiView> {
-
-        public TestPresenter(TiConfiguration config) {
-            super(config);
-        }
-    }
-
-    private TestPresenterSavior mSavior;
+public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest {
 
     @Test
-    public void dontKeepActivitiesFalse_configurationChange() throws Exception {
+    public void configurationChange_retainFalse_dkAFalse() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
                 .build());
 
-        final TestPresenter[] retainedPresenter = new TestPresenter[]{null};
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+        final TestTiActivity activity = new TestTiActivity.Builder()
                 .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(true)
-                .setDontKeepActivitiesEnabled(false)
                 .setSavior(mSavior)
-                .setRetainedPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
-                    @NonNull
-                    @Override
-                    public TiPresenter<TiView> providePresenter() {
-                        return retainedPresenter[0];
-                    }
-                })
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        final PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
 
-        doFullLifecycleAndDestroy(delegate, savedState);
-
-        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
-        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID))
-                .contains("TestPresenter");
-
+        // Then the presenter is saved in savior
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
-        retainedPresenter[0] = presenter;
-        delegate.onCreate_afterSuper(savedState);
-    }
+        // When the Activity changes configurations
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(true);
+        activity.onStop();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
 
-    @Test
-    public void dontKeepActivitiesFalse_finish() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(false)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        doFullLifecycleAndDestroy(delegate, savedState);
-
+        // Then the presenter is destroyed
         assertThat(presenter.isDestroyed()).isTrue();
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
-        try {
-            // presenter is destroyed and cannot be recreated
-            delegate.onCreate_afterSuper(savedState);
-            fail("did not throw");
-        } catch (Exception e) {
-            assertThat(e).hasMessageContaining("DESTROYED");
-        }
+        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
+        // And recovered in the new instance
+        final TestTiActivity activity2 = new TestTiActivity.Builder()
+                .setSavior(mSavior)
+                .setPresenter(presenter2)
+                .build();
+
+        // When the new Activity instance gets created
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity2.onCreate(mActivitySavedState);
+        activity2.onStart();
+
+        // Then a new presenter gets created
+        assertThat(activity2.getPresenter()).isNotEqualTo(presenter);
     }
 
     @Test
-    public void dontKeepActivitiesFalse_moveToBackground_moveToForeground()
-            throws Exception {
+    public void configurationChange_retainFalse_dkATrue() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
                 .build());
 
-        final TestPresenter[] retainedPresenter = new TestPresenter[]{null};
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+        final TestTiActivity activity = new TestTiActivity.Builder()
                 .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(false)
                 .setSavior(mSavior)
-                .setRetainedPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
-                    @NonNull
-                    @Override
-                    public TiPresenter<TiView> providePresenter() {
-                        return retainedPresenter[0];
-                    }
-                })
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        delegate.onCreate_afterSuper(null);
-        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
 
-        assertThat(delegate.getPresenter().isInitialized()).isTrue();
-
-        delegate.onStart_afterSuper();
-
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
-
-        delegate.onStop_beforeSuper();
-        delegate.onStop_afterSuper();
-        delegate.onSaveInstanceState_afterSuper(savedState);
-
-        delegate.onStart_afterSuper();
-
+        // Then the presenter is saved in savior
         assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
-        retainedPresenter[0] = presenter;
-        delegate.onCreate_afterSuper(savedState);
-    }
+        // When the Activity changes configurations
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(true);
+        activity.onStop();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
 
-    @Test
-    public void dontKeepActivitiesTrue_configurationChange() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(true)
-                .setDontKeepActivitiesEnabled(true)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        final PutInMapAnswer putInMap = putInMap();
-        doAnswer(putInMap).when(savedState).putString(anyString(), anyString());
-
-        doFullLifecycleAndDestroy(delegate, savedState);
-
-        assertThat(putInMap.map).containsKey(TiActivityDelegate.SAVED_STATE_PRESENTER_ID);
-        assertThat(putInMap.map.get(TiActivityDelegate.SAVED_STATE_PRESENTER_ID))
-                .contains("TestPresenter");
-
-        assertThat(presenter.isDestroyed()).isFalse();
-        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
-    }
-
-    @Test
-    public void dontKeepActivitiesTrue_finish() throws Exception {
-        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
-                .build());
-
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
-                .setPresenter(presenter)
-                .setIsFinishing(true)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(true)
-                .setSavior(mSavior)
-                .build();
-
-        final Bundle savedState = mock(Bundle.class);
-        doFullLifecycleAndDestroy(delegate, savedState);
-
+        // Then the presenter is destroyed
         assertThat(presenter.isDestroyed()).isTrue();
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
-        try {
-            // presenter is destroyed and cannot be recreated
-            delegate.onCreate_afterSuper(savedState);
-            fail("did not throw");
-        } catch (Exception e) {
-            assertThat(e).hasMessageContaining("DESTROYED");
-        }
+        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
+        // And recovered in the new instance
+        final TestTiActivity activity2 = new TestTiActivity.Builder()
+                .setSavior(mSavior)
+                .setPresenter(presenter2)
+                .build();
+
+        // When the new Activity instance gets created
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity2.onCreate(mActivitySavedState);
+        activity2.onStart();
+
+        // Then a new presenter gets created
+        assertThat(activity2.getPresenter()).isNotEqualTo(presenter);
     }
 
     @Test
-    public void dontKeepActivitiesTrue_moveToBackground_moveToForeground()
-            throws Exception {
+    public void configurationChange_retainTrue_dkAFalse() throws Exception {
         final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true)
                 .build());
 
-        final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate = new TiActivityDelegateBuilder()
+        final TestTiActivity activity = new TestTiActivity.Builder()
                 .setPresenter(presenter)
-                .setIsFinishing(false)
-                .setIsChangingConfigurations(false)
-                .setDontKeepActivitiesEnabled(true)
                 .setSavior(mSavior)
                 .build();
 
-        final Bundle savedState = mock(Bundle.class);
-        doFullLifecycleAndDestroy(delegate, savedState);
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
 
+        // Then the presenter is saved in savior
         assertThat(presenter.isDestroyed()).isFalse();
         assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity changes configurations
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(true);
+        activity.onStop();
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                activity.getHostingActivity(), mActivitySavedState);
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // Then the presenter is not destroyed
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // And recovered in the new instance
+        final TestTiActivity activity2 = new TestTiActivity.Builder()
+                .setSavior(mSavior)
+                .build();
+
+        // When the new Activity instance gets created
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                activity2.getHostingActivity(), mActivitySavedState);
+        activity2.onCreate(mActivitySavedState);
+        activity2.onStart();
+
+        // Then the same presenter gets recovered
+        assertThat(activity2.getPresenter()).isEqualTo(presenter);
     }
 
-    @Before
-    public void setUp() throws Exception {
-        mSavior = new TestPresenterSavior();
+    @Test
+    public void configurationChange_retainTrue_dkATrue() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // Then the presenter is saved in savior
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity changes configurations
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(true);
+        activity.onStop();
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                activity.getHostingActivity(), mActivitySavedState);
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // Then the presenter is not destroyed
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // And recovered in the new instance
+        final TestTiActivity activity2 = new TestTiActivity.Builder()
+                .setSavior(mSavior)
+                .build();
+
+        // When the new Activity instance gets created
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                activity2.getHostingActivity(), mActivitySavedState);
+        activity2.onCreate(mActivitySavedState);
+        activity2.onStart();
+
+        // Then the same presenter gets recovered
+        assertThat(activity2.getPresenter()).isEqualTo(presenter);
     }
 
-    private void doFullLifecycleAndDestroy(final TiActivityDelegate<TiPresenter<TiView>, TiView> delegate,
-            final Bundle savedState) {
-        delegate.onCreate_afterSuper(null);
+    @Test
+    public void finish_retainFalse_dkAFalse() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
 
-        assertThat(delegate.getPresenter().isInitialized()).isTrue();
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
 
-        delegate.onStart_afterSuper();
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
 
-        assertThat(delegate.getPresenter().isDestroyed()).isFalse();
+        // Then the presenter is saved in savior
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
-        delegate.onStop_beforeSuper();
-        delegate.onStop_afterSuper();
-        delegate.onSaveInstanceState_afterSuper(savedState);
-        delegate.onDestroy_afterSuper();
+        // When the Activity gets finished
+        activity.setFinishing(true);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // Then the presenter is destroyed
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
 
-    @NonNull
-    private PutInMapAnswer putInMap() {
-        return new PutInMapAnswer();
+    @Test
+    public void finish_retainFalse_dkATrue() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // Then the presenter is saved in savior
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+
+        // When the Activity gets finished
+        activity.setFinishing(true);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // savior cleaned up
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+
+        // Then the presenter is destroyed
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
     }
+
+    @Test
+    public void finish_retainTrue_dkAFalse() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // Then the presenter is saved in savior
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity gets finished
+        activity.setFinishing(true);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                activity.getHostingActivity(), mActivitySavedState);
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // Then the presenter is destroyed
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void finish_retainTrue_dkATrue() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // Then the presenter is saved in savior
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity gets finished
+        activity.setFinishing(true);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                activity.getHostingActivity(), mActivitySavedState);
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // savior cleaned up
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+
+        // Then the presenter is destroyed
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void moveToBackground_moveToForeground_retainFalse_dkAFalse() throws Exception {
+
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // When the Activity moves to background
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+
+        // Then the presenter is not destroyed
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+
+        // When the Activity moves to foreground
+        activity.onStart();
+
+        // Then presenter not destroyed and the same
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+        assertThat(activity.getPresenter()).isEqualTo(presenter);
+    }
+
+    @Test
+    public void moveToBackground_moveToForeground_retainFalse_dkATrue() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // When the Activity moves to background
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // Then the presenter is not destroyed
+        assertThat(presenter.isDestroyed()).isTrue();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(0);
+
+        final TestPresenter presenter2 = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(false)
+                .build());
+
+        // When the Activity moves to foreground
+        final TestTiActivity activity2 = new TestTiActivity.Builder()
+                .setSavior(mSavior)
+                .setPresenter(presenter2)
+                .build();
+
+        // When the new Activity instance gets created
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
+        activity2.onCreate(mActivitySavedState);
+        assertThat(activity2.getPresenter().isInitialized()).isTrue();
+        activity2.onStart();
+        assertThat(activity2.getPresenter().isDestroyed()).isFalse();
+
+        // Then a new presenter was created
+        assertThat(activity2.getPresenter()).isNotEqualTo(presenter);
+        assertThat(presenter2.isDestroyed()).isFalse();
+    }
+
+    @Test
+    public void moveToBackground_moveToForeground_retainTrue_dkAFalse() throws Exception {
+
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // When the Activity moves to background
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                activity.getHostingActivity(), mActivitySavedState);
+
+        // Then the presenter is not destroyed
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity moves to foreground
+        activity.onStart();
+
+        // Then presenter not destroyed and the same
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+        assertThat(activity.getPresenter()).isEqualTo(presenter);
+    }
+
+    @Test
+    public void moveToBackground_moveToForeground_retainTrue_dkATrue() throws Exception {
+        final TestPresenter presenter = new TestPresenter(new TiConfiguration.Builder()
+                .setRetainPresenterEnabled(true)
+                .build());
+
+        final TestTiActivity activity = new TestTiActivity.Builder()
+                .setPresenter(presenter)
+                .setSavior(mSavior)
+                .build();
+
+        // When the Activity gets created
+        activity.onCreate(null);
+        assertThat(activity.getPresenter().isInitialized()).isTrue();
+        activity.onStart();
+        assertThat(activity.getPresenter().isDestroyed()).isFalse();
+
+        // When the Activity moves to background
+        activity.setFinishing(false);
+        activity.setChangingConfiguration(false);
+        activity.onStop();
+        mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
+                activity.getHostingActivity(), mActivitySavedState);
+        activity.onSaveInstanceState(mActivitySavedState);
+        activity.onDestroy();
+
+        // Then the presenter is not destroyed
+        assertThat(presenter.isDestroyed()).isFalse();
+        assertThat(mSavior.getPresenterCount()).isEqualTo(1);
+
+        // When the Activity moves to foreground
+        final TestTiActivity activity2 = new TestTiActivity.Builder()
+                .setSavior(mSavior)
+                .build();
+
+        // When the new Activity instance gets created
+        mSavior.mActivityInstanceObserver.onActivityCreated(
+                activity2.getHostingActivity(), mActivitySavedState);
+        activity2.onCreate(mActivitySavedState);
+        assertThat(activity2.getPresenter().isInitialized()).isTrue();
+        activity2.onStart();
+        assertThat(activity2.getPresenter().isDestroyed()).isFalse();
+
+        // Then the same presenter gets recovered
+        assertThat(activity2.getPresenter()).isEqualTo(presenter);
+    }
+
 }

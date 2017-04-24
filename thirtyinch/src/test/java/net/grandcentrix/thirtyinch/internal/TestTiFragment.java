@@ -145,11 +145,6 @@ public class TestTiFragment
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return mIsDontKeepActivitiesEnabled;
-    }
-
-    @Override
     public boolean isFragmentAdded() {
         return mAdded;
     }

@@ -201,8 +201,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             mUiThreadBinderRemovable = null;
         }
 
-        logState();
-
         boolean destroyPresenter = false;
 
         if (!mTiFragment.isInBackstack()) {
@@ -218,36 +216,22 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "fragment is in backstack");
         }
 
-        if (mTiFragment.isHostingActivityFinishing()) {
+        if (mTiFragment.isHostingActivityFinishing()
+                && !mTiFragment.isHostingActivityChangingConfigurations()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
             TiLog.v(mLogTag.getLoggingTag(),
-                    "Activity is finishing, destroying presenter " + mPresenter);
+                    "Hosting Activity is finishing, destroying presenter " + mPresenter);
         }
 
-        final TiConfiguration config = mPresenter.getConfig();
         if (!destroyPresenter &&
-                !config.shouldRetainPresenter()) {
+                !mPresenter.getConfig().shouldRetainPresenter()) {
             // configuration says the presenter should not be retained, a new presenter instance
             // will be created and the current presenter should be destroyed
             destroyPresenter = true;
             TiLog.v(mLogTag.getLoggingTag(),
                     "presenter configured as not retaining, destroying " + mPresenter);
-        }
-
-        if (!destroyPresenter
-                && !config.shouldRetainPresenter()
-                && mTiFragment.isDontKeepActivitiesEnabled()) {
-            // configuration says the PresenterSavior should not be used. Retaining the presenter
-            // relays on the Activity nonConfigurationInstance which is always null when
-            // "don't keep activities" is enabled.
-            // a new presenter instance will be created and the current presenter should be destroyed
-            destroyPresenter = true;
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "the PresenterSavior is disabled and \"don\'t keep activities\" is "
-                            + "activated. The presenter can't be retained. Destroying "
-                            + mPresenter);
         }
 
         if (destroyPresenter) {
@@ -299,22 +283,4 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         return mTiFragment.isFragmentAdded() && !mTiFragment.isFragmentDetached();
     }
 
-    private void logState() {
-        if (ENABLE_DEBUG_LOGGING) {
-            TiLog.v(mLogTag.getLoggingTag(), "isChangingConfigurations = "
-                    + mTiFragment.isHostingActivityChangingConfigurations());
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "isHostingActivityFinishing = " + mTiFragment.isHostingActivityFinishing());
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "isAdded = " + mTiFragment.isFragmentAdded());
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "isDetached = " + mTiFragment.isFragmentDetached());
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "isDontKeepActivitiesEnabled = " + mTiFragment.isDontKeepActivitiesEnabled());
-
-            final TiConfiguration config = mPresenter.getConfig();
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "shouldRetain = " + config.shouldRetainPresenter());
-        }
-    }
 }

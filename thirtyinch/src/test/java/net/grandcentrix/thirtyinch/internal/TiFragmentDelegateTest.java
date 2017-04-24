@@ -30,7 +30,7 @@ import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class TiFragmentDelegateTest extends TiFragmentPresenterDestroyTest {
+public class TiFragmentDelegateTest extends AbstractPresenterDestroyTest {
 
     @Test
     public void provideDestroyedPresenter() throws Exception {

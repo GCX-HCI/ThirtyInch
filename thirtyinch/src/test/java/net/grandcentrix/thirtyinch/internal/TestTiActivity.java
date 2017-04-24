@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.concurrent.Executor;
 
@@ -39,15 +38,9 @@ public class TestTiActivity
 
     public static final class Builder {
 
-        private boolean mIsDontKeepActivitiesEnabled;
-
         private TiPresenter<TiView> mPresenter;
 
         private TiPresenterProvider<TiPresenter<TiView>> mPresenterProvider;
-
-        private TiPresenterProvider<TiPresenter<TiView>> mRetainedInstanceProvider;
-
-        private TiPresenter<TiView> mRetainedPresenter;
 
         private TiPresenterSavior mSavior = new PresenterSavior();
 
@@ -65,25 +58,7 @@ public class TestTiActivity
                     }
                 };
             }
-
-            TiPresenterProvider<TiPresenter<TiView>> retainedPresenterProvider
-                    = mRetainedInstanceProvider;
-            if (retainedPresenterProvider == null) {
-                retainedPresenterProvider = new TiPresenterProvider<TiPresenter<TiView>>() {
-                    @NonNull
-                    @Override
-                    public TiPresenter<TiView> providePresenter() {
-                        return mRetainedPresenter;
-                    }
-                };
-            }
-            return new TestTiActivity(presenterProvider, mIsDontKeepActivitiesEnabled, mSavior,
-                    retainedPresenterProvider);
-        }
-
-        public Builder setDontKeepActivitiesEnabled(final boolean val) {
-            mIsDontKeepActivitiesEnabled = val;
-            return this;
+            return new TestTiActivity(presenterProvider, mSavior);
         }
 
         public Builder setPresenter(TiPresenter<TiView> presenter) {
@@ -97,17 +72,6 @@ public class TestTiActivity
             return this;
         }
 
-        public Builder setRetainedPresenter(TiPresenter<TiView> presenter) {
-            mRetainedPresenter = presenter;
-            return this;
-        }
-
-        public Builder setRetainedPresenterProvider(
-                final TiPresenterProvider<TiPresenter<TiView>> val) {
-            mRetainedInstanceProvider = val;
-            return this;
-        }
-
         public Builder setSavior(final TiPresenterSavior savior) {
             mSavior = savior;
             return this;
@@ -118,16 +82,9 @@ public class TestTiActivity
 
     private final HostingActivity mHostingActivity = new HostingActivity();
 
-    private final boolean mIsDontKeepActivitiesEnabled;
-
-    private final TiPresenterProvider<TiPresenter<TiView>> mRetainedInstanceProvider;
 
     private TestTiActivity(final TiPresenterProvider<TiPresenter<TiView>> presenterProvider,
-            final boolean isDontKeepActivitiesEnabled,
-            final TiPresenterSavior savior,
-            final TiPresenterProvider<TiPresenter<TiView>> retainedInstanceProvider) {
-        mRetainedInstanceProvider = retainedInstanceProvider;
-
+            final TiPresenterSavior savior) {
         mDelegate = new TiActivityDelegate<>(this, this, presenterProvider,
                 new TiLoggingTagProvider() {
                     @Override
@@ -135,8 +92,6 @@ public class TestTiActivity
                         return "Test";
                     }
                 }, savior);
-
-        mIsDontKeepActivitiesEnabled = isDontKeepActivitiesEnabled;
     }
 
     @Override
@@ -147,12 +102,6 @@ public class TestTiActivity
     @Override
     public TiPresenter<TiView> getPresenter() {
         return mDelegate.getPresenter();
-    }
-
-    @Nullable
-    @Override
-    public TiPresenter<TiView> getRetainedPresenter() {
-        return mRetainedInstanceProvider.providePresenter();
     }
 
     @Override
@@ -173,11 +122,6 @@ public class TestTiActivity
     @Override
     public boolean isActivityFinishing() {
         return mHostingActivity.isFinishing();
-    }
-
-    @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return mIsDontKeepActivitiesEnabled;
     }
 
     public void onConfigurationChanged() {

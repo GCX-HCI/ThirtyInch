@@ -22,7 +22,7 @@ import org.junit.Test;
 import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-public class TiActivityDelegateTest extends TiFragmentPresenterDestroyTest {
+public class TiActivityDelegateTest extends AbstractPresenterDestroyTest {
 
     @Test
     public void provideReusedPresenter() throws Exception {

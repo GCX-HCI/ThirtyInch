@@ -28,11 +28,6 @@ public interface DelegatedTiFragment {
     Executor getUiThreadExecutor();
 
     /**
-     * @return true when the developer option "Don't keep Activities" is enabled
-     */
-    boolean isDontKeepActivitiesEnabled();
-
-    /**
      * @return {@link Fragment#isAdded()}
      */
     boolean isFragmentAdded();

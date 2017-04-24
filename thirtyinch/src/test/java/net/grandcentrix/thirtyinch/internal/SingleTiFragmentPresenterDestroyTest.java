@@ -27,7 +27,7 @@ import android.view.LayoutInflater;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDestroyTest {
+public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestroyTest {
 
     /**
      * Activity changing configuration without retain
@@ -63,7 +63,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // And when the Activity is changing its configuration.
         hostingActivity.setChangingConfiguration(true);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -89,8 +89,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // And the fragment will be resumed
         fragment2.setAdded(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then a new Presenter instance will be generated and the old presenter isn't used
@@ -137,7 +137,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -164,8 +164,8 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
 
         // And the fragment will be resumed
         fragment2.setAdded(true);
-        fragment2.onCreate(mSavedState);
-        fragment2.onCreateView(mock(LayoutInflater.class), null, mSavedState);
+        fragment2.onCreate(mFragmentSavedState);
+        fragment2.onCreateView(mock(LayoutInflater.class), null, mFragmentSavedState);
         fragment2.onStart();
 
         // Then the Presenter is the same
@@ -292,7 +292,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // And when the Activity is moved to background
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
 
         // Then the Presenter is not destroyed
@@ -342,7 +342,7 @@ public class SingleTiFragmentPresenterDestroyTest extends TiFragmentPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // And when the Activity is moved to background
-        fragment.onSaveInstanceState(mSavedState);
+        fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
 
         // Then the presenter stays alive and is saved in the savior.
