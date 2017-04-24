@@ -16,52 +16,10 @@
 package net.grandcentrix.thirtyinch;
 
 
-import net.grandcentrix.thirtyinch.internal.ActivityPresenterBinder;
-import net.grandcentrix.thirtyinch.internal.FragmentPresenterBinder;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 
-import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+public interface TiPresenterBinder<P extends TiPresenter<V>, V extends TiView>
+        extends PresenterAccessor<P, V>, InterceptableViewBinder<V> {
 
-public class TiPresenterBinder {
-
-    /**
-     * must be called before {@link Activity#onCreate(Bundle)}
-     */
-    public static <P extends TiPresenter<V>, V extends TiView> PresenterAccessor<P, V> attachPresenter(
-            final Activity activity, final TiPresenterProvider<P> provider) {
-
-        final ActivityPresenterBinder<P, V> binder =
-                new ActivityPresenterBinder<>(activity, provider);
-
-        Application app = activity.getApplication();
-        app.registerActivityLifecycleCallbacks(binder);
-
-        return binder;
-    }
-
-    /**
-     * must be called before {@link Fragment#onCreate(Bundle)}
-     */
-    public static <P extends TiPresenter<V>, V extends TiView> PresenterAccessor<P, V> attachPresenter(
-            final Fragment fragment, final Bundle savedInstanceState,
-            final TiPresenterProvider<P> provider) {
-
-        if (fragment instanceof TiFragment) {
-            throw new IllegalStateException(
-                    "Can't attach a TiPresenter to a Fragment which already has a TiPresenter");
-        }
-
-        final FragmentPresenterBinder<P, V> binder =
-                new FragmentPresenterBinder<>(fragment, savedInstanceState, provider);
-
-        FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
-        fragmentManager.registerFragmentLifecycleCallbacks(binder, false);
-
-        return binder;
-    }
 }

@@ -16,7 +16,10 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiPresenterBinder;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
@@ -24,12 +27,14 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
         implements DelegatedTiActivity<P>, TiViewProvider<V>, TiLoggingTagProvider,
-        Application.ActivityLifecycleCallbacks, PresenterAccessor<P, V> {
+        Application.ActivityLifecycleCallbacks, TiPresenterBinder<P, V> {
 
     private final String TAG;
 
@@ -40,6 +45,7 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
     public ActivityPresenterBinder(@NonNull final Activity activity,
+            final Bundle savedInstanceState,
             final TiPresenterProvider<P> provider) {
         mActivity = activity;
 
@@ -48,11 +54,33 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
 
         mDelegate = new TiActivityDelegate<>(this, this, provider, this,
                 PresenterSavior.getInstance());
+
+        // no callback available before onCreate() :(
+        mDelegate.onCreate_afterSuper(savedInstanceState);
+    }
+
+    @NonNull
+    @Override
+    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+        return mDelegate.addBindViewInterceptor(interceptor);
     }
 
     @Override
     public Activity getHostingActivity() {
         return mActivity;
+    }
+
+    @Nullable
+    @Override
+    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+        return mDelegate.getInterceptedViewOf(interceptor);
+    }
+
+    @NonNull
+    @Override
+    public List<BindViewInterceptor> getInterceptors(
+            @NonNull final Filter<BindViewInterceptor> predicate) {
+        return mDelegate.getInterceptors(predicate);
     }
 
     @Override
@@ -71,6 +99,11 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
+    public void invalidateView() {
+        mDelegate.invalidateView();
+    }
+
+    @Override
     public boolean isActivityChangingConfigurations() {
         return mActivity.isChangingConfigurations();
     }
@@ -83,9 +116,7 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onActivityCreated(final Activity activity,
             final Bundle savedInstanceState) {
-        if (activity == mActivity) {
-            mDelegate.onCreate_afterSuper(savedInstanceState);
-        }
+        // already called in constructor
     }
 
     @Override

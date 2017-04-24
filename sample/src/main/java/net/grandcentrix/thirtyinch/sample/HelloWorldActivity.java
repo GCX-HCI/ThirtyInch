@@ -19,13 +19,11 @@ package net.grandcentrix.thirtyinch.sample;
 import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiPresenterBinder;
-import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.TiPresenterBinders;
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,14 +33,13 @@ import android.widget.TextView;
 
 import rx.Observable;
 
-public class HelloWorldActivity extends AppCompatActivity implements HelloWorldView,
-        TiPresenterProvider<HelloWorldPresenter> {
+public class HelloWorldActivity extends AppCompatActivity implements HelloWorldView {
 
     private Button mButton;
 
     private TextView mOutput;
 
-    private PresenterAccessor<HelloWorldPresenter, HelloWorldView> mPresenterAccessor;
+    private TiPresenterBinder<HelloWorldPresenter, HelloWorldView> mPresenterBinder;
 
     private TextView mUptime;
 
@@ -55,12 +52,6 @@ public class HelloWorldActivity extends AppCompatActivity implements HelloWorldV
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_hello_world, menu);
         return true;
-    }
-
-    @NonNull
-    @Override
-    public HelloWorldPresenter providePresenter() {
-        return new HelloWorldPresenter();
     }
 
     @Override
@@ -80,8 +71,10 @@ public class HelloWorldActivity extends AppCompatActivity implements HelloWorldV
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        mPresenterAccessor = TiPresenterBinder.attachPresenter(this, this);
         super.onCreate(savedInstanceState);
+        mPresenterBinder = TiPresenterBinders
+                .attachPresenter(this, savedInstanceState, () -> new HelloWorldPresenter());
+        assert mPresenterBinder.getPresenter() != null;
         setContentView(R.layout.activity_hello_world);
 
         mButton = (Button) findViewById(R.id.button);

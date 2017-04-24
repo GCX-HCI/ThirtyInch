@@ -16,25 +16,30 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiPresenterBinder;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.BackstackReader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
         extends FragmentManager.FragmentLifecycleCallbacks
         implements DelegatedTiFragment, TiViewProvider<V>, TiLoggingTagProvider,
-        PresenterAccessor<P, V> {
+        TiPresenterBinder<P, V> {
 
     private final String TAG;
 
@@ -65,9 +70,28 @@ public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @NonNull
+    @Override
+    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+        return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
     @Override
     public Activity getHostingActivity() {
         return mActivity;
+    }
+
+    @Nullable
+    @Override
+    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+        return mDelegate.getInterceptedViewOf(interceptor);
+    }
+
+    @NonNull
+    @Override
+    public List<BindViewInterceptor> getInterceptors(
+            @NonNull final Filter<BindViewInterceptor> predicate) {
+        return mDelegate.getInterceptors(predicate);
     }
 
     @Override
@@ -83,6 +107,11 @@ public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     @Override
     public Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
+    }
+
+    @Override
+    public void invalidateView() {
+        mDelegate.invalidateView();
     }
 
     @Override
@@ -118,39 +147,51 @@ public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void onFragmentDestroyed(final FragmentManager fm, final Fragment f) {
         super.onFragmentDestroyed(fm, f);
-        mDelegate.onDestroy_afterSuper();
+        if (f == mFragment) {
+            mDelegate.onDestroy_afterSuper();
+        }
     }
 
     @Override
     public void onFragmentSaveInstanceState(final FragmentManager fm, final Fragment f,
             final Bundle outState) {
         super.onFragmentSaveInstanceState(fm, f, outState);
-        mDelegate.onSaveInstanceState_afterSuper(outState);
+        if (f == mFragment) {
+            mDelegate.onSaveInstanceState_afterSuper(outState);
+        }
     }
 
     @Override
     public void onFragmentStarted(final FragmentManager fm, final Fragment f) {
         super.onFragmentStarted(fm, f);
-        mDelegate.onStart_afterSuper();
+        if (f == mFragment) {
+            mDelegate.onStart_afterSuper();
+        }
     }
 
     @Override
     public void onFragmentStopped(final FragmentManager fm, final Fragment f) {
-        mDelegate.onStop_beforeSuper();
         super.onFragmentStopped(fm, f);
+        if (f == mFragment) {
+            mDelegate.onStop_beforeSuper();
+        }
     }
 
     @Override
     public void onFragmentViewCreated(final FragmentManager fm, final Fragment f, final View v,
             final Bundle savedInstanceState) {
-        mDelegate.onCreateView_beforeSuper(null, null, savedInstanceState);
         super.onFragmentViewCreated(fm, f, v, savedInstanceState);
+        if (f == mFragment) {
+            mDelegate.onCreateView_beforeSuper(null, null, savedInstanceState);
+        }
     }
 
     @Override
     public void onFragmentViewDestroyed(final FragmentManager fm, final Fragment f) {
-        mDelegate.onDestroyView_beforeSuper();
         super.onFragmentViewDestroyed(fm, f);
+        if (f == mFragment) {
+            mDelegate.onDestroyView_beforeSuper();
+        }
     }
 
     @SuppressWarnings("unchecked")
