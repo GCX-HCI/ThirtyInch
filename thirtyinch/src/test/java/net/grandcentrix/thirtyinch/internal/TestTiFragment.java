@@ -170,7 +170,7 @@ public class TestTiFragment
     }
 
     @Override
-    public boolean isInBackstack() {
+    public boolean isFragmentInBackstack() {
         return mInBackstack;
     }
 

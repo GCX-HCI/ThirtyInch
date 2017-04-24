@@ -55,7 +55,7 @@ public interface DelegatedTiFragment {
     /**
      * @return {@link Fragment#isInBackStack()}
      */
-    boolean isInBackstack();
+    boolean isFragmentInBackstack();
 
     /**
      * @return the hosting Activity

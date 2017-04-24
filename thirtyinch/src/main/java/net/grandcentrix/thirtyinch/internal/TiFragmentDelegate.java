@@ -203,7 +203,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         boolean destroyPresenter = false;
 
-        if (!mTiFragment.isInBackstack()) {
+        if (!mTiFragment.isFragmentInBackstack()) {
 
             if (mTiFragment.isFragmentRemoving()) {
                 // fragment was removed with remove() or replace()

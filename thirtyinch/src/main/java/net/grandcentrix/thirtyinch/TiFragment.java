@@ -198,7 +198,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
-    public boolean isInBackstack() {
+    public boolean isFragmentInBackstack() {
         return BackstackReader.isInBackStack(this);
     }
 
