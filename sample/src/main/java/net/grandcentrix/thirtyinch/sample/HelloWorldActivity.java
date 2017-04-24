@@ -18,12 +18,15 @@ package net.grandcentrix.thirtyinch.sample;
 
 import com.jakewharton.rxbinding.view.RxView;
 
-import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.TiPresenterBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,12 +35,14 @@ import android.widget.TextView;
 
 import rx.Observable;
 
-public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWorldView>
-        implements HelloWorldView {
+public class HelloWorldActivity extends AppCompatActivity implements HelloWorldView,
+        TiPresenterProvider<HelloWorldPresenter> {
 
     private Button mButton;
 
     private TextView mOutput;
+
+    private PresenterAccessor<HelloWorldPresenter, HelloWorldView> mPresenterAccessor;
 
     private TextView mUptime;
 
@@ -75,6 +80,7 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        mPresenterAccessor = TiPresenterBinder.attachPresenter(this, this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hello_world);
 

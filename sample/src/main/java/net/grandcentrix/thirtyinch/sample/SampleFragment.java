@@ -15,19 +15,31 @@
 
 package net.grandcentrix.thirtyinch.sample;
 
-import net.grandcentrix.thirtyinch.TiFragment;
+import net.grandcentrix.thirtyinch.TiPresenterBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SampleFragment extends TiFragment<SamplePresenter, SampleView> implements SampleView {
+public class SampleFragment extends Fragment
+        implements TiPresenterProvider<SamplePresenter>, SampleView {
+
+    private PresenterAccessor<SamplePresenter, SampleView> mPresenterAccessor;
 
     private TextView mSampleText;
+
+    @Override
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
+        mPresenterAccessor = TiPresenterBinder.attachPresenter(this, savedInstanceState, this);
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
