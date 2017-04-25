@@ -18,6 +18,8 @@
 
         <activity android:name=".fragmentlifecycle.FragmentLifecycleActivity" />
 
+        <activity android:name=".fragmentlifecycle.viewpager.LifecycleViewPagerActivity" />
+
     </application>
 
 </manifest>
