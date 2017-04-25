@@ -20,6 +20,7 @@ import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
+import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.viewpager.LifecycleViewPagerActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -52,6 +53,19 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.start_fragment_lifecycle_test:
+                startActivity(new Intent(this, FragmentLifecycleActivity.class));
+                return true;
+            case R.id.start_viewpager_test:
+                startActivity(new Intent(this, LifecycleViewPagerActivity.class));
+                return true;
+        }
+        return false;
+    }
+
     @NonNull
     @Override
     public HelloWorldPresenter providePresenter() {
@@ -66,11 +80,6 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     @Override
     public void showText(final String text) {
         mOutput.setText(text);
-    }
-
-    public void startFragmentLifecycleTest(MenuItem item) {
-        final Intent intent = new Intent(this, FragmentLifecycleActivity.class);
-        startActivity(intent);
     }
 
     @Override
@@ -95,4 +104,5 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
             }
         });
     }
+
 }
