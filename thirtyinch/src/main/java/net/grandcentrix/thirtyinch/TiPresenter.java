@@ -232,7 +232,7 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void destroy() {
         if (!isInitialized() || isDestroyed()) {
-            TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
+            TiLog.v(TAG, "not calling onDestroy(), destroy was already called");
             return;
         }
 

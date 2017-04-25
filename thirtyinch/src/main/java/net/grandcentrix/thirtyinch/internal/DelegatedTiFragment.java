@@ -28,11 +28,6 @@ public interface DelegatedTiFragment {
     Executor getUiThreadExecutor();
 
     /**
-     * @return true when the developer option "Don't keep Activities" is enabled
-     */
-    boolean isDontKeepActivitiesEnabled();
-
-    /**
      * @return {@link Fragment#isAdded()}
      */
     boolean isFragmentAdded();
@@ -41,6 +36,11 @@ public interface DelegatedTiFragment {
      * @return {@link Fragment#isDetached()}
      */
     boolean isFragmentDetached();
+
+    /**
+     * @return {@link Fragment#isRemoving()}
+     */
+    boolean isFragmentRemoving();
 
     /**
      * @return {@link Activity#isChangingConfigurations()}
@@ -53,7 +53,13 @@ public interface DelegatedTiFragment {
     boolean isHostingActivityFinishing();
 
     /**
-     * Call {@link Fragment#setRetainInstance(boolean)}
+     * @return {@link Fragment#isInBackStack()}
      */
-    void setFragmentRetainInstance(final boolean retain);
+    boolean isFragmentInBackstack();
+
+    /**
+     * @return the hosting Activity
+     */
+    Activity getHostingActivity();
+
 }

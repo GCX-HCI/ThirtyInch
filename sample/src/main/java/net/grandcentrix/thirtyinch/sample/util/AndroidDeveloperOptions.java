@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.util;
+package net.grandcentrix.thirtyinch.sample.util;
 
 import android.content.Context;
 import android.os.Build;

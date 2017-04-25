@@ -15,25 +15,21 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
 
-public class PresenterNonConfigurationInstance<P extends TiPresenter> {
+/**
+ * adds some functions for testing
+ */
+public class TestPresenterSavior extends PresenterSavior {
 
-    private Object OtherNonConfigurationInstance;
+    public int getPresenterCount() {
+        if (mScopes.isEmpty()) {
+            return 0;
+        }
 
-    private P mPresenter;
-
-    public PresenterNonConfigurationInstance(final P presenter,
-            final Object otherNonConfigurationInstance) {
-        mPresenter = presenter;
-        OtherNonConfigurationInstance = otherNonConfigurationInstance;
-    }
-
-    public Object getOtherNonConfigurationInstance() {
-        return OtherNonConfigurationInstance;
-    }
-
-    public P getPresenter() {
-        return mPresenter;
+        int size = 0;
+        for (final ActivityScopedPresenters scope : mScopes.values()) {
+            size += scope.size();
+        }
+        return size;
     }
 }

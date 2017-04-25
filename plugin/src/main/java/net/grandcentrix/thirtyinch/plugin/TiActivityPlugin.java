@@ -32,7 +32,6 @@ import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;
@@ -77,7 +76,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
         mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this,
-                PresenterSavior.INSTANCE);
+                PresenterSavior.getInstance());
     }
 
     @NonNull
@@ -116,17 +115,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return mDelegate.getPresenter();
     }
 
-    @SuppressWarnings("unchecked")
-    @Nullable
-    @Override
-    public final P getRetainedPresenter() {
-        final Object nci = getLastNonConfigurationInstance(NCI_KEY_PRESENTER);
-        if (nci != null) {
-            return (P) nci;
-        }
-        return null;
-    }
-
     @Override
     public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
@@ -152,8 +140,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public final boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
+    public Activity getHostingActivity() {
+        return getActivity();
     }
 
     @CallSuper

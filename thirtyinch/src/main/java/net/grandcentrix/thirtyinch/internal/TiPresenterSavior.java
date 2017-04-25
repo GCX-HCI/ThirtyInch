@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch.internal;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -32,7 +33,7 @@ public interface TiPresenterSavior {
      *
      * @param presenterId the id of the presenter
      */
-    void free(String presenterId);
+    void free(String presenterId, @NonNull Activity activity);
 
     /**
      * Gets a presenter from the store.
@@ -41,7 +42,7 @@ public interface TiPresenterSavior {
      * @return the presenter of {@code null} if no presenter could be found
      */
     @Nullable
-    TiPresenter recover(String presenterId);
+    TiPresenter recover(String presenterId, @NonNull Activity activity);
 
     /**
      * Stores a presenter in the store.
@@ -49,5 +50,5 @@ public interface TiPresenterSavior {
      * @param presenter the presenter that should be stored
      * @return the id of the stored presenter
      */
-    String save(@NonNull TiPresenter presenter);
+    String save(@NonNull TiPresenter presenter, @NonNull Activity activity);
 }

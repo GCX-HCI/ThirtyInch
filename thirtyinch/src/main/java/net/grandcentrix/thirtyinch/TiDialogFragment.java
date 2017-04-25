@@ -24,7 +24,6 @@ import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.os.Bundle;
@@ -49,7 +48,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiFragmentDelegate<P, V> mDelegate =
-            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.INSTANCE);
+            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.getInstance());
 
     @NonNull
     @Override
@@ -92,11 +91,6 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     @Override
     public final void invalidateView() {
         mDelegate.invalidateView();
-    }
-
-    @Override
-    public final boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
     }
 
     @Override
@@ -197,11 +191,6 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
                 return (V) this;
             }
         }
-    }
-
-    @Override
-    public final void setFragmentRetainInstance(final boolean retain) {
-        setRetainInstance(retain);
     }
 
     @Override
