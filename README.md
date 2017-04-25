@@ -25,7 +25,7 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.8.0-rc3' // prerelease
+    def thirtyinchVersion = '0.8.0-rc4' // prerelease
     // def thirtyinchVersion = '0.7.1' // stable
     
     // MVP for activity and fragment
@@ -34,6 +34,9 @@ dependencies {
     // rx (1 or 2) extension
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
+    
+    // logging interceptor (added in 0.8.0-rc4)
+    compile "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
     
     // test extension
     testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
