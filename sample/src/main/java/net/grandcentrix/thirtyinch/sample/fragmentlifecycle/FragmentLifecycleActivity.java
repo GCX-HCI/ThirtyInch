@@ -1,9 +1,9 @@
 package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
 import net.grandcentrix.thirtyinch.sample.R;
+import net.grandcentrix.thirtyinch.sample.util.AndroidDeveloperOptions;
 
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -13,7 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import static android.provider.Settings.Global.ALWAYS_FINISH_ACTIVITIES;
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
 
 public class FragmentLifecycleActivity extends AppCompatActivity {
 
@@ -63,7 +65,16 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
 
     public void recreateActivity(View view) {
         Log.v(TAG, "// And when the Activity is changing its configurations.");
-        recreate();
+        //recreate();
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_placeholder);
+        getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
+
+        Observable.just(null).delay(3, TimeUnit.SECONDS).subscribe(o ->
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_placeholder, fragment)
+                        .addToBackStack(null)
+                        .commit());
     }
 
     public void removeFragmentA(View view) {
@@ -154,15 +165,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     }
 
     private boolean isDontKeepActivities() {
-        // default behaviour
-        int dontKeepActivities = 0;
-        try {
-            dontKeepActivities = Settings.Global
-                    .getInt(getContentResolver(), ALWAYS_FINISH_ACTIVITIES);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
-        return dontKeepActivities != 0;
+        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
     }
 
     private boolean isRetainPresenterInstance() {

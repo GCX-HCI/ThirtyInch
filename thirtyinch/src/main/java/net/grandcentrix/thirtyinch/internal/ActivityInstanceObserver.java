@@ -23,11 +23,10 @@ import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.HashMap;
 import java.util.UUID;
-
-import static net.grandcentrix.thirtyinch.internal.PresenterSavior.TI_ACTIVITY_PRESENTER_SCOPE_KEY;
 
 /**
  * Keeps track of {@link Activity}s across orientation changes using a unique id when added via
@@ -48,6 +47,9 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
         void onActivityFinished(final Activity activity, final String activityId);
     }
 
+    @VisibleForTesting
+    static final String TI_ACTIVITY_ID_KEY = "ThirtyInch_Activity_id";
+
     private static final String TAG = ActivityInstanceObserver.class.getSimpleName();
 
     private Listener mListener;
@@ -59,8 +61,10 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     }
 
     /**
-     * a unique id for each {@link Activity} which doesn't change when the {@link Activity} changes
-     * its configuration
+     * Returns the id created with {@link #startTracking(Activity)}
+     *
+     * @return a unique id for each {@link Activity} which doesn't change when the {@link Activity}
+     * changes its configuration
      */
     @Nullable
     public String getActivityId(final Activity activity) {
@@ -70,7 +74,7 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     @Override
     public void onActivityCreated(final Activity activity, final Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            final String scopeId = savedInstanceState.getString(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
+            final String scopeId = savedInstanceState.getString(TI_ACTIVITY_ID_KEY);
             if (scopeId != null) {
                 // refresh mapping
                 mScopeIdForActivity.put(activity, scopeId);
@@ -80,10 +84,6 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivityDestroyed(final Activity activity) {
-
-        // TODO check if "Don't keep Activities" case is handled correctly
-        // and remove logging
-
         TiLog.v(TAG, "destroying " + activity);
         TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
         TiLog.v(TAG, "isChangingConfigurations = " + activity.isChangingConfigurations());
@@ -117,7 +117,7 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
             // activity not managed, don't add an id.
             return;
         }
-        outState.putString(TI_ACTIVITY_PRESENTER_SCOPE_KEY, id);
+        outState.putString(TI_ACTIVITY_ID_KEY, id);
     }
 
     @Override

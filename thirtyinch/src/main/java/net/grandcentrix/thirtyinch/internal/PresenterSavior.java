@@ -51,9 +51,6 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
 
-    @VisibleForTesting
-    static final String TI_ACTIVITY_PRESENTER_SCOPE_KEY = "ThirtyInch_presenter_scope_id";
-
     /**
      * enable debug logging for testing
      */
@@ -73,8 +70,6 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
 
     /**
      * Access to the {@link PresenterSavior} singleton to save presenters across orientation changes
-     *
-     * @return singleton for
      */
     public static synchronized PresenterSavior getInstance() {
         if (INSTANCE == null) {
@@ -100,33 +95,17 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
                 }
             }
         }
-        if (mScopes.isEmpty()) {
-            if (mActivityInstanceObserver != null) {
-                activity.getApplication()
-                        .unregisterActivityLifecycleCallbacks(mActivityInstanceObserver);
-                mActivityInstanceObserver = null;
-            }
-        }
+        unregisterActivityObserver(activity);
 
         printRemainingPresenter();
     }
 
     @Override
     public void onActivityFinished(final Activity activity, final String activityId) {
+        // First remove the scope, and don't leak it when the Activity got finished
         final ActivityScopedPresenters scope = mScopes.remove(activityId);
+        unregisterActivityObserver(activity);
 
-        if (mScopes.isEmpty()) {
-            // unregister detector because there are no presenters which could be recovered.
-            // next #save call will create a new one
-            if (mActivityInstanceObserver != null) {
-                if (DEBUG) {
-                    TiLog.v(TAG, "unregistering lifecycle callback");
-                }
-                activity.getApplication()
-                        .unregisterActivityLifecycleCallbacks(mActivityInstanceObserver);
-                mActivityInstanceObserver = null;
-            }
-        }
         TiLog.d(TAG, "Activity is finishing, free remaining presenters " + activity);
         if (scope != null) {
             for (final Map.Entry<String, TiPresenter> entry : scope.getAllMappings()) {
@@ -198,11 +177,7 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
      */
     @NonNull
     private synchronized ActivityScopedPresenters getScopeOrCreate(final Activity activity) {
-        if (mActivityInstanceObserver == null) {
-            mActivityInstanceObserver = new ActivityInstanceObserver(this);
-            TiLog.v(TAG, "registering lifecycle callback");
-            activity.getApplication().registerActivityLifecycleCallbacks(mActivityInstanceObserver);
-        }
+        registerActivityObserver(activity);
 
         final String scopeId = mActivityInstanceObserver.getActivityId(activity);
         final ActivityScopedPresenters scope;
@@ -224,6 +199,11 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
         return scope;
     }
 
+    /**
+     * print all presenters saved in the savior for debug
+     *
+     * @see #DEBUG
+     */
     private void printRemainingPresenter() {
         if (DEBUG) {
             final ArrayList<TiPresenter> presenters = new ArrayList<>();
@@ -234,6 +214,35 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
             TiLog.d(TAG, "presenter count: " + presenters.size());
             for (final TiPresenter presenter : presenters) {
                 TiLog.v(TAG, " - " + presenter);
+            }
+        }
+    }
+
+    /**
+     * registers the {@link #mActivityInstanceObserver}
+     */
+    private void registerActivityObserver(final Activity activity) {
+        if (mActivityInstanceObserver == null) {
+            mActivityInstanceObserver = new ActivityInstanceObserver(this);
+            TiLog.v(TAG, "registering lifecycle callback");
+            activity.getApplication().registerActivityLifecycleCallbacks(mActivityInstanceObserver);
+        }
+    }
+
+    /**
+     * unregister {@link #mActivityInstanceObserver} when scopes are empty
+     */
+    private void unregisterActivityObserver(final Activity activity) {
+        if (mScopes.isEmpty()) {
+            // unregister detector because there are no presenters which could be recovered.
+            // next #save call will create a new one
+            if (mActivityInstanceObserver != null) {
+                if (DEBUG) {
+                    TiLog.v(TAG, "unregistering lifecycle callback");
+                }
+                activity.getApplication()
+                        .unregisterActivityLifecycleCallbacks(mActivityInstanceObserver);
+                mActivityInstanceObserver = null;
             }
         }
     }

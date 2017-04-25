@@ -71,7 +71,7 @@ import java.util.concurrent.Executor;
  * {@link TiPresenter} will be destroyed accordingly.
  * </p>
  * <p>
- * Using {@code setRetainInstance(true)} is now allowed as it causes many troubles. You should favor
+ * Using {@code setRetainInstance(true)} is not allowed as it causes many troubles. You should favor
  * the dumb view pattern and move all your state into the {@link TiPresenter}.
  * </p>
  *

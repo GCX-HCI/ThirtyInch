@@ -32,7 +32,6 @@ import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.app.Activity;

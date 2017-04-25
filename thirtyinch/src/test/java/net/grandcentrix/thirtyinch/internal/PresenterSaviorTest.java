@@ -27,7 +27,6 @@ import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
-import static net.grandcentrix.thirtyinch.internal.PresenterSavior.TI_ACTIVITY_PRESENTER_SCOPE_KEY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -276,7 +275,7 @@ public class PresenterSaviorTest {
         hostingActivity.isChangingConfiguration();
         savior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mSavedState);
-        final String scopeId = fakeBundle.get(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
+        final String scopeId = fakeBundle.get(ActivityInstanceObserver.TI_ACTIVITY_ID_KEY);
         assertThat(scopeId).isNotNull();
         savior.mActivityInstanceObserver
                 .onActivityDestroyed(hostingActivity.getMockActivityInstance());

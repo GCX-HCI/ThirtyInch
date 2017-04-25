@@ -28,7 +28,8 @@ import java.util.Map;
 /**
  * Simple wrapper around a {@link HashMap} to save {@link TiPresenter} by id. For every {@link
  * android.app.Activity} containing a {@link TiPresenter} a corresponding {@link
- * ActivityScopedPresenters} will be created
+ * ActivityScopedPresenters} will be created. It contains the {@link TiPresenter} of the Activity
+ * itself and of all of its Fragments.
  */
 public class ActivityScopedPresenters {
 
