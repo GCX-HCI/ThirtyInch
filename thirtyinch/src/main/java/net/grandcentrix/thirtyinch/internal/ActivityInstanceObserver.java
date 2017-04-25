@@ -38,7 +38,7 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     /**
      * Callback when an {@link Activity} will be completely destroyed
      */
-    interface Listener {
+    public interface Listener {
 
         /**
          * called when the {@link Activity} finishes completely. Doesn't get called when the
