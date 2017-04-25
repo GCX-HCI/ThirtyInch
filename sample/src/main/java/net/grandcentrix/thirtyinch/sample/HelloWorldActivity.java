@@ -57,10 +57,10 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.start_fragment_lifecycle_test:
-                startViewPagerTest(FragmentLifecycleActivity.class);
+                startActivity(new Intent(this, FragmentLifecycleActivity.class));
                 return true;
             case R.id.start_viewpager_test:
-                startViewPagerTest(LifecycleViewPagerActivity.class);
+                startActivity(new Intent(this, LifecycleViewPagerActivity.class));
                 return true;
         }
         return false;
@@ -105,8 +105,4 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         });
     }
 
-    private void startViewPagerTest(final Class activityClass) {
-        final Intent intent = new Intent(this, activityClass);
-        startActivity(intent);
-    }
 }
