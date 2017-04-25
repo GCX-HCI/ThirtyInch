@@ -42,7 +42,7 @@ public class LoggingInterceptor implements BindViewInterceptor {
          * limit each argument instead of the complete string. This should limit the overall
          * output to a reasonable length while showing all params
          */
-        public static final int MAX_LEN_OF_PARAM = 240;
+        private static final int MAX_LENGTH_OF_PARAM = 240;
 
         private TiLog.Logger mLogger;
 
@@ -132,7 +132,7 @@ public class LoggingInterceptor implements BindViewInterceptor {
             final StringBuilder sb = new StringBuilder(method.getName());
             sb.append("(");
             if (args != null && args.length > 0) {
-                final String paramsString = parseParams(args, MAX_LEN_OF_PARAM);
+                final String paramsString = parseParams(args, MAX_LENGTH_OF_PARAM);
                 sb.append(paramsString);
             }
             sb.append(")");
