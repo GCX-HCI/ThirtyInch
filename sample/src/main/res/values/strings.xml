@@ -6,6 +6,7 @@
     <string name="add_fragment_a">Add Fragment A</string>
     <string name="remove_fragment_a">Remove Fragment A</string>
     <string name="add_fragment_b">Add Fragment B</string>
+    <string name="detach_attach_again">Fragment Detach/Attach again</string>
     <string name="recreate_activity">Recreate Activity</string>
     <string name="finish_activity">Finish Activity</string>
     <string name="dont_keep_activities_enabled">Don\'t keep activities enabled</string>

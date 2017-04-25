@@ -12,6 +12,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +41,23 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         addFragment(fragment);
     }
 
+    public void detachFragmentAndAddAgain(View view) {
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_placeholder);
+        if (fragment != null) {
+            //remove fragment
+            Log.v(TAG, "// When the Fragment is removed.");
+            getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
+
+            Log.v(TAG, "// When the Fragment get added again to the Activity.");
+            //add after delay again. Don't use the same transaction
+            Observable.just(null).delay(1, TimeUnit.SECONDS)
+                    .subscribe(o -> addFragment(fragment));
+        } else {
+            Toast.makeText(this, "no fragment found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void finish() {
         super.finish();
@@ -65,16 +83,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
 
     public void recreateActivity(View view) {
         Log.v(TAG, "// And when the Activity is changing its configurations.");
-        //recreate();
-        final Fragment fragment = getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_placeholder);
-        getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
-
-        Observable.just(null).delay(3, TimeUnit.SECONDS).subscribe(o ->
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_placeholder, fragment)
-                        .addToBackStack(null)
-                        .commit());
+        recreate();
     }
 
     public void removeFragmentA(View view) {

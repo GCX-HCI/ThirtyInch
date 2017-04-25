@@ -64,17 +64,43 @@
             android:onClick="addFragmentB"
             android:text="@string/add_fragment_b" />
 
-        <Button
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="recreateActivity"
-            android:text="@string/recreate_activity" />
+            android:orientation="horizontal">
 
-        <Button
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:onClick="detachFragmentAndAddAgain"
+                android:text="@string/detach_attach_again" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="finishActivity"
-            android:text="@string/finish_activity" />
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:onClick="recreateActivity"
+                android:text="@string/recreate_activity" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:onClick="finishActivity"
+                android:text="@string/finish_activity" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
