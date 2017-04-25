@@ -54,7 +54,27 @@ public class TiLog {
         }
     };
 
+    /**
+     * no-op version, doesn't log
+     */
+    public static Logger NOOP = new Logger() {
+        @Override
+        public void log(final int level, final String tag, final String msg) {
+            // no-op
+        }
+    };
+
     private static Logger logger;
+
+    /**
+     * forward log to {@link TiLog} for logging
+     */
+    public static Logger TI_LOG = new Logger() {
+        @Override
+        public void log(final int level, final String tag, final String msg) {
+            TiLog.log(level, tag, msg);
+        }
+    };
 
     public static void d(final String tag, final String msg) {
         if (logger != null) {
@@ -71,6 +91,12 @@ public class TiLog {
     public static void i(final String tag, final String msg) {
         if (logger != null) {
             logger.log(Log.INFO, tag, msg);
+        }
+    }
+
+    public static void log(final int level, final String tag, final String msg) {
+        if (logger != null) {
+            logger.log(level, tag, msg);
         }
     }
 
@@ -99,6 +125,10 @@ public class TiLog {
      * </code>
      */
     public static void setLogger(@Nullable final Logger logger) {
+        if (logger == TI_LOG) {
+            throw new IllegalArgumentException(
+                    "Recursion warning: You can't use TI_LOG as Logger for TiLog");
+        }
         TiLog.logger = logger;
     }
 
