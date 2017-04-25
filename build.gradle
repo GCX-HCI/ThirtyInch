@@ -23,7 +23,7 @@ allprojects {
 }
 
 ext {
-    VERSION_NAME = "0.8.0-rc4"
+    VERSION_NAME = "0.8.0-SNAPSHOT"
     VERSION_CODE = 4
     MIN_SDK_VERSION = 14
     TARGET_SDK_VERSION = 25
