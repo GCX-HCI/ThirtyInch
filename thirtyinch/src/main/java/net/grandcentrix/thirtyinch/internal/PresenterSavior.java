@@ -45,7 +45,8 @@ import java.util.Map;
  * and destroys and cleans the presenters to prevents leaks.
  * </p>
  */
-public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObserver.Listener {
+public class PresenterSavior implements TiPresenterSavior,
+        ActivityInstanceObserver.ActivityFinishListener {
 
     private static PresenterSavior INSTANCE;
 
@@ -61,12 +62,12 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
 
     /**
      * Holds a scope for every Activity with one or more presenters. There is no direct mapping for
-     * {@link Activity} to {@link ActivityScopedPresenters} because Activity instances can be
+     * {@link Activity} to {@link PresenterScope} because Activity instances can be
      * destroyed. The {@link ActivityInstanceObserver} takes care to manage unique Ids for each
      * Activity which are used as keys here.
      */
     @VisibleForTesting
-    final HashMap<String, ActivityScopedPresenters> mScopes = new HashMap<>();
+    final HashMap<String, PresenterScope> mScopes = new HashMap<>();
 
     /**
      * Access to the {@link PresenterSavior} singleton to save presenters across orientation changes
@@ -84,26 +85,35 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
     }
 
     @Override
-    public void free(final String presenterId, @NonNull final Activity activity) {
-        final ActivityScopedPresenters scope = getScope(activity);
+    public void free(final String presenterId, @NonNull final Object host) {
+        final PresenterScope scope = getScope(host);
         if (scope != null) {
             scope.remove(presenterId);
+
+            // cleanup empty PresenterScope
             if (scope.isEmpty()) {
-                String scopeId = mActivityInstanceObserver.getActivityId(activity);
-                if (scopeId != null) {
-                    mScopes.remove(scopeId);
-                }
+                mScopes.values().remove(scope);
             }
         }
-        unregisterActivityObserver(activity);
+
+        // unregister host observer
+        if (host instanceof Activity) {
+            final Activity activity = (Activity) host;
+            unregisterActivityObserver(activity);
+        } else {
+            // currently only Activity is supported as host
+            throw new IllegalStateException(
+                    "Host has unknown type " + host.getClass().getSimpleName()
+                            + " and is not supported.");
+        }
 
         printRemainingPresenter();
     }
 
     @Override
-    public void onActivityFinished(final Activity activity, final String activityId) {
+    public void onActivityFinished(final Activity activity, final String hostId) {
         // First remove the scope, and don't leak it when the Activity got finished
-        final ActivityScopedPresenters scope = mScopes.remove(activityId);
+        final PresenterScope scope = mScopes.remove(hostId);
         unregisterActivityObserver(activity);
 
         TiLog.d(TAG, "Activity is finishing, free remaining presenters " + activity);
@@ -125,8 +135,8 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
 
     @Override
     @Nullable
-    public TiPresenter recover(final String presenterId, @NonNull final Activity activity) {
-        final ActivityScopedPresenters scope = getScope(activity);
+    public TiPresenter recover(final String presenterId, @NonNull final Object host) {
+        final PresenterScope scope = getScope(host);
         if (scope == null) {
             return null;
         }
@@ -134,14 +144,40 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
     }
 
     @Override
-    public String save(@NonNull final TiPresenter presenter, @NonNull final Activity activity) {
-        final String id = generatePresenterId(presenter);
+    public String save(@NonNull final TiPresenter presenter, @NonNull final Object host) {
 
-        final ActivityScopedPresenters scope = getScopeOrCreate(activity);
-        scope.save(id, presenter);
+        // the hostId
+        String hostId = null;
+
+        PresenterScope scope = getScope(host);
+        if (scope == null) {
+            // create a new scope
+            scope = new PresenterScope();
+            hostId = generateHostId(host);
+            mScopes.put(hostId, scope);
+        }
+        final String presenterId = generatePresenterId(presenter);
+        scope.save(presenterId, presenter);
+
+        // register host observer
+        if (host instanceof Activity) {
+            final Activity activity = (Activity) host;
+            observeActivityFinish(activity, hostId);
+        } else {
+            // currently only Activity is supported as host
+            throw new IllegalStateException(
+                    "Host has unknown type " + host.getClass().getSimpleName()
+                            + " and is not supported.");
+        }
+
         printRemainingPresenter();
 
-        return id;
+        return presenterId;
+    }
+
+    private String generateHostId(final Object host) {
+        return host.getClass().getSimpleName()
+                + ":" + System.nanoTime();
     }
 
     private String generatePresenterId(@NonNull final TiPresenter presenter) {
@@ -155,48 +191,41 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
      * doesn't exist
      */
     @Nullable
-    private synchronized ActivityScopedPresenters getScope(final Activity activity) {
-        final ActivityInstanceObserver detector = mActivityInstanceObserver;
-        if (detector == null) {
-            return null;
-        }
+    private synchronized PresenterScope getScope(final Object host) {
+        if (host instanceof Activity) {
+            final ActivityInstanceObserver detector = mActivityInstanceObserver;
+            if (detector == null) {
+                return null;
+            }
 
-        final String scopeId = detector.getActivityId(activity);
-        if (scopeId == null) {
-            return null;
-        }
+            final Activity activity = (Activity) host;
+            final String scopeId = detector.getActivityId(activity);
+            if (scopeId == null) {
+                return null;
+            }
 
-        return mScopes.get(scopeId);
+            return mScopes.get(scopeId);
+        } else {
+            // currently only Activity is supported as host
+            throw new IllegalStateException(
+                    "Host has unknown type " + host.getClass().getSimpleName());
+        }
     }
 
     /**
-     * Returns an existing scope or creates a new one for the given Activity. Registers a callback
-     * so the scope will be cleaned up when the Activity finishes
+     * registers the {@link ActivityInstanceObserver.ActivityFinishListener} for the activity
      *
-     * @return an existing or new created scope for presenters
+     * @param activity to listen for the finish event
+     * @param hostId   id to track the Activity across orientation changes
      */
-    @NonNull
-    private synchronized ActivityScopedPresenters getScopeOrCreate(final Activity activity) {
-        registerActivityObserver(activity);
-
-        final String scopeId = mActivityInstanceObserver.getActivityId(activity);
-        final ActivityScopedPresenters scope;
-
-        if (scopeId == null) {
-            final String newScopeId = mActivityInstanceObserver.startTracking(activity);
-            scope = new ActivityScopedPresenters();
-            mScopes.put(newScopeId, scope);
+    private void observeActivityFinish(final Activity activity, @Nullable final String hostId) {
+        final ActivityInstanceObserver observer = registerActivityObserver(activity);
+        if (hostId != null) {
+            // stack tracking of this untracked Activity
+            observer.startTracking(activity, hostId);
         } else {
-            final ActivityScopedPresenters savedScope = mScopes.get(scopeId);
-            if (savedScope == null) {
-                scope = new ActivityScopedPresenters();
-                mScopes.put(scopeId, scope);
-            } else {
-                scope = savedScope;
-            }
+            // already observing this activity
         }
-
-        return scope;
     }
 
     /**
@@ -207,7 +236,7 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
     private void printRemainingPresenter() {
         if (DEBUG) {
             final ArrayList<TiPresenter> presenters = new ArrayList<>();
-            for (final Map.Entry<String, ActivityScopedPresenters> entry : mScopes.entrySet()) {
+            for (final Map.Entry<String, PresenterScope> entry : mScopes.entrySet()) {
                 presenters.addAll(entry.getValue().getAll());
             }
 
@@ -221,12 +250,13 @@ public class PresenterSavior implements TiPresenterSavior, ActivityInstanceObser
     /**
      * registers the {@link #mActivityInstanceObserver}
      */
-    private void registerActivityObserver(final Activity activity) {
+    private ActivityInstanceObserver registerActivityObserver(final Activity activity) {
         if (mActivityInstanceObserver == null) {
             mActivityInstanceObserver = new ActivityInstanceObserver(this);
             TiLog.v(TAG, "registering lifecycle callback");
             activity.getApplication().registerActivityLifecycleCallbacks(mActivityInstanceObserver);
         }
+        return mActivityInstanceObserver;
     }
 
     /**

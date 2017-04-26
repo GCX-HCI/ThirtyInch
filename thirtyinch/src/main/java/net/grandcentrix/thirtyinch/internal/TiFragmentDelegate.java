@@ -144,13 +144,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
                 TiLog.v(mLogTag.getLoggingTag(),
                         "try to recover Presenter with id: " + recoveredPresenterId);
                 mPresenter = (P) mSavior
-                        .recover(recoveredPresenterId, mTiFragment.getHostingActivity());
+                        .recover(recoveredPresenterId, mTiFragment.getHostingContainer());
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
                     // this presenter from the savior
-                    mSavior.free(recoveredPresenterId, mTiFragment.getHostingActivity());
-                    mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingActivity());
+                    mSavior.free(recoveredPresenterId, mTiFragment.getHostingContainer());
+                    mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingContainer());
                 }
                 TiLog.v(mLogTag.getLoggingTag(), "recovered Presenter " + mPresenter);
             }
@@ -167,7 +167,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter()) {
-                mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingActivity());
+                mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingContainer());
             }
             mPresenter.create();
         }
@@ -236,7 +236,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            mSavior.free(mPresenterId, mTiFragment.getHostingActivity());
+            mSavior.free(mPresenterId, mTiFragment.getHostingContainer());
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by a future Fragment instance");
