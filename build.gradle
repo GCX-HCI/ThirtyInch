@@ -36,5 +36,6 @@ ext {
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     assertjVersion = '2.5.0'
-    androidStateVersion = '1.0.0'
+    androidStateVersion = '1.0.6'
+    robolectricVersion = '3.3.2'
 }

@@ -1,9 +1,6 @@
 package net.grandcentrix.thirtyinch.serialize.android.state;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.LargeTest;
-import android.support.test.runner.AndroidJUnit4;
 
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
@@ -11,25 +8,28 @@ import net.grandcentrix.thirtyinch.TiView;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class AndroidStateSerializerTest {
 
     @Test
     public void testSerializeAndroidState() throws Exception {
-        TestPresenter presenter = new TestPresenter(InstrumentationRegistry.getContext());
+        TestPresenter presenter = new TestPresenter(RuntimeEnvironment.application);
         final String id = presenter.getId();
 
         presenter.mValue = 5;
         presenter.persist();
         ((AndroidStatePresenterSerializer) presenter.getConfig().getPresenterSerializer()).waitForPendingTasks();
 
-        AndroidStatePresenterSerializer serializer = new AndroidStatePresenterSerializer(InstrumentationRegistry.getContext());
+        AndroidStatePresenterSerializer serializer = new AndroidStatePresenterSerializer(RuntimeEnvironment.application);
 
-        presenter = new TestPresenter(InstrumentationRegistry.getContext());
+        presenter = new TestPresenter(RuntimeEnvironment.application);
         assertEquals(0, presenter.mValue);
 
         presenter = serializer.deserialize(presenter, id);

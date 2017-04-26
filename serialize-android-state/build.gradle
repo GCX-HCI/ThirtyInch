@@ -41,10 +41,12 @@ dependencies {
     provided "com.android.support:support-annotations:$supportLibraryVersion"
 
     compile "com.evernote:android-state:$androidStateVersion"
-    androidTestAnnotationProcessor "com.evernote:android-state-processor:$androidStateVersion"
+    testAnnotationProcessor "com.evernote:android-state-processor:$androidStateVersion"
 
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    testCompile "org.assertj:assertj-core:$assertjVersion"
+    testCompile "org.robolectric:robolectric:$robolectricVersion"
 }
 
 publish {
