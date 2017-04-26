@@ -19,7 +19,6 @@ package net.grandcentrix.thirtyinch.internal;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -42,8 +41,6 @@ public class TestTiFragment
 
         private HostingActivity mHostingActivity = new HostingActivity();
 
-        private boolean mIsDontKeepActivitiesEnabled = false;
-
         private TiPresenter<TiView> mPresenter;
 
         private TiPresenterProvider<TiPresenter<TiView>> mPresenterProvider;
@@ -62,13 +59,7 @@ public class TestTiFragment
                 };
             }
 
-            return new TestTiFragment(presenterProvider, mIsDontKeepActivitiesEnabled, mSavior,
-                    mHostingActivity);
-        }
-
-        public Builder setDontKeepActivitiesEnabled(final boolean enabled) {
-            mIsDontKeepActivitiesEnabled = enabled;
-            return this;
+            return new TestTiFragment(presenterProvider, mSavior, mHostingActivity);
         }
 
         public Builder setHostingActivity(final HostingActivity hostingActivity) {
@@ -103,12 +94,9 @@ public class TestTiFragment
 
     private boolean mInBackstack;
 
-    private boolean mIsDontKeepActivitiesEnabled;
-
     private boolean mRemoving;
 
     private TestTiFragment(final TiPresenterProvider<TiPresenter<TiView>> presenterProvider,
-            final boolean isDontKeepActivitiesEnabled,
             final TiPresenterSavior savior,
             final HostingActivity hostingActivity) {
 
@@ -120,12 +108,11 @@ public class TestTiFragment
                     }
                 }, savior);
 
-        mIsDontKeepActivitiesEnabled = isDontKeepActivitiesEnabled;
         mHostingActivity = hostingActivity;
     }
 
     @Override
-    public Activity getHostingActivity() {
+    public Object getHostingContainer() {
         return mHostingActivity.getMockActivityInstance();
     }
 
@@ -155,23 +142,13 @@ public class TestTiFragment
     }
 
     @Override
-    public boolean isFragmentRemoving() {
-        return mRemoving;
-    }
-
-    @Override
-    public boolean isHostingActivityChangingConfigurations() {
-        return mHostingActivity.isChangingConfiguration();
-    }
-
-    @Override
-    public boolean isHostingActivityFinishing() {
-        return mHostingActivity.isFinishing();
-    }
-
-    @Override
     public boolean isFragmentInBackstack() {
         return mInBackstack;
+    }
+
+    @Override
+    public boolean isFragmentRemoving() {
+        return mRemoving;
     }
 
     public void onCreate(final Bundle saveInstanceState) {
