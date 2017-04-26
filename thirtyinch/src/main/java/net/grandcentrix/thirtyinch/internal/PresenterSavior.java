@@ -124,7 +124,12 @@ public class PresenterSavior implements TiPresenterSavior,
 
                 // when the presenter is not destroyed yet, destroy it.
                 if (!presenter.isDestroyed()) {
-                    presenter.destroy();
+                    if (presenter.isViewAttached()) {
+                        presenter.detachView();
+                    }
+                    if (!presenter.isDestroyed()) {
+                        presenter.destroy();
+                    }
                 }
                 scope.remove(presenterId);
             }

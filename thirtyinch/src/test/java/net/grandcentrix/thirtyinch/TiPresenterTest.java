@@ -110,6 +110,21 @@ public class TiPresenterTest {
     }
 
     @Test
+    public void destroyPresenterWithAttachedView() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+
+        try {
+            mPresenter.destroy();
+            fail("error expected");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("attached"));
+            assertTrue(e.getMessage().contains("detachView()"));
+        }
+
+    }
+
+    @Test
     public void destroyWithoutAttachingView() throws Exception {
         mPresenter.create();
         mPresenter.destroy();
