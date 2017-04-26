@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,7 @@ public class CallOnMainThreadInterceptor implements BindViewInterceptor {
         return wrapped;
     }
 
+    @SuppressWarnings("unchecked")
     private <V extends TiView> V wrap(final V view) {
 
         Class<?> foundInterfaceClass = getInterfaceOfClassExtendingGivenInterface(
@@ -49,11 +50,8 @@ public class CallOnMainThreadInterceptor implements BindViewInterceptor {
             return view;
         }
 
-        //noinspection unchecked,UnnecessaryLocalVariable
-        final V wrappedView = (V) Proxy.newProxyInstance(
+        return (V) Proxy.newProxyInstance(
                 foundInterfaceClass.getClassLoader(), new Class<?>[]{foundInterfaceClass},
                 new CallOnMainThreadInvocationHandler<>(view));
-
-        return wrappedView;
     }
 }

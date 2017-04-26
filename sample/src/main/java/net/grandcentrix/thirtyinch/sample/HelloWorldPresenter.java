@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.functions.Action1;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -45,21 +45,13 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     protected void onAttachView(@NonNull final HelloWorldView view) {
         super.onAttachView(view);
 
-        rxSubscriptionHelper.manageViewSubscription(mText.asObservable()
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(final String text) {
-                        view.showText(text);
-                    }
-                }));
+        final Subscription showTextSub = mText.asObservable().subscribe(view::showText);
+        final Subscription onButtonClickSub = view.onButtonClicked()
+                .subscribe(aVoid -> {
+                    triggerHeavyCalculation.onNext(null);
+                });
 
-        rxSubscriptionHelper.manageViewSubscription(view.onButtonClicked()
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(final Void aVoid) {
-                        triggerHeavyCalculation.onNext(null);
-                    }
-                }));
+        rxSubscriptionHelper.manageViewSubscriptions(showTextSub, onButtonClickSub);
     }
 
     @Override
@@ -69,39 +61,21 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
         mText.onNext("Hello World!");
 
         rxSubscriptionHelper.manageSubscription(Observable.interval(0, 1, TimeUnit.SECONDS)
-                .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(final Long uptime) {
-                        getView().showPresenterUpTime(uptime);
-                    }
+                .compose(RxTiPresenterUtils.deliverLatestToView(this))
+                .subscribe(uptime -> {
+                    sendToView(view -> view.showPresenterUpTime(uptime));
                 }));
 
         rxSubscriptionHelper.manageSubscription(triggerHeavyCalculation
-                .onBackpressureDrop(new Action1<Void>() {
-                    @Override
-                    public void call(final Void aVoid) {
-                        mText.onNext("Don't hurry me!");
-                    }
-                })
-                .doOnNext(new Action1<Void>() {
-                    @Override
-                    public void call(final Void aVoid) {
-                        mText.onNext("calculating next number...");
-                    }
-                })
+                .onBackpressureDrop(aVoid -> mText.onNext("Don't hurry me!"))
+                .doOnNext(aVoid -> mText.onNext("calculating next number..."))
                 .flatMap(new Func1<Void, Observable<Integer>>() {
                     @Override
                     public Observable<Integer> call(final Void aVoid) {
                         return increaseCounter();
                     }
                 }, 1)
-                .doOnNext(new Action1<Integer>() {
-                    @Override
-                    public void call(final Integer integer) {
-                        mText.onNext("Count: " + mCounter);
-                    }
-                })
+                .doOnNext(integer -> mText.onNext("Count: " + mCounter))
                 .subscribe());
     }
 
@@ -113,12 +87,9 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                 .subscribeOn(Schedulers.computation())
                 // fake heavy calculation
                 .delay(2, TimeUnit.SECONDS)
-                .doOnNext(new Action1<Integer>() {
-                    @Override
-                    public void call(final Integer integer) {
-                        mCounter++;
-                        mText.onNext("value: " + mCounter);
-                    }
+                .doOnNext(integer -> {
+                    mCounter++;
+                    mText.onNext("value: " + mCounter);
                 });
     }
 }

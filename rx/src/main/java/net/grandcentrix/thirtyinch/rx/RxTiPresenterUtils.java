@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,40 +114,37 @@ public class RxTiPresenterUtils {
      * TiPresenter#attachView(TiView)} and before calling {@link TiPresenter#detachView()}.
      */
     public static Observable<Boolean> isViewReady(final TiPresenter presenter) {
-        return Observable.create(
-                new Observable.OnSubscribe<Boolean>() {
-                    @Override
-                    public void call(final Subscriber<? super Boolean> subscriber) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(presenter.getState()
-                                    == TiPresenter.State.VIEW_ATTACHED);
-                        }
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(final Subscriber<? super Boolean> subscriber) {
+                if (!subscriber.isUnsubscribed()) {
+                    subscriber.onNext(presenter.getState() == TiPresenter.State.VIEW_ATTACHED);
+                }
 
-                        final Removable removable = presenter
-                                .addLifecycleObserver(new TiLifecycleObserver() {
-                                    @Override
-                                    public void onChange(final TiPresenter.State state,
-                                            final boolean beforeLifecycleEvent) {
-                                        if (!subscriber.isUnsubscribed()) {
-                                            subscriber.onNext(state
-                                                    == TiPresenter.State.VIEW_ATTACHED);
-                                        }
-                                    }
-                                });
-
-                        subscriber.add(new Subscription() {
+                final Removable removable = presenter
+                        .addLifecycleObserver(new TiLifecycleObserver() {
                             @Override
-                            public boolean isUnsubscribed() {
-                                return removable.isRemoved();
-                            }
-
-                            @Override
-                            public void unsubscribe() {
-                                removable.remove();
+                            public void onChange(final TiPresenter.State state,
+                                    final boolean hasLifecycleMethodBeenCalled) {
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onNext(state == TiPresenter.State.VIEW_ATTACHED
+                                            && hasLifecycleMethodBeenCalled);
+                                }
                             }
                         });
+
+                subscriber.add(new Subscription() {
+                    @Override
+                    public boolean isUnsubscribed() {
+                        return removable.isRemoved();
                     }
-                })
-                .distinctUntilChanged();
+
+                    @Override
+                    public void unsubscribe() {
+                        removable.remove();
+                    }
+                });
+            }
+        }).distinctUntilChanged();
     }
 }

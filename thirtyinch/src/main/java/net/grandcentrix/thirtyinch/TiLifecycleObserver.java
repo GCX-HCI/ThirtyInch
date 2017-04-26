@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,13 @@ public interface TiLifecycleObserver {
     /**
      * gets called when the {@link net.grandcentrix.thirtyinch.TiPresenter.State} changes
      *
-     * @param state                the new state of the {@link TiPresenter}
-     * @param beforeLifecycleEvent {@code true} when called before the {@code on...} lifecycle
-     *                             methods, {@code false} when called after
+     * @param state                        the new state of the {@link TiPresenter}
+     * @param hasLifecycleMethodBeenCalled {@code false} when called before the {@code on...}
+     *                                     lifecycle methods, {@code true} when called after
+     * @see TiPresenter#onCreate()
+     * @see TiPresenter#onAttachView(TiView)
+     * @see TiPresenter#onDetachView()
+     * @see TiPresenter#onDestroy()
      */
-    void onChange(final TiPresenter.State state, final boolean beforeLifecycleEvent);
+    void onChange(final TiPresenter.State state, final boolean hasLifecycleMethodBeenCalled);
 }

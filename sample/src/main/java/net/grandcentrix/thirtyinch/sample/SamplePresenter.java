@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,6 @@ import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.functions.Action1;
 
 
 public class SamplePresenter extends TiPresenter<SampleView> {
@@ -35,13 +34,10 @@ public class SamplePresenter extends TiPresenter<SampleView> {
         super.onCreate();
 
         mSubscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
-                .compose(RxTiPresenterUtils.<Long>deliverLatestToView(this))
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(final Long alive) {
-                        // deliverLatestToView makes getView() here @NonNull
-                        getView().showText("I'm a fragment and alive for " + (alive * 37) + "ms");
-                    }
+                .compose(RxTiPresenterUtils.deliverLatestToView(this))
+                .subscribe(alive -> {
+                    // deliverLatestToView makes getView() here @NonNull
+                    getView().showText("I'm a fragment and alive for " + (alive * 37) + "ms");
                 }));
     }
 }

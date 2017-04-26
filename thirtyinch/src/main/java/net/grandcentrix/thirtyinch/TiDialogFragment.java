@@ -1,15 +1,33 @@
+/*
+ * Copyright (C) 2017 grandcentrix GmbH
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.grandcentrix.thirtyinch;
 
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
+import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -18,34 +36,35 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatDialogFragment
         implements DelegatedTiFragment, TiPresenterProvider<P>, TiLoggingTagProvider,
-        TiViewProvider<V>, InterceptableViewBinder<V> {
+        TiViewProvider<V>, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiDialogFragment.class.getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiFragmentDelegate<P, V> mDelegate =
-            new TiFragmentDelegate<>(this, this, this, this);
+            new TiFragmentDelegate<>(this, this, this, this, PresenterSavior.getInstance());
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -55,8 +74,14 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         return TAG;
     }
 
-    public P getPresenter() {
+    @Override
+    public final P getPresenter() {
         return mDelegate.getPresenter();
+    }
+
+    @Override
+    public final Executor getUiThreadExecutor() {
+        return new UiThreadExecutor();
     }
 
     /**
@@ -64,41 +89,38 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getActivity());
-    }
-
-    @Override
-    public boolean isFragmentAdded() {
+    public final boolean isFragmentAdded() {
         return isAdded();
     }
 
     @Override
-    public boolean isFragmentDetached() {
+    public final boolean isFragmentDetached() {
         return isDetached();
     }
 
     @Override
-    public boolean isHostingActivityChangingConfigurations() {
+    public final boolean isHostingActivityChangingConfigurations() {
         return getActivity().isChangingConfigurations();
     }
 
     @Override
-    public boolean isHostingActivityFinishing() {
+    public final boolean isHostingActivityFinishing() {
         return getActivity().isFinishing();
     }
 
+    @CallSuper
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @CallSuper
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
@@ -107,39 +129,39 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    @CallSuper
     @Override
     public void onDestroy() {
         super.onDestroy();
         mDelegate.onDestroy_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onDestroyView() {
         mDelegate.onDestroyView_beforeSuper();
         super.onDestroyView();
     }
 
+    @CallSuper
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
+    @CallSuper
     @Override
     public void onStart() {
         super.onStart();
         mDelegate.onStart_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onStop() {
         mDelegate.onStop_beforeSuper();
         super.onStop();
-    }
-
-    @Override
-    public boolean postToMessageQueue(final Runnable runnable) {
-        return getActivity().getWindow().getDecorView().post(runnable);
     }
 
     /**
@@ -148,6 +170,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
      *
      * @return the object implementing the TiView interface
      */
+    @SuppressWarnings("unchecked")
     @NonNull
     public V provideView() {
 
@@ -165,15 +188,9 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
                                 + " This is the default behaviour. Override provideView() to explicitly change this.");
             } else {
                 // assume that the fragment itself is the view and implements the TiView interface
-                //noinspection unchecked
                 return (V) this;
             }
         }
-    }
-
-    @Override
-    public void setFragmentRetainInstance(final boolean retain) {
-        setRetainInstance(retain);
     }
 
     @Override

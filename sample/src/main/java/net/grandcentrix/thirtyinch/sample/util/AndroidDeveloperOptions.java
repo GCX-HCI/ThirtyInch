@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.util;
+package net.grandcentrix.thirtyinch.sample.util;
 
 import android.content.Context;
 import android.os.Build;
@@ -25,6 +25,7 @@ public class AndroidDeveloperOptions {
      * Returns the state of the "Don't keep activities - Destroy every activity as soon as the user
      * leaves it" developer option
      */
+    @SuppressWarnings("deprecation")
     public static boolean isDontKeepActivitiesEnabled(final Context context) {
         int alwaysFinishActivitiesInt;
         if (Build.VERSION.SDK_INT >= 17) {

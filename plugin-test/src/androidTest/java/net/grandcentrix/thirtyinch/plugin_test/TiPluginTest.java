@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,6 @@ package net.grandcentrix.thirtyinch.plugin_test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
@@ -48,6 +47,9 @@ public class TiPluginTest {
         Espresso.onView(withId(R.id.helloworld_text))
                 .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
 
+        Espresso.onView(withId(R.id.fragment_helloworld_text))
+                .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
+
         activity.finish();
     }
 
@@ -64,6 +66,8 @@ public class TiPluginTest {
         // make sure the attached presenter filled the UI
         Espresso.onView(withId(R.id.helloworld_text))
                 .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
+        Espresso.onView(withId(R.id.fragment_helloworld_text))
+                .check(matches(allOf(isDisplayed(), withText("Hello World 1"))));
 
         // restart the activity
         rotateOrientation(activity);
@@ -71,6 +75,8 @@ public class TiPluginTest {
         // assert the activity was bound to the presenter. The presenter should update the UI
         // correctly
         Espresso.onView(withId(R.id.helloworld_text))
+                .check(matches(allOf(isDisplayed(), withText("Hello World 2"))));
+        Espresso.onView(withId(R.id.fragment_helloworld_text))
                 .check(matches(allOf(isDisplayed(), withText("Hello World 2"))));
 
         activity.finish();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,7 +44,7 @@ import java.util.List;
  * It also allows 3rd party developers do add this delegate to other Activities using composition.
  */
 public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
-        implements InterceptableViewBinder<V> {
+        implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     @VisibleForTesting
     static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
@@ -55,7 +55,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
      */
     private volatile boolean mActivityStarted = false;
 
-    private TiLoggingTagProvider mLogTag;
+    private final TiLoggingTagProvider mLogTag;
 
     /**
      * The presenter to which this activity will be attached as view when in the right state.
@@ -70,21 +70,27 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final TiPresenterProvider<P> mPresenterProvider;
 
+    private final TiPresenterSavior mSavior;
+
     private final DelegatedTiActivity<P> mTiActivity;
+
+    private Removable mUiThreadBinderRemovable;
 
     private final PresenterViewBinder<V> mViewBinder;
 
-    private TiViewProvider<V> mViewProvider;
+    private final TiViewProvider<V> mViewProvider;
 
     public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
             final TiViewProvider<V> viewProvider,
             final TiPresenterProvider<P> presenterProvider,
-            final TiLoggingTagProvider logTag) {
+            final TiLoggingTagProvider logTag,
+            final TiPresenterSavior savior) {
         mTiActivity = activityProvider;
         mViewProvider = viewProvider;
         mPresenterProvider = presenterProvider;
         mLogTag = logTag;
         mViewBinder = new PresenterViewBinder<>(logTag);
+        mSavior = savior;
     }
 
     @NonNull
@@ -106,6 +112,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         return mViewBinder.getInterceptors(predicate);
     }
 
+    @Override
     public P getPresenter() {
         return mPresenter;
     }
@@ -124,23 +131,14 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         mViewBinder.invalidateView();
     }
 
+    @SuppressWarnings("unchecked")
     public void onCreate_afterSuper(final Bundle savedInstanceState) {
-
-        // try recover presenter via lastNonConfigurationInstance
-        // this works most of the time
-        mPresenter = mTiActivity.getRetainedPresenter();
-        if (mPresenter == null) {
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "could not recover a Presenter from getLastNonConfigurationInstance()");
-        } else {
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "recovered Presenter from lastCustomNonConfigurationInstance " + mPresenter);
-        }
 
         // try to recover with the PresenterSavior
         final String recoveredPresenterId;
         if (savedInstanceState != null) {
-            recoveredPresenterId = savedInstanceState.getString(SAVED_STATE_PRESENTER_ID);
+             recoveredPresenterId = savedInstanceState
+                    .getString(SAVED_STATE_PRESENTER_ID);
 
             if (mPresenter == null) {
                 if (recoveredPresenterId != null) {
@@ -148,8 +146,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     // this should always work.
                     TiLog.v(mLogTag.getLoggingTag(),
                             "try to recover Presenter with id: " + recoveredPresenterId);
-                    //noinspection unchecked
-                    mPresenter = (P) PresenterSavior.INSTANCE.recover(recoveredPresenterId);
+                    mPresenter = (P) mSavior
+                            .recover(recoveredPresenterId, mTiActivity.getHostingActivity());
                     TiLog.v(mLogTag.getLoggingTag(),
                             "recovered Presenter from savior " + mPresenter);
                 } else {
@@ -165,8 +163,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 // save recovered presenter with new id. No other instance of this activity,
                 // holding the presenter before, is now able to remove the reference to
                 // this presenter from the savior
-                PresenterSavior.INSTANCE.free(recoveredPresenterId);
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+                mSavior.free(recoveredPresenterId, mTiActivity.getHostingActivity());
+                mPresenterId = mSavior.save(mPresenter, mTiActivity.getHostingActivity());
 
                 TiPresenterSerializer serializer = mPresenter.getConfig().getPresenterSerializer();
                 if (serializer != null && recoveredPresenterId != null) {
@@ -180,6 +178,12 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         if (mPresenter == null) {
             // could not recover, create a new presenter
             mPresenter = mPresenterProvider.providePresenter();
+            if (mPresenter.getState() != TiPresenter.State.INITIALIZED) {
+                throw new IllegalStateException("Presenter not in initialized state. "
+                        + "Current state is " + mPresenter.getState() + ". "
+                        + "Presenter provided with #providePresenter() cannot be reused. "
+                        + "Always return a fresh instance!");
+            }
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             final TiPresenterSerializer presenterSerializer = config.getPresenterSerializer();
@@ -189,8 +193,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                 TiLog.v(mLogTag.getLoggingTag(), "deserialized Presenter: " + mPresenter);
             }
 
-            if (config.shouldRetainPresenter() && config.useStaticSaviorToRetain()) {
-                mPresenterId = PresenterSavior.INSTANCE.safe(mPresenter);
+            if (config.shouldRetainPresenter()) {
+                mPresenterId = mSavior.save(mPresenter, mTiActivity.getHostingActivity());
             }
             mPresenter.create();
         }
@@ -203,13 +207,26 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         if (config.isDistinctUntilChangedInterceptorEnabled()) {
             addBindViewInterceptor(new DistinctUntilChangedInterceptor());
         }
+
+        //noinspection unchecked
+        final UiThreadExecutorAutoBinder uiThreadAutoBinder =
+                new UiThreadExecutorAutoBinder(mPresenter, mTiActivity.getUiThreadExecutor());
+
+        // bind ui thread to presenter when view is attached
+        mUiThreadBinderRemovable = mPresenter.addLifecycleObserver(uiThreadAutoBinder);
     }
 
     public void onDestroy_afterSuper() {
-        final TiConfiguration config = mPresenter.getConfig();
+
+        // unregister observer and don't leak it
+        if (mUiThreadBinderRemovable != null) {
+            mUiThreadBinderRemovable.remove();
+            mUiThreadBinderRemovable = null;
+        }
 
         boolean destroyPresenter = false;
-        if (mTiActivity.isActivityFinishing()) {
+        if (mTiActivity.isActivityFinishing()
+                && !mTiActivity.isActivityChangingConfigurations()) {
             // Probably a backpress and not a configuration change
             // Activity will not be recreated and finally destroyed, also destroyed the presenter
             destroyPresenter = true;
@@ -218,7 +235,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         }
 
         if (!destroyPresenter &&
-                !config.shouldRetainPresenter()) {
+                !mPresenter.getConfig().shouldRetainPresenter()) {
             // configuration says the presenter should not be retained, a new presenter instance
             // will be created and the current presenter should be destroyed
             destroyPresenter = true;
@@ -226,28 +243,13 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
                     "presenter configured as not retaining, destroying " + mPresenter);
         }
 
-        if (!destroyPresenter
-                && !config.useStaticSaviorToRetain()
-                && !mTiActivity.isActivityChangingConfigurations()
-                && mTiActivity.isDontKeepActivitiesEnabled()) {
-            // configuration says the PresenterSavior should not be used. Retaining the presenter
-            // relays on the Activity nonConfigurationInstance which is always null when
-            // "don't keep activities" is enabled.
-            // a new presenter instance will be created and the current presenter should be destroyed
-            destroyPresenter = true;
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "the PresenterSavior is disabled and \"don\'t keep activities\" is activated. "
-                            + "The presenter can't be retained. Destroying " + mPresenter);
-        }
-
         if (destroyPresenter) {
             mPresenter.destroy();
-            PresenterSavior.INSTANCE.free(mPresenterId);
+            mSavior.free(mPresenterId, mTiActivity.getHostingActivity());
             TiPresenterSerializer serializer = mPresenter.getConfig().getPresenterSerializer();
             if (serializer != null) {
                 serializer.cleanup(mPresenterId);
             }
-
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by the next Activity instance, recreating...");
@@ -261,7 +263,8 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     public void onStart_afterSuper() {
         mActivityStarted = true;
-        mTiActivity.postToMessageQueue(new Runnable() {
+        // post to the UI queue to delay bindView until all queued work has finished
+        mTiActivity.getUiThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 // check if still started. It happens that onStop got already called, specially

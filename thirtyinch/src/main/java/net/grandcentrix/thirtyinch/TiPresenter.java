@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ import net.grandcentrix.thirtyinch.serialize.TiPresenterSerializer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -91,6 +92,12 @@ public abstract class TiPresenter<V extends TiView> {
 
     private State mState = State.INITIALIZED;
 
+    /**
+     * Executor for UI operations, must be set by the view implementation
+     */
+    @Nullable
+    private Executor mUiThreadExecutor;
+
     private V mView;
 
     public static void setDefaultConfig(final TiConfiguration config) {
@@ -112,7 +119,9 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Observes the lifecycle state of this presenter.
+     * Observes the lifecycle state of this presenter. Observers get called in order they are
+     * added for constructive events and in reversed order for destructive events. First in, last
+     * out.
      *
      * @param observer called when lifecycle state changes after the lifecycle method such as
      *                 {@link
@@ -190,6 +199,8 @@ public abstract class TiPresenter<V extends TiView> {
                     + " did not call through to super.onWakeUp()");
         }
         moveToState(State.VIEW_ATTACHED, true);
+
+        sendPostponedActionsToView(view);
     }
 
     /**
@@ -224,7 +235,7 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public final void destroy() {
         if (!isInitialized() || isDestroyed()) {
-            TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
+            TiLog.v(TAG, "not calling onDestroy(), destroy was already called");
             return;
         }
 
@@ -318,6 +329,43 @@ public abstract class TiPresenter<V extends TiView> {
         return mState == State.VIEW_ATTACHED;
     }
 
+    /**
+     * Runs the specified action on the UI thread. It only works when a view is attached
+     * <p>
+     * When you are looking for a way to execute code when the view got available in the future
+     * have a look at {@link #sendToView(ViewAction)}
+     *
+     * @param action the action to run on the UI thread
+     * @throws IllegalStateException when the executor is not available (most likely because the
+     *                               view is not attached)
+     */
+    public void runOnUiThread(@NonNull final Runnable action) {
+        if (mUiThreadExecutor != null) {
+            mUiThreadExecutor.execute(action);
+        } else {
+            if (getView() == null) {
+                throw new IllegalStateException("view is not attached, "
+                        + "no executor available to run ui interactions on");
+            } else {
+                throw new IllegalStateException("no ui thread executor available");
+            }
+        }
+    }
+
+    /**
+     * sets the Executor used for the {@link #runOnUiThread(Runnable)} method.
+     * <p>
+     * This Executor is most likely the {@link net.grandcentrix.thirtyinch.internal.UiThreadExecutor}
+     * posting the work on the Android Main Thread.
+     * When using the {@code TiPresenterInstructor} in your tests an {@link Executor} for the
+     * current {@link Thread} is used, therefore all executed actions run synchronous.
+     *
+     * @param uiThreadExecutor executor for view interactions
+     */
+    public void setUiThreadExecutor(@Nullable final Executor uiThreadExecutor) {
+        mUiThreadExecutor = uiThreadExecutor;
+    }
+
     @Override
     public String toString() {
         final String viewName;
@@ -353,11 +401,6 @@ public abstract class TiPresenter<V extends TiView> {
                     "don't call #onAttachView(TiView) directly, call #attachView(TiView)");
         }
         mCalled = true;
-
-        // send all queued actions since the view was detached to the new view.
-        // It's part of the super call because there might be usecases where the implementer
-        // wants to execute actions on the view before executing the queued ones.
-        sendPostponedActionsToView(view);
     }
 
     /**
@@ -427,7 +470,7 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Executes the {@link ViewAction} when the view is available.
+     * Executes the {@link ViewAction} when the view is available on the UI thread.
      * Once a view is attached the actions get called in the same order they have been added.
      * When the view is already attached the action will be executed immediately.
      * <p>
@@ -448,10 +491,15 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #sendPostponedActionsToView
      * @see #onAttachView(TiView)
      */
-    protected void sendToView(ViewAction<V> action) {
+    protected void sendToView(final ViewAction<V> action) {
         final V view = getView();
         if (view != null) {
-            action.call(view);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    action.call(view);
+                }
+            });
         } else {
             mPostponedViewActions.add(action);
         }
@@ -509,8 +557,20 @@ public abstract class TiPresenter<V extends TiView> {
             mState = newState;
         }
 
-        for (int i = 0; i < mLifecycleObservers.size(); i++) {
-            mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+        switch (newState) {
+            case INITIALIZED:
+            case VIEW_ATTACHED:
+                for (int i = 0; i < mLifecycleObservers.size(); i++) {
+                    mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+                }
+                break;
+
+            case VIEW_DETACHED:
+            case DESTROYED:
+                // reverse observer order for teardown events; first in, last out
+                for (int i = mLifecycleObservers.size() - 1; i >= 0; i--) {
+                    mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+                }
         }
     }
 
@@ -519,7 +579,7 @@ public abstract class TiPresenter<V extends TiView> {
      *
      * @param view where the actions will be sent to
      */
-    private void sendPostponedActionsToView(V view) {
+    private void sendPostponedActionsToView(@NonNull final V view) {
         while (!mPostponedViewActions.isEmpty()) {
             mPostponedViewActions.poll().call(view);
         }

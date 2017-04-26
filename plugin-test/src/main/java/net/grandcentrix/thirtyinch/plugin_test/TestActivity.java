@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,15 @@ public class TestActivity extends CompositeActivity implements TestView {
 
         setContentView(R.layout.activity_test);
         mText = (TextView) findViewById(R.id.helloworld_text);
+
+        if (savedInstanceState == null) {
+
+            final TestFragment testFragment = new TestFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, testFragment)
+                    .commit();
+        }
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,25 +15,21 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-
-import java.util.HashMap;
 
 /**
- * helper to clear the savior in the test environment without exposing this to the public API
+ * adds some functions for testing
  */
-public class PresenterSaviorTestHelper {
+public class TestPresenterSavior extends PresenterSavior {
 
-    public static void clear() {
-        PresenterSavior.INSTANCE.clear();
+    public int getPresenterCount() {
+        if (mScopes.isEmpty()) {
+            return 0;
+        }
+
+        int size = 0;
+        for (final ActivityScopedPresenters scope : mScopes.values()) {
+            size += scope.size();
+        }
+        return size;
     }
-
-    public static int presenterCount() {
-        return presenters().entrySet().size();
-    }
-
-    public static HashMap<String, TiPresenter> presenters() {
-        return PresenterSavior.INSTANCE.mPresenters;
-    }
-
 }
