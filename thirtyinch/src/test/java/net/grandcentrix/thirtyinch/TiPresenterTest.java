@@ -284,7 +284,8 @@ public class TiPresenterTest {
             mPresenter.getViewOrThrow();
             failBecauseExceptionWasNotThrown(IllegalStateException.class);
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), equalTo("view is not attached"));
+            assertThat(e.getMessage(),
+                    equalTo("The view is currently not attached. Use 'sendToView(ViewAction)' instead."));
         }
     }
 

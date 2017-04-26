@@ -316,19 +316,18 @@ public abstract class TiPresenter<V extends TiView> {
 
     /**
      * Gets the currently attached view or throws an {@link IllegalStateException} if the view
-     * is not attached. If you want to invoke methods on your view even when the view isn't
-     * currently attached or your can't be sure that the view is currently attached you should
-     * better use {@link #sendToView(ViewAction)} where the action will be executed when the view is
-     * attached.
+     * is not attached. Use this method if you are sure that a view is currently attached to the
+     * presenter. If you're not sure you should better use {@link #sendToView(ViewAction)} where the
+     * action will be executed when the view is attached.
      *
      * @return the currently attached view of this presenter
      */
     @NonNull
     public V getViewOrThrow() {
-
         final V view = getView();
         if (view == null) {
-            throw new IllegalStateException("view is not attached");
+            throw new IllegalStateException(
+                    "The view is currently not attached. Use 'sendToView(ViewAction)' instead.");
         }
 
         return view;
