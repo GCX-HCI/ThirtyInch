@@ -15,15 +15,15 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
@@ -185,7 +185,9 @@ public class PresenterSaviorTest {
         assertThat(savior.getPresenterCount()).isEqualTo(0);
 
         final String id2 = savior.save(presenter, hostingActivity.getMockActivityInstance());
-        assertThat(id2).isNotEqualTo(id);
+
+        // this check changed, the ID does NOT change for a presenter instance
+        assertThat(id2).isEqualTo(id);
 
         assertThat(savior.getPresenterCount()).isEqualTo(1);
     }
