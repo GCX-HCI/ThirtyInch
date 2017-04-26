@@ -300,7 +300,7 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Returns the currently attached view. The view is attached between the lifecycle callbacks
+     * Gets the currently attached view. The view is attached between the lifecycle callbacks
      * {@link #onAttachView(TiView)} and {@link #onSleep()}.
      * <p>
      * If you don't care about the view being attached or detached you should either rethink your
@@ -312,6 +312,26 @@ public abstract class TiPresenter<V extends TiView> {
     @Nullable
     public V getView() {
         return mView;
+    }
+
+    /**
+     * Gets the currently attached view or throws an {@link IllegalStateException} if the view
+     * is not attached. If you want to invoke methods on your view even when the view isn't
+     * currently attached or your can't be sure that the view is currently attached you should
+     * better use {@link #sendToView(ViewAction)} where the action will be executed when the view is
+     * attached.
+     *
+     * @return the currently attached view of this presenter
+     */
+    @NonNull
+    public V getViewOrThrow() {
+
+        final V view = getView();
+        if (view == null) {
+            throw new IllegalStateException("view is not attached");
+        }
+
+        return view;
     }
 
     public boolean isDestroyed() {
