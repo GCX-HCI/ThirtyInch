@@ -29,8 +29,10 @@ import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -273,7 +275,37 @@ public class TiPresenterTest {
     }
 
     @Test
-    public void testGetView() throws Exception {
+    public void testGetViewOrThrow() {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+
+        try {
+            mPresenter.getViewOrThrow();
+            failBecauseExceptionWasNotThrown(IllegalStateException.class);
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(),
+                    equalTo("The view is currently not attached. Use 'sendToView(ViewAction)' instead."));
+        }
+    }
+
+    @Test
+    public void testGetViewOrThrowReturnsView() {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        assertThat(mPresenter.getViewOrThrow(), equalTo(mView));
+    }
+
+    @Test
+    public void testGetViewReturnsNull() {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+        assertNull(mPresenter.getView());
+    }
+
+    @Test
+    public void testGetViewReturnsView() {
         mPresenter.create();
         mPresenter.attachView(mView);
         assertThat(mPresenter.getView(), equalTo(mView));
