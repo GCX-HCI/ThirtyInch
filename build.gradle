@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
     }
 }
@@ -24,13 +24,13 @@ allprojects {
 
 ext {
     VERSION_NAME = "0.8.0-SNAPSHOT"
-    VERSION_CODE = 3
+    VERSION_CODE = 4
     MIN_SDK_VERSION = 14
     TARGET_SDK_VERSION = 25
     COMPILE_SDK_VERSION = 25
     BUILD_TOOLS_VERSION = '25.0.2'
 
-    supportLibraryVersion = '25.1.0'
+    supportLibraryVersion = '25.2.0'
 
     bintrayVersion = '0.3.4'
     junitVersion = '4.12'

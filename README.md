@@ -1,4 +1,4 @@
-![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat)
+![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat) [![Gitter](https://badges.gitter.im/ThirtyInch/gitter.svg)](https://gitter.im/ThirtyInch/Lobby)
 # ThirtyInch - a MVP library for Android
 
 
@@ -25,14 +25,18 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.8.0-rc2' // prerelease
+    def thirtyinchVersion = '0.8.0-rc4' // prerelease
     // def thirtyinchVersion = '0.7.1' // stable
     
     // MVP for activity and fragment
     compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
     
-    // rx extension
+    // rx (1 or 2) extension
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
+    compile "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
+    
+    // logging interceptor (added in 0.8.0-rc4)
+    compile "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
     
     // test extension
     testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
@@ -171,7 +175,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     public static final TiConfiguration PRESENTER_CONFIG = 
             new TiConfiguration.Builder()
                 .setRetainPresenterEnabled(true) 
-                .setUseStaticSaviorToRetain(true)
                 .setCallOnMainThreadInterceptorEnabled(true)
                 .setDistinctUntilChangedInterceptorEnabled(true)
                 .build();

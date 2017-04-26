@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 
 public class TiLifecycleObserverTest {
@@ -52,13 +54,104 @@ public class TiLifecycleObserverTest {
     }
 
     @Test
+    public void testCalledAttachedInCorrectOrder() throws Exception {
+        mPresenter.create();
+
+        // Given 2 observers
+        final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer1);
+        final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer2);
+
+        // When a view attaches
+        mPresenter.attachView(mock(TiView.class));
+
+        // Then the last added observer gets called last
+        final InOrder inOrder = inOrder(observer1, observer2);
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, false);
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_ATTACHED, false);
+
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, true);
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_ATTACHED, true);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testCalledCreateInCorrectOrder() throws Exception {
+
+        // Given 2 observers
+        final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer1);
+        final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer2);
+
+        // When the presenter gets created and reached view detached state
+        mPresenter.create();
+
+        // Then the last added observer gets called first because it's a destructive event
+        final InOrder inOrder = inOrder(observer1, observer2);
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_DETACHED, false);
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_DETACHED, false);
+
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_DETACHED, true);
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_DETACHED, true);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testCalledDestroyInCorrectOrder() throws Exception {
+
+        // Given a presenter with 2 added observers
+        mPresenter.create();
+        final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer1);
+        final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer2);
+
+        // When the presenter gets destroyed
+        mPresenter.destroy();
+
+        // Then the last added observer gets called first
+        final InOrder inOrder = inOrder(observer1, observer2);
+        inOrder.verify(observer2).onChange(TiPresenter.State.DESTROYED, false);
+        inOrder.verify(observer1).onChange(TiPresenter.State.DESTROYED, false);
+
+        inOrder.verify(observer2).onChange(TiPresenter.State.DESTROYED, true);
+        inOrder.verify(observer1).onChange(TiPresenter.State.DESTROYED, true);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testCalledDetachedInCorrectOrder() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mock(TiView.class));
+
+        // Given 2 observers
+        final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer1);
+        final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer2);
+
+        // When the view detached
+        mPresenter.detachView();
+
+        // Then the last added observer gets called first
+        final InOrder inOrder = inOrder(observer1, observer2);
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_DETACHED, false);
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_DETACHED, false);
+
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_DETACHED, true);
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_DETACHED, true);
+    }
+
+    @Test
     public void testCreate() throws Exception {
         final List<Object[]> states = new ArrayList<>();
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         });
 
@@ -79,8 +172,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         });
 
@@ -104,8 +197,8 @@ public class TiLifecycleObserverTest {
         final Removable removable = mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         });
 
@@ -136,8 +229,8 @@ public class TiLifecycleObserverTest {
         final TiLifecycleObserver observer = new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled});
             }
         };
 
@@ -161,8 +254,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent, mPresenter.getView()});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled, mPresenter.getView()});
             }
         });
 
@@ -187,8 +280,8 @@ public class TiLifecycleObserverTest {
         mPresenter.addLifecycleObserver(new TiLifecycleObserver() {
             @Override
             public void onChange(final TiPresenter.State state,
-                    final boolean beforeLifecycleEvent) {
-                states.add(new Object[]{state, beforeLifecycleEvent, mPresenter.getView()});
+                    final boolean hasLifecycleMethodBeenCalled) {
+                states.add(new Object[]{state, hasLifecycleMethodBeenCalled, mPresenter.getView()});
             }
         });
 

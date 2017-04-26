@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import android.app.Activity;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+
+import java.util.concurrent.Executor;
 
 /**
  * This interface, implemented by Activities allows easy testing of the {@link TiActivityDelegate}
@@ -26,11 +26,9 @@ import android.support.v7.app.AppCompatActivity;
 public interface DelegatedTiActivity<P> {
 
     /**
-     * @return the retained presenter from {@link AppCompatActivity#getLastCustomNonConfigurationInstance()}
-     * or equivalent implementations
+     * @return {@link UiThreadExecutor}
      */
-    @Nullable
-    P getRetainedPresenter();
+    Executor getUiThreadExecutor();
 
     /**
      * @return {@link Activity#isChangingConfigurations()}
@@ -43,12 +41,7 @@ public interface DelegatedTiActivity<P> {
     boolean isActivityFinishing();
 
     /**
-     * @return true when the developer option "Don't keep Activities" is enabled
+     * @return the Activity itself instance
      */
-    boolean isDontKeepActivitiesEnabled();
-
-    /**
-     * Post the runnable on the UI queue
-     */
-    boolean postToMessageQueue(Runnable runnable);
+    Activity getHostingActivity();
 }

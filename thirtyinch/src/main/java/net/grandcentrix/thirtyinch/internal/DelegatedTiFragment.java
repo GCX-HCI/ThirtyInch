@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 grandcentrix GmbH
+ * Copyright (C) 2017 grandcentrix GmbH
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,14 @@ package net.grandcentrix.thirtyinch.internal;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 
+import java.util.concurrent.Executor;
+
 public interface DelegatedTiFragment {
 
     /**
-     * @return true when the developer option "Don't keep Activities" is enabled
+     * @return {@link UiThreadExecutor}
      */
-    boolean isDontKeepActivitiesEnabled();
+    Executor getUiThreadExecutor();
 
     /**
      * @return {@link Fragment#isAdded()}
@@ -36,6 +38,11 @@ public interface DelegatedTiFragment {
     boolean isFragmentDetached();
 
     /**
+     * @return {@link Fragment#isRemoving()}
+     */
+    boolean isFragmentRemoving();
+
+    /**
      * @return {@link Activity#isChangingConfigurations()}
      */
     boolean isHostingActivityChangingConfigurations();
@@ -46,12 +53,13 @@ public interface DelegatedTiFragment {
     boolean isHostingActivityFinishing();
 
     /**
-     * Post the runnable on the UI queue
+     * @return {@link Fragment#isInBackStack()}
      */
-    boolean postToMessageQueue(Runnable runnable);
+    boolean isFragmentInBackstack();
 
     /**
-     * Call {@link Fragment#setRetainInstance(boolean)}
+     * @return the hosting Activity
      */
-    void setFragmentRetainInstance(final boolean retain);
+    Activity getHostingActivity();
+
 }

@@ -1,1 +1,2 @@
-include ':thirtyinch', ':plugin', ':sample', ':rx', ':test', ':plugin-test', ':serialize-android-state'
+include ':thirtyinch', ':plugin', ':sample', ':rx', ':test', ':plugin-test', ':rx2',
+        ':logginginterceptor', ':serialize-android-state'
