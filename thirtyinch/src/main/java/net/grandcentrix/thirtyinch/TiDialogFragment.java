@@ -56,6 +56,11 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         return mDelegate.addBindViewInterceptor(interceptor);
     }
 
+    @Override
+    public Object getHostingContainer() {
+        return getHost();
+    }
+
     @Nullable
     @Override
     public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
@@ -101,16 +106,6 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     @Override
     public final boolean isFragmentDetached() {
         return isDetached();
-    }
-
-    @Override
-    public final boolean isHostingActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
-    @Override
-    public final boolean isHostingActivityFinishing() {
-        return getActivity().isFinishing();
     }
 
     @CallSuper

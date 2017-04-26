@@ -34,7 +34,6 @@ import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -89,8 +88,8 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public Activity getHostingActivity() {
-        return getFragment().getActivity();
+    public Object getHostingContainer() {
+        return getFragment().getHost();
     }
 
     /**
@@ -148,23 +147,13 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public boolean isFragmentRemoving() {
-        return getFragment().isRemoving();
-    }
-
-    @Override
-    public final boolean isHostingActivityChangingConfigurations() {
-        return getFragment().getActivity().isChangingConfigurations();
-    }
-
-    @Override
-    public final boolean isHostingActivityFinishing() {
-        return getFragment().getActivity().isFinishing();
-    }
-
-    @Override
     public boolean isFragmentInBackstack() {
         return BackstackReader.isInBackStack(getFragment());
+    }
+
+    @Override
+    public boolean isFragmentRemoving() {
+        return getFragment().isRemoving();
     }
 
     @CallSuper
