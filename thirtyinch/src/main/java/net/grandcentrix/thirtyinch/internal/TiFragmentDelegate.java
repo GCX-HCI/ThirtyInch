@@ -216,15 +216,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "fragment is in backstack");
         }
 
-        if (mTiFragment.isHostingActivityFinishing()
-                && !mTiFragment.isHostingActivityChangingConfigurations()) {
-            // Probably a backpress and not a configuration change
-            // Activity will not be recreated and finally destroyed, also destroyed the presenter
-            destroyPresenter = true;
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "Hosting Activity is finishing, destroying presenter " + mPresenter);
-        }
-
         if (!destroyPresenter &&
                 !mPresenter.getConfig().shouldRetainPresenter()) {
             // configuration says the presenter should not be retained, a new presenter instance
