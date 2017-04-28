@@ -127,7 +127,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
-    public Object getHostingContainer() {
+    public final Object getHostingContainer() {
         return getHost();
     }
 

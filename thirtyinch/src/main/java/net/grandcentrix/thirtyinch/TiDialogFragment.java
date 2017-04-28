@@ -58,7 +58,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     }
 
     @Override
-    public Object getHostingContainer() {
+    public final Object getHostingContainer() {
         return getHost();
     }
 
@@ -110,12 +110,12 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     }
 
     @Override
-    public boolean isFragmentInBackstack() {
+    public final boolean isFragmentInBackstack() {
         return BackstackReader.isInBackStack(this);
     }
 
     @Override
-    public boolean isFragmentRemoving() {
+    public final boolean isFragmentRemoving() {
         return isRemoving();
     }
 

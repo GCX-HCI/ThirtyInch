@@ -106,7 +106,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public Object getHostingContainer() {
+    public final Object getHostingContainer() {
         return this;
     }
 
