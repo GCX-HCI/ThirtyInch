@@ -244,7 +244,6 @@ public class RxTiPresenterSubscriptionHandlerTest {
         }
     }
 
-
     @Test
     public void testManageSubscriptions_WithAlreadyUnsubscribedSubscription_ShouldDoNothing()
             throws Exception {
