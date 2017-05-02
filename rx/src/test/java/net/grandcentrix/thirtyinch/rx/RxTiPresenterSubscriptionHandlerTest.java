@@ -23,9 +23,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import rx.Subscription;
 import rx.observers.TestSubscriber;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.fail;
@@ -69,6 +71,17 @@ public class RxTiPresenterSubscriptionHandlerTest {
     }
 
     @Test
+    public void testManageSubscription_ShouldReturnSameSubscription() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+
+        final Subscription subscription = mSubscriptionHandler.manageSubscription(testSubscriber);
+
+        assertThat(testSubscriber, is(equalTo(subscription)));
+    }
+
+    @Test
     public void testManageSubscription_WithAlreadyUnsubscribedSubscription_ShouldDoNothing()
             throws Exception {
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
@@ -89,6 +102,18 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         mPresenter.destroy();
         testSubscriber.assertUnsubscribed();
+    }
+
+    @Test
+    public void testManageViewSubscription_ShouldReturnSameSubscription() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+
+        final Subscription subscription =
+                mSubscriptionHandler.manageViewSubscription(testSubscriber);
+
+        assertThat(testSubscriber, is(equalTo(subscription)));
     }
 
     @Test
@@ -118,9 +143,12 @@ public class RxTiPresenterSubscriptionHandlerTest {
     }
 
     @Test
-    public void testManageViewSubscription_manageBeforeViewAttached_ShouldThrowIllegalStateException()
+    public void testManageViewSubscription_manageAfterDetach_ShouldThrowIllegalStateException()
             throws Exception {
         mPresenter.create();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
         try {
@@ -132,12 +160,9 @@ public class RxTiPresenterSubscriptionHandlerTest {
     }
 
     @Test
-    public void testManageViewSubscription_manageAfterDetach_ShouldThrowIllegalStateException()
+    public void testManageViewSubscription_manageBeforeViewAttached_ShouldThrowIllegalStateException()
             throws Exception {
         mPresenter.create();
-        mPresenter.attachView(mView);
-        mPresenter.detachView();
-
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
         try {
@@ -157,7 +182,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
         TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
         secondSubscriber.unsubscribe();
 
-        mSubscriptionHandler.manageViewSubscription(firstSubscriber, secondSubscriber);
+        mSubscriptionHandler.manageViewSubscriptions(firstSubscriber, secondSubscriber);
 
         assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
         secondSubscriber.assertUnsubscribed();
@@ -172,12 +197,82 @@ public class RxTiPresenterSubscriptionHandlerTest {
         TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
 
         mSubscriptionHandler
-                .manageViewSubscription(firstSubscriber, secondSubscriber, thirdSubscriber);
+                .manageViewSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
         assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
         assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
         assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
 
         mPresenter.detachView();
+        firstSubscriber.assertUnsubscribed();
+        secondSubscriber.assertUnsubscribed();
+        thirdSubscriber.assertUnsubscribed();
+    }
+
+    @Test
+    public void testManageSubscriptions_WithDetach_ShouldUnsubcribe() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        TestSubscriber<Void> firstSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler
+                .manageViewSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
+        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
+
+        mPresenter.detachView();
+        firstSubscriber.assertUnsubscribed();
+        secondSubscriber.assertUnsubscribed();
+        thirdSubscriber.assertUnsubscribed();
+    }
+
+    @Test
+    public void testManageSubscriptions_AfterDestroy_ShouldThrowIllegalState() throws Exception {
+        mPresenter.create();
+        mPresenter.destroy();
+        TestSubscriber<Void> firstSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
+
+        try {
+            mSubscriptionHandler.manageSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
+            fail("no exception");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), containsString("DESTROYED"));
+        }
+    }
+
+    @Test
+    public void testManageSubscriptions_WithAlreadyUnsubscribedSubscription_ShouldDoNothing()
+            throws Exception {
+        TestSubscriber<Void> firstSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
+        firstSubscriber.unsubscribe();
+        secondSubscriber.unsubscribe();
+        thirdSubscriber.unsubscribe();
+
+        mSubscriptionHandler.manageSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
+
+        firstSubscriber.assertUnsubscribed();
+        secondSubscriber.assertUnsubscribed();
+        thirdSubscriber.assertUnsubscribed();
+    }
+
+    @Test
+    public void testManageSubscriptions_WithDestroy_ShouldUnsubscribe() throws Exception {
+        mPresenter.create();
+        TestSubscriber<Void> firstSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> secondSubscriber = new TestSubscriber<>();
+        TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
+
+        mSubscriptionHandler.manageSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
+        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
+        mPresenter.destroy();
         firstSubscriber.assertUnsubscribed();
         secondSubscriber.assertUnsubscribed();
         thirdSubscriber.assertUnsubscribed();

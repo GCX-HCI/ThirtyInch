@@ -58,34 +58,63 @@ public class RxTiPresenterDisposableHandler {
     }
 
     /**
-     * Add your disposables here and they will automatically disposed when
+     * Add your disposable here and they will automatically disposed when
      * {@link TiPresenter#destroy()} gets called
      *
      * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
      */
-    public void manageDisposable(@NonNull final Disposable... disposables) {
+    public Disposable manageDisposable(@NonNull final Disposable disposable) {
         if (mPresenterDisposables == null) {
             throw new IllegalStateException("disposable handling doesn't work"
                     + " when the presenter has reached the DESTROYED state");
         }
 
-        mPresenterDisposables.addAll(disposables);
+        mPresenterDisposables.add(disposable);
+        return disposable;
+    }
+
+
+    /**
+     * Add your disposables here and they will automatically disposed when
+     * {@link TiPresenter#destroy()} gets called
+     *
+     * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
+     * @see #manageDisposable(Disposable)
+     */
+    public void manageDisposables(@NonNull final Disposable... disposable) {
+        for (int i = 0; i < disposable.length; i++) {
+            manageDisposable(disposable[i]);
+        }
     }
 
     /**
-     * Add your disposables for View events to this method to get them automatically cleaned up
-     * in {@link TiPresenter#detachView()}. typically call this in {@link
-     * TiPresenter#attachView(TiView)} where you dispose to the UI events.
+     * Add your disposable for View events to this method to get them automatically cleaned up
+     * in {@link TiPresenter#detachView()}. typically call this in
+     * {@link TiPresenter#attachView(TiView)} where you dispose to the UI events.
      *
      * @throws IllegalStateException when no view is attached
      */
-    public void manageViewDisposable(@NonNull final Disposable... disposables) {
+    public Disposable manageViewDisposable(@NonNull final Disposable disposable) {
         if (mUiDisposables == null) {
             throw new IllegalStateException("view disposable can't be handled"
                     + " when there is no view");
         }
 
-        mUiDisposables.addAll(disposables);
+        mUiDisposables.add(disposable);
+        return disposable;
+    }
+
+    /**
+     * Add your disposables for View events to this method to get them automatically cleaned up
+     * in {@link TiPresenter#detachView()}. typically call this in
+     * {@link TiPresenter#attachView(TiView)} where you dispose to the UI events.
+     *
+     * @throws IllegalStateException when no view is attached
+     */
+    public void manageViewDisposables(@NonNull final Disposable... disposables) {
+        for (int i = 0; i < disposables.length; i++) {
+            manageViewDisposable(disposables[i]);
+        }
     }
 
 }

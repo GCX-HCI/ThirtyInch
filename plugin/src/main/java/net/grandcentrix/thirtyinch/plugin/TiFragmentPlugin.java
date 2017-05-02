@@ -25,17 +25,21 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.BackstackReader;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +57,7 @@ import java.util.concurrent.Executor;
  */
 public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extends FragmentPlugin
         implements TiViewProvider<V>, DelegatedTiFragment, TiLoggingTagProvider,
-        InterceptableViewBinder<V> {
+        InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private String TAG = this.getClass().getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
@@ -74,13 +78,19 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      * @param presenterProvider callback returning the presenter.
      */
     public TiFragmentPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
-        mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider, this);
+        mDelegate = new TiFragmentDelegate<>(this, this, presenterProvider, this,
+                PresenterSavior.getInstance());
     }
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return getFragment().getActivity();
     }
 
     /**
@@ -88,7 +98,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
@@ -98,7 +108,7 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      */
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -108,12 +118,13 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return TAG;
     }
 
-    public P getPresenter() {
+    @Override
+    public final P getPresenter() {
         return mDelegate.getPresenter();
     }
 
     @Override
-    public Executor getUiThreadExecutor() {
+    public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
     }
 
@@ -122,41 +133,48 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
     @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(getFragment().getActivity());
-    }
-
-    @Override
-    public boolean isFragmentAdded() {
+    public final boolean isFragmentAdded() {
         return getFragment().isAdded();
     }
 
     @Override
-    public boolean isFragmentDetached() {
+    public final boolean isFragmentDetached() {
         return getFragment().isDetached();
     }
 
     @Override
-    public boolean isHostingActivityChangingConfigurations() {
+    public boolean isFragmentRemoving() {
+        return getFragment().isRemoving();
+    }
+
+    @Override
+    public final boolean isHostingActivityChangingConfigurations() {
         return getFragment().getActivity().isChangingConfigurations();
     }
 
     @Override
-    public boolean isHostingActivityFinishing() {
+    public final boolean isHostingActivityFinishing() {
         return getFragment().getActivity().isFinishing();
     }
 
+    @Override
+    public boolean isFragmentInBackstack() {
+        return BackstackReader.isInBackStack(getFragment());
+    }
+
+    @CallSuper
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @CallSuper
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
@@ -165,30 +183,35 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    @CallSuper
     @Override
     public void onDestroy() {
         super.onDestroy();
         mDelegate.onDestroy_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onDestroyView() {
         mDelegate.onDestroyView_beforeSuper();
         super.onDestroyView();
     }
 
+    @CallSuper
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
+    @CallSuper
     @Override
     public void onStart() {
         super.onStart();
         mDelegate.onStart_afterSuper();
     }
 
+    @CallSuper
     @Override
     public void onStop() {
         mDelegate.onStop_beforeSuper();
@@ -222,11 +245,6 @@ public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> extend
                 return (V) getFragment();
             }
         }
-    }
-
-    @Override
-    public void setFragmentRetainInstance(final boolean retain) {
-        getFragment().setRetainInstance(retain);
     }
 
     @Override

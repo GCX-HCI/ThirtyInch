@@ -37,7 +37,7 @@ public class RxTiPresenterSubscriptionHandler {
                     final boolean hasLifecycleMethodBeenCalled) {
                 if (state == TiPresenter.State.VIEW_DETACHED && !hasLifecycleMethodBeenCalled) {
                     // unsubscribe all UI subscriptions created in onAttachView() and added
-                    // via manageViewSubscription(Subscription)
+                    // via manageViewSubscriptions(Subscription)
                     if (mUiSubscriptions != null) {
                         mUiSubscriptions.unsubscribe();
                         mUiSubscriptions = null;
@@ -57,34 +57,65 @@ public class RxTiPresenterSubscriptionHandler {
     }
 
     /**
-     * Add your subscriptions here and they will automatically unsubscribed when
+     * Add your subscription here and they will automatically unsubscribed when
      * {@link TiPresenter#destroy()} gets called
      *
      * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
+     * @see #manageSubscriptions(Subscription...)
      */
-    public void manageSubscription(@NonNull final Subscription... subscriptions) {
+    public Subscription manageSubscription(@NonNull final Subscription subscription) {
         if (mPresenterSubscriptions == null) {
             throw new IllegalStateException("subscription handling doesn't work"
                     + " when the presenter has reached the DESTROYED state");
         }
 
-        mPresenterSubscriptions.addAll(subscriptions);
+        mPresenterSubscriptions.add(subscription);
+        return subscription;
+    }
+
+    /**
+     * Add your subscriptions here and they will automatically unsubscribed when
+     * {@link TiPresenter#destroy()} gets called
+     *
+     * @throws IllegalStateException when the presenter has reached {@link net.grandcentrix.thirtyinch.TiPresenter.State#DESTROYED}
+     * @see #manageSubscription(Subscription)
+     */
+    public void manageSubscriptions(@NonNull final Subscription... subscriptions) {
+        for (int i = 0; i < subscriptions.length; i++) {
+            manageSubscription(subscriptions[i]);
+        }
+    }
+
+    /**
+     * Add your subscription for View events to this method to get them automatically cleaned up
+     * in {@link TiPresenter#detachView()}. Typically call this in
+     * {@link TiPresenter#attachView(TiView)} where you subscribe to the UI events.
+     *
+     * @throws IllegalStateException when no view is attached
+     * @see #manageViewSubscriptions(Subscription...)
+     */
+    public Subscription manageViewSubscription(@NonNull final Subscription subscription) {
+        if (mUiSubscriptions == null) {
+            throw new IllegalStateException("view subscription can't be handled"
+                    + " when there is no view");
+        }
+
+        mUiSubscriptions.add(subscription);
+        return subscription;
     }
 
     /**
      * Add your subscriptions for View events to this method to get them automatically cleaned up
-     * in {@link TiPresenter#detachView()}. typically call this in {@link
-     * TiPresenter#attachView(TiView)} where you subscribe to the UI events.
+     * in {@link TiPresenter#detachView()}. Typically call this in
+     * {@link TiPresenter#attachView(TiView)} where you subscribe to the UI events.
      *
      * @throws IllegalStateException when no view is attached
+     * @see #manageViewSubscription(Subscription)
      */
-    public void manageViewSubscription(@NonNull final Subscription... subscriptions) {
-        if (mUiSubscriptions == null) {
-            throw new IllegalStateException("view subscriptions can't be handled"
-                    + " when there is no view");
+    public void manageViewSubscriptions(@NonNull final Subscription... subscriptions) {
+        for (int i = 0; i < subscriptions.length; i++) {
+            manageViewSubscription(subscriptions[i]);
         }
-
-        mUiSubscriptions.addAll(subscriptions);
     }
 
 }

@@ -17,17 +17,19 @@ package net.grandcentrix.thirtyinch;
 
 import net.grandcentrix.thirtyinch.internal.DelegatedTiActivity;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
-import net.grandcentrix.thirtyinch.internal.PresenterNonConfigurationInstance;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiActivityDelegate;
 import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AndroidDeveloperOptions;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -36,37 +38,88 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 /**
- * Created by pascalwelsch on 9/8/15.
+ * An Activity which has a {@link TiPresenter} to build the Model View Presenter architecture on
+ * Android.
+ *
+ * <p>
+ * The {@link TiPresenter} will be created in {@link #providePresenter()} called in
+ * {@link #onCreate(Bundle)}. Depending on the {@link TiConfiguration} passed into the
+ * {@link TiPresenter#TiPresenter(TiConfiguration)} constructor the {@link TiPresenter} survives
+ * orientation changes (default).
+ * </p>
+ * <p>
+ * The {@link TiPresenter} requires a interface to communicate with the View. Normally the Activity
+ * implements the View interface (which must extend {@link TiView}) and is returned by default
+ * from {@link #provideView()}.
+ * </p>
+ *
+ * <p>
+ * Example:
+ * <code>
+ * <pre>
+ * public class MyActivity extends TiActivity&lt;MyPresenter, MyView&gt; implements MyView {
+ *
+ *     &#064;Override
+ *     public MyPresenter providePresenter() {
+ *         return new MyPresenter();
+ *     }
+ * }
+ *
+ * public class MyPresenter extends TiPresenter&lt;MyView&gt; {
+ *
+ *     &#064;Override
+ *     protected void onCreate() {
+ *         super.onCreate();
+ *     }
+ * }
+ *
+ * public interface MyView extends TiView {
+ *
+ *     // void showItems(List&lt;Item&gt; items);
+ *
+ *     // Observable&lt;Item&gt; onItemClicked();
+ * }
+ * </pre>
+ * </code>
+ * </p>
+ *
+ * @param <V> the View type, must implement {@link TiView}
+ * @param <P> the Presenter type, must extend {@link TiPresenter<V>}
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
         implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
-        TiLoggingTagProvider, InterceptableViewBinder<V> {
+        TiLoggingTagProvider, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiActivity.class.getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
 
     private final TiActivityDelegate<P, V> mDelegate
-            = new TiActivityDelegate<>(this, this, this, this);
+            = new TiActivityDelegate<>(this, this, this, this, PresenterSavior.getInstance());
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
     @NonNull
     @Override
-    public Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
+    public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
+    @Override
+    public Activity getHostingActivity() {
+        return this;
     }
 
     @Nullable
     @Override
-    public V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
+    public final V getInterceptedViewOf(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.getInterceptedViewOf(interceptor);
     }
 
     @NonNull
     @Override
-    public List<BindViewInterceptor> getInterceptors(
+    public final List<BindViewInterceptor> getInterceptors(
             @NonNull final Filter<BindViewInterceptor> predicate) {
         return mDelegate.getInterceptors(predicate);
     }
@@ -76,26 +129,16 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         return TAG;
     }
 
-    public P getPresenter() {
+    /**
+     * is {@code null} before {@link #onCreate(Bundle)}
+     */
+    @Override
+    public final P getPresenter() {
         return mDelegate.getPresenter();
     }
 
-    @SuppressWarnings("unchecked")
-    @Nullable
     @Override
-    public P getRetainedPresenter() {
-        // try recover presenter via lastNonConfigurationInstance
-        // this works most of the time
-        final Object nci = getLastCustomNonConfigurationInstance();
-        if (nci instanceof PresenterNonConfigurationInstance) {
-            final PresenterNonConfigurationInstance pnci = (PresenterNonConfigurationInstance) nci;
-            return (P) pnci.getPresenter();
-        }
-        return null;
-    }
-
-    @Override
-    public Executor getUiThreadExecutor() {
+    public final Executor getUiThreadExecutor() {
         return mUiThreadExecutor;
     }
 
@@ -104,45 +147,25 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
      * through all the interceptors (again).
      */
     @Override
-    public void invalidateView() {
+    public final void invalidateView() {
         mDelegate.invalidateView();
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
+    public final boolean isActivityChangingConfigurations() {
         return isChangingConfigurations();
     }
 
     @Override
-    public boolean isActivityFinishing() {
+    public final boolean isActivityFinishing() {
         return isFinishing();
     }
 
-    @Override
-    public boolean isDontKeepActivitiesEnabled() {
-        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
-    }
-
+    @CallSuper
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDelegate.onConfigurationChanged_afterSuper(newConfig);
-    }
-
-    @Nullable
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        final P presenter = mDelegate.getPresenter();
-        if (presenter == null) {
-            return null;
-        }
-
-        if (presenter.getConfig().shouldRetainPresenter()) {
-            return new PresenterNonConfigurationInstance<>(presenter,
-                    super.onRetainCustomNonConfigurationInstance());
-        }
-
-        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -180,30 +203,35 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
                 + "{presenter = " + presenter + "}";
     }
 
+    @CallSuper
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDelegate.onCreate_afterSuper(savedInstanceState);
     }
 
+    @CallSuper
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mDelegate.onDestroy_afterSuper();
     }
 
+    @CallSuper
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
+    @CallSuper
     @Override
     protected void onStart() {
         super.onStart();
         mDelegate.onStart_afterSuper();
     }
 
+    @CallSuper
     @Override
     protected void onStop() {
         mDelegate.onStop_beforeSuper();

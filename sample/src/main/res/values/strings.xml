@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">Sample</string>
+    <string name="app_name">ThirtyInch Sample</string>
+
+    <!-- Fragment lifecycle -->
+    <string name="start_fragment_lifecycle_test">Start fragment lifecycle test</string>
+    <string name="add_fragment_a">Add Fragment A</string>
+    <string name="remove_fragment_a">Remove Fragment A</string>
+    <string name="add_fragment_b">Add Fragment B</string>
+    <string name="detach_attach_again">Fragment Detach/Attach again</string>
+    <string name="recreate_activity">Recreate Activity</string>
+    <string name="finish_activity">Finish Activity</string>
+    <string name="dont_keep_activities_enabled">Don\'t keep activities enabled</string>
+    <string name="dont_keep_activities_disabled">Don\'t keep activities disabled</string>
+    <string name="retain_presenter_instance">Retain presenter instance</string>
+    <string name="add_transaction_to_back_stack">Add transaction to back stack</string>
 </resources>

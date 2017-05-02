@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -37,13 +38,13 @@ public class RxTiPresenterDisposableHandlerTest {
 
     private RxTiPresenterDisposableHandler mDisposableHandler;
 
-    private TiPresenter mPresenter;
+    private TiPresenter<TiView> mPresenter;
 
     private TiView mView;
 
     @Before
     public void setUp() throws Exception {
-        mPresenter = new TiPresenter() {
+        mPresenter = new TiPresenter<TiView>() {
         };
         mDisposableHandler = new RxTiPresenterDisposableHandler(mPresenter);
         mView = mock(TiView.class);
@@ -61,6 +62,17 @@ public class RxTiPresenterDisposableHandlerTest {
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), containsString("DESTROYED"));
         }
+    }
+
+    @Test
+    public void testManageDisposable_ShouldReturnSameDisposable() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestObserver<Integer> testObserver = new TestObserver<>();
+
+        final Disposable disposable = mDisposableHandler.manageDisposable(testObserver);
+
+        assertThat(testObserver, is(equalTo(disposable)));
     }
 
     @Test
@@ -102,6 +114,17 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
+    public void testManageViewDisposable_ShouldReturnSameDisposable() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestObserver<Integer> testObserver = new TestObserver<>();
+
+        final Disposable disposable = mDisposableHandler.manageViewDisposable(testObserver);
+
+        assertThat(testObserver, is(equalTo(disposable)));
+    }
+
+    @Test
     public void testManageViewDisposable_manageAfterDetach_ShouldThrowIllegalStateException()
             throws Exception {
         mPresenter.create();
@@ -133,7 +156,7 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManageViewDisposeable_WithOneAlreadyDisposed_ShouldNotAddToDisposable()
+    public void testManageViewDisposables_WithOneAlreadyDisposed_ShouldNotAddToDisposable()
             throws Exception {
         mPresenter.create();
         mPresenter.attachView(mView);
@@ -141,14 +164,14 @@ public class RxTiPresenterDisposableHandlerTest {
         final TestObserver<Integer> secondTestObserver = new TestObserver<>();
         secondTestObserver.dispose();
 
-        mDisposableHandler.manageViewDisposable(firstTestObserver, secondTestObserver);
+        mDisposableHandler.manageViewDisposables(firstTestObserver, secondTestObserver);
 
         assertThat(firstTestObserver.isDisposed(), is(false));
         assertThat(secondTestObserver.isDisposed(), is(true));
     }
 
     @Test
-    public void testManagerViewDisposable_WithDetach_ShouldDispose() throws Exception {
+    public void testManagerViewDisposables_WithDetach_ShouldDispose() throws Exception {
         mPresenter.create();
         mPresenter.attachView(mView);
         final TestObserver<Integer> firstTestObserver = new TestObserver<>();
@@ -156,12 +179,59 @@ public class RxTiPresenterDisposableHandlerTest {
         final TestObserver<Integer> thirdTestObserver = new TestObserver<>();
 
         mDisposableHandler
-                .manageViewDisposable(firstTestObserver, secondTestObserver, thirdTestObserver);
+                .manageViewDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
         assertThat(firstTestObserver.isDisposed(), equalTo(false));
         assertThat(secondTestObserver.isDisposed(), equalTo(false));
         assertThat(thirdTestObserver.isDisposed(), equalTo(false));
 
         mPresenter.detachView();
+        assertThat(firstTestObserver.isDisposed(), equalTo(true));
+        assertThat(secondTestObserver.isDisposed(), equalTo(true));
+        assertThat(thirdTestObserver.isDisposed(), equalTo(true));
+    }
+
+    @Test
+    public void testManageDisposables_WithOneAlreadyDisposed_ShouldNotAddToDisposable()
+            throws Exception {
+        mPresenter.create();
+        final TestObserver<Integer> firstTestObserver = new TestObserver<>();
+        final TestObserver<Integer> secondTestObserver = new TestObserver<>();
+        secondTestObserver.dispose();
+
+        mDisposableHandler.manageDisposables(firstTestObserver, secondTestObserver);
+
+        assertThat(firstTestObserver.isDisposed(), is(false));
+        assertThat(secondTestObserver.isDisposed(), is(true));
+    }
+
+    @Test
+    public void testManagerDisposables_WithDestroyed_ShouldThrow() throws Exception {
+        mPresenter.create();
+        mPresenter.destroy();
+        final TestObserver<Integer> firstTestObserver = new TestObserver<>();
+        final TestObserver<Integer> secondTestObserver = new TestObserver<>();
+        final TestObserver<Integer> thirdTestObserver = new TestObserver<>();
+
+        try {
+            mDisposableHandler
+                    .manageDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
+            fail("no exception");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), containsString("DESTROYED"));
+        }
+    }
+
+    @Test
+    public void testManagerDisposables_Destroy_ShouldDispose() throws Exception {
+        mPresenter.create();
+        final TestObserver<Integer> firstTestObserver = new TestObserver<>();
+        final TestObserver<Integer> secondTestObserver = new TestObserver<>();
+        final TestObserver<Integer> thirdTestObserver = new TestObserver<>();
+
+        mDisposableHandler
+                .manageDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
+
+        mPresenter.destroy();
         assertThat(firstTestObserver.isDisposed(), equalTo(true));
         assertThat(secondTestObserver.isDisposed(), equalTo(true));
         assertThat(thirdTestObserver.isDisposed(), equalTo(true));

@@ -13,27 +13,33 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.internal;
+package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
+
+import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
-public class PresenterNonConfigurationInstance<P extends TiPresenter> {
+public class TestPresenter extends TiPresenter<TestPresenter.TestView> {
 
-    private Object OtherNonConfigurationInstance;
+    public interface TestView extends TiView {
 
-    private P mPresenter;
-
-    public PresenterNonConfigurationInstance(final P presenter,
-            final Object otherNonConfigurationInstance) {
-        mPresenter = presenter;
-        OtherNonConfigurationInstance = otherNonConfigurationInstance;
     }
 
-    public Object getOtherNonConfigurationInstance() {
-        return OtherNonConfigurationInstance;
+    private final String mName;
+
+    public TestPresenter(final String name) {
+        mName = name;
     }
 
-    public P getPresenter() {
-        return mPresenter;
+    public TestPresenter(final TiConfiguration config, final String name) {
+        super(config);
+
+        mName = name;
+    }
+
+    @Override
+    public String toString() {
+        return mName + "#" + super.toString();
     }
 }

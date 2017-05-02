@@ -15,25 +15,21 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-
-import java.util.HashMap;
 
 /**
- * helper to clear the savior in the test environment without exposing this to the public API
+ * adds some functions for testing
  */
-public class PresenterSaviorTestHelper {
+public class TestPresenterSavior extends PresenterSavior {
 
-    public static void clear() {
-        PresenterSavior.INSTANCE.clear();
+    public int getPresenterCount() {
+        if (mScopes.isEmpty()) {
+            return 0;
+        }
+
+        int size = 0;
+        for (final ActivityScopedPresenters scope : mScopes.values()) {
+            size += scope.size();
+        }
+        return size;
     }
-
-    public static int presenterCount() {
-        return presenters().entrySet().size();
-    }
-
-    public static HashMap<String, TiPresenter> presenters() {
-        return PresenterSavior.INSTANCE.mPresenters;
-    }
-
 }
