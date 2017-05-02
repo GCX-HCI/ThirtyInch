@@ -44,6 +44,12 @@ public class ViewRenderer<V extends TiView, VM> implements TiLifecycleObserver {
     }
 
     /**
+     * flag if the next render should  be a forced render. True when rendering is not possible to
+     * save the force property for the next render call
+     */
+    private boolean mForce = false;
+
+    /**
      * boolean flag indicating a rendering on the main thread is pending. It's therefore not
      * required to call runOnUiThread(() -> performRender(true)); again because a runnable already
      * got posted
@@ -107,7 +113,7 @@ public class ViewRenderer<V extends TiView, VM> implements TiLifecycleObserver {
 
         if (state == TiPresenter.State.VIEW_ATTACHED && hasLifecycleMethodBeenCalled) {
             // after onAttachView(view)
-            dispatchRender(false);
+            dispatchRender(mForce);
         }
 
         if (state == TiPresenter.State.VIEW_DETACHED && hasLifecycleMethodBeenCalled) {
@@ -138,6 +144,14 @@ public class ViewRenderer<V extends TiView, VM> implements TiLifecycleObserver {
         synchronized (mRenderingLock) {
             if (!mIsRenderingPending || force) {
                 mIsRenderingPending = true;
+                if (mPresenter.getView() == null) {
+                    // can't execute it now, no executor
+                    if (force) {
+                        // save force rendering for next attach event
+                        mForce = true;
+                    }
+                    return;
+                }
                 // no render operation posted, dispatch render on the UI thread
                 mPresenter.runOnUiThread(new Runnable() {
                     @Override
@@ -172,6 +186,8 @@ public class ViewRenderer<V extends TiView, VM> implements TiLifecycleObserver {
                         // render not required, virtual view hasn't changed
                         return;
                     }
+                } else {
+                    mForce = false;
                 }
 
                 mRenderBlock.render(view, newViewModel);
