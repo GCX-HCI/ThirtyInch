@@ -189,12 +189,12 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     @Override
     public final boolean isHostingActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
+        return getHostingActivity().isChangingConfigurations();
     }
 
     @Override
     public final boolean isHostingActivityFinishing() {
-        return getActivity().isFinishing();
+        return getHostingActivity().isFinishing();
     }
 
     @Override
