@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import rx.Observable;
 import rx.Subscription;
 import rx.observers.TestSubscriber;
 
@@ -102,6 +103,30 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         mPresenter.destroy();
         testSubscriber.assertUnsubscribed();
+    }
+
+    @Test
+    public void testManageViewSubscription_InOnDetachView_ShouldThrow() throws Exception {
+        final TiMockPresenter presenter = new TiMockPresenter() {
+
+            private RxTiPresenterSubscriptionHandler mSubscriptionHandler =
+                    new RxTiPresenterSubscriptionHandler(this);
+
+            @Override
+            protected void onDetachView() {
+                super.onDetachView();
+                mSubscriptionHandler.manageViewSubscription(Observable.just("test").subscribe());
+            }
+        };
+        presenter.create();
+        presenter.attachView(mView);
+
+        try {
+            presenter.detachView();
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e.getMessage(), containsString("no view"));
+        }
     }
 
     @Test
