@@ -48,6 +48,17 @@ import java.util.Map;
 public class PresenterSavior implements TiPresenterSavior,
         ActivityInstanceObserver.ActivityFinishListener {
 
+    /**
+     * Thrown for not supported host types
+     */
+    public static class IllegalHostException extends RuntimeException {
+
+        public IllegalHostException(final Object host) {
+            super("Host has unknown type " + host.getClass().getSimpleName()
+                    + " and is not supported.");
+        }
+    }
+
     private static PresenterSavior INSTANCE;
 
     private static final String TAG = PresenterSavior.class.getSimpleName();
@@ -151,28 +162,28 @@ public class PresenterSavior implements TiPresenterSavior,
     @Override
     public String save(@NonNull final TiPresenter presenter, @NonNull final Object host) {
 
-        // the hostId
+        // hostId will be non null for new hosts
         String hostId = null;
 
         PresenterScope scope = getScope(host);
         if (scope == null) {
             // create a new scope
             scope = new PresenterScope();
-            hostId = generateHostId(host);
+            hostId = generateId(host);
             mScopes.put(hostId, scope);
         }
-        final String presenterId = generatePresenterId(presenter);
+        final String presenterId = generateId(presenter);
         scope.save(presenterId, presenter);
 
-        // register host observer
-        if (host instanceof Activity) {
-            final Activity activity = (Activity) host;
-            observeActivityFinish(activity, hostId);
-        } else {
-            // currently only Activity is supported as host
-            throw new IllegalStateException(
-                    "Host has unknown type " + host.getClass().getSimpleName()
-                            + " and is not supported.");
+        if (hostId != null) {
+            // register host observer when a new host was detected
+            if (host instanceof Activity) {
+                final Activity activity = (Activity) host;
+                observeActivityFinish(activity, hostId);
+            } else {
+                // currently only Activity is supported as host
+                throw new IllegalHostException(host);
+            }
         }
 
         printRemainingPresenter();
@@ -180,14 +191,12 @@ public class PresenterSavior implements TiPresenterSavior,
         return presenterId;
     }
 
-    private String generateHostId(final Object host) {
-        return host.getClass().getSimpleName()
-                + ":" + System.nanoTime();
-    }
-
-    private String generatePresenterId(@NonNull final TiPresenter presenter) {
-        return presenter.getClass().getSimpleName()
-                + ":" + presenter.hashCode()
+    /**
+     * Generates a unique id for a given object
+     */
+    private String generateId(final Object object) {
+        return object.getClass().getSimpleName()
+                + ":" + object.hashCode()
                 + ":" + System.nanoTime();
     }
 
@@ -212,8 +221,7 @@ public class PresenterSavior implements TiPresenterSavior,
             return mScopes.get(scopeId);
         } else {
             // currently only Activity is supported as host
-            throw new IllegalStateException(
-                    "Host has unknown type " + host.getClass().getSimpleName());
+            throw new IllegalHostException(host);
         }
     }
 
@@ -223,14 +231,9 @@ public class PresenterSavior implements TiPresenterSavior,
      * @param activity to listen for the finish event
      * @param hostId   id to track the Activity across orientation changes
      */
-    private void observeActivityFinish(final Activity activity, @Nullable final String hostId) {
+    private void observeActivityFinish(final Activity activity, @NonNull final String hostId) {
         final ActivityInstanceObserver observer = registerActivityObserver(activity);
-        if (hostId != null) {
-            // stack tracking of this untracked Activity
-            observer.startTracking(activity, hostId);
-        } else {
-            // already observing this activity
-        }
+        observer.startTracking(activity, hostId);
     }
 
     /**

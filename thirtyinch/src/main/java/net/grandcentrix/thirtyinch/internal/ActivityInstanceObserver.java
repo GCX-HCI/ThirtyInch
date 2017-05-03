@@ -60,7 +60,7 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     }
 
     /**
-     * Returns the id created with {@link #startTracking(Activity, String)}
+     * Returns the id provided by {@link #startTracking(Activity, String)}
      *
      * @return a unique id for each {@link Activity} which doesn't change when the {@link Activity}
      * changes its configuration
