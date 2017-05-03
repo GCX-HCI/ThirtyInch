@@ -19,6 +19,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +28,13 @@ import java.util.List;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class TiLifecycleObserverTest {
 
@@ -246,6 +253,33 @@ public class TiLifecycleObserverTest {
 
         removable2.remove();
         assertEquals(0, mPresenter.mLifecycleObservers.size());
+    }
+
+    @Test
+    public void testRemoveOtherObserver() throws Exception {
+        mPresenter.create();
+
+        final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer1);
+        final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
+        final Removable removable = mPresenter.addLifecycleObserver(observer2);
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+                removable.remove();
+                return null;
+            }
+        }).when(observer1).onChange(any(TiPresenter.State.class), anyBoolean());
+
+        mPresenter.attachView(mock(TiView.class));
+
+        //receives both events
+        verify(observer1, times(2)).onChange(any(TiPresenter.State.class), anyBoolean());
+
+        // only gets first event, already unregistered when second event fires
+        verify(observer2, times(1)).onChange(any(TiPresenter.State.class), anyBoolean());
+
     }
 
     @Test
