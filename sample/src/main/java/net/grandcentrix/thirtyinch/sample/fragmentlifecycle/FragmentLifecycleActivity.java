@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 
 public class FragmentLifecycleActivity extends AppCompatActivity {
 
@@ -52,6 +53,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
             Log.v(TAG, "// When the Fragment get added again to the Activity.");
             //add after delay again. Don't use the same transaction
             Observable.just(null).delay(1, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(o -> addFragment(fragment));
         } else {
             Toast.makeText(this, "no fragment found", Toast.LENGTH_SHORT).show();
@@ -154,9 +156,13 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         if (retain) {
             Log.v(TAG, "retaining presenter");
         }
-        final Bundle bundle = new Bundle();
-        bundle.putBoolean(TestFragment.RETAIN_PRESENTER, retain);
-        fragment.setArguments(bundle);
+        if (fragment.getArguments() == null) {
+            final Bundle bundle = new Bundle();
+            bundle.putBoolean(TestFragment.RETAIN_PRESENTER, retain);
+            fragment.setArguments(bundle);
+        } else {
+            Log.v(TAG, "reusing fragment, not setting new arguments");
+        }
 
         fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
         if (isAddToBackStack()) {
