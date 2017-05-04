@@ -25,8 +25,7 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.8.0-rc4' // prerelease
-    // def thirtyinchVersion = '0.7.1' // stable
+    def thirtyinchVersion = '0.8.0'
     
     // MVP for activity and fragment
     compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
@@ -35,7 +34,6 @@ dependencies {
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
     
-    // logging interceptor (added in 0.8.0-rc4)
     compile "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
     
     // test extension
@@ -57,7 +55,6 @@ dependencies {
 ## [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
 
 There is a sample implementation based on the [Android Architecture Blueprints TODO app](https://github.com/googlesamples/android-architecture) which can be found here: [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
-
 
 ## Hello World MVP example with ThirtyInch
 
@@ -107,7 +104,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     @Override    
     protected void onAttachView(@NonNull final HelloWorldView view) {
         super.onAttachView(view);
-        getView().showText("Hello World!");
+        view.showText("Hello World!");
     }
 }
 
@@ -248,11 +245,12 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
         implements HelloWorldView {
 
     public HelloWorldActivity() {
-        addBindViewInterceptor(new MyInterceptor());
+        addBindViewInterceptor(new LoggingInterceptor());
     }
 }
 ```
 
+`LoggingInterceptor` is available as module and logs all calls to the view.
 
 ### [RxJava](https://github.com/ReactiveX/RxJava)
 
