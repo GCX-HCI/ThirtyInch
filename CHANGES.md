@@ -7,6 +7,9 @@
 Version 0.8.0 is a big step forward towards 1.0.0. The biggest problem, a memory leak when using Fragments could be resolved. This bugfix was only possible after introducing tons of tests.
 API enhancements of `TiPresenter` make MVP even easier and removes common pitfalls
 
+Thanks for external contributors:
+@remcomokveld, @vRallev, @jonathan-caryl, @k0shk0sh
+
 ### thirtyinch
 
 **TiPresenter**
