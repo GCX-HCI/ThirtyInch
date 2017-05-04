@@ -95,7 +95,11 @@ public class TestTiActivity
     }
 
     @Override
-    public Activity getHostingActivity() {
+    public Object getHostingContainer() {
+        return mHostingActivity.getMockActivityInstance();
+    }
+
+    public Activity getMockActivityInstance() {
         return mHostingActivity.getMockActivityInstance();
     }
 

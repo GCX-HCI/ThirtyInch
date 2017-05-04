@@ -231,6 +231,11 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #onDestroy()
      */
     public final void destroy() {
+        if (isViewAttached()) {
+            throw new IllegalStateException(
+                    "view is attached, can't destroy the presenter. First call detachView()");
+        }
+
         if (!isInitialized() || isDestroyed()) {
             TiLog.v(TAG, "not calling onDestroy(), destroy was already called");
             return;

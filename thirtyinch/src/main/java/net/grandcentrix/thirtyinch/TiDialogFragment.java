@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.BackstackReader;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +55,11 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     @Override
     public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
+    @Override
+    public final Object getHostingContainer() {
+        return getHost();
     }
 
     @Nullable
@@ -104,13 +110,13 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     }
 
     @Override
-    public final boolean isHostingActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
+    public final boolean isFragmentInBackstack() {
+        return BackstackReader.isInBackStack(this);
     }
 
     @Override
-    public final boolean isHostingActivityFinishing() {
-        return getActivity().isFinishing();
+    public final boolean isFragmentRemoving() {
+        return isRemoving();
     }
 
     @CallSuper
