@@ -321,47 +321,6 @@ public class HelloWorldActivity extends CompositeActivity implements HelloWorldV
 
 Yes you have to extends `CompositeActivity`, but that's the last level of inheritance you'll ever need.
 
-## Versions
-
-
-##### Version 0.7.1 `07.09.16`
-- add missing `TiActivity#getPresenter()`
-
-##### Version 0.7.0 `04.09.16`
-- `TiConfiguration`
-- Presenter LifecycleObservers
-- ViewBindingInterceptors
-- `TiActivityDelegate` for code sharing
-- separate Rx module
-- separate Test module
-- public release, projects using `Ti`: ∞
-
-##### Version 0.6 `11.06.16`
-- Tests
-- Smaller bugfixes and minor breaking changes
-
-##### Version 0.5 `03.05.16`
-- plugin for CompositeAndroid
-- Clean usage syntax by automatically using the `TiActivity` as the `TiView`
-- Projects using `Ti`: 6
-
-##### Version 0.4 `12.05.16`
-- Extracted into standalone library
-- Rebranded to ThirtyInch
-- Projects using `Ti`: 3
-
-##### Version 0.3 `19.02.16`
-- CallOnMainThread annotation
-- fix "Don't keep activities" with `PresenterSavior`
-
-##### Version 0.2 `02.09.15`
-- stabilize Activity and Fragment support
-
-##### Version 0.1 `10.04.15`
-- first configuration change surviving Presenter
-- heavy usage or RxJava
-
-
 # License
 
 ```
