@@ -33,8 +33,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class TiLifecycleObserverTest {
 
@@ -259,11 +258,13 @@ public class TiLifecycleObserverTest {
     public void testRemoveOtherObserver() throws Exception {
         mPresenter.create();
 
+        // add observers only for attach event
         final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
         mPresenter.addLifecycleObserver(observer1);
         final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
         final Removable removable = mPresenter.addLifecycleObserver(observer2);
 
+        // when observer1 receives the first event it unregisters observer2
         doAnswer(new Answer() {
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
@@ -274,12 +275,20 @@ public class TiLifecycleObserverTest {
 
         mPresenter.attachView(mock(TiView.class));
 
-        //receives both events
-        verify(observer1, times(2)).onChange(any(TiPresenter.State.class), anyBoolean());
+        final InOrder inOrder = inOrder(observer1, observer2);
 
-        // only gets first event, already unregistered when second event fires
-        verify(observer2, times(1)).onChange(any(TiPresenter.State.class), anyBoolean());
+        //observer 1 receives pre onAttachView event
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, false);
 
+        // observer2 receives the pre event even when observer1 removed observer2 before observer2 received the pre event
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_ATTACHED, false);
+
+
+        // observer 1 receives post onAttachView event
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, true);
+        
+        // observer2 never receives the post event, is unregistered at that time
+        verifyNoMoreInteractions(observer2);
     }
 
     @Test
