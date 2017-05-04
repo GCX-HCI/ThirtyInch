@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.TestObserver;
 
@@ -100,7 +101,31 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManageVieDisposable_WithDetachSingleDispose_ShouldDispose()
+    public void testManageViewSubscription_InOnDetachView_ShouldThrow() throws Exception {
+        final TiPresenter presenter = new TiPresenter() {
+
+            private RxTiPresenterDisposableHandler mSubscriptionHandler =
+                    new RxTiPresenterDisposableHandler(this);
+
+            @Override
+            protected void onDetachView() {
+                super.onDetachView();
+                mSubscriptionHandler.manageViewDisposable(Observable.just("test").subscribe());
+            }
+        };
+        presenter.create();
+        presenter.attachView(mView);
+
+        try {
+            presenter.detachView();
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e.getMessage(), containsString("no view"));
+        }
+    }
+
+    @Test
+    public void testManageViewDisposable_WithDetachSingleDispose_ShouldDispose()
             throws Exception {
         mPresenter.create();
         mPresenter.attachView(mView);
