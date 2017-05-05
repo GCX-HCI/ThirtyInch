@@ -27,7 +27,7 @@ public class TestPresenterSavior extends PresenterSavior {
         }
 
         int size = 0;
-        for (final ActivityScopedPresenters scope : mScopes.values()) {
+        for (final PresenterScope scope : mScopes.values()) {
             size += scope.size();
         }
         return size;
