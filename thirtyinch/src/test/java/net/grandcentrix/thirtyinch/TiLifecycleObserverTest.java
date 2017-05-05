@@ -19,6 +19,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +28,12 @@ import java.util.List;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class TiLifecycleObserverTest {
 
@@ -246,6 +252,43 @@ public class TiLifecycleObserverTest {
 
         removable2.remove();
         assertEquals(0, mPresenter.mLifecycleObservers.size());
+    }
+
+    @Test
+    public void testRemoveOtherObserver() throws Exception {
+        mPresenter.create();
+
+        // add observers only for attach event
+        final TiLifecycleObserver observer1 = mock(TiLifecycleObserver.class);
+        mPresenter.addLifecycleObserver(observer1);
+        final TiLifecycleObserver observer2 = mock(TiLifecycleObserver.class);
+        final Removable removable = mPresenter.addLifecycleObserver(observer2);
+
+        // when observer1 receives the first event it unregisters observer2
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+                removable.remove();
+                return null;
+            }
+        }).when(observer1).onChange(any(TiPresenter.State.class), anyBoolean());
+
+        mPresenter.attachView(mock(TiView.class));
+
+        final InOrder inOrder = inOrder(observer1, observer2);
+
+        //observer 1 receives pre onAttachView event
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, false);
+
+        // observer2 receives the pre event even when observer1 removed observer2 before observer2 received the pre event
+        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_ATTACHED, false);
+
+
+        // observer 1 receives post onAttachView event
+        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, true);
+        
+        // observer2 never receives the post event, is unregistered at that time
+        verifyNoMoreInteractions(observer2);
     }
 
     @Test

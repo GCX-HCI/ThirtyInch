@@ -146,13 +146,13 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
                 TiLog.v(mLogTag.getLoggingTag(),
                         "try to recover Presenter with id: " + recoveredPresenterId);
                 mPresenter = (P) mSavior
-                        .recover(recoveredPresenterId, mTiFragment.getHostingActivity());
+                        .recover(recoveredPresenterId, mTiFragment.getHostingContainer());
                 if (mPresenter != null) {
                     // save recovered presenter with new id. No other instance of this activity,
                     // holding the presenter before, is now able to remove the reference to
                     // this presenter from the savior
-                    mSavior.free(recoveredPresenterId, mTiFragment.getHostingActivity());
-                    mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingActivity());
+                    mSavior.free(recoveredPresenterId, mTiFragment.getHostingContainer());
+                    mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingContainer());
 
                     TiPresenterSerializer serializer = mPresenter.getConfig().getPresenterSerializer();
                     if (serializer != null) {
@@ -183,7 +183,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             }
 
             if (config.shouldRetainPresenter()) {
-                mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingActivity());
+                mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingContainer());
             }
             mPresenter.create();
         }
@@ -232,15 +232,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "fragment is in backstack");
         }
 
-        if (mTiFragment.isHostingActivityFinishing()
-                && !mTiFragment.isHostingActivityChangingConfigurations()) {
-            // Probably a backpress and not a configuration change
-            // Activity will not be recreated and finally destroyed, also destroyed the presenter
-            destroyPresenter = true;
-            TiLog.v(mLogTag.getLoggingTag(),
-                    "Hosting Activity is finishing, destroying presenter " + mPresenter);
-        }
-
         if (!destroyPresenter &&
                 !mPresenter.getConfig().shouldRetainPresenter()) {
             // configuration says the presenter should not be retained, a new presenter instance
@@ -252,7 +243,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            mSavior.free(mPresenterId, mTiFragment.getHostingActivity());
+            mSavior.free(mPresenterId, mTiFragment.getHostingContainer());
             TiPresenterSerializer serializer = mPresenter.getConfig().getPresenterSerializer();
             if (serializer != null) {
                 serializer.cleanup(mPresenterId);

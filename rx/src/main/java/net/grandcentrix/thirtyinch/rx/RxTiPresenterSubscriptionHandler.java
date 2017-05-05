@@ -82,7 +82,7 @@ public class RxTiPresenterSubscriptionHandler {
      */
     public void manageSubscriptions(@NonNull final Subscription... subscriptions) {
         for (int i = 0; i < subscriptions.length; i++) {
-            manageViewSubscription(subscriptions[i]);
+            manageSubscription(subscriptions[i]);
         }
     }
 

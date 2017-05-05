@@ -38,6 +38,7 @@ android {
 dependencies {
     compile project(':thirtyinch')
     compile 'io.reactivex:rxjava:1.2.3'
+    compile 'com.artemzin.rxjava:proguard-rules:1.2.3.0'
     provided "com.android.support:support-annotations:$supportLibraryVersion"
 
     testCompile "junit:junit:$junitVersion"

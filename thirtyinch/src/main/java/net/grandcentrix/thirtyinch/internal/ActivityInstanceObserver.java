@@ -26,25 +26,24 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 /**
- * Keeps track of {@link Activity}s across orientation changes using a unique id when added via
- * {@link #startTracking(Activity)}. When the {@link Activity} finishes the {@link Listener} is
- * triggered.
+ * Keeps track of {@link Activity}s across orientation changes using a id when added via
+ * {@link #startTracking(Activity, String)}. When the {@link Activity} finishes the
+ * {@link ActivityFinishListener} is triggered.
  */
 public class ActivityInstanceObserver implements Application.ActivityLifecycleCallbacks {
 
     /**
      * Callback when an {@link Activity} will be completely destroyed
      */
-    public interface Listener {
+    public interface ActivityFinishListener {
 
         /**
          * called when the {@link Activity} finishes completely. Doesn't get called when the
          * Activity changes its configuration
          */
-        void onActivityFinished(final Activity activity, final String activityId);
+        void onActivityFinished(final Activity activity, final String hostId);
     }
 
     @VisibleForTesting
@@ -52,16 +51,16 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
 
     private static final String TAG = ActivityInstanceObserver.class.getSimpleName();
 
-    private Listener mListener;
+    private ActivityFinishListener mListener;
 
     private final HashMap<Activity, String> mScopeIdForActivity = new HashMap<>();
 
-    public ActivityInstanceObserver(@NonNull final Listener listener) {
+    public ActivityInstanceObserver(@NonNull final ActivityFinishListener listener) {
         mListener = listener;
     }
 
     /**
-     * Returns the id created with {@link #startTracking(Activity)}
+     * Returns the id provided by {@link #startTracking(Activity, String)}
      *
      * @return a unique id for each {@link Activity} which doesn't change when the {@link Activity}
      * changes its configuration
@@ -131,17 +130,13 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     }
 
     /**
-     * tracks the Activity over orientation changes using a unique id. Use
-     * {@link #getActivityId(Activity)} to get the current Activity instance with the id returned
-     * from this method
+     * tracks the Activity over orientation changes using the passed in id. Use
+     * {@link #getActivityId(Activity)} to get the current Activity instance with the id
      *
      * @param activity to be tracked {@link Activity}
-     * @return a unique id for this Activity
      * @see #getActivityId(Activity)
      */
-    public String startTracking(final Activity activity) {
-        final String activityId = UUID.randomUUID().toString();
+    public void startTracking(final Activity activity, final String activityId) {
         mScopeIdForActivity.put(activity, activityId);
-        return activityId;
     }
 }

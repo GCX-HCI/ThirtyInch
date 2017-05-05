@@ -140,7 +140,7 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public Activity getHostingActivity() {
+    public final Object getHostingContainer() {
         return getActivity();
     }
 

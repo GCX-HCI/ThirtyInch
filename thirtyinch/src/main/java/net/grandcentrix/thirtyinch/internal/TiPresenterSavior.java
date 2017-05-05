@@ -21,6 +21,7 @@ import net.grandcentrix.thirtyinch.TiPresenter;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 
 /**
  * Store for presenters to survive when their associated context gets destroyed (e.g. Activity or
@@ -32,23 +33,28 @@ public interface TiPresenterSavior {
      * Frees a certain presenter from the store.
      *
      * @param presenterId the id of the presenter
+     * @param host        host of the presenter, see {@link #save(TiPresenter, Object)}
      */
-    void free(String presenterId, @NonNull Activity activity);
+    void free(String presenterId, @NonNull Object host);
 
     /**
      * Gets a presenter from the store.
      *
      * @param presenterId the id of the presenter
+     * @param host        host of the presenter, see {@link #save(TiPresenter, Object)}
      * @return the presenter of {@code null} if no presenter could be found
      */
     @Nullable
-    TiPresenter recover(String presenterId, @NonNull Activity activity);
+    TiPresenter recover(String presenterId, @NonNull Object host);
 
     /**
-     * Stores a presenter in the store.
+     * Stores a presenter in the store for a given host. When the host gets destroyed the presenter
+     * will be destroyed automatically. For {@link Activity} the host is the {@link Activity}
+     * itself, for {@link Fragment} the host is {@link Fragment#getHost()}
      *
      * @param presenter the presenter that should be stored
+     * @param host      host of the presenter
      * @return the id of the stored presenter
      */
-    String save(@NonNull TiPresenter presenter, @NonNull Activity activity);
+    String save(@NonNull TiPresenter presenter, @NonNull Object host);
 }

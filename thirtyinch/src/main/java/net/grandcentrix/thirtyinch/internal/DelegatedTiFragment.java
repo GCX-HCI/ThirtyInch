@@ -15,12 +15,19 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import java.util.concurrent.Executor;
 
 public interface DelegatedTiFragment {
+
+    /**
+     * This Object is used identify the correct scope where the presenter should be saved in the
+     * {@link PresenterSavior}. This object is only used for identity comparison.
+     *
+     * @return the object hosting this {@link Fragment}, most likely {@link Fragment#getHost()}
+     */
+    Object getHostingContainer();
 
     /**
      * @return {@link UiThreadExecutor}
@@ -38,28 +45,13 @@ public interface DelegatedTiFragment {
     boolean isFragmentDetached();
 
     /**
-     * @return {@link Fragment#isRemoving()}
-     */
-    boolean isFragmentRemoving();
-
-    /**
-     * @return {@link Activity#isChangingConfigurations()}
-     */
-    boolean isHostingActivityChangingConfigurations();
-
-    /**
-     * @return {@link Activity#isFinishing()}
-     */
-    boolean isHostingActivityFinishing();
-
-    /**
      * @return {@link Fragment#isInBackStack()}
      */
     boolean isFragmentInBackstack();
 
     /**
-     * @return the hosting Activity
+     * @return {@link Fragment#isRemoving()}
      */
-    Activity getHostingActivity();
+    boolean isFragmentRemoving();
 
 }

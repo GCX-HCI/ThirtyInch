@@ -28,6 +28,7 @@ import org.mockito.stubbing.Answer;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -294,6 +295,18 @@ public class PresenterSaviorTest {
     }
 
     @Test
+    public void recoverUnsupportedHost() throws Exception {
+        final TestPresenterSavior savior = new TestPresenterSavior();
+        try {
+            savior.recover("someRandomId", "not supported host");
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e).isInstanceOf(PresenterSavior.IllegalHostException.class)
+                    .hasMessageContaining("String");
+        }
+    }
+
+    @Test
     public void restoreFailWithDifferentActivity() throws Exception {
 
         final TestPresenterSavior savior = new TestPresenterSavior();
@@ -338,6 +351,20 @@ public class PresenterSaviorTest {
         final String id = savior.save(presenter, hostingActivity.getMockActivityInstance());
         assertThat(savior.getPresenterCount()).isEqualTo(1);
         assertThat(id).isNotEmpty().isNotNull();
+    }
+
+    @Test
+    public void saveUnsupportedHost() throws Exception {
+        final TestPresenterSavior savior = new TestPresenterSavior();
+        final TiPresenter presenter = new TiPresenter() {
+        };
+        try {
+            savior.save(presenter, "not supported host");
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e).isInstanceOf(PresenterSavior.IllegalHostException.class)
+                    .hasMessageContaining("String");
+        }
     }
 
     @Before
