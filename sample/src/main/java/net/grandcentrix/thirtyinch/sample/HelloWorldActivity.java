@@ -108,6 +108,17 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
                 recreate();
             }
         });
+
+        if (savedInstanceState != null) {
+            final Bundle state = savedInstanceState.getBundle("presenter_state");
+            getPresenter().onRestorePersistentState(state);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle("presenter_state", getPresenter().getPersistentState());
     }
 
 }

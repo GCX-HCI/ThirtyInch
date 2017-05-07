@@ -52,4 +52,8 @@ dependencies {
     compile project(':rx')
     compile project(':logginginterceptor')
     testCompile "junit:junit:$junitVersion"
+
+    compile 'com.evernote:android-state:1.0.6'
+    // Java only project
+    annotationProcessor 'com.evernote:android-state-processor:1.0.6'
 }

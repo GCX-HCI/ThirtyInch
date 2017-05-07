@@ -15,10 +15,13 @@
 
 package net.grandcentrix.thirtyinch.sample;
 
+import com.evernote.android.state.*;
+
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
@@ -30,9 +33,11 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
+
 public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 
-    private int mCounter = 0;
+    @com.evernote.android.state.State
+    int mCounter = 0;
 
     private BehaviorSubject<String> mText = BehaviorSubject.create();
 
@@ -40,6 +45,17 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
             = new RxTiPresenterSubscriptionHandler(this);
 
     private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
+
+    public Bundle getPersistentState() {
+        final Bundle bundle = new Bundle();
+        StateSaver.saveInstanceState(this, bundle);
+        return bundle;
+    }
+
+    public void onRestorePersistentState(final Bundle bundle) {
+        StateSaver.restoreInstanceState(this, bundle);
+        mText.onNext("Count: " + mCounter);
+    }
 
     @Override
     protected void onAttachView(@NonNull final HelloWorldView view) {
@@ -89,7 +105,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                 .delay(2, TimeUnit.SECONDS)
                 .doOnNext(integer -> {
                     mCounter++;
-                    mText.onNext("value: " + mCounter);
+                    mText.onNext("Count: " + mCounter);
                 });
     }
 }
