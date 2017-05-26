@@ -30,4 +30,6 @@ public interface HelloWorldView extends TiView {
     @CallOnMainThread
     @DistinctUntilChanged
     void showText(final String text);
+
+    void showToast(String s);
 }

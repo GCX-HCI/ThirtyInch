@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import rx.Observable;
 
@@ -85,6 +86,11 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     @Override
     public void showText(final String text) {
         mOutput.setText(text);
+    }
+
+    @Override
+    public void showToast(final String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
     @Override

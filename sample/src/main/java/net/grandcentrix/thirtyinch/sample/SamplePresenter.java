@@ -16,6 +16,7 @@
 package net.grandcentrix.thirtyinch.sample;
 
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.rx.RxTiObservableUtils;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
 
@@ -34,7 +35,7 @@ public class SamplePresenter extends TiPresenter<SampleView> {
         super.onCreate();
 
         mSubscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
-                .compose(RxTiPresenterUtils.deliverLatestToView(this))
+                .compose(RxTiObservableUtils.deliverLatestToView(this))
                 .subscribe(alive -> {
                     // deliverLatestToView makes getView() here @NonNull
                     getView().showText("I'm a fragment and alive for " + (alive * 37) + "ms");

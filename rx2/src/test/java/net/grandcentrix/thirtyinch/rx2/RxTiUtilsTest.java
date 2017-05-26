@@ -11,7 +11,7 @@ import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Mockito.mock;
 
-public class RxTiPresenterUtilsTest {
+public class RxTiUtilsTest {
 
     private TiPresenter mPresenter;
 
@@ -34,7 +34,7 @@ public class RxTiPresenterUtilsTest {
     public void testIsViewReady_AttachView_ShouldCallValueFalseTrue() throws Exception {
         mPresenter.create();
 
-        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
+        final TestObserver<Boolean> test = RxTiUtils.isViewReady(mPresenter).test();
 
         mPresenter.attachView(mView);
         test.assertValues(false, true);
@@ -44,7 +44,7 @@ public class RxTiPresenterUtilsTest {
     public void testIsViewReady_BeforeAttachView_ShouldCallValueFalse() throws Exception {
         mPresenter.create();
 
-        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
+        final TestObserver<Boolean> test = RxTiUtils.isViewReady(mPresenter).test();
 
         test.assertValue(false);
     }
@@ -53,7 +53,7 @@ public class RxTiPresenterUtilsTest {
     public void testIsViewReady_DisposeBeforeAttachView_ShouldRemoveCallback() throws Exception {
         mPresenter.create();
 
-        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
+        final TestObserver<Boolean> test = RxTiUtils.isViewReady(mPresenter).test();
 
         test.assertValue(false);
         test.dispose();
