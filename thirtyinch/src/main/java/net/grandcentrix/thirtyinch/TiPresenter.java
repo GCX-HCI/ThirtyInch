@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -496,8 +497,8 @@ public abstract class TiPresenter<V extends TiView> {
      * When the view is already attached the action will be executed immediately.
      * <p>
      * This method might be very useful for single actions which invoke function like {@link
-     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link
-     * android.widget.Toast} in the view.
+     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link Toast} in the
+     * view.
      * <p>
      * <b>But don't overuse it.</b>
      * The action will only be called <b>once</b>.

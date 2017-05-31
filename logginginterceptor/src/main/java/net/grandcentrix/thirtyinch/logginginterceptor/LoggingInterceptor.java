@@ -153,7 +153,8 @@ public class LoggingInterceptor implements BindViewInterceptor {
     }
 
     /**
-     * Logs all view interface method invocations to the provided {@link TiLog.Logger} interface
+     * Logs all view interface method invocations to the provided
+     * {@link net.grandcentrix.thirtyinch.TiLog.Logger} interface
      *
      * @param logger custom logger, {@link TiLog#LOGCAT} or {@link TiLog#NOOP} to disable logging.
      */

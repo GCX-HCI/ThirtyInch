@@ -83,7 +83,7 @@ import java.util.concurrent.Executor;
  * </p>
  *
  * @param <V> the View type, must implement {@link TiView}
- * @param <P> the Presenter type, must extend {@link TiPresenter<V>}
+ * @param <P> the Presenter type, must extend {@link TiPresenter}
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
