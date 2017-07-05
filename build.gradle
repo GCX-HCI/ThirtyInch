@@ -13,8 +13,6 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        mavenLocal()
-        maven { url = "https://dl.bintray.com/passsy/maven/" }
     }
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
