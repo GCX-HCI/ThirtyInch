@@ -71,7 +71,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final TiPresenterSavior mSavior;
 
-    private final DelegatedTiActivity<P> mTiActivity;
+    private final DelegatedTiActivity mTiActivity;
 
     private Removable mUiThreadBinderRemovable;
 
@@ -79,7 +79,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private final TiViewProvider<V> mViewProvider;
 
-    public TiActivityDelegate(final DelegatedTiActivity<P> activityProvider,
+    public TiActivityDelegate(final DelegatedTiActivity activityProvider,
             final TiViewProvider<V> viewProvider,
             final TiPresenterProvider<P> presenterProvider,
             final TiLoggingTagProvider logTag,

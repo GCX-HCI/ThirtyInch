@@ -23,7 +23,7 @@ import java.util.concurrent.Executor;
  * This interface, implemented by Activities allows easy testing of the {@link TiActivityDelegate}
  * without mocking Android classes such as {@link Activity}
  */
-public interface DelegatedTiActivity<P> {
+public interface DelegatedTiActivity {
 
     /**
      * This Object is used identify the correct scope where the presenter should be saved in the

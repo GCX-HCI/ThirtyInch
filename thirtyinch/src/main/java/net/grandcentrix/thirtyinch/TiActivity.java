@@ -87,7 +87,7 @@ import java.util.concurrent.Executor;
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
-        implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
+        implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity,
         TiLoggingTagProvider, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()

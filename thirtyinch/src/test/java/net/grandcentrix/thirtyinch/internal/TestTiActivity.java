@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock;
  * {@link TiActivityDelegate} for testing
  */
 public class TestTiActivity
-        implements DelegatedTiActivity<TiPresenter<TiView>>, TiViewProvider<TiView>,
+        implements DelegatedTiActivity, TiViewProvider<TiView>,
         PresenterAccessor<TiPresenter<TiView>, TiView> {
 
     public static final class Builder {
