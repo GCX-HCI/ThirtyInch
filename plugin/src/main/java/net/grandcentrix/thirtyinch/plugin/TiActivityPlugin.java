@@ -135,11 +135,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
-    @Override
     public final boolean isActivityFinishing() {
         return getActivity().isFinishing();
     }

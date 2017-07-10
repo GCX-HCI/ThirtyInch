@@ -119,17 +119,8 @@ public class TestTiActivity
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
-        return mHostingActivity.isChangingConfiguration();
-    }
-
-    @Override
     public boolean isActivityFinishing() {
         return mHostingActivity.isFinishing();
-    }
-
-    public void onConfigurationChanged() {
-        mDelegate.onConfigurationChanged_afterSuper(mock(Configuration.class));
     }
 
     public void onCreate(final Bundle saveInstanceState) {

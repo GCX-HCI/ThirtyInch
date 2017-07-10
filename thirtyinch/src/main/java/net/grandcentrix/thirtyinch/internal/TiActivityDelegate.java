@@ -209,10 +209,7 @@ public class TiActivityDelegate<P extends TiPresenter<V>, V extends TiView>
         }
 
         boolean destroyPresenter = false;
-        if (mTiActivity.isActivityFinishing()
-                && !mTiActivity.isActivityChangingConfigurations()) {
-            // Probably a backpress and not a configuration change
-            // Activity will not be recreated and finally destroyed, also destroyed the presenter
+        if (mTiActivity.isActivityFinishing()) {
             destroyPresenter = true;
             TiLog.v(mLogTag.getLoggingTag(),
                     "Activity is finishing, destroying presenter " + mPresenter);

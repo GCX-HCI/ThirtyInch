@@ -39,11 +39,6 @@ public interface DelegatedTiActivity {
     Executor getUiThreadExecutor();
 
     /**
-     * @return {@link Activity#isChangingConfigurations()}
-     */
-    boolean isActivityChangingConfigurations();
-
-    /**
      * @return {@link Activity#isFinishing()}
      */
     boolean isActivityFinishing();
