@@ -273,7 +273,6 @@ public class PresenterSaviorTest {
         final String id = savior.save(presenter, hostingActivity.getMockActivityInstance());
 
         // Activity changes configuration
-        hostingActivity.isChangingConfiguration();
         savior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mSavedState);
         final String scopeId = fakeBundle.get(ActivityInstanceObserver.TI_ACTIVITY_ID_KEY);

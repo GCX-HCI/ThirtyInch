@@ -42,13 +42,8 @@ public class HostingActivity {
 
     public Activity getMockActivityInstance() {
         // always update with latest data
-        when(mActivityMock.isChangingConfigurations()).thenReturn(mIsChangingConfiguration);
         when(mActivityMock.isFinishing()).thenReturn(mIsFinishing);
         return mActivityMock;
-    }
-
-    public boolean isChangingConfiguration() {
-        return mIsChangingConfiguration;
     }
 
     public boolean isFinishing() {
