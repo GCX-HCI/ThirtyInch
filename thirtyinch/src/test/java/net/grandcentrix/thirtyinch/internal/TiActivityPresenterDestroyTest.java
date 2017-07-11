@@ -47,7 +47,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity changes configurations
         activity.setFinishing(false);
-        activity.setChangingConfiguration(true);
         activity.onStop();
         assertThat(mSavior.mActivityInstanceObserver).isNull();
         activity.onSaveInstanceState(mActivitySavedState);
@@ -98,7 +97,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity changes configurations
         activity.setFinishing(false);
-        activity.setChangingConfiguration(true);
         activity.onStop();
         assertThat(mSavior.mActivityInstanceObserver).isNull();
         activity.onSaveInstanceState(mActivitySavedState);
@@ -149,7 +147,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity changes configurations
         activity.setFinishing(false);
-        activity.setChangingConfiguration(true);
         activity.onStop();
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 activity.getMockActivityInstance(), mActivitySavedState);
@@ -198,7 +195,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity changes configurations
         activity.setFinishing(false);
-        activity.setChangingConfiguration(true);
         activity.onStop();
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 activity.getMockActivityInstance(), mActivitySavedState);
@@ -247,7 +243,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity gets finished
         activity.setFinishing(true);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         assertThat(mSavior.mActivityInstanceObserver).isNull();
         activity.onSaveInstanceState(mActivitySavedState);
@@ -281,7 +276,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity gets finished
         activity.setFinishing(true);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         assertThat(mSavior.mActivityInstanceObserver).isNull();
         activity.onSaveInstanceState(mActivitySavedState);
@@ -318,7 +312,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity gets finished
         activity.setFinishing(true);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 activity.getMockActivityInstance(), mActivitySavedState);
@@ -353,7 +346,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity gets finished
         activity.setFinishing(true);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 activity.getMockActivityInstance(), mActivitySavedState);
@@ -388,7 +380,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity moves to background
         activity.setFinishing(false);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         assertThat(mSavior.mActivityInstanceObserver).isNull();
 
@@ -423,7 +414,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity moves to background
         activity.setFinishing(false);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         assertThat(mSavior.mActivityInstanceObserver).isNull();
         activity.onSaveInstanceState(mActivitySavedState);
@@ -475,7 +465,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity moves to background
         activity.setFinishing(false);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 activity.getMockActivityInstance(), mActivitySavedState);
@@ -511,7 +500,6 @@ public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest
 
         // When the Activity moves to background
         activity.setFinishing(false);
-        activity.setChangingConfiguration(false);
         activity.onStop();
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 activity.getMockActivityInstance(), mActivitySavedState);

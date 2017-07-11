@@ -31,8 +31,6 @@ public class HostingActivity {
 
     private final Activity mActivityMock;
 
-    private boolean mIsChangingConfiguration;
-
     private boolean mIsFinishing;
 
     public HostingActivity() {
@@ -48,10 +46,6 @@ public class HostingActivity {
 
     public boolean isFinishing() {
         return mIsFinishing;
-    }
-
-    public void setChangingConfiguration(final boolean changingConfiguration) {
-        mIsChangingConfiguration = changingConfiguration;
     }
 
     public void setFinishing(final boolean finishing) {

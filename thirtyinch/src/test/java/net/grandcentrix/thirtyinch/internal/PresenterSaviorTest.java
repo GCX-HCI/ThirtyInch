@@ -239,7 +239,6 @@ public class PresenterSaviorTest {
         assertThat(savior.getPresenterCount()).isEqualTo(1);
         assertThat(id).isNotEmpty().isNotNull();
 
-        hostingActivity.setChangingConfiguration(true);
         savior.mActivityInstanceObserver
                 .onActivityDestroyed(hostingActivity.getMockActivityInstance());
 

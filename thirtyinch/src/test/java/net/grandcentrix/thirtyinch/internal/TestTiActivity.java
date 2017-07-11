@@ -150,10 +150,6 @@ public class TestTiActivity
         return mock(TiView.class);
     }
 
-    public void setChangingConfiguration(final boolean changingConfiguration) {
-        mHostingActivity.setChangingConfiguration(changingConfiguration);
-    }
-
     public void setFinishing(final boolean finishing) {
         mHostingActivity.setFinishing(finishing);
     }
