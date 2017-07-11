@@ -85,9 +85,8 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     public void onActivityDestroyed(final Activity activity) {
         TiLog.v(TAG, "destroying " + activity);
         TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
-        TiLog.v(TAG, "isChangingConfigurations = " + activity.isChangingConfigurations());
 
-        if (activity.isFinishing() && !activity.isChangingConfigurations()) {
+        if (activity.isFinishing()) {
             // detected Activity finish, no new Activity instance will be created
             // with savedInstanceState, clear saved presenters
             final String scopeId = mScopeIdForActivity.remove(activity);

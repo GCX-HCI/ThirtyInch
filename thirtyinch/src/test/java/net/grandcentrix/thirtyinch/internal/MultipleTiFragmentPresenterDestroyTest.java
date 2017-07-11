@@ -61,7 +61,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
 
         // Then nothing happens with the fragment, not managed anymore
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
@@ -103,7 +102,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
         fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onDestroy();
 
@@ -150,7 +148,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
 
         // Then nothing happens with the fragment, not managed anymore
         assertThat(fragment.getPresenter().isDestroyed()).isTrue();
@@ -195,7 +192,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mFragmentSavedState);
@@ -270,7 +266,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(0);
 
         // When the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
         assertThat(mSavior.mActivityInstanceObserver).isNull();
         fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onDestroy();
@@ -330,7 +325,6 @@ public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDes
         assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // When the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mFragmentSavedState);

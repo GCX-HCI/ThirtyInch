@@ -87,7 +87,7 @@ import java.util.concurrent.Executor;
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
-        implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
+        implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity,
         TiLoggingTagProvider, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()
@@ -148,11 +148,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public final void invalidateView() {
         mDelegate.invalidateView();
-    }
-
-    @Override
-    public final boolean isActivityChangingConfigurations() {
-        return isChangingConfigurations();
     }
 
     @Override

@@ -51,7 +51,7 @@ import java.util.concurrent.Executor;
  * @param <V> View, expected by the {@link TiPresenter}
  */
 public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extends ActivityPlugin
-        implements TiViewProvider<V>, DelegatedTiActivity<P>, TiLoggingTagProvider,
+        implements TiViewProvider<V>, DelegatedTiActivity, TiLoggingTagProvider,
         InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private static final String NCI_KEY_PRESENTER = "presenter";
@@ -83,6 +83,11 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     @Override
     public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
         return mDelegate.addBindViewInterceptor(interceptor);
+    }
+
+    @Override
+    public final Object getHostingContainer() {
+        return getActivity();
     }
 
     /**
@@ -130,18 +135,8 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
-    @Override
     public final boolean isActivityFinishing() {
         return getActivity().isFinishing();
-    }
-
-    @Override
-    public final Object getHostingContainer() {
-        return getActivity();
     }
 
     @CallSuper

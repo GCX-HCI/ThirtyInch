@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock;
  * {@link TiActivityDelegate} for testing
  */
 public class TestTiActivity
-        implements DelegatedTiActivity<TiPresenter<TiView>>, TiViewProvider<TiView>,
+        implements DelegatedTiActivity, TiViewProvider<TiView>,
         PresenterAccessor<TiPresenter<TiView>, TiView> {
 
     public static final class Builder {
@@ -119,17 +119,8 @@ public class TestTiActivity
     }
 
     @Override
-    public boolean isActivityChangingConfigurations() {
-        return mHostingActivity.isChangingConfiguration();
-    }
-
-    @Override
     public boolean isActivityFinishing() {
         return mHostingActivity.isFinishing();
-    }
-
-    public void onConfigurationChanged() {
-        mDelegate.onConfigurationChanged_afterSuper(mock(Configuration.class));
     }
 
     public void onCreate(final Bundle saveInstanceState) {
@@ -157,10 +148,6 @@ public class TestTiActivity
     @Override
     public TiView provideView() {
         return mock(TiView.class);
-    }
-
-    public void setChangingConfiguration(final boolean changingConfiguration) {
-        mHostingActivity.setChangingConfiguration(changingConfiguration);
     }
 
     public void setFinishing(final boolean finishing) {
