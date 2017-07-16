@@ -189,13 +189,6 @@ public abstract class TiPresenter<V extends TiView> {
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onAttachView(TiView)");
         }
-        mCalled = false;
-        TiLog.v(TAG, "deprecated onWakeUp()");
-        onWakeUp();
-        if (!mCalled) {
-            throw new SuperNotCalledException("Presenter " + this
-                    + " did not call through to super.onWakeUp()");
-        }
         moveToState(State.VIEW_ATTACHED, true);
 
         sendPostponedActionsToView(view);
