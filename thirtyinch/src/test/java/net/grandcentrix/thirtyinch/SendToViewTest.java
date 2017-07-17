@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.failBecauseExceptionWasNotThrown;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -99,33 +100,6 @@ public class SendToViewTest {
     }
 
     @Test
-    public void sendToView_viewAttached_executorNull_doesNotThrow() throws Exception {
-        final TestPresenter presenter = new TestPresenter();
-        presenter.create();
-
-        final TestView view = mock(TestView.class);
-        presenter.attachView(view);
-
-        // will not be posted until a executor will be attached
-        presenter.sendToView(new ViewAction<TestView>() {
-            @Override
-            public void call(final TestView testView) {
-                testView.doSomething1();
-            }
-        });
-        verify(view, never()).doSomething1();
-
-        // once attached it executes the postponed actions
-        presenter.setUiThreadExecutor(new Executor() {
-            @Override
-            public void execute(@NonNull final Runnable command) {
-                command.run();
-            }
-        });
-        verify(view).doSomething1();
-    }
-
-    @Test
     public void sendToView_viewDetached_setExecutor_executesActions() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
@@ -156,24 +130,83 @@ public class SendToViewTest {
     }
 
     @Test
-    public void setNullExecutor_doesNothing() throws Exception {
+    public void sendToView_withView_afterInRunningState_crashes() throws Exception {
         final TestPresenter presenter = new TestPresenter();
         presenter.create();
 
         final TestView view = mock(TestView.class);
         presenter.attachView(view);
 
-        // will never be posted
-        presenter.sendToView(new ViewAction<TestView>() {
+        // call sendToView without executor crashes when the view is running
+        try {
+            presenter.sendToView(new ViewAction<TestView>() {
+                @Override
+                public void call(final TestView testView) {
+                    testView.doSomething1();
+                }
+            });
+            failBecauseExceptionWasNotThrown(IllegalStateException.class);
+        } catch (IllegalStateException e) {
+            assertThat(e).hasMessageContaining("no ui thread executor");
+        }
+
+        verify(view, never()).doSomething1();
+    }
+
+    @Test
+    public void sendToView_withView_beforeInRunningState_executesAction_withExecutor()
+            throws Exception {
+        final TestPresenter presenter = new TestPresenter() {
             @Override
-            public void call(final TestView testView) {
-                testView.doSomething1();
+            protected void onAttachView(@NonNull final TestView view) {
+                super.onAttachView(view);
+                // call sendToView in attachView before executor is attached, will be postponed
+                sendToView(new ViewAction<TestView>() {
+                    @Override
+                    public void call(final TestView testView) {
+                        testView.doSomething1();
+                    }
+                });
+            }
+        };
+        presenter.create();
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(@NonNull final Runnable command) {
+                command.run();
             }
         });
-        verify(view, never()).doSomething1();
 
-        presenter.setUiThreadExecutor(null);
-        verify(view, never()).doSomething1();
+        // postponed actions will be executed
+        final TestView view = mock(TestView.class);
+        presenter.attachView(view);
+
+        verify(view).doSomething1();
+    }
+
+    @Test
+    public void sendToView_withView_beforeInRunningState_executesAction_without_executor()
+            throws Exception {
+        final TestPresenter presenter = new TestPresenter() {
+            @Override
+            protected void onAttachView(@NonNull final TestView view) {
+                super.onAttachView(view);
+                // call sendToView in attachView before executor is attached, will be postponed
+                sendToView(new ViewAction<TestView>() {
+                    @Override
+                    public void call(final TestView testView) {
+                        testView.doSomething1();
+                    }
+                });
+            }
+        };
+        presenter.create();
+
+        // postponed actions will be executed even without executor
+        final TestView view = mock(TestView.class);
+        presenter.attachView(view);
+
+        verify(view).doSomething1();
     }
 
     @Test

@@ -400,21 +400,6 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public void setUiThreadExecutor(@Nullable final Executor uiThreadExecutor) {
         mUiThreadExecutor = uiThreadExecutor;
-
-        if (uiThreadExecutor == null) {
-            return;
-        }
-
-        // execute pending actions when already in running state
-        final V view = getView();
-        if (view != null && mRunning) {
-            uiThreadExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    sendPostponedActionsToView(view);
-                }
-            });
-        }
     }
 
     @Override
@@ -544,7 +529,7 @@ public abstract class TiPresenter<V extends TiView> {
      */
     protected void sendToView(final ViewAction<V> action) {
         final V view = getView();
-        if (view != null && mUiThreadExecutor != null) {
+        if (mRunning) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
