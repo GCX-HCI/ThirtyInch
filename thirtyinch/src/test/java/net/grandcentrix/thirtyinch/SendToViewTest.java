@@ -33,6 +33,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -95,6 +96,84 @@ public class SendToViewTest {
         inOrder.verify(view).doSomething3();
         inOrder.verify(view).doSomething1();
         inOrder.verify(view).doSomething2();
+    }
+
+    @Test
+    public void sendToView_viewAttached_executorNull_doesNotThrow() throws Exception {
+        final TestPresenter presenter = new TestPresenter();
+        presenter.create();
+
+        final TestView view = mock(TestView.class);
+        presenter.attachView(view);
+
+        // will not be posted until a executor will be attached
+        presenter.sendToView(new ViewAction<TestView>() {
+            @Override
+            public void call(final TestView testView) {
+                testView.doSomething1();
+            }
+        });
+        verify(view, never()).doSomething1();
+
+        // once attached it executes the postponed actions
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(@NonNull final Runnable command) {
+                command.run();
+            }
+        });
+        verify(view).doSomething1();
+    }
+
+    @Test
+    public void sendToView_viewDetached_setExecutor_executesActions() throws Exception {
+        final TestPresenter presenter = new TestPresenter();
+        presenter.create();
+
+        final TestView view = mock(TestView.class);
+
+        // will not be posted until the view and the executor will be attached
+        presenter.sendToView(new ViewAction<TestView>() {
+            @Override
+            public void call(final TestView testView) {
+                testView.doSomething1();
+            }
+        });
+        verify(view, never()).doSomething1();
+
+        // setting the executor doesn't run the actions when the view is detached
+        presenter.setUiThreadExecutor(new Executor() {
+            @Override
+            public void execute(@NonNull final Runnable command) {
+                command.run();
+            }
+        });
+        verify(view, never()).doSomething1();
+
+        // when both are attached, the actions will be executed
+        presenter.attachView(view);
+        verify(view).doSomething1();
+    }
+
+    @Test
+    public void setNullExecutor_doesNothing() throws Exception {
+        final TestPresenter presenter = new TestPresenter();
+        presenter.create();
+
+        final TestView view = mock(TestView.class);
+        presenter.attachView(view);
+
+        // will never be posted
+        presenter.sendToView(new ViewAction<TestView>() {
+            @Override
+            public void call(final TestView testView) {
+                testView.doSomething1();
+            }
+        });
+        verify(view, never()).doSomething1();
+
+        presenter.setUiThreadExecutor(null);
+        verify(view, never()).doSomething1();
     }
 
     @Test
