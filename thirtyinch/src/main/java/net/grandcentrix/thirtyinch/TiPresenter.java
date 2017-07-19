@@ -96,7 +96,7 @@ public abstract class TiPresenter<V extends TiView> {
      * This is a temporary field without public getter until the presenter state and notifications
      * get completely refactored
      */
-    private boolean mRunning = false;
+    private volatile boolean mRunning = false;
 
     private State mState = State.INITIALIZED;
 
