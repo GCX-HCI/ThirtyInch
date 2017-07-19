@@ -29,6 +29,7 @@ ext {
     COMPILE_SDK_VERSION = 26
     BUILD_TOOLS_VERSION = '25.0.2'
 
+    //TODO wait for stable 26.0.0 release
     supportLibraryVersion = '26.0.0-beta2'
 
     bintrayVersion = '0.3.4'

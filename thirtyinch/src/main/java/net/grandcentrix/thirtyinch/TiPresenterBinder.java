@@ -19,6 +19,7 @@ package net.grandcentrix.thirtyinch;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
 import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
 
+//TODO I'm not happy with the binder name
 public interface TiPresenterBinder<P extends TiPresenter<V>, V extends TiView>
         extends PresenterAccessor<P, V>, InterceptableViewBinder<V> {
 

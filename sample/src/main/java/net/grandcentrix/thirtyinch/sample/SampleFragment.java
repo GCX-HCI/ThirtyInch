@@ -25,8 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SampleFragment extends Fragment
-        implements SampleView {
+public class SampleFragment extends Fragment implements SampleView {
 
 
     private SamplePresenter mPresenter;
