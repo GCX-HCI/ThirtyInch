@@ -1,2 +1,8 @@
 # ThirtyInch
 -keep public class * implements net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctComparator
+
+# Keep string ressources if we find a member with define_
+# This is needed for detection by AboutLibraries. See https://git.io/vQhQa
+-keepclasseswithmembers class **.R$string {
+    public static final int define_*;
+}
