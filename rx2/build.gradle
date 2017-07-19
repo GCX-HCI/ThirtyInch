@@ -50,6 +50,5 @@ publish {
     artifactId = 'thirtyinch-rx2'
     uploadName = 'ThirtyInch'
     publishVersion = VERSION_NAME
-    //description = ''
     website = 'https://github.com/grandcentrix/ThirtyInch'
 }

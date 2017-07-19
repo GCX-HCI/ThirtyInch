@@ -23,7 +23,6 @@ import net.grandcentrix.thirtyinch.TiPresenterBinder;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -78,8 +77,8 @@ public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public Activity getHostingActivity() {
-        return mActivity;
+    public Object getHostingContainer() {
+        return mFragment.getActivity();
     }
 
     @Nullable
@@ -133,16 +132,6 @@ public class FragmentPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     @Override
     public boolean isFragmentRemoving() {
         return mFragment.isRemoving();
-    }
-
-    @Override
-    public boolean isHostingActivityChangingConfigurations() {
-        return mActivity.isChangingConfigurations();
-    }
-
-    @Override
-    public boolean isHostingActivityFinishing() {
-        return mActivity.isFinishing();
     }
 
     @Override

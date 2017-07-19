@@ -1,0 +1,2 @@
+# ThirtyInch
+-keep public class * implements net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctComparator

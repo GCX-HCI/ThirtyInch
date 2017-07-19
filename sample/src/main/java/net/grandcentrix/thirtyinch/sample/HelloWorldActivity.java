@@ -20,14 +20,15 @@ import com.jakewharton.rxbinding.view.RxView;
 
 import net.grandcentrix.thirtyinch.TiPresenterBinder;
 import net.grandcentrix.thirtyinch.TiPresenterBinders;
+import net.grandcentrix.thirtyinch.logginginterceptor.LoggingInterceptor;
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
+import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.viewpager.LifecycleViewPagerActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -39,7 +40,7 @@ public class HelloWorldActivity extends AppCompatActivity implements HelloWorldV
 
     private TextView mOutput;
 
-    private TiPresenterBinder<HelloWorldPresenter, HelloWorldView> mPresenterBinder;
+    private HelloWorldPresenter mPresenter;
 
     private TextView mUptime;
 
@@ -55,6 +56,19 @@ public class HelloWorldActivity extends AppCompatActivity implements HelloWorldV
     }
 
     @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.start_fragment_lifecycle_test:
+                startActivity(new Intent(this, FragmentLifecycleActivity.class));
+                return true;
+            case R.id.start_viewpager_test:
+                startActivity(new Intent(this, LifecycleViewPagerActivity.class));
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     public void showPresenterUpTime(final Long uptime) {
         mUptime.setText(String.format("Presenter alive for %ss", uptime));
     }
@@ -64,22 +78,19 @@ public class HelloWorldActivity extends AppCompatActivity implements HelloWorldV
         mOutput.setText(text);
     }
 
-    public void startFragmentLifecycleTest(MenuItem item) {
-        final Intent intent = new Intent(this, FragmentLifecycleActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPresenterBinder = TiPresenterBinders
+        final TiPresenterBinder<HelloWorldPresenter, HelloWorldView> binder = TiPresenterBinders
                 .attachPresenter(this, savedInstanceState, () -> new HelloWorldPresenter());
-        assert mPresenterBinder.getPresenter() != null;
+        binder.addBindViewInterceptor(new LoggingInterceptor());
+        mPresenter = binder.getPresenter();
+
         setContentView(R.layout.activity_hello_world);
 
-        mButton = (Button) findViewById(R.id.button);
-        mOutput = (TextView) findViewById(R.id.output);
-        mUptime = (TextView) findViewById(R.id.uptime);
+        mButton = findViewById(R.id.button);
+        mOutput = findViewById(R.id.output);
+        mUptime = findViewById(R.id.uptime);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -87,11 +98,7 @@ public class HelloWorldActivity extends AppCompatActivity implements HelloWorldV
                     .commit();
         }
 
-        findViewById(R.id.recreate).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                recreate();
-            }
-        });
+        findViewById(R.id.recreate).setOnClickListener(v -> recreate());
     }
+
 }

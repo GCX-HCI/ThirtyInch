@@ -23,7 +23,15 @@ import java.util.concurrent.Executor;
  * This interface, implemented by Activities allows easy testing of the {@link TiActivityDelegate}
  * without mocking Android classes such as {@link Activity}
  */
-public interface DelegatedTiActivity<P> {
+public interface DelegatedTiActivity {
+
+    /**
+     * This Object is used identify the correct scope where the presenter should be saved in the
+     * {@link PresenterSavior}. This object is only used for identity comparison.
+     *
+     * @return the {@link Activity} instance itself, which is it's own host
+     */
+    Object getHostingContainer();
 
     /**
      * @return {@link UiThreadExecutor}
@@ -31,17 +39,7 @@ public interface DelegatedTiActivity<P> {
     Executor getUiThreadExecutor();
 
     /**
-     * @return {@link Activity#isChangingConfigurations()}
-     */
-    boolean isActivityChangingConfigurations();
-
-    /**
      * @return {@link Activity#isFinishing()}
      */
     boolean isActivityFinishing();
-
-    /**
-     * @return the Activity itself instance
-     */
-    Activity getHostingActivity();
 }

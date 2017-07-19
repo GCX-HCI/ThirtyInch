@@ -26,7 +26,6 @@ import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -71,7 +70,7 @@ import java.util.concurrent.Executor;
  * {@link TiPresenter} will be destroyed accordingly.
  * </p>
  * <p>
- * Using {@code setRetainInstance(true)} is now allowed as it causes many troubles. You should favor
+ * Using {@code setRetainInstance(true)} is not allowed as it causes many troubles. You should favor
  * the dumb view pattern and move all your state into the {@link TiPresenter}.
  * </p>
  *
@@ -106,7 +105,7 @@ import java.util.concurrent.Executor;
  * </p>
  *
  * @param <V> the View type, must implement {@link TiView}
- * @param <P> the Presenter type, must extend {@link TiPresenter<V>}
+ * @param <P> the Presenter type, must extend {@link TiPresenter}
  */
 public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> extends Fragment
         implements DelegatedTiFragment, TiPresenterProvider<P>, TiLoggingTagProvider,
@@ -128,8 +127,8 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
-    public Activity getHostingActivity() {
-        return getActivity();
+    public final Object getHostingContainer() {
+        return getHost();
     }
 
     @Nullable
@@ -183,23 +182,13 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     }
 
     @Override
-    public boolean isFragmentRemoving() {
-        return isRemoving();
-    }
-
-    @Override
-    public final boolean isHostingActivityChangingConfigurations() {
-        return getActivity().isChangingConfigurations();
-    }
-
-    @Override
-    public final boolean isHostingActivityFinishing() {
-        return getActivity().isFinishing();
-    }
-
-    @Override
     public boolean isFragmentInBackstack() {
         return BackstackReader.isInBackStack(this);
+    }
+
+    @Override
+    public boolean isFragmentRemoving() {
+        return isRemoving();
     }
 
     @CallSuper

@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -231,8 +232,13 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #onDestroy()
      */
     public final void destroy() {
+        if (isViewAttached()) {
+            throw new IllegalStateException(
+                    "view is attached, can't destroy the presenter. First call detachView()");
+        }
+
         if (!isInitialized() || isDestroyed()) {
-            TiLog.w(TAG, "not calling onDestroy(), destroy was already called");
+            TiLog.v(TAG, "not calling onDestroy(), destroy was already called");
             return;
         }
 
@@ -300,7 +306,7 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
-     * Returns the currently attached view. The view is attached between the lifecycle callbacks
+     * Gets the currently attached view. The view is attached between the lifecycle callbacks
      * {@link #onAttachView(TiView)} and {@link #onSleep()}.
      * <p>
      * If you don't care about the view being attached or detached you should either rethink your
@@ -312,6 +318,25 @@ public abstract class TiPresenter<V extends TiView> {
     @Nullable
     public V getView() {
         return mView;
+    }
+
+    /**
+     * Gets the currently attached view or throws an {@link IllegalStateException} if the view
+     * is not attached. Use this method if you are sure that a view is currently attached to the
+     * presenter. If you're not sure you should better use {@link #sendToView(ViewAction)} where the
+     * action will be executed when the view is attached.
+     *
+     * @return the currently attached view of this presenter
+     */
+    @NonNull
+    public V getViewOrThrow() {
+        final V view = getView();
+        if (view == null) {
+            throw new IllegalStateException(
+                    "The view is currently not attached. Use 'sendToView(ViewAction)' instead.");
+        }
+
+        return view;
     }
 
     public boolean isDestroyed() {
@@ -472,8 +497,8 @@ public abstract class TiPresenter<V extends TiView> {
      * When the view is already attached the action will be executed immediately.
      * <p>
      * This method might be very useful for single actions which invoke function like {@link
-     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link
-     * android.widget.Toast} in the view.
+     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link Toast} in the
+     * view.
      * <p>
      * <b>But don't overuse it.</b>
      * The action will only be called <b>once</b>.
@@ -554,20 +579,25 @@ public abstract class TiPresenter<V extends TiView> {
             mState = newState;
         }
 
-        switch (newState) {
-            case INITIALIZED:
-            case VIEW_ATTACHED:
-                for (int i = 0; i < mLifecycleObservers.size(); i++) {
-                    mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
-                }
-                break;
+        if (mLifecycleObservers.size() > 0) {
+            // make a local copy to call all observers,
+            // even observers which will been removed by other observers which received this event
+            final List<TiLifecycleObserver> observers = new ArrayList<>(mLifecycleObservers);
+            switch (newState) {
+                case INITIALIZED:
+                case VIEW_ATTACHED:
+                    for (int i = 0; i < observers.size(); i++) {
+                        observers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+                    }
+                    break;
 
-            case VIEW_DETACHED:
-            case DESTROYED:
-                // reverse observer order for teardown events; first in, last out
-                for (int i = mLifecycleObservers.size() - 1; i >= 0; i--) {
-                    mLifecycleObservers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
-                }
+                case VIEW_DETACHED:
+                case DESTROYED:
+                    // reverse observer order for teardown events; first in, last out
+                    for (int i = observers.size() - 1; i >= 0; i--) {
+                        observers.get(i).onChange(newState, hasLifecycleMethodBeenCalled);
+                    }
+            }
         }
     }
 

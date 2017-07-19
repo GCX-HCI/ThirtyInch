@@ -26,7 +26,6 @@ import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -84,11 +83,11 @@ import java.util.concurrent.Executor;
  * </p>
  *
  * @param <V> the View type, must implement {@link TiView}
- * @param <P> the Presenter type, must extend {@link TiPresenter<V>}
+ * @param <P> the Presenter type, must extend {@link TiPresenter}
  */
 public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatActivity
-        implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity<P>,
+        implements TiPresenterProvider<P>, TiViewProvider<V>, DelegatedTiActivity,
         TiLoggingTagProvider, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
     private final String TAG = this.getClass().getSimpleName()
@@ -107,7 +106,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public Activity getHostingActivity() {
+    public final Object getHostingContainer() {
         return this;
     }
 
@@ -149,11 +148,6 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
     @Override
     public final void invalidateView() {
         mDelegate.invalidateView();
-    }
-
-    @Override
-    public final boolean isActivityChangingConfigurations() {
-        return isChangingConfigurations();
     }
 
     @Override

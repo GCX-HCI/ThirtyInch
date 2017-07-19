@@ -1,9 +1,9 @@
 package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
 import net.grandcentrix.thirtyinch.sample.R;
+import net.grandcentrix.thirtyinch.sample.util.AndroidDeveloperOptions;
 
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,8 +12,12 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import static android.provider.Settings.Global.ALWAYS_FINISH_ACTIVITIES;
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 
 public class FragmentLifecycleActivity extends AppCompatActivity {
 
@@ -36,6 +40,24 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         final TestFragmentB fragment = new TestFragmentB();
         Log.v(TAG, "adding FragmentB");
         addFragment(fragment);
+    }
+
+    public void detachFragmentAndAddAgain(View view) {
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_placeholder);
+        if (fragment != null) {
+            //remove fragment
+            Log.v(TAG, "// When the Fragment is removed.");
+            getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
+
+            Log.v(TAG, "// When the Fragment get added again to the Activity.");
+            //add after delay again. Don't use the same transaction
+            Observable.just(null).delay(1, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(o -> addFragment(fragment));
+        } else {
+            Toast.makeText(this, "no fragment found", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -134,9 +156,13 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         if (retain) {
             Log.v(TAG, "retaining presenter");
         }
-        final Bundle bundle = new Bundle();
-        bundle.putBoolean(TestFragment.RETAIN_PRESENTER, retain);
-        fragment.setArguments(bundle);
+        if (fragment.getArguments() == null) {
+            final Bundle bundle = new Bundle();
+            bundle.putBoolean(TestFragment.RETAIN_PRESENTER, retain);
+            fragment.setArguments(bundle);
+        } else {
+            Log.v(TAG, "reusing fragment, not setting new arguments");
+        }
 
         fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
         if (isAddToBackStack()) {
@@ -154,15 +180,7 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     }
 
     private boolean isDontKeepActivities() {
-        // default behaviour
-        int dontKeepActivities = 0;
-        try {
-            dontKeepActivities = Settings.Global
-                    .getInt(getContentResolver(), ALWAYS_FINISH_ACTIVITIES);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
-        return dontKeepActivities != 0;
+        return AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this);
     }
 
     private boolean isRetainPresenterInstance() {

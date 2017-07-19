@@ -26,13 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Simple wrapper around a {@link HashMap} to save {@link TiPresenter} by id. For every {@link
- * android.app.Activity} containing a {@link TiPresenter} a corresponding {@link
- * ActivityScopedPresenters} will be created
+ * Simple wrapper around a {@link HashMap} to save {@link TiPresenter} by id. For every host of a
+ * {@link TiPresenter} (i.e. {@link android.app.Activity}) a corresponding {@link PresenterScope}
+ * will be created.
+ * It contains the {@link TiPresenter} of the Activity itself and of all of its Fragments.
  */
-public class ActivityScopedPresenters {
+public class PresenterScope {
 
-    private final String TAG = ActivityScopedPresenters.class.getSimpleName()
+    private final String TAG = PresenterScope.class.getSimpleName()
             + "@" + Integer.toHexString(hashCode());
 
     private final HashMap<String, TiPresenter> mStore = new HashMap<>();

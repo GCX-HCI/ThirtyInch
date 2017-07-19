@@ -21,6 +21,7 @@ android {
         versionCode VERSION_CODE
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'proguard-rules.txt'
     }
     buildTypes {
         release {
@@ -51,8 +52,6 @@ dependencies {
     androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
 }
 
-// usage:
-// ./gradlew clean build bintrayUpload -PbintrayUser=BINTRAY_USERNAME -PbintrayKey=BINTRAY_KEY -PdryRun=true
 publish {
     userOrg = 'passsy'
     groupId = 'net.grandcentrix.thirtyinch'

@@ -358,7 +358,10 @@ public abstract class TestFragment
     @NonNull
     @Override
     public TestPresenter providePresenter() {
-        final boolean retain = getArguments().getBoolean(RETAIN_PRESENTER, false);
+        boolean retain = false;
+        if (getArguments() != null) {
+            retain = getArguments().getBoolean(RETAIN_PRESENTER, false);
+        }
 
         final TiConfiguration config = new TiConfiguration.Builder()
                 .setRetainPresenterEnabled(retain)

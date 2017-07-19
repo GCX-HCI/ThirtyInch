@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
-        implements DelegatedTiActivity<P>, TiViewProvider<V>, TiLoggingTagProvider,
+        implements DelegatedTiActivity, TiViewProvider<V>, TiLoggingTagProvider,
         Application.ActivityLifecycleCallbacks, TiPresenterBinder<P, V> {
 
     private final String TAG;
@@ -70,7 +70,7 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     }
 
     @Override
-    public Activity getHostingActivity() {
+    public Object getHostingContainer() {
         return mActivity;
     }
 
@@ -105,11 +105,6 @@ public class ActivityPresenterBinder<P extends TiPresenter<V>, V extends TiView>
     @Override
     public void invalidateView() {
         mDelegate.invalidateView();
-    }
-
-    @Override
-    public boolean isActivityChangingConfigurations() {
-        return mActivity.isChangingConfigurations();
     }
 
     @Override

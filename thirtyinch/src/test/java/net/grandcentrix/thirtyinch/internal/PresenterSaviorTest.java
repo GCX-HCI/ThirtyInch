@@ -27,8 +27,8 @@ import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
-import static net.grandcentrix.thirtyinch.internal.PresenterSavior.TI_ACTIVITY_PRESENTER_SCOPE_KEY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -239,7 +239,6 @@ public class PresenterSaviorTest {
         assertThat(savior.getPresenterCount()).isEqualTo(1);
         assertThat(id).isNotEmpty().isNotNull();
 
-        hostingActivity.setChangingConfiguration(true);
         savior.mActivityInstanceObserver
                 .onActivityDestroyed(hostingActivity.getMockActivityInstance());
 
@@ -273,10 +272,9 @@ public class PresenterSaviorTest {
         final String id = savior.save(presenter, hostingActivity.getMockActivityInstance());
 
         // Activity changes configuration
-        hostingActivity.isChangingConfiguration();
         savior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mSavedState);
-        final String scopeId = fakeBundle.get(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
+        final String scopeId = fakeBundle.get(ActivityInstanceObserver.TI_ACTIVITY_ID_KEY);
         assertThat(scopeId).isNotNull();
         savior.mActivityInstanceObserver
                 .onActivityDestroyed(hostingActivity.getMockActivityInstance());
@@ -290,6 +288,18 @@ public class PresenterSaviorTest {
         // recover with new Activity
         final TiPresenter recover = savior.recover(id, hostingActivity2.getMockActivityInstance());
         assertThat(recover).isEqualTo(presenter);
+    }
+
+    @Test
+    public void recoverUnsupportedHost() throws Exception {
+        final TestPresenterSavior savior = new TestPresenterSavior();
+        try {
+            savior.recover("someRandomId", "not supported host");
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e).isInstanceOf(PresenterSavior.IllegalHostException.class)
+                    .hasMessageContaining("String");
+        }
     }
 
     @Test
@@ -337,6 +347,20 @@ public class PresenterSaviorTest {
         final String id = savior.save(presenter, hostingActivity.getMockActivityInstance());
         assertThat(savior.getPresenterCount()).isEqualTo(1);
         assertThat(id).isNotEmpty().isNotNull();
+    }
+
+    @Test
+    public void saveUnsupportedHost() throws Exception {
+        final TestPresenterSavior savior = new TestPresenterSavior();
+        final TiPresenter presenter = new TiPresenter() {
+        };
+        try {
+            savior.save(presenter, "not supported host");
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e).isInstanceOf(PresenterSavior.IllegalHostException.class)
+                    .hasMessageContaining("String");
+        }
     }
 
     @Before

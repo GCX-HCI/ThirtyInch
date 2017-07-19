@@ -13,8 +13,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        mavenLocal()
-        maven { url = "https://dl.bintray.com/passsy/maven/" }
+        maven { url "https://maven.google.com" }
     }
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
@@ -23,14 +22,14 @@ allprojects {
 }
 
 ext {
-    VERSION_NAME = "0.8.0-SNAPSHOT"
-    VERSION_CODE = 4
+    VERSION_NAME = "0.8.1-SNAPSHOT"
+    VERSION_CODE = 6
     MIN_SDK_VERSION = 14
-    TARGET_SDK_VERSION = 25
-    COMPILE_SDK_VERSION = 25
+    TARGET_SDK_VERSION = 26
+    COMPILE_SDK_VERSION = 26
     BUILD_TOOLS_VERSION = '25.0.2'
 
-    supportLibraryVersion = '25.3.0'
+    supportLibraryVersion = '26.0.0-beta2'
 
     bintrayVersion = '0.3.4'
     junitVersion = '4.12'

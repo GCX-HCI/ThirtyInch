@@ -44,7 +44,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -62,7 +61,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
         assertThat(mSavior.mActivityInstanceObserver).isNull();
 
         // And when the Activity is changing its configuration.
-        hostingActivity.setChangingConfiguration(true);
         fragment.onSaveInstanceState(mFragmentSavedState);
         fragment.onStop();
         fragment.onDestroyView();
@@ -81,7 +79,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
                 .setRetainPresenterEnabled(false)
                 .build());
         final TestTiFragment fragment2 = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity2)
                 .setSavior(mSavior)
                 .setPresenter(presenter2)
@@ -118,7 +115,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -134,7 +130,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
         assertThat(mSavior.getPresenterCount()).isEqualTo(1);
 
         // And when the Activity is changing its configurations.
-        hostingActivity.setChangingConfiguration(true);
         mSavior.mActivityInstanceObserver.onActivitySaveInstanceState(
                 hostingActivity.getMockActivityInstance(), mActivitySavedState);
         fragment.onSaveInstanceState(mFragmentSavedState);
@@ -156,7 +151,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
                 .setRetainPresenterEnabled(false)
                 .build());
         final TestTiFragment fragment2 = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity2)
                 .setSavior(mSavior)
                 .setPresenter(presenter2)
@@ -189,7 +183,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -206,6 +199,7 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
+        assertThat(mSavior.mActivityInstanceObserver).isNull();
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -235,7 +229,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -252,6 +245,8 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And when the Activity is finishing.
         hostingActivity.setFinishing(true);
+        mSavior.mActivityInstanceObserver.onActivityDestroyed(
+                hostingActivity.getMockActivityInstance());
         fragment.onStop();
         fragment.onDestroyView();
         fragment.onDestroy();
@@ -276,7 +271,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -326,7 +320,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -373,7 +366,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -415,7 +407,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -466,7 +457,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -508,7 +498,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenter(presenter)
@@ -559,7 +548,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
@@ -620,7 +608,6 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
 
         // And given a Fragment.
         final TestTiFragment fragment = new TestTiFragment.Builder()
-                .setDontKeepActivitiesEnabled(false)
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {

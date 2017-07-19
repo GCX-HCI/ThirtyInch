@@ -23,44 +23,47 @@ import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.HashMap;
-import java.util.UUID;
-
-import static net.grandcentrix.thirtyinch.internal.PresenterSavior.TI_ACTIVITY_PRESENTER_SCOPE_KEY;
 
 /**
- * Keeps track of {@link Activity}s across orientation changes using a unique id when added via
- * {@link #startTracking(Activity)}. When the {@link Activity} finishes the {@link Listener} is
- * triggered.
+ * Keeps track of {@link Activity}s across orientation changes using a id when added via
+ * {@link #startTracking(Activity, String)}. When the {@link Activity} finishes the
+ * {@link ActivityFinishListener} is triggered.
  */
 public class ActivityInstanceObserver implements Application.ActivityLifecycleCallbacks {
 
     /**
      * Callback when an {@link Activity} will be completely destroyed
      */
-    interface Listener {
+    public interface ActivityFinishListener {
 
         /**
          * called when the {@link Activity} finishes completely. Doesn't get called when the
          * Activity changes its configuration
          */
-        void onActivityFinished(final Activity activity, final String activityId);
+        void onActivityFinished(final Activity activity, final String hostId);
     }
+
+    @VisibleForTesting
+    static final String TI_ACTIVITY_ID_KEY = "ThirtyInch_Activity_id";
 
     private static final String TAG = ActivityInstanceObserver.class.getSimpleName();
 
-    private Listener mListener;
+    private ActivityFinishListener mListener;
 
     private final HashMap<Activity, String> mScopeIdForActivity = new HashMap<>();
 
-    public ActivityInstanceObserver(@NonNull final Listener listener) {
+    public ActivityInstanceObserver(@NonNull final ActivityFinishListener listener) {
         mListener = listener;
     }
 
     /**
-     * a unique id for each {@link Activity} which doesn't change when the {@link Activity} changes
-     * its configuration
+     * Returns the id provided by {@link #startTracking(Activity, String)}
+     *
+     * @return a unique id for each {@link Activity} which doesn't change when the {@link Activity}
+     * changes its configuration
      */
     @Nullable
     public String getActivityId(final Activity activity) {
@@ -70,7 +73,7 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     @Override
     public void onActivityCreated(final Activity activity, final Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            final String scopeId = savedInstanceState.getString(TI_ACTIVITY_PRESENTER_SCOPE_KEY);
+            final String scopeId = savedInstanceState.getString(TI_ACTIVITY_ID_KEY);
             if (scopeId != null) {
                 // refresh mapping
                 mScopeIdForActivity.put(activity, scopeId);
@@ -80,15 +83,10 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivityDestroyed(final Activity activity) {
-
-        // TODO check if "Don't keep Activities" case is handled correctly
-        // and remove logging
-
         TiLog.v(TAG, "destroying " + activity);
         TiLog.v(TAG, "isFinishing = " + activity.isFinishing());
-        TiLog.v(TAG, "isChangingConfigurations = " + activity.isChangingConfigurations());
 
-        if (activity.isFinishing() && !activity.isChangingConfigurations()) {
+        if (activity.isFinishing()) {
             // detected Activity finish, no new Activity instance will be created
             // with savedInstanceState, clear saved presenters
             final String scopeId = mScopeIdForActivity.remove(activity);
@@ -117,7 +115,7 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
             // activity not managed, don't add an id.
             return;
         }
-        outState.putString(TI_ACTIVITY_PRESENTER_SCOPE_KEY, id);
+        outState.putString(TI_ACTIVITY_ID_KEY, id);
     }
 
     @Override
@@ -131,17 +129,13 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
     }
 
     /**
-     * tracks the Activity over orientation changes using a unique id. Use
-     * {@link #getActivityId(Activity)} to get the current Activity instance with the id returned
-     * from this method
+     * tracks the Activity over orientation changes using the passed in id. Use
+     * {@link #getActivityId(Activity)} to get the current Activity instance with the id
      *
      * @param activity to be tracked {@link Activity}
-     * @return a unique id for this Activity
      * @see #getActivityId(Activity)
      */
-    public String startTracking(final Activity activity) {
-        final String activityId = UUID.randomUUID().toString();
+    public void startTracking(final Activity activity, final String activityId) {
         mScopeIdForActivity.put(activity, activityId);
-        return activityId;
     }
 }
