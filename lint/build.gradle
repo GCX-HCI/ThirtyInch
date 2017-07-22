@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+configurations {
+    lintChecks
+}
+
+jar {
+    manifest {
+        attributes('Lint-Registry': 'net.grandcentrix.thirtyinch.IssueRegistry')
+    }
+}
+
+repositories {
+    maven { url "https://dl.bintray.com/android/android-tools" }
+}
+
+dependencies {
+    compile "com.android.tools.lint:lint-api:$lintVersion"
+    compile "com.android.tools.lint:lint-checks:$lintVersion"
+
+    testCompile "com.android.tools.lint:lint:$lintVersion"
+    testCompile "com.android.tools.lint:lint-tests:$lintVersion"
+    testCompile 'org.easytesting:fest-assert-core:2.0M10'
+
+    lintChecks files(jar)
+}

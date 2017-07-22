@@ -34,4 +34,6 @@ ext {
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
     assertjVersion = '2.5.0'
+
+    lintVersion = '25.4.0-alpha7'
 }
