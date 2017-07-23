@@ -24,6 +24,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
 // TODO Check for CompositeActivity
 @SuppressWarnings("WeakerAccess")
 public final class MissingTiViewImplementationDetector extends Detector implements Detector.JavaPsiScanner {
@@ -56,9 +59,16 @@ public final class MissingTiViewImplementationDetector extends Detector implemen
     private static final class ClassVisitor extends JavaElementVisitor {
 
         private static final String TI_VIEW_FQ = "net.grandcentrix.thirtyinch.TiView";
-        private static final String TI_ACTIVITY_FQ = "net.grandcentrix.thirtyinch.TiActivity";
-        private static final String TI_FRAGMENT_FQ = "net.grandcentrix.thirtyinch.TiFragment";
         private static final String PROVIDE_VIEW_METHOD = "provideView";
+        private static final List<String> TI_CLASS_NAMES = unmodifiableList(asList(
+                "net.grandcentrix.thirtyinch.TiActivity",
+                "net.grandcentrix.thirtyinch.TiFragment"));
+        private static final String ADD_PLUGIN_METHOD = "addPlugin";
+        private static final String TI_ACTIVITY_PLUGIN_NAME = "TiActivityPlugin";
+        private static final String TI_FRAGMENT_PLUGIN_NAME = "TiFragmentPlugin";
+        private static final List<String> CA_CLASS_NAMES = unmodifiableList(asList(
+                "com.pascalwelsch.compositeandroid.activity.CompositeActivity",
+                "com.pascalwelsch.compositeandroid.fragment.CompositeFragment"));
 
         private final JavaContext context;
 
@@ -68,40 +78,30 @@ public final class MissingTiViewImplementationDetector extends Detector implemen
 
         @Override
         public void visitClass(PsiClass declaration) {
-            super.visitClass(declaration);
-
             // Don't trigger on abstract classes
             if (PsiUtil.isAbstractClass(declaration)) {
                 return;
             }
 
             // Extract the MVP View interface type from the class
-            PsiType resolvedViewInterface = resolveRelevantViewInterface(declaration);
-            if (resolvedViewInterface == null) {
+            PsiType viewInterface = resolveRelevantViewInterface(declaration);
+            if (viewInterface == null) {
                 return;
             }
 
-            // Check if the Activity implements that interface
-            boolean detectedView = false;
-            for (PsiClassType implementedType : declaration.getImplementsListTypes()) {
-                if (implementedType.equals(resolvedViewInterface)) {
-                    detectedView = true;
-                    break;
-                }
-            }
-
-            if (!detectedView) {
-                // Check if provideView() is overridden instead
+            // Check if the class implements that interface as well
+            if (!hasViewInterfaceImplementation(declaration, viewInterface)) {
+                // Interface not implemented; check if provideView() is overridden instead
                 boolean detectedOverride = false;
                 for (PsiMethod method : declaration.findMethodsByName(PROVIDE_VIEW_METHOD, true)) {
-                    if (resolvedViewInterface.equals(method.getReturnType())) {
+                    if (viewInterface.equals(method.getReturnType())) {
                         detectedOverride = true;
                         break;
                     }
                 }
 
                 if (!detectedOverride) {
-                    // Report issue for this class
+                    // Invalid state: Report issue for this class
                     context.report(ISSUE, context.getLocation(declaration.getNameIdentifier()), ISSUE.getBriefDescription(TextFormat.TEXT));
                 }
             }
@@ -110,24 +110,52 @@ public final class MissingTiViewImplementationDetector extends Detector implemen
         @Nullable
         private PsiType resolveRelevantViewInterface(@NotNull PsiClass declaration) {
             for (PsiClassType extendedType : declaration.getExtendsListTypes()) {
-                PsiClass resolvedType = PsiUtil.resolveGenericsClassInType(extendedType).getElement();
+                PsiClass resolvedType = extendedType.resolveGenerics().getElement();
                 if (resolvedType == null) {
                     logInternalError("Unable to resolve type '" + extendedType.getClassName() + "', extended by class '" + declaration.getName() + "'");
                     return null;
                 }
 
                 String qualifiedName = resolvedType.getQualifiedName();
-                if (TI_ACTIVITY_FQ.equals(qualifiedName) || TI_FRAGMENT_FQ.equals(qualifiedName)) {
-                    return resolveViewFromParameters(resolvedType.getTypeParameters(), extendedType.getParameters());
+                if (TI_CLASS_NAMES.contains(qualifiedName)) {
+                    // ThirtyInch-based inheritance
+                    return resolveFromThirtyInchClass(declaration, extendedType, resolvedType);
                 }
+
+                if (CA_CLASS_NAMES.contains(qualifiedName)) {
+                    // CompositeAndroid-based inheritance
+                    return resolveFromCompositeAndroidClass(declaration, extendedType, resolvedType);
+                }
+
+                // Crawl up the type hierarchy to catch declarations in super classes
+                return resolveRelevantViewInterface(resolvedType);
             }
 
             return null;
         }
 
+        private boolean hasViewInterfaceImplementation(@NotNull PsiClass declaration, @NotNull PsiType viewInterface) {
+            for (PsiClassType implementedType : declaration.getImplementsListTypes()) {
+                if (implementedType.equals(viewInterface)) {
+                    return true;
+                }
+
+                PsiClass resolvedType = implementedType.resolve();
+                if (resolvedType == null) {
+                    logInternalError("Unable to resolve implemented type '" + implementedType.getClassName() + "', extended by class '" + declaration.getName() + "'");
+                    continue;
+                }
+                return hasViewInterfaceImplementation(resolvedType, viewInterface);
+            }
+
+            return false;
+        }
+
         @Nullable
-        private PsiType resolveViewFromParameters(PsiTypeParameter[] parameterTypes, PsiType[] parameters) {
-            // Expect <P extends TiPresenter, V extends TiView>
+        private PsiType resolveFromThirtyInchClass(PsiClass declaration, PsiClassType extendedType, PsiClass resolvedType) {
+            // Expect <P extends TiPresenter, V extends TiView> signature in the extended Ti class
+            PsiType[] parameters = extendedType.getParameters();
+            PsiTypeParameter[] parameterTypes = resolvedType.getTypeParameters();
             if (parameters.length != 2 || parameterTypes.length != 2) {
                 return null;
             }
@@ -135,15 +163,69 @@ public final class MissingTiViewImplementationDetector extends Detector implemen
             // Check that the second type parameter is actually a TiView
             PsiTypeParameter parameterType = parameterTypes[1];
             PsiType parameter = parameters[1];
-            for (PsiClassType extendedType : parameterType.getExtendsListTypes()) {
-                PsiClass resolvedType = PsiUtil.resolveGenericsClassInType(extendedType).getElement();
-                if (resolvedType == null) {
-                    logInternalError("Unable to resolve type '" + extendedType.getClassName() + "', used as parameter");
+            for (PsiClassType extendedParamType : parameterType.getExtendsListTypes()) {
+                PsiClass resolvedParamType = extendedParamType.resolveGenerics().getElement();
+                if (resolvedParamType == null) {
+                    logInternalError("Unable to resolve type '" + extendedParamType.getClassName() + "', used as parameter");
                     return null;
                 }
 
-                if (TI_VIEW_FQ.equals(resolvedType.getQualifiedName())) {
+                if (TI_VIEW_FQ.equals(resolvedParamType.getQualifiedName())) {
                     return parameter;
+                }
+            }
+
+            return null;
+        }
+
+        @Nullable
+        private PsiType resolveFromCompositeAndroidClass(PsiClass declaration, PsiClassType extendedType, PsiClass resolvedType) {
+            // Expect TiPlugin to be applied in the extended CA class
+            PsiMethod defaultConstructor = null;
+            for (PsiMethod constructor : declaration.getConstructors()) {
+                if (constructor.getTypeParameters().length == 0) {
+                    // Found default constructor
+                    defaultConstructor = constructor;
+                    break;
+                }
+            }
+
+            if (defaultConstructor == null) {
+                return null;
+            }
+
+//            PsiCodeBlock body = defaultConstructor.getBody();
+//            if (body == null) {
+//                context.log(null, "Body null");
+//                return null;
+//            }
+//
+//            // Search for the registration of a Ti-based plugin inside the constructor
+//            for (PsiStatement statement : body.getStatements()) {
+//                context.log(null, "\t" + statement.getText());
+//
+//                PsiType resolved = resolveCompositeAndroidConstructorStatement(statement);
+//                if (resolved != null) {
+//                    return resolved;
+//                }
+////                String text = statement.getText();
+////                if (text.contains(ADD_PLUGIN_METHOD) &&
+////                        (text.contains(TI_ACTIVITY_PLUGIN_NAME) || text.contains(TI_FRAGMENT_PLUGIN_NAME))) {
+////
+////                }
+//            }
+
+            return null;
+        }
+
+        @Nullable
+        private PsiType resolveCompositeAndroidConstructorStatement(PsiElement element) {
+            context.log(null, "\t\t" + element.getClass() + "\t" + element.getText());
+
+            for (PsiElement child : element.getChildren()) {
+                PsiType resolved = resolveCompositeAndroidConstructorStatement(child);
+                if (resolved != null) {
+                    return resolved;
                 }
             }
 
