@@ -8,10 +8,8 @@ import com.android.tools.lint.detector.api.JavaContext;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.android.tools.lint.detector.api.TextFormat;
-import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiType;
@@ -27,17 +25,14 @@ import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UReferenceExpression;
 import org.jetbrains.uast.UastContext;
 import org.jetbrains.uast.UastUtils;
-import org.jetbrains.uast.visitor.UastVisitor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
-// TODO Check for CompositeActivity
 @SuppressWarnings("WeakerAccess")
 public final class MissingTiViewImplementationDetector extends Detector implements Detector.UastScanner {
 
