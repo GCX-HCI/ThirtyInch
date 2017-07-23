@@ -35,18 +35,25 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
             "public interface TiView {\n" +
             "}");
 
+    private final TestFile caBasePluginStub = java("" +
+            "package com.pascalwelsch.compositeandroid;\n" +
+            "public interface Plugin {\n" +
+            "}");
+
     private final TestFile caActivityStub = java("" +
             "package com.pascalwelsch.compositeandroid.activity;\n" +
             "import net.grandcentrix.thirtyinch.plugin.*;\n" +
+            "import com.pascalwelsch.compositeandroid.*;\n" +
             "public class CompositeActivity {\n" +
-            "   public void addPlugin(TiActivityPlugin plugin) {\n" +
+            "   public void addPlugin(Plugin plugin) {\n" +
             "   }\n" +
             "}");
 
     private final TestFile caActivityPluginStub = java("" +
             "package net.grandcentrix.thirtyinch.plugin;\n" +
             "import net.grandcentrix.thirtyinch.*;\n" +
-            "public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> {\n" +
+            "import com.pascalwelsch.compositeandroid.*;\n" +
+            "public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> implements Plugin {\n" +
             "   public TiActivityPlugin(Runnable action) {\n" +
             "   }\n" +
             "}");
@@ -54,15 +61,17 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
     private final TestFile caFragmentStub = java("" +
             "package com.pascalwelsch.compositeandroid.fragment;\n" +
             "import net.grandcentrix.thirtyinch.plugin.*;\n" +
+            "import com.pascalwelsch.compositeandroid.*;\n" +
             "public class CompositeFragment {\n" +
-            "   public void addPlugin(TiFragmentPlugin plugin) {\n" +
+            "   public void addPlugin(Plugin plugin) {\n" +
             "   }\n" +
             "}");
 
     private final TestFile caFragmentPluginStub = java("" +
             "package net.grandcentrix.thirtyinch.plugin;\n" +
             "import net.grandcentrix.thirtyinch.*;\n" +
-            "public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> {\n" +
+            "import com.pascalwelsch.compositeandroid.*;\n" +
+            "public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> implements Plugin {\n" +
             "   public TiFragmentPlugin(Runnable action) {\n" +
             "   }\n" +
             "}");
@@ -253,7 +262,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caActivityStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
+                caActivityStub, caBasePluginStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, activity))
                 .isEqualTo(NO_WARNINGS);
     }
@@ -271,7 +280,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caActivityStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
+                caActivityStub, caBasePluginStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, activity))
                 .isEqualTo(NO_WARNINGS);
     }
@@ -289,7 +298,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caActivityStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
+                caActivityStub, caBasePluginStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, activity))
                 .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
     }
@@ -303,7 +312,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caActivityStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
+                caActivityStub, caBasePluginStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, activity))
                 .isEqualTo(NO_WARNINGS);
     }
@@ -323,14 +332,14 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caActivityStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
+                caActivityStub, caBasePluginStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, fragment))
                 .isEqualTo(NO_WARNINGS);
     }
 
     public void testCompositeFragment_andViewIsImplementedCorrectly_noWarnings() throws Exception {
         TestFile fragment = java("" +
-                "package foo;" +
+                "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
                 "import com.pascalwelsch.compositeandroid.fragment.*;\n" +
                 "public class MyFragment extends CompositeFragment implements MyView {\n" +
@@ -341,14 +350,38 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caFragmentStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
+                caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, fragment))
                 .isEqualTo(NO_WARNINGS);
     }
 
-    public void testCompositeFragment_doesntImplementInterface_hasWarning() throws Exception {
+    @SuppressWarnings("Convert2Lambda")
+    public void testCompositeFragment_doesntImplementInterface_hasWarning_java7() throws Exception {
         TestFile fragment = java("" +
-                "package foo;" +
+                "package foo;\n" +
+                "import net.grandcentrix.thirtyinch.plugin.*;\n" +
+                "import com.pascalwelsch.compositeandroid.fragment.*;\n" +
+                "public class MyFragment extends CompositeFragment {\n" +
+                "   public MyFragment() {\n" +
+                "       addPlugin(new TiFragmentPlugin<>(\n" +
+                "                new Runnable() {\n" +
+                "                    @Override\n" +
+                "                    public void run() {\n" +
+                "                        new MyPresenter();\n" +
+                "                    }\n" +
+                "                }));" +
+                "   }\n" +
+                "}");
+
+        assertThat(lintProject(
+                caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
+                presenter, view, fragment))
+                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
+    }
+
+    public void testCompositeFragment_doesntImplementInterface_hasWarning_java8() throws Exception {
+        TestFile fragment = java("" +
+                "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
                 "import com.pascalwelsch.compositeandroid.fragment.*;\n" +
                 "public class MyFragment extends CompositeFragment {\n" +
@@ -359,22 +392,45 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 "}");
 
         assertThat(lintProject(
-                caFragmentStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
+                caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, fragment))
                 .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
     }
 
     public void testCompositeFragment_doesntImplementInterface_butDoesntHavePluginAppliedEither_noWarnings() throws Exception {
         TestFile fragment = java("" +
-                "package foo;" +
+                "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
                 "import com.pascalwelsch.compositeandroid.fragment.*;\n" +
                 "public class MyFragment extends CompositeFragment {\n" +
                 "}");
 
         assertThat(lintProject(
-                caFragmentStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
+                caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, fragment))
+                .isEqualTo(NO_WARNINGS);
+    }
+
+    public void testCompositeFragment_appliesUnrelatedPlugin_noWarnings() throws Exception {
+        TestFile otherPlugin = java("" +
+                "package foo;\n" +
+                "import com.pascalwelsch.compositeandroid.*;\n" +
+                "public class OtherPlugin implements Plugin {\n" +
+                "}");
+
+        TestFile fragment = java("" +
+                "package foo;\n" +
+                "import net.grandcentrix.thirtyinch.plugin.*;\n" +
+                "import com.pascalwelsch.compositeandroid.fragment.*;\n" +
+                "public class MyFragment extends CompositeFragment {\n" +
+                "   public MyFragment() {\n" +
+                "       addPlugin(new OtherPlugin());\n" +
+                "   }\n" +
+                "}");
+
+        assertThat(lintProject(
+                caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
+                presenter, view, otherPlugin, fragment))
                 .isEqualTo(NO_WARNINGS);
     }
 
