@@ -7,7 +7,7 @@ import com.android.tools.lint.detector.api.Issue;
 import java.util.Collections;
 import java.util.List;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MissingViewInThirtyInchDetectorTest extends LintDetectorTest {
 

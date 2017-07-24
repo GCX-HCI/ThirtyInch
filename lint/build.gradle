@@ -34,7 +34,7 @@ dependencies {
 
     testCompile "com.android.tools.lint:lint:$lintVersion"
     testCompile "com.android.tools.lint:lint-tests:$lintVersion"
-    testCompile 'org.easytesting:fest-assert-core:2.0M10'
+    testCompile "org.assertj:assertj-core:$assertjVersion"
 
     lintChecks files(jar)
 }
