@@ -1,4 +1,13 @@
-apply plugin: 'java'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+apply plugin: 'kotlin'
 apply plugin: 'jacoco'
 
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -19,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile "com.android.tools.lint:lint-api:$lintVersion"
     compile "com.android.tools.lint:lint-checks:$lintVersion"
 

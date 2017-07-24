@@ -9,21 +9,11 @@ import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
+public class MissingViewInCompositeDetectorTest extends LintDetectorTest {
 
     private static final String NO_WARNINGS = "No warnings.";
 
     /* Stubbed-out source files */
-
-    private final TestFile tiActivityStub = java("" +
-            "package net.grandcentrix.thirtyinch;\n" +
-            "public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView> {\n" +
-            "}");
-
-    private final TestFile tiFragmentStub = java("" +
-            "package net.grandcentrix.thirtyinch;\n" +
-            "public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> {\n" +
-            "}");
 
     private final TestFile tiPresenterStub = java("" +
             "package net.grandcentrix.thirtyinch;\n" +
@@ -90,170 +80,11 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
 
     /*
      * --------------------------------------------------------------------------------
-     * TiActivity
-     * --------------------------------------------------------------------------------
-     */
-
-    public void testTiActivity_dontTriggerOnAbstractClass() throws Exception {
-        TestFile activity = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public abstract class MyActivity extends TiActivity<MyPresenter, MyView> {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiActivityStub, tiPresenterStub, tiViewStub,
-                presenter, view, activity))
-                .isEqualTo(NO_WARNINGS);
-    }
-
-    public void testTiActivity_andViewIsImplementedCorrectly_noWarnings() throws Exception {
-        TestFile activity = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyActivity extends TiActivity<MyPresenter, MyView> implements MyView {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiActivityStub, tiPresenterStub, tiViewStub,
-                presenter, view, activity))
-                .isEqualTo(NO_WARNINGS);
-    }
-
-    public void testTiActivity_doesntImplementInterface_hasWarning() throws Exception {
-        TestFile activity = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyActivity extends TiActivity<MyPresenter, MyView> {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiActivityStub, tiPresenterStub, tiViewStub,
-                presenter, view, activity))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
-    }
-
-    public void testTiActivity_doesntImplementInterface_butOverridesProvideView_noWarnings() throws Exception {
-        TestFile activity = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyActivity extends TiActivity<MyPresenter, MyView> {\n" +
-                "   public MyView provideView() {\n" +
-                "       return null;\n" +
-                "   }\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiActivityStub, tiPresenterStub, tiViewStub,
-                presenter, view, activity))
-                .isEqualTo(NO_WARNINGS);
-    }
-
-    public void testTiActivity_throughTransitiveBaseClass_hasWarning() throws Exception {
-        TestFile baseActivity = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public abstract class BaseActivity<P extends TiPresenter<V>, V extends TiView> extends TiActivity<P, V> {\n" +
-                "}");
-
-        TestFile activity = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyActivity extends BaseActivity<MyPresenter, MyView> {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiActivityStub, tiPresenterStub, tiViewStub,
-                presenter, view, baseActivity, activity))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
-    }
-    /*
-     * --------------------------------------------------------------------------------
-     * TiFragment
-     * --------------------------------------------------------------------------------
-     */
-
-    public void testTiFragment_dontTriggerOnAbstractClass() throws Exception {
-        TestFile fragment = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public abstract class MyFragment extends TiFragment<MyPresenter, MyView> {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, fragment))
-                .isEqualTo(NO_WARNINGS);
-    }
-
-    public void testTiFragment_andViewIsImplementedCorrectly_noWarnings() throws Exception {
-        TestFile fragment = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyFragment extends TiFragment<MyPresenter, MyView> implements MyView {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, fragment))
-                .isEqualTo(NO_WARNINGS);
-    }
-
-    public void testTiFragment_doesntImplementInterface_hasWarning() throws Exception {
-        TestFile fragment = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyFragment extends TiFragment<MyPresenter, MyView> {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, fragment))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
-    }
-
-    public void testTiFragment_doesntImplementInterface_butOverridesProvideView_noWarnings() throws Exception {
-        TestFile fragment = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyFragment extends TiFragment<MyPresenter, MyView> {\n" +
-                "   public MyView provideView() {\n" +
-                "       return null;\n" +
-                "   }\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, fragment))
-                .isEqualTo(NO_WARNINGS);
-    }
-
-    public void testTiFragment_throughTransitiveBaseClass_hasWarning() throws Exception {
-        TestFile baseFragment = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public abstract class BaseFragment<P extends TiPresenter<V>, V extends TiView> extends TiFragment<P, V> {\n" +
-                "}");
-
-        TestFile fragment = java("" +
-                "package foo;\n" +
-                "import net.grandcentrix.thirtyinch.*;\n" +
-                "public class MyFragment extends BaseFragment<MyPresenter, MyView> {\n" +
-                "}");
-
-        assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, baseFragment, fragment))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
-    }
-
-    /*
-     * --------------------------------------------------------------------------------
      * CompositeActivity
      * --------------------------------------------------------------------------------
      */
 
-    public void testCompositeActivity_dontTriggerOnAbstractClass() throws Exception {
+    public void testActivity_dontTriggerOnAbstractClass() throws Exception {
         TestFile activity = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -267,7 +98,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 .isEqualTo(NO_WARNINGS);
     }
 
-    public void testCompositeActivity_andViewIsImplementedCorrectly_noWarnings() throws Exception {
+    public void testActivity_andViewIsImplementedCorrectly_noWarnings() throws Exception {
         TestFile activity = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -285,7 +116,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 .isEqualTo(NO_WARNINGS);
     }
 
-    public void testCompositeActivity_doesntImplementInterface_hasWarning() throws Exception {
+    public void testActivity_doesntImplementInterface_hasWarning() throws Exception {
         TestFile activity = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -300,10 +131,10 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
         assertThat(lintProject(
                 caActivityStub, caBasePluginStub, caActivityPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, activity))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
+                .containsOnlyOnce(Issues.MISSING_VIEW.getId());
     }
 
-    public void testCompositeActivity_doesntImplementInterface_butDoesntHavePluginAppliedEither_noWarnings() throws Exception {
+    public void testActivity_doesntImplementInterface_butDoesntHavePluginAppliedEither_noWarnings() throws Exception {
         TestFile activity = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -323,7 +154,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
      * --------------------------------------------------------------------------------
      */
 
-    public void testCompositeFragment_dontTriggerOnAbstractClass() throws Exception {
+    public void testFragment_dontTriggerOnAbstractClass() throws Exception {
         TestFile fragment = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -337,7 +168,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 .isEqualTo(NO_WARNINGS);
     }
 
-    public void testCompositeFragment_andViewIsImplementedCorrectly_noWarnings() throws Exception {
+    public void testFragment_andViewIsImplementedCorrectly_noWarnings() throws Exception {
         TestFile fragment = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -356,7 +187,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
     }
 
     @SuppressWarnings("Convert2Lambda")
-    public void testCompositeFragment_doesntImplementInterface_hasWarning_java7() throws Exception {
+    public void testFragment_doesntImplementInterface_hasWarning_java7() throws Exception {
         TestFile fragment = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -376,10 +207,10 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
         assertThat(lintProject(
                 caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, fragment))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
+                .containsOnlyOnce(Issues.MISSING_VIEW.getId());
     }
 
-    public void testCompositeFragment_doesntImplementInterface_hasWarning_java8() throws Exception {
+    public void testFragment_doesntImplementInterface_hasWarning_java8() throws Exception {
         TestFile fragment = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -394,10 +225,10 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
         assertThat(lintProject(
                 caFragmentStub, caBasePluginStub, caFragmentPluginStub, tiPresenterStub, tiViewStub,
                 presenter, view, fragment))
-                .containsOnlyOnce(MissingTiViewImplementationDetector.ISSUE.getId());
+                .containsOnlyOnce(Issues.MISSING_VIEW.getId());
     }
 
-    public void testCompositeFragment_doesntImplementInterface_butDoesntHavePluginAppliedEither_noWarnings() throws Exception {
+    public void testFragment_doesntImplementInterface_butDoesntHavePluginAppliedEither_noWarnings() throws Exception {
         TestFile fragment = java("" +
                 "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.plugin.*;\n" +
@@ -411,7 +242,7 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
                 .isEqualTo(NO_WARNINGS);
     }
 
-    public void testCompositeFragment_appliesUnrelatedPlugin_noWarnings() throws Exception {
+    public void testFragment_appliesUnrelatedPlugin_noWarnings() throws Exception {
         TestFile otherPlugin = java("" +
                 "package foo;\n" +
                 "import com.pascalwelsch.compositeandroid.*;\n" +
@@ -438,11 +269,11 @@ public class MissingTiViewImplementationDetectorTest extends LintDetectorTest {
 
     @Override
     protected Detector getDetector() {
-        return new MissingTiViewImplementationDetector();
+        return new MissingViewInCompositeDetector();
     }
 
     @Override
     protected List<Issue> getIssues() {
-        return Collections.singletonList(MissingTiViewImplementationDetector.ISSUE);
+        return Collections.singletonList(MissingViewInCompositeDetector.Companion.getISSUE());
     }
 }

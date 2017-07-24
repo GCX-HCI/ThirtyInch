@@ -34,6 +34,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
 @SuppressWarnings("WeakerAccess")
+@Deprecated
 public final class MissingTiViewImplementationDetector extends Detector implements Detector.UastScanner {
 
     private static final String TI_VIEW_FQ = "net.grandcentrix.thirtyinch.TiView";
