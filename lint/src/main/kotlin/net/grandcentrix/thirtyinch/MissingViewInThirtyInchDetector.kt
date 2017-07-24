@@ -45,7 +45,7 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
                 .map { it.resolveGenerics().element }
                 .filter { TI_VIEW_FQ == it?.qualifiedName }
                 .map { parameter }
-                .first()
+                .firstOrNull()
     }
 
     override fun allowMissingViewInterface(context: JavaContext, declaration: UClass, viewInterface: PsiType): Boolean {

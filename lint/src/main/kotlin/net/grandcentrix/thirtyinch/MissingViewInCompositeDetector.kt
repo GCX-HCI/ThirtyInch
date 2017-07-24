@@ -3,7 +3,10 @@ package net.grandcentrix.thirtyinch
 import com.android.annotations.VisibleForTesting
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
-import com.intellij.psi.*
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiJavaCodeReferenceElement
+import com.intellij.psi.PsiType
 import org.jetbrains.uast.*
 
 private val ADD_PLUGIN_METHOD = "addPlugin"
@@ -31,22 +34,18 @@ class MissingViewInCompositeDetector : BaseMissingViewDetector() {
 
     override fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType, resolvedType: PsiClass): PsiType? {
         // Expect TiPlugin to be applied in the extended CA class
-        var defaultConstructor: PsiMethod? = null
-        for (constructor in declaration.constructors) {
-            if (constructor.typeParameters.size == 0) {
-                // Found default constructor
-                defaultConstructor = constructor
-                break
-            }
+        // Found default constructor
+        val defaultConstructor = declaration.constructors
+                .filter { it.typeParameters.isEmpty() }
+                .firstOrNull()
+
+        defaultConstructor?.let {
+            val uastContext = declaration.getUastContext()
+            val body = uastContext.getMethodBody(defaultConstructor)
+            return tryFindViewFromCompositeConstructor(context, declaration, body)
         }
 
-        if (defaultConstructor == null) {
-            return null
-        }
-
-        val uastContext = declaration.getUastContext()
-        val body = uastContext.getMethodBody(defaultConstructor)
-        return tryFindViewFromCompositeConstructor(context, declaration, body)
+        return null
     }
 
     private fun tryFindViewFromCompositeConstructor(context: JavaContext, declaration: UClass, expression: UExpression?): PsiType? {
@@ -54,35 +53,35 @@ class MissingViewInCompositeDetector : BaseMissingViewDetector() {
             return null
         }
 
-        if (expression is UBlockExpression) {
-            // Unwrap block statements
-            for (child in expression.expressions) {
-                val resolved = tryFindViewFromCompositeConstructor(context, declaration, child)
-                if (resolved != null) {
-                    return resolved
-                }
+        when (expression) {
+            is UBlockExpression -> {
+                // Unwrap block statements; the first resolvable result is returned
+                expression.expressions
+                        .mapNotNull { tryFindViewFromCompositeConstructor(context, declaration, it) }
+                        .forEach { return it }
             }
 
-        } else if (expression is UCallExpression) {
-            // Inspect call sites
-            val call = expression as UCallExpression?
-            if (ADD_PLUGIN_METHOD == call!!.methodName && call.valueArgumentCount == 1) {
-                // Expect a plugin to be used as the only argument to this method
-                val argument = call.valueArguments[0]
-                if (argument is UCallExpression) {
-                    val argReference = argument.classReference ?: return null
+            is UCallExpression -> {
+                // Inspect call sites
+                if (ADD_PLUGIN_METHOD == expression.methodName && expression.valueArgumentCount == 1) {
+                    // Expect a plugin to be used as the only argument to this method
+                    val argument = expression.valueArguments[0]
 
-                    val resolvedName = argReference.resolvedName
-                    if (TI_ACTIVITY_PLUGIN_NAME == resolvedName || TI_FRAGMENT_PLUGIN_NAME == resolvedName) {
-                        // Matching names. Finally, find the type parameters passed to the plugin
-                        val psiReference = argReference.psi as PsiJavaCodeReferenceElement? ?: return null
+                    if (argument is UCallExpression) {
+                        val argReference = argument.classReference ?: return null
 
-                        val parameterTypes = psiReference.typeParameters
-                        if (parameterTypes.size != 2) {
-                            return null
+                        val resolvedName = argReference.resolvedName
+                        if (TI_ACTIVITY_PLUGIN_NAME == resolvedName || TI_FRAGMENT_PLUGIN_NAME == resolvedName) {
+                            // Matching names. Finally, find the type parameters passed to the plugin
+                            val psiReference = argReference.psi as PsiJavaCodeReferenceElement? ?: return null
+
+                            val parameterTypes = psiReference.typeParameters
+                            if (parameterTypes.size != 2) {
+                                return null
+                            }
+
+                            return parameterTypes[1]
                         }
-
-                        return parameterTypes[1]
                     }
                 }
             }
