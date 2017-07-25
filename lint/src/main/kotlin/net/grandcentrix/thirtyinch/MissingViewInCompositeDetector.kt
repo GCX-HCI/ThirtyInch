@@ -7,7 +7,11 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiType
-import org.jetbrains.uast.*
+import org.jetbrains.uast.UBlockExpression
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.getUastContext
 
 private val ADD_PLUGIN_METHOD = "addPlugin"
 private val TI_ACTIVITY_PLUGIN_NAME = "TiActivityPlugin"

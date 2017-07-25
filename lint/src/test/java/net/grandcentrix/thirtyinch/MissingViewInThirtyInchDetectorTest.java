@@ -35,47 +35,6 @@ public class MissingViewInThirtyInchDetectorTest extends LintDetectorTest {
             "public interface TiView {\n" +
             "}");
 
-//    private final TestFile caBasePluginStub = java("" +
-//            "package com.pascalwelsch.compositeandroid;\n" +
-//            "public interface Plugin {\n" +
-//            "}");
-//
-//    private final TestFile caActivityStub = java("" +
-//            "package com.pascalwelsch.compositeandroid.activity;\n" +
-//            "import net.grandcentrix.thirtyinch.plugin.*;\n" +
-//            "import com.pascalwelsch.compositeandroid.*;\n" +
-//            "public class CompositeActivity {\n" +
-//            "   public void addPlugin(Plugin plugin) {\n" +
-//            "   }\n" +
-//            "}");
-//
-//    private final TestFile caActivityPluginStub = java("" +
-//            "package net.grandcentrix.thirtyinch.plugin;\n" +
-//            "import net.grandcentrix.thirtyinch.*;\n" +
-//            "import com.pascalwelsch.compositeandroid.*;\n" +
-//            "public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> implements Plugin {\n" +
-//            "   public TiActivityPlugin(Runnable action) {\n" +
-//            "   }\n" +
-//            "}");
-//
-//    private final TestFile caFragmentStub = java("" +
-//            "package com.pascalwelsch.compositeandroid.fragment;\n" +
-//            "import net.grandcentrix.thirtyinch.plugin.*;\n" +
-//            "import com.pascalwelsch.compositeandroid.*;\n" +
-//            "public class CompositeFragment {\n" +
-//            "   public void addPlugin(Plugin plugin) {\n" +
-//            "   }\n" +
-//            "}");
-//
-//    private final TestFile caFragmentPluginStub = java("" +
-//            "package net.grandcentrix.thirtyinch.plugin;\n" +
-//            "import net.grandcentrix.thirtyinch.*;\n" +
-//            "import com.pascalwelsch.compositeandroid.*;\n" +
-//            "public class TiFragmentPlugin<P extends TiPresenter<V>, V extends TiView> implements Plugin {\n" +
-//            "   public TiFragmentPlugin(Runnable action) {\n" +
-//            "   }\n" +
-//            "}");
-
     private final TestFile view = java("" +
             "package foo;\n" +
             "import net.grandcentrix.thirtyinch.*;\n" +
