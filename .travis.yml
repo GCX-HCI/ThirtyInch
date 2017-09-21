@@ -13,17 +13,18 @@ android:
     - build-tools-25.0.2
 
     # The SDK version used to compile your project
+    - android-21
     - android-25
 
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - addon-google_apis-google-25
+    - addon-google_apis-google-24
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-25
+    - sys-img-armeabi-v7a-android-21
 
 
 before_script:
@@ -35,7 +36,7 @@ before_script:
   - android list targets
 
   # Emulator Management: Create, Start and Wait
-  - echo no | android create avd --force -n test -t android-25
+  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
