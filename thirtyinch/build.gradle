@@ -41,8 +41,14 @@ android {
     }
 }
 
+configurations {
+    lintChecks
+}
+
 dependencies {
     provided "com.android.support:appcompat-v7:$supportLibraryVersion"
+
+    lintChecks project(path: ':lint', configuration: 'lintChecks')
 
     testCompile "junit:junit:$junitVersion"
     testCompile "org.mockito:mockito-core:$mockitoVersion"
@@ -50,6 +56,18 @@ dependencies {
 
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
+}
+
+task copyLintJar(type: Copy) {
+    from(configurations.lintChecks) {
+        rename { 'lint.jar' }
+    }
+    into 'build/intermediates/lint/'
+}
+
+project.afterEvaluate {
+    def compileLintTask = project.tasks.find { it.name == 'compileLint' }
+    compileLintTask.dependsOn(copyLintJar)
 }
 
 publish {
