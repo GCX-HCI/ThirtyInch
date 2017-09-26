@@ -10,9 +10,7 @@ android {
         targetSdkVersion TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "net.grandcentrix.thirtyinch.plugin_test.TestRunner"
-
     }
     buildTypes {
         release {
