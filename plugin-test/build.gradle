@@ -31,7 +31,7 @@ dependencies {
     compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
     compile "com.pascalwelsch.compositeandroid:fragment:$supportLibraryVersion"
 
-    androidTestCompile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"
     androidTestCompile "com.android.support.test:runner:$atslVersion";
     androidTestCompile "com.android.support.test:rules:$atslVersion";
     androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoVersion";
