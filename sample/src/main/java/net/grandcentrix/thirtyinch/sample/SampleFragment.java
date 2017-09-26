@@ -15,19 +15,30 @@
 
 package net.grandcentrix.thirtyinch.sample;
 
-import net.grandcentrix.thirtyinch.TiFragment;
+import net.grandcentrix.thirtyinch.TiPresenterBinders;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SampleFragment extends TiFragment<SamplePresenter, SampleView> implements SampleView {
+public class SampleFragment extends Fragment implements SampleView {
+
+
+    private SamplePresenter mPresenter;
 
     private TextView mSampleText;
+
+    @Override
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mPresenter = TiPresenterBinders.attachPresenter(this, savedInstanceState,
+                () -> new SamplePresenter()).getPresenter();
+    }
 
     @Nullable
     @Override
@@ -38,14 +49,8 @@ public class SampleFragment extends TiFragment<SamplePresenter, SampleView> impl
         final ViewGroup view = (ViewGroup) inflater
                 .inflate(R.layout.fragment_sample, container, false);
 
-        mSampleText = (TextView) view.findViewById(R.id.sample_text);
+        mSampleText = view.findViewById(R.id.sample_text);
         return view;
-    }
-
-    @NonNull
-    @Override
-    public SamplePresenter providePresenter() {
-        return new SamplePresenter();
     }
 
     @Override
