@@ -1,49 +1,42 @@
-language: android
-jdk:
-    - oraclejdk8
+sudo: required
 
+language: android
+jdk: oraclejdk8
+
+services:
+  - docker
+  
+env:
+ - TEST_SUITE=unit
+ - TEST_SUITE=instrumentation
+  
 android:
   components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
-    - tools
-    - platform-tools
-    - tools
+    - $(if [ $TEST_SUITE == "instrumentation" ]; then echo "tools,platform-tools,tools,build-tools-26.0.1,android-22,android-26,extra-google-google_play_services,extra-google-m2repository,extra-android-m2repository,addon-google_apis-google-24,sys-img-armeabi-v7a-android-22"; fi)
 
-    # The BuildTools version used by your project
-    - build-tools-26.0.1
-
-    # The SDK version used to compile your project
-    - android-22
-    - android-26
-
-    # Additional components
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - addon-google_apis-google-24
-
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
-
-
+before_install:
+  - if [ $TEST_SUITE == "unit" ]; then
+    docker pull stefma-docker-hub.bintray.io/android-build-env:0.1-alpha;
+    docker run -i -v $PWD:/project -t stefma-docker-hub.bintray.io/android-build-env:0.1-alpha /bin/bash -c "./gradlew build jacocoTestReport";
+    fi
+    
 before_script:
-
-  # First assemble the project before launching the emulator
-  - ./gradlew assemble
-
-  # List available emulators
-  - android list targets
-
   # Emulator Management: Create, Start and Wait
-  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
+  - if [ $TEST_SUITE == "instrumentation" ]; then
+    ./gradlew assemble;
+    echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a;
+    emulator -avd test -no-skin -no-audio -no-window &
+    android-wait-for-emulator;
+    adb shell input keyevent 82 &
+    fi   
 
 script:
-  - ./gradlew build jacocoTestReport assembleAndroidTest connectedCheck
+  - if [ $TEST_SUITE == "instrumentation" ]; then 
+    ./gradlew assembleAndroidTest connectedCheck;
+    fi
+  - if [ $TEST_SUITE == "unit" ]; then
+    echo "Everything is done already in the before_install docker...";
+    fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
