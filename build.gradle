@@ -36,6 +36,6 @@ ext {
 
     bintrayVersion = '0.5.0'
     junitVersion = '4.12'
-    mockitoVersion = '1.10.19'
-    assertjVersion = '2.5.0'
+    mockitoVersion = '2.10.0'
+    assertjVersion = '2.8.0'
 }
