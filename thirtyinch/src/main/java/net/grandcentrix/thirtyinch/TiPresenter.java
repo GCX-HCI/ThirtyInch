@@ -89,6 +89,15 @@ public abstract class TiPresenter<V extends TiView> {
 
     private LinkedBlockingQueue<ViewAction<V>> mPostponedViewActions = new LinkedBlockingQueue<>();
 
+    /**
+     * view is attached and all {@link #mLifecycleObservers} have been notified about the attache
+     * event. The view is now in a "running" state
+     *
+     * This is a temporary field without public getter until the presenter state and notifications
+     * get completely refactored
+     */
+    private volatile boolean mRunning = false;
+
     private State mState = State.INITIALIZED;
 
     /**
@@ -198,6 +207,10 @@ public abstract class TiPresenter<V extends TiView> {
         }
         moveToState(State.VIEW_ATTACHED, true);
 
+        // TODO refactor events and add a new state HERE when the view is attached and prepared by all observers.
+        // Calling this a "running" state for now, prevents executing postponed actions before this point
+        mRunning = true;
+
         sendPostponedActionsToView(view);
     }
 
@@ -269,6 +282,7 @@ public abstract class TiPresenter<V extends TiView> {
             TiLog.v(TAG, "not calling onDetachView(), not woken up");
             return;
         }
+        mRunning = false;
         moveToState(State.VIEW_DETACHED, false);
         mCalled = false;
         TiLog.v(TAG, "deprecated onSleep()");
@@ -515,7 +529,7 @@ public abstract class TiPresenter<V extends TiView> {
      */
     protected void sendToView(final ViewAction<V> action) {
         final V view = getView();
-        if (view != null) {
+        if (mRunning) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
