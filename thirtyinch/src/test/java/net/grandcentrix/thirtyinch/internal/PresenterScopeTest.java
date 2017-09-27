@@ -52,7 +52,7 @@ public class PresenterScopeTest {
         };
         scope.save("a", presenter1);
 
-        // override with same id
+        // add second presenter with different id
         final TiPresenter presenter2 = new TiPresenter() {
         };
         scope.save("b", presenter2);
