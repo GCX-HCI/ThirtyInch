@@ -79,22 +79,22 @@ public class PresenterScopeTest {
     }
 
     @Test
-    public void overrideMapping() throws Exception {
+    public void overrideMappingThrows() throws Exception {
 
         final PresenterScope scope = new PresenterScope();
         final TiPresenter presenter1 = new TiPresenter() {
         };
-        scope.save("a", presenter1);
+        scope.save("myId", presenter1);
 
-        // override with same id
+        // override with same id throws
         final TiPresenter presenter2 = new TiPresenter() {
         };
-        scope.save("a", presenter2);
-
-        assertThat(scope.getAll())
-                .hasSize(1)
-                .contains(presenter2)
-                .doesNotContain(presenter1);
+        try {
+            scope.save("myId", presenter2);
+            fail("did not throw");
+        } catch (IllegalStateException e) {
+            assertThat(e).hasMessageContaining("myId");
+        }
     }
 
     @Test
@@ -142,6 +142,25 @@ public class PresenterScopeTest {
             fail("did not throw");
         } catch (IllegalStateException e) {
             assertThat(e).hasMessageContaining("null").hasMessageContaining("id");
+        }
+    }
+
+    @Test
+    public void saveSamePresenterTwiceThrows() throws Exception {
+
+        final PresenterScope scope = new PresenterScope();
+        final TiPresenter presenter1 = new TiPresenter() {
+        };
+        scope.save("myId", presenter1);
+
+        // add second presenter with same id
+        final TiPresenter presenter2 = new TiPresenter() {
+        };
+        try {
+            scope.save("myId", presenter2);
+            fail("did not throw");
+        } catch (IllegalStateException e) {
+            assertThat(e).hasMessageContaining("myId");
         }
     }
 }
