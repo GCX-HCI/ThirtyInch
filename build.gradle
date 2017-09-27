@@ -39,6 +39,6 @@ ext {
     junitVersion = '4.12'
     mockitoVersion = '2.10.0'
     assertjVersion = '2.8.0'
-    atslVersion = '1.0.1'
+    supportTestVersion = '1.0.1'
     espressoVersion = '3.0.1'
 }
