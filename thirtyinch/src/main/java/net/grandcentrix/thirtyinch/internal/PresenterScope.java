@@ -19,6 +19,8 @@ package net.grandcentrix.thirtyinch.internal;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,10 +44,12 @@ public class PresenterScope {
         return mStore.get(id);
     }
 
+    @NonNull
     public List<TiPresenter> getAll() {
         return Collections.unmodifiableList(new ArrayList<>(mStore.values()));
     }
 
+    @NonNull
     public List<Map.Entry<String, TiPresenter>> getAllMappings() {
         return Collections.unmodifiableList(new ArrayList<>(mStore.entrySet()));
     }
@@ -54,13 +58,19 @@ public class PresenterScope {
         return mStore.isEmpty();
     }
 
-    public TiPresenter remove(final String id) {
+    public TiPresenter remove(@NonNull final String id) {
         final TiPresenter presenter = mStore.remove(id);
         TiLog.d(TAG, "remove " + id + " " + presenter);
         return presenter;
     }
 
-    public void save(final String id, final TiPresenter presenter) {
+    public void save(@NonNull final String id, @NonNull final TiPresenter presenter) {
+        if (id == null) {
+            throw new IllegalStateException("id must be non-null");
+        }
+        if (presenter == null) {
+            throw new IllegalStateException("presenter must be non-null");
+        }
         TiLog.d(TAG, "save " + id + " " + presenter);
         mStore.put(id, presenter);
     }
