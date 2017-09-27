@@ -25,6 +25,7 @@ ext {
     VERSION_NAME = "0.8.1-SNAPSHOT"
     VERSION_CODE = 6
     MIN_SDK_VERSION = 14
+    // If you change the SDK version don't forgot to update .travis.yml
     TARGET_SDK_VERSION = 26
     COMPILE_SDK_VERSION = 26
     BUILD_TOOLS_VERSION = '26.0.1'
