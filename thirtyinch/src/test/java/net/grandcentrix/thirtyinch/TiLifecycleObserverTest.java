@@ -183,6 +183,8 @@ public class TiLifecycleObserverTest {
             }
         });
 
+        assertEquals(1, mPresenter.mLifecycleObservers.size());
+
         mPresenter.create();
         mPresenter.attachView(mView);
         mPresenter.detachView();
@@ -195,6 +197,8 @@ public class TiLifecycleObserverTest {
         final Object[] last = states.get(states.size() - 1);
         assertEquals(last[0], TiPresenter.State.DESTROYED);
         assertEquals(last[1], true);
+
+        assertEquals(0, mPresenter.mLifecycleObservers.size());
     }
 
     @Test
