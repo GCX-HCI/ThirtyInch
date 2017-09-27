@@ -28,6 +28,7 @@ ext {
     // If you change the SDK version don't forgot to update .travis.yml
     TARGET_SDK_VERSION = 26
     COMPILE_SDK_VERSION = 26
+    // If you change the build tools version don't forgot to update .travis.yml
     BUILD_TOOLS_VERSION = '26.0.1'
 
     supportLibraryVersion = '26.0.0'
