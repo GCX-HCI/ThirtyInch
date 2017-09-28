@@ -17,7 +17,6 @@ android:
 before_install:
   - if [ $TEST_SUITE == "unit" ]; then
     docker pull stefma-docker-hub.bintray.io/android-build-env:0.1-alpha;
-    docker run -i -v $PWD:/project -t stefma-docker-hub.bintray.io/android-build-env:0.1-alpha /bin/bash -c "./gradlew build jacocoTestReport";
     fi
     
 before_script:
@@ -35,7 +34,7 @@ script:
     ./gradlew assembleAndroidTest connectedCheck;
     fi
   - if [ $TEST_SUITE == "unit" ]; then
-    echo "Everything is done already in the before_install docker...";
+    docker run -i -v $PWD:/project -t stefma-docker-hub.bintray.io/android-build-env:0.1-alpha /bin/bash -c "./gradlew build jacocoTestReport";
     fi
 
 after_success:
