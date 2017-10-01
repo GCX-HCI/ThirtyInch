@@ -1,12 +1,22 @@
 package net.grandcentrix.thirtyinch.test;
 
 import android.support.annotation.NonNull;
-
+import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.ViewAction;
 
-import java.util.concurrent.Executor;
-
+/**
+ * Designed for unit testing of {@link TiPresenter#sendToView(ViewAction)}.
+ * <p>
+ * The problem is that {@link TiPresenter#sendToView(ViewAction)} needs a ui executor thread.
+ * Unfortunately a ui executor thread isn't available in unit test.
+ * </p>
+ * <p>
+ * This {@link TiTestPresenter} holds the {@link TiPresenter} under test and replace the "ui executor" with a stubbed
+ * implementation.
+ * </p>
+ */
 public class TiTestPresenter<V extends TiView> {
 
     private TiPresenter<V> mPresenter;
