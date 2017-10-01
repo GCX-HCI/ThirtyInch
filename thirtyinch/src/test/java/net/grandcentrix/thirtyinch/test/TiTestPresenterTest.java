@@ -2,6 +2,7 @@ package net.grandcentrix.thirtyinch.test;
 
 import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import android.support.annotation.NonNull;
 import net.grandcentrix.thirtyinch.TiPresenter;
@@ -17,18 +18,17 @@ public class TiTestPresenterTest {
 
     }
 
-    private TiPresenter<MockTiView> mockTiPresenter;
+    private TiPresenter<MockTiView> mMockTiPresenter;
 
-    private MockTiView mockTiView;
+    private MockTiView mMockTiView;
 
     @Before
     public void setUp() throws Exception {
-        mockTiPresenter = new TiPresenter<MockTiView>() {
+        mMockTiPresenter = new TiPresenter<MockTiView>() {
 
             @Override
             protected void onAttachView(@NonNull MockTiView view) {
                 super.onAttachView(view);
-
                 sendToView(new ViewAction<MockTiView>() {
                     @Override
                     public void call(MockTiView tiView) {
@@ -37,19 +37,14 @@ public class TiTestPresenterTest {
                 });
             }
         };
-        mockTiPresenter.create();
-        mockTiView = new MockTiView() {
-            @Override
-            public void helloWorld() {
-                System.out.println("Hello World");
-            }
-        };
+        mMockTiPresenter.create();
+        mMockTiView = mock(MockTiView.class);
     }
 
     @Test
     public void test_attachViewInUnitTest_ShouldThrow() throws Exception {
         try {
-            mockTiPresenter.attachView(mockTiView);
+            mMockTiPresenter.attachView(mMockTiView);
             fail("No exception");
         } catch (IllegalStateException e) {
             assertThat(e.getMessage()).contains("no ui thread executor available");
@@ -58,11 +53,9 @@ public class TiTestPresenterTest {
 
     @Test
     public void test_attachViewInUnitTestWithTiTestPresenter_ShouldNotThrow() throws Exception {
-        final TiTestPresenter<MockTiView> testPresenter = new TiTestPresenter<>(mockTiPresenter);
-        try {
-            testPresenter.attachView(mockTiView);
-        } catch (IllegalStateException e) {
-            fail("We throw an exception but don't expect one");
-        }
+        final TiTestPresenter<MockTiView> testPresenter = new TiTestPresenter<>(mMockTiPresenter);
+        testPresenter.attachView(mMockTiView);
+
+        verify(mMockTiView).helloWorld();
     }
 }
