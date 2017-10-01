@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import android.support.annotation.NonNull;
+import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiPresenter.State;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.ViewAction;
 import org.junit.*;
@@ -57,5 +59,16 @@ public class TiTestPresenterTest {
         testPresenter.attachView(mMockTiView);
 
         verify(mMockTiView).helloWorld();
+    }
+
+    @Test
+    public void testAttachView_ShouldReplaceUIThreadExecutor() throws Exception {
+        final TiPresenter mockPresenter = mock(TiPresenter.class);
+        when(mockPresenter.getState()).thenReturn(State.VIEW_DETACHED);
+        final TiTestPresenter<TiView> tiTestPresenter = new TiTestPresenter<TiView>(mockPresenter);
+        tiTestPresenter.attachView(mMockTiView);
+
+        verify(mockPresenter).setUiThreadExecutor(any(Executor.class));
+        verify(mockPresenter).attachView(mMockTiView);
     }
 }
