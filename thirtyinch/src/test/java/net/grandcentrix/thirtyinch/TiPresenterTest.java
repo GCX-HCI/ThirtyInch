@@ -15,6 +15,8 @@
 
 package net.grandcentrix.thirtyinch;
 
+import net.grandcentrix.thirtyinch.test.TiTestPresenter;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +35,7 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.assertj.core.api.Assertions.filter;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -472,5 +475,12 @@ public class TiPresenterTest {
         } catch (SuperNotCalledException e) {
             assertTrue(e.getMessage().contains("super.onWakeUp()"));
         }
+    }
+
+    @Test
+    public void testTest_ShouldReturnTiTestPresenter() throws Exception {
+        final TiTestPresenter<TiView> test = mPresenter.test();
+
+        Assertions.assertThat(test).isInstanceOf(TiTestPresenter.class);
     }
 }

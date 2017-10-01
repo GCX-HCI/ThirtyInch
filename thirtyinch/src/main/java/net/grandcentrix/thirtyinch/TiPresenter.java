@@ -16,8 +16,6 @@
 package net.grandcentrix.thirtyinch;
 
 
-import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -25,12 +23,13 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
+import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
+import net.grandcentrix.thirtyinch.test.TiTestPresenter;
 
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern. If used with {@link
@@ -144,7 +143,6 @@ public abstract class TiPresenter<V extends TiView> {
             }
         };
     }
-
 
     /**
      * bind a new view to this presenter.
@@ -386,6 +384,10 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public void setUiThreadExecutor(@Nullable final Executor uiThreadExecutor) {
         mUiThreadExecutor = uiThreadExecutor;
+    }
+
+    public TiTestPresenter<V> test() {
+        return new TiTestPresenter<>(this);
     }
 
     @Override
