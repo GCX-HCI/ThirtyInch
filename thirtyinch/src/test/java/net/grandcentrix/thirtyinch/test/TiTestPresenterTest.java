@@ -42,7 +42,7 @@ public class TiTestPresenterTest {
     }
 
     @Test
-    public void test_attachViewInUnitTest_ShouldThrow() throws Exception {
+    public void testSendToView_InUnitTest_ShouldThrow() throws Exception {
         try {
             mMockTiPresenter.attachView(mMockTiView);
             fail("No exception");
@@ -52,7 +52,7 @@ public class TiTestPresenterTest {
     }
 
     @Test
-    public void test_attachViewInUnitTestWithTiTestPresenter_ShouldNotThrow() throws Exception {
+    public void testSendToView_InUnitTestWithTiTestPresenter_ShouldNotThrow() throws Exception {
         final TiTestPresenter<MockTiView> testPresenter = new TiTestPresenter<>(mMockTiPresenter);
         testPresenter.attachView(mMockTiView);
 
