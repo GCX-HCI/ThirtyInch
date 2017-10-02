@@ -15,17 +15,15 @@
 
 package net.grandcentrix.thirtyinch.plugin_test;
 
-import com.pascalwelsch.compositeandroid.activity.CompositeActivity;
-
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-import net.grandcentrix.thirtyinch.plugin.TiActivityPlugin;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.TextView;
+import com.pascalwelsch.compositeandroid.activity.CompositeActivity;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.plugin.TiActivityPlugin;
 
 public class TestActivity extends CompositeActivity implements TestView {
 
