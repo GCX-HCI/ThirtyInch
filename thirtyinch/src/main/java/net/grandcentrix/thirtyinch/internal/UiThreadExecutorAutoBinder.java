@@ -15,10 +15,9 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
-
-import java.util.concurrent.Executor;
 
 /**
  * binds a ui thread executor to the presenter when this view is attached

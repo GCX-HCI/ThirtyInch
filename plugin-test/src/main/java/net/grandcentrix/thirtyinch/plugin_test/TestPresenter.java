@@ -15,9 +15,8 @@
 
 package net.grandcentrix.thirtyinch.plugin_test;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-
 import android.support.annotation.NonNull;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 public class TestPresenter extends TiPresenter<TestView> {
 

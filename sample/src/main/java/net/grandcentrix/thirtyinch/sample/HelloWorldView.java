@@ -18,7 +18,6 @@ package net.grandcentrix.thirtyinch.sample;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
-
 import rx.Observable;
 
 public interface HelloWorldView extends TiView {

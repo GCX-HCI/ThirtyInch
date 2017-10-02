@@ -16,9 +16,8 @@
 package net.grandcentrix.thirtyinch.sample;
 
 
-import net.grandcentrix.thirtyinch.TiLog;
-
 import android.app.Application;
+import net.grandcentrix.thirtyinch.TiLog;
 
 public class SampleApp extends Application {
 

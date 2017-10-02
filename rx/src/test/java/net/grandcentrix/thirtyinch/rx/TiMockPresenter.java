@@ -15,10 +15,9 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
+import android.support.annotation.NonNull;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-
-import android.support.annotation.NonNull;
 
 /**
  * @author jannisveerkamp
@@ -35,12 +34,6 @@ class TiMockPresenter extends TiPresenter<TiView> {
     protected int onDetachCalled = 0;
 
     @Override
-    protected void onAttachView(@NonNull final TiView view) {
-        super.onAttachView(view);
-        onAttachCalled++;
-    }
-
-    @Override
     protected void onCreate() {
         super.onCreate();
         onCreateCalled++;
@@ -50,6 +43,12 @@ class TiMockPresenter extends TiPresenter<TiView> {
     protected void onDestroy() {
         super.onDestroy();
         onDestroyCalled++;
+    }
+
+    @Override
+    protected void onAttachView(@NonNull final TiView view) {
+        super.onAttachView(view);
+        onAttachCalled++;
     }
 
     @Override

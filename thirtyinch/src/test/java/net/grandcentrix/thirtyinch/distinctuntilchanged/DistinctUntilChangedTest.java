@@ -15,13 +15,12 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.core.Is.*;
+import static org.hamcrest.core.IsEqual.*;
+
 import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
+import org.junit.*;
 
 /**
  * Testing {@link DistinctUntilChanged} annotation via {@link DistinctUntilChangedInterceptor}

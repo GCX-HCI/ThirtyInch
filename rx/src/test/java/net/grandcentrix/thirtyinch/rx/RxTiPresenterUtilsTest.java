@@ -15,21 +15,16 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
 import rx.Observable;
 import rx.observers.TestSubscriber;
-
-import static org.mockito.Mockito.mock;
 
 @RunWith(JUnit4.class)
 public class RxTiPresenterUtilsTest {

@@ -15,9 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-
 import android.support.annotation.NonNull;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 /**
  * Provides access to a new instance of a {@link TiPresenter} which will be attached to

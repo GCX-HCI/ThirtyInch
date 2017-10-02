@@ -16,7 +16,6 @@
 package net.grandcentrix.thirtyinch.internal;
 
 import android.app.Activity;
-
 import java.util.concurrent.Executor;
 
 /**

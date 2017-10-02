@@ -15,14 +15,11 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-
-import org.junit.Test;
+import static org.assertj.core.api.Java6Assertions.*;
 
 import java.util.ArrayList;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.fail;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import org.junit.*;
 
 public class PresenterScopeTest {
 

@@ -16,11 +16,10 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
+import static org.mockito.Mockito.*;
+
 import android.app.Activity;
 import android.app.Application;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * mutable object mocking the hosting activity and their state

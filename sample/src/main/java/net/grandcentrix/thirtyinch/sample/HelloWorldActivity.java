@@ -16,13 +16,6 @@
 package net.grandcentrix.thirtyinch.sample;
 
 
-import com.jakewharton.rxbinding.view.RxView;
-
-import net.grandcentrix.thirtyinch.TiActivity;
-import net.grandcentrix.thirtyinch.logginginterceptor.LoggingInterceptor;
-import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
-import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.viewpager.LifecycleViewPagerActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,7 +24,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
+import com.jakewharton.rxbinding.view.RxView;
+import net.grandcentrix.thirtyinch.TiActivity;
+import net.grandcentrix.thirtyinch.logginginterceptor.LoggingInterceptor;
+import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity;
+import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.viewpager.LifecycleViewPagerActivity;
 import rx.Observable;
 
 public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWorldView>
@@ -45,6 +42,29 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
     public HelloWorldActivity() {
         addBindViewInterceptor(new LoggingInterceptor());
+    }
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_hello_world);
+
+        mButton = (Button) findViewById(R.id.button);
+        mOutput = (TextView) findViewById(R.id.output);
+        mUptime = (TextView) findViewById(R.id.uptime);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new SampleFragment())
+                    .commit();
+        }
+
+        findViewById(R.id.recreate).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                recreate();
+            }
+        });
     }
 
     @Override
@@ -85,29 +105,6 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
     @Override
     public void showText(final String text) {
         mOutput.setText(text);
-    }
-
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hello_world);
-
-        mButton = (Button) findViewById(R.id.button);
-        mOutput = (TextView) findViewById(R.id.output);
-        mUptime = (TextView) findViewById(R.id.uptime);
-
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new SampleFragment())
-                    .commit();
-        }
-
-        findViewById(R.id.recreate).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                recreate();
-            }
-        });
     }
 
 }

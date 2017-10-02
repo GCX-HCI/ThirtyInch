@@ -16,11 +16,6 @@
 package net.grandcentrix.thirtyinch.plugin_test;
 
 
-import com.pascalwelsch.compositeandroid.fragment.CompositeFragment;
-
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-import net.grandcentrix.thirtyinch.plugin.TiFragmentPlugin;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,6 +23,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.pascalwelsch.compositeandroid.fragment.CompositeFragment;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.plugin.TiFragmentPlugin;
 
 public class TestFragment extends CompositeFragment implements TestView {
 
