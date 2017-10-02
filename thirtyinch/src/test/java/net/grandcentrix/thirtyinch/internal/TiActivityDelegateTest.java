@@ -15,24 +15,23 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiConfiguration;
-
-import org.junit.Test;
-
 import static junit.framework.Assert.fail;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.*;
+
+import net.grandcentrix.thirtyinch.TiConfiguration;
+import org.junit.*;
 
 public class TiActivityDelegateTest extends AbstractPresenterDestroyTest {
 
     @Test
-    public void provideReusedPresenter() throws Exception {
-
-        final TestPresenter reusedPresenter = new TestPresenter(TiConfiguration.DEFAULT);
-        // create the instance once, the presenter is now not in INITIALIZED state
-        reusedPresenter.create();
+    public void provideDestroyedPresenter() throws Exception {
+        final TestPresenter destroyedPresenter = new TestPresenter(TiConfiguration.DEFAULT);
+        // make presenter destroyed
+        destroyedPresenter.create();
+        destroyedPresenter.destroy();
 
         final TestTiActivity activity = new TestTiActivity.Builder()
-                .setPresenter(reusedPresenter)
+                .setPresenter(destroyedPresenter)
                 .build();
         try {
             activity.onCreate(null);
@@ -44,14 +43,14 @@ public class TiActivityDelegateTest extends AbstractPresenterDestroyTest {
     }
 
     @Test
-    public void provideDestroyedPresenter() throws Exception {
-        final TestPresenter destroyedPresenter = new TestPresenter(TiConfiguration.DEFAULT);
-        // make presenter destroyed
-        destroyedPresenter.create();
-        destroyedPresenter.destroy();
+    public void provideReusedPresenter() throws Exception {
+
+        final TestPresenter reusedPresenter = new TestPresenter(TiConfiguration.DEFAULT);
+        // create the instance once, the presenter is now not in INITIALIZED state
+        reusedPresenter.create();
 
         final TestTiActivity activity = new TestTiActivity.Builder()
-                .setPresenter(destroyedPresenter)
+                .setPresenter(reusedPresenter)
                 .build();
         try {
             activity.onCreate(null);

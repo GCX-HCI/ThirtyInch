@@ -15,20 +15,17 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiConfiguration;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.Test;
+import static junit.framework.Assert.fail;
+import static org.assertj.core.api.Java6Assertions.*;
+import static org.mockito.Mockito.*;
 
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
-
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static junit.framework.Assert.fail;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiConfiguration;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
 
 public class TiFragmentDelegateTest extends AbstractPresenterDestroyTest {
 

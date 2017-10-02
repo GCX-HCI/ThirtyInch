@@ -16,26 +16,20 @@
 package net.grandcentrix.thirtyinch;
 
 
-import org.junit.Test;
-import org.mockito.InOrder;
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertTrue;
+import static org.assertj.core.api.Java6Assertions.*;
+import static org.mockito.Mockito.*;
 
 import android.support.annotation.NonNull;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
-import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertTrue;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import org.junit.*;
+import org.mockito.*;
 
 public class SendToViewTest {
 
