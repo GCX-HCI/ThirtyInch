@@ -43,8 +43,8 @@
         android:id="@+id/recreate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="recreate"
         android:layout_alignBaseline="@+id/button"
         android:layout_alignBottom="@+id/button"
-        android:layout_toStartOf="@+id/button" />
+        android:layout_toStartOf="@+id/button"
+        android:text="recreate" />
 </RelativeLayout>

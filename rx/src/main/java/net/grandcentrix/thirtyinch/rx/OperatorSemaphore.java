@@ -25,7 +25,6 @@
 package net.grandcentrix.thirtyinch.rx;
 
 import java.util.ArrayList;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -146,6 +145,19 @@ public class OperatorSemaphore<T> implements Observable.Operator<T, T> {
             T nextCache;
 
             @Override
+            public void onStart() {
+                super.onStart();
+                child.add(go.subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean open) {
+                        isOpen = open;
+                        tick(cache);
+                    }
+                }));
+                child.add(this);
+            }
+
+            @Override
             public void onCompleted() {
                 if (!cache) {
                     deliverCompleted = true;
@@ -169,19 +181,6 @@ public class OperatorSemaphore<T> implements Observable.Operator<T, T> {
                 }
                 next.add(o);
                 tick(false);
-            }
-
-            @Override
-            public void onStart() {
-                super.onStart();
-                child.add(go.subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean open) {
-                        isOpen = open;
-                        tick(cache);
-                    }
-                }));
-                child.add(this);
             }
 
             void tick(boolean deliverCache) {

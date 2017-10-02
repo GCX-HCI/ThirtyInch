@@ -33,6 +33,13 @@ public class TestRunner extends AndroidJUnitRunner {
     private PowerManager.WakeLock mWakeLock;
 
     @Override
+    public void onDestroy() {
+        mWakeLock.release();
+
+        super.onDestroy();
+    }
+
+    @Override
     public void callApplicationOnCreate(final Application app) {
         // Unlock the screen
         KeyguardManager keyguard = (KeyguardManager) app.getSystemService(Context.KEYGUARD_SERVICE);
@@ -46,12 +53,5 @@ public class TestRunner extends AndroidJUnitRunner {
         mWakeLock.acquire();
         super.callApplicationOnCreate(app);
 
-    }
-
-    @Override
-    public void onDestroy() {
-        mWakeLock.release();
-
-        super.onDestroy();
     }
 }

@@ -15,18 +15,16 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Binds a {@link TiView} to a {@link TiPresenter} and allows {@link BindViewInterceptor}s to

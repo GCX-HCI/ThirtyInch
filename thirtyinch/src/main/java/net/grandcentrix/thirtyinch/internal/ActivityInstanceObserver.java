@@ -16,16 +16,14 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
-import net.grandcentrix.thirtyinch.TiLog;
-
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-
 import java.util.HashMap;
+import net.grandcentrix.thirtyinch.TiLog;
 
 /**
  * Keeps track of {@link Activity}s across orientation changes using a id when added via
@@ -59,17 +57,6 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
         mListener = listener;
     }
 
-    /**
-     * Returns the id provided by {@link #startTracking(Activity, String)}
-     *
-     * @return a unique id for each {@link Activity} which doesn't change when the {@link Activity}
-     * changes its configuration
-     */
-    @Nullable
-    public String getActivityId(final Activity activity) {
-        return mScopeIdForActivity.get(activity);
-    }
-
     @Override
     public void onActivityCreated(final Activity activity, final Bundle savedInstanceState) {
         if (savedInstanceState != null) {
@@ -79,6 +66,17 @@ public class ActivityInstanceObserver implements Application.ActivityLifecycleCa
                 mScopeIdForActivity.put(activity, scopeId);
             }
         }
+    }
+
+    /**
+     * Returns the id provided by {@link #startTracking(Activity, String)}
+     *
+     * @return a unique id for each {@link Activity} which doesn't change when the {@link Activity}
+     * changes its configuration
+     */
+    @Nullable
+    public String getActivityId(final Activity activity) {
+        return mScopeIdForActivity.get(activity);
     }
 
     @Override

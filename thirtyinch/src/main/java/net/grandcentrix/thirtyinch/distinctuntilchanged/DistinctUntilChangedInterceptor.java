@@ -15,18 +15,16 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
+import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
+import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import java.lang.reflect.Proxy;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import java.lang.reflect.Proxy;
-
-import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
-import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
 public class DistinctUntilChangedInterceptor implements BindViewInterceptor {
 

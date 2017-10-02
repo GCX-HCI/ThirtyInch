@@ -15,9 +15,16 @@
 
 package net.grandcentrix.thirtyinch.plugin;
 
+import android.app.Activity;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.pascalwelsch.compositeandroid.activity.ActivityPlugin;
 import com.pascalwelsch.compositeandroid.activity.CompositeNonConfigurationInstance;
-
+import java.util.List;
+import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiActivity;
@@ -33,16 +40,6 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
-
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * Binds a {@link TiPresenter} to an {@link Activity}
@@ -77,6 +74,58 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     public TiActivityPlugin(@NonNull final TiPresenterProvider<P> presenterProvider) {
         mDelegate = new TiActivityDelegate<>(this, this, presenterProvider, this,
                 PresenterSavior.getInstance());
+    }
+
+    @CallSuper
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDelegate.onCreate_afterSuper(savedInstanceState);
+    }
+
+    @CallSuper
+    @Override
+    public void onStart() {
+        super.onStart();
+        mDelegate.onStart_afterSuper();
+    }
+
+    @CallSuper
+    @Override
+    public void onStop() {
+        mDelegate.onStop_beforeSuper();
+        super.onStop();
+        mDelegate.onStop_afterSuper();
+    }
+
+    @CallSuper
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mDelegate.onSaveInstanceState_afterSuper(outState);
+    }
+
+    @CallSuper
+    @Override
+    @Nullable
+    public CompositeNonConfigurationInstance onRetainNonConfigurationInstance() {
+        final P presenter = mDelegate.getPresenter();
+        if (presenter == null) {
+            return null;
+        }
+
+        if (presenter.getConfig().shouldRetainPresenter()) {
+            return new CompositeNonConfigurationInstance(NCI_KEY_PRESENTER, presenter);
+        }
+
+        return null;
+    }
+
+    @CallSuper
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDelegate.onDestroy_afterSuper();
     }
 
     @NonNull
@@ -144,58 +193,6 @@ public class TiActivityPlugin<P extends TiPresenter<V>, V extends TiView> extend
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDelegate.onConfigurationChanged_afterSuper(newConfig);
-    }
-
-    @CallSuper
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mDelegate.onCreate_afterSuper(savedInstanceState);
-    }
-
-    @CallSuper
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDelegate.onDestroy_afterSuper();
-    }
-
-    @CallSuper
-    @Override
-    @Nullable
-    public CompositeNonConfigurationInstance onRetainNonConfigurationInstance() {
-        final P presenter = mDelegate.getPresenter();
-        if (presenter == null) {
-            return null;
-        }
-
-        if (presenter.getConfig().shouldRetainPresenter()) {
-            return new CompositeNonConfigurationInstance(NCI_KEY_PRESENTER, presenter);
-        }
-
-        return null;
-    }
-
-    @CallSuper
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState_afterSuper(outState);
-    }
-
-    @CallSuper
-    @Override
-    public void onStart() {
-        super.onStart();
-        mDelegate.onStart_afterSuper();
-    }
-
-    @CallSuper
-    @Override
-    public void onStop() {
-        mDelegate.onStop_beforeSuper();
-        super.onStop();
-        mDelegate.onStop_afterSuper();
     }
 
     @SuppressWarnings("unchecked")

@@ -15,16 +15,14 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
-
 import android.support.annotation.VisibleForTesting;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 final class DistinctUntilChangedInvocationHandler<V> extends AbstractInvocationHandler {
 

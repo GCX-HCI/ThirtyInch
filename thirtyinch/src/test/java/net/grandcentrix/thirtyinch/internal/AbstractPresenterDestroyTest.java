@@ -15,23 +15,18 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiConfiguration;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.After;
-import org.junit.Before;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-
 import java.util.HashMap;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiConfiguration;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
+import org.mockito.invocation.*;
+import org.mockito.stubbing.*;
 
 public abstract class AbstractPresenterDestroyTest {
 

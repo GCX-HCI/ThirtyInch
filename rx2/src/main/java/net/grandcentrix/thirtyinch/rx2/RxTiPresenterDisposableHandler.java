@@ -15,14 +15,12 @@
 
 package net.grandcentrix.thirtyinch.rx2;
 
+import android.support.annotation.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-
-import android.support.annotation.NonNull;
-
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 public class RxTiPresenterDisposableHandler {
 

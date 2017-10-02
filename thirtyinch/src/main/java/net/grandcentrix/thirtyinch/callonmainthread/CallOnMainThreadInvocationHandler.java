@@ -15,14 +15,12 @@
 
 package net.grandcentrix.thirtyinch.callonmainthread;
 
-import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
-
 import android.os.Handler;
 import android.os.Looper;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 final class CallOnMainThreadInvocationHandler<V> extends AbstractInvocationHandler {
 

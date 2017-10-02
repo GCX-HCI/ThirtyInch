@@ -18,9 +18,7 @@ package net.grandcentrix.thirtyinch.internal;
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThreadInterceptor;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 
 public class CallOnMainThreadTest {
 

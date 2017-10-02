@@ -1,15 +1,11 @@
 package net.grandcentrix.thirtyinch.rx2;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.mockito.Mockito.*;
 
 import io.reactivex.observers.TestObserver;
-
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
 
 public class RxTiPresenterUtilsTest {
 

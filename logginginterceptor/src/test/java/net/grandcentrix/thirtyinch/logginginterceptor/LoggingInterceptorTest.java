@@ -15,25 +15,20 @@
 
 package net.grandcentrix.thirtyinch.logginginterceptor;
 
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.mockito.ArgumentCaptor;
+import static org.assertj.core.api.Java6Assertions.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.fail;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.mockito.*;
 
 @RunWith(JUnit4.class)
 public class LoggingInterceptorTest {

@@ -15,15 +15,13 @@
 
 package net.grandcentrix.thirtyinch;
 
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import static junit.framework.Assert.fail;
+import static org.assertj.core.api.Java6Assertions.*;
+import static org.mockito.Mockito.*;
 
 import android.util.Log;
-
-import static junit.framework.Assert.fail;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import org.junit.*;
+import org.mockito.*;
 
 public class TiLogTest {
 

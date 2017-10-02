@@ -15,15 +15,14 @@
 
 package net.grandcentrix.thirtyinch.rx2;
 
-import net.grandcentrix.thirtyinch.Removable;
-import net.grandcentrix.thirtyinch.TiLifecycleObserver;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
+import net.grandcentrix.thirtyinch.Removable;
+import net.grandcentrix.thirtyinch.TiLifecycleObserver;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 public class RxTiPresenterUtils {
 

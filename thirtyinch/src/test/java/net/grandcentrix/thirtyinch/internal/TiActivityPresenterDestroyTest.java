@@ -16,11 +16,10 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
+import static org.assertj.core.api.Java6Assertions.*;
+
 import net.grandcentrix.thirtyinch.TiConfiguration;
-
-import org.junit.Test;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import org.junit.*;
 
 public class TiActivityPresenterDestroyTest extends AbstractPresenterDestroyTest {
 

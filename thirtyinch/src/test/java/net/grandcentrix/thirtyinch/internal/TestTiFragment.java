@@ -16,17 +16,15 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
+import static org.mockito.Mockito.*;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
 import java.util.concurrent.Executor;
-
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 
 /**
