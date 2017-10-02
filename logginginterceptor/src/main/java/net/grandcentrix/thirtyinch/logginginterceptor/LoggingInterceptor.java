@@ -15,21 +15,19 @@
 
 package net.grandcentrix.thirtyinch.logginginterceptor;
 
-import net.grandcentrix.thirtyinch.BindViewInterceptor;
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
+import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
-
-import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
+import net.grandcentrix.thirtyinch.BindViewInterceptor;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiView;
+import net.grandcentrix.thirtyinch.util.AbstractInvocationHandler;
 
 /**
  * Logs all methods calls and parameters to the bound view interface.
