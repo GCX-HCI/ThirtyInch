@@ -101,10 +101,10 @@ public class TiTestPresenterTest {
                 });
             }
         };
-        presenter.test();
+        final TiTestPresenter<MockTiView> testPresenter = presenter.test();
 
         final MockTiView view = mock(MockTiView.class);
-        presenter.attachView(view);
+        testPresenter.attachView(view);
 
         verify(view).helloWorld();
     }
