@@ -15,12 +15,10 @@
 
 package net.grandcentrix.thirtyinch.sample;
 
+import java.util.concurrent.TimeUnit;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
-
-import java.util.concurrent.TimeUnit;
-
 import rx.Observable;
 
 
