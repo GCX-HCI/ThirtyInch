@@ -81,8 +81,8 @@ public class PresenterScope {
         // saving a presenter twice with a different id is not supported
         for (final Map.Entry<String, TiPresenter> entry : mStore.entrySet()) {
             if (entry.getValue().equals(presenter)) {
-                throw new IllegalStateException("Presenter is already saved with different id "
-                        + entry.getKey() + " " + presenter);
+                throw new IllegalStateException("Presenter is already saved with different id '"
+                        + entry.getKey() + "' " + presenter);
             }
         }
 

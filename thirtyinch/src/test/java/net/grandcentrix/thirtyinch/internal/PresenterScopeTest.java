@@ -149,15 +149,13 @@ public class PresenterScopeTest {
     public void saveSamePresenterTwiceThrows() throws Exception {
 
         final PresenterScope scope = new PresenterScope();
-        final TiPresenter presenter1 = new TiPresenter() {
+        final TiPresenter presenter = new TiPresenter() {
         };
-        scope.save("myId", presenter1);
+        scope.save("myId", presenter);
 
-        // add second presenter with same id
-        final TiPresenter presenter2 = new TiPresenter() {
-        };
+        // try to save the same presenter with a different id
         try {
-            scope.save("myId", presenter2);
+            scope.save("b", presenter);
             fail("did not throw");
         } catch (IllegalStateException e) {
             assertThat(e).hasMessageContaining("myId");
