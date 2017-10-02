@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2017 grandcentrix GmbH
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.grandcentrix.thirtyinch.test;
 
 import static junit.framework.Assert.fail;
@@ -44,13 +59,14 @@ public class TiTestPresenterTest {
     }
 
     @Test
-    public void testSendToView_InUnitTest_ShouldThrow() throws Exception {
-        try {
-            mMockTiPresenter.attachView(mMockTiView);
-            fail("No exception");
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).contains("no ui thread executor available");
-        }
+    public void testAttachView_ShouldReplaceUIThreadExecutor() throws Exception {
+        final TiPresenter mockPresenter = mock(TiPresenter.class);
+        when(mockPresenter.getState()).thenReturn(State.VIEW_DETACHED);
+        final TiTestPresenter<TiView> tiTestPresenter = new TiTestPresenter<TiView>(mockPresenter);
+        tiTestPresenter.attachView(mMockTiView);
+
+        verify(mockPresenter).setUiThreadExecutor(any(Executor.class));
+        verify(mockPresenter).attachView(mMockTiView);
     }
 
     @Test
@@ -62,13 +78,34 @@ public class TiTestPresenterTest {
     }
 
     @Test
-    public void testAttachView_ShouldReplaceUIThreadExecutor() throws Exception {
-        final TiPresenter mockPresenter = mock(TiPresenter.class);
-        when(mockPresenter.getState()).thenReturn(State.VIEW_DETACHED);
-        final TiTestPresenter<TiView> tiTestPresenter = new TiTestPresenter<TiView>(mockPresenter);
-        tiTestPresenter.attachView(mMockTiView);
+    public void testSendToView_InUnitTest_ShouldThrow() throws Exception {
+        try {
+            mMockTiPresenter.attachView(mMockTiView);
+            fail("No exception");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage()).contains("no ui thread executor available");
+        }
+    }
 
-        verify(mockPresenter).setUiThreadExecutor(any(Executor.class));
-        verify(mockPresenter).attachView(mMockTiView);
+    @Test
+    public void testSimpleViewInvocationWithTestPresenter() throws Exception {
+        final TiPresenter<MockTiView> presenter = new TiPresenter<MockTiView>() {
+            @Override
+            protected void onAttachView(@NonNull MockTiView view) {
+                super.onAttachView(view);
+                sendToView(new ViewAction<MockTiView>() {
+                    @Override
+                    public void call(MockTiView tiView) {
+                        tiView.helloWorld();
+                    }
+                });
+            }
+        };
+        presenter.test();
+
+        final MockTiView view = mock(MockTiView.class);
+        presenter.attachView(view);
+
+        verify(view).helloWorld();
     }
 }
