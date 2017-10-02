@@ -16,7 +16,6 @@
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
 import android.support.annotation.VisibleForTesting;
-
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 

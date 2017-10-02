@@ -15,12 +15,10 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
+import android.support.annotation.NonNull;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-
-import android.support.annotation.NonNull;
-
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 

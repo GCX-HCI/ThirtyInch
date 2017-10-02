@@ -15,14 +15,13 @@
 
 package net.grandcentrix.thirtyinch;
 
+import android.app.Activity;
+import android.app.Application;
+import android.os.Bundle;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
 import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
 import net.grandcentrix.thirtyinch.internal.PresenterSavior;
 import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-
-import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
 
 /**
  * Configure how ThirtyInch should handle the {@link TiPresenter}.

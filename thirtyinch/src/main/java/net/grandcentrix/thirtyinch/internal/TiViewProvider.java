@@ -15,10 +15,9 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.support.annotation.NonNull;
 import net.grandcentrix.thirtyinch.TiActivity;
 import net.grandcentrix.thirtyinch.TiView;
-
-import android.support.annotation.NonNull;
 
 /**
  * The {@link TiActivity} itself doesn't not have to implement

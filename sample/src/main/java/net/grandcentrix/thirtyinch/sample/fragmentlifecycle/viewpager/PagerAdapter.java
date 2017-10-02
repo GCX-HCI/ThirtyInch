@@ -1,10 +1,9 @@
 package net.grandcentrix.thirtyinch.sample.fragmentlifecycle.viewpager;
 
-import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.TestFragmentA;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.TestFragmentA;
 
 class PagerAdapter extends FragmentPagerAdapter {
 

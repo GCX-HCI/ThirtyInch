@@ -15,29 +15,25 @@
 
 package net.grandcentrix.thirtyinch;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import android.support.annotation.NonNull;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
-import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
+
+import android.support.annotation.NonNull;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import org.junit.*;
 
 /**
  * @author jannisveerkamp

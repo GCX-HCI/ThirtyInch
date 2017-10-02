@@ -16,15 +16,12 @@
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
 
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Java6Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
 
 public class DistinctUntilChangedEqualsProblem {
 
@@ -58,13 +55,13 @@ public class DistinctUntilChangedEqualsProblem {
             return name;
         }
 
+        public void setName(final String name) {
+            this.name = name;
+        }
+
         @Override
         public int hashCode() {
             return name != null ? name.hashCode() : 0;
-        }
-
-        public void setName(final String name) {
-            this.name = name;
         }
     }
 

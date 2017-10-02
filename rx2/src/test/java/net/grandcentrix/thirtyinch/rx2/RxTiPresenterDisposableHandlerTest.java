@@ -15,24 +15,20 @@
 
 package net.grandcentrix.thirtyinch.rx2;
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.TestObserver;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
 
 @RunWith(JUnit4.class)
 public class RxTiPresenterDisposableHandlerTest {
@@ -101,27 +97,28 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManageViewSubscription_InOnDetachView_ShouldThrow() throws Exception {
-        final TiPresenter presenter = new TiPresenter() {
+    public void testManageDisposables_WithOneAlreadyDisposed_ShouldNotAddToDisposable()
+            throws Exception {
+        mPresenter.create();
+        final TestObserver<Integer> firstTestObserver = new TestObserver<>();
+        final TestObserver<Integer> secondTestObserver = new TestObserver<>();
+        secondTestObserver.dispose();
 
-            private RxTiPresenterDisposableHandler mSubscriptionHandler =
-                    new RxTiPresenterDisposableHandler(this);
+        mDisposableHandler.manageDisposables(firstTestObserver, secondTestObserver);
 
-            @Override
-            protected void onDetachView() {
-                super.onDetachView();
-                mSubscriptionHandler.manageViewDisposable(Observable.just("test").subscribe());
-            }
-        };
-        presenter.create();
-        presenter.attachView(mView);
+        assertThat(firstTestObserver.isDisposed(), is(false));
+        assertThat(secondTestObserver.isDisposed(), is(true));
+    }
 
-        try {
-            presenter.detachView();
-            fail("did not throw");
-        } catch (Throwable e) {
-            assertThat(e.getMessage(), containsString("no view"));
-        }
+    @Test
+    public void testManageViewDisposable_ShouldReturnSameDisposable() throws Exception {
+        mPresenter.create();
+        mPresenter.attachView(mView);
+        final TestObserver<Integer> testObserver = new TestObserver<>();
+
+        final Disposable disposable = mDisposableHandler.manageViewDisposable(testObserver);
+
+        assertThat(testObserver, is(equalTo(disposable)));
     }
 
     @Test
@@ -136,17 +133,6 @@ public class RxTiPresenterDisposableHandlerTest {
 
         mPresenter.detachView();
         assertThat(testObserver.isDisposed(), is(true));
-    }
-
-    @Test
-    public void testManageViewDisposable_ShouldReturnSameDisposable() throws Exception {
-        mPresenter.create();
-        mPresenter.attachView(mView);
-        final TestObserver<Integer> testObserver = new TestObserver<>();
-
-        final Disposable disposable = mDisposableHandler.manageViewDisposable(testObserver);
-
-        assertThat(testObserver, is(equalTo(disposable)));
     }
 
     @Test
@@ -196,37 +182,43 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManagerViewDisposables_WithDetach_ShouldDispose() throws Exception {
+    public void testManageViewSubscription_InOnDetachView_ShouldThrow() throws Exception {
+        final TiPresenter presenter = new TiPresenter() {
+
+            private RxTiPresenterDisposableHandler mSubscriptionHandler =
+                    new RxTiPresenterDisposableHandler(this);
+
+            @Override
+            protected void onDetachView() {
+                super.onDetachView();
+                mSubscriptionHandler.manageViewDisposable(Observable.just("test").subscribe());
+            }
+        };
+        presenter.create();
+        presenter.attachView(mView);
+
+        try {
+            presenter.detachView();
+            fail("did not throw");
+        } catch (Throwable e) {
+            assertThat(e.getMessage(), containsString("no view"));
+        }
+    }
+
+    @Test
+    public void testManagerDisposables_Destroy_ShouldDispose() throws Exception {
         mPresenter.create();
-        mPresenter.attachView(mView);
         final TestObserver<Integer> firstTestObserver = new TestObserver<>();
         final TestObserver<Integer> secondTestObserver = new TestObserver<>();
         final TestObserver<Integer> thirdTestObserver = new TestObserver<>();
 
         mDisposableHandler
-                .manageViewDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
-        assertThat(firstTestObserver.isDisposed(), equalTo(false));
-        assertThat(secondTestObserver.isDisposed(), equalTo(false));
-        assertThat(thirdTestObserver.isDisposed(), equalTo(false));
+                .manageDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
 
-        mPresenter.detachView();
+        mPresenter.destroy();
         assertThat(firstTestObserver.isDisposed(), equalTo(true));
         assertThat(secondTestObserver.isDisposed(), equalTo(true));
         assertThat(thirdTestObserver.isDisposed(), equalTo(true));
-    }
-
-    @Test
-    public void testManageDisposables_WithOneAlreadyDisposed_ShouldNotAddToDisposable()
-            throws Exception {
-        mPresenter.create();
-        final TestObserver<Integer> firstTestObserver = new TestObserver<>();
-        final TestObserver<Integer> secondTestObserver = new TestObserver<>();
-        secondTestObserver.dispose();
-
-        mDisposableHandler.manageDisposables(firstTestObserver, secondTestObserver);
-
-        assertThat(firstTestObserver.isDisposed(), is(false));
-        assertThat(secondTestObserver.isDisposed(), is(true));
     }
 
     @Test
@@ -247,16 +239,20 @@ public class RxTiPresenterDisposableHandlerTest {
     }
 
     @Test
-    public void testManagerDisposables_Destroy_ShouldDispose() throws Exception {
+    public void testManagerViewDisposables_WithDetach_ShouldDispose() throws Exception {
         mPresenter.create();
+        mPresenter.attachView(mView);
         final TestObserver<Integer> firstTestObserver = new TestObserver<>();
         final TestObserver<Integer> secondTestObserver = new TestObserver<>();
         final TestObserver<Integer> thirdTestObserver = new TestObserver<>();
 
         mDisposableHandler
-                .manageDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
+                .manageViewDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
+        assertThat(firstTestObserver.isDisposed(), equalTo(false));
+        assertThat(secondTestObserver.isDisposed(), equalTo(false));
+        assertThat(thirdTestObserver.isDisposed(), equalTo(false));
 
-        mPresenter.destroy();
+        mPresenter.detachView();
         assertThat(firstTestObserver.isDisposed(), equalTo(true));
         assertThat(secondTestObserver.isDisposed(), equalTo(true));
         assertThat(thirdTestObserver.isDisposed(), equalTo(true));

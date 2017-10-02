@@ -19,7 +19,6 @@ import net.grandcentrix.thirtyinch.Removable;
 import net.grandcentrix.thirtyinch.TiLifecycleObserver;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;

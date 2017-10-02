@@ -15,14 +15,11 @@
 
 package net.grandcentrix.thirtyinch.sample;
 
+import android.support.annotation.NonNull;
+import java.util.concurrent.TimeUnit;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
-
-import android.support.annotation.NonNull;
-
-import java.util.concurrent.TimeUnit;
-
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Func1;
@@ -40,19 +37,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
             = new RxTiPresenterSubscriptionHandler(this);
 
     private PublishSubject<Void> triggerHeavyCalculation = PublishSubject.create();
-
-    @Override
-    protected void onAttachView(@NonNull final HelloWorldView view) {
-        super.onAttachView(view);
-
-        final Subscription showTextSub = mText.asObservable().subscribe(view::showText);
-        final Subscription onButtonClickSub = view.onButtonClicked()
-                .subscribe(aVoid -> {
-                    triggerHeavyCalculation.onNext(null);
-                });
-
-        rxSubscriptionHelper.manageViewSubscriptions(showTextSub, onButtonClickSub);
-    }
 
     @Override
     protected void onCreate() {
@@ -77,6 +61,19 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
                 }, 1)
                 .doOnNext(integer -> mText.onNext("Count: " + mCounter))
                 .subscribe());
+    }
+
+    @Override
+    protected void onAttachView(@NonNull final HelloWorldView view) {
+        super.onAttachView(view);
+
+        final Subscription showTextSub = mText.asObservable().subscribe(view::showText);
+        final Subscription onButtonClickSub = view.onButtonClicked()
+                .subscribe(aVoid -> {
+                    triggerHeavyCalculation.onNext(null);
+                });
+
+        rxSubscriptionHelper.manageViewSubscriptions(showTextSub, onButtonClickSub);
     }
 
     /**

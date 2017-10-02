@@ -1,8 +1,5 @@
 package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
-import net.grandcentrix.thirtyinch.sample.R;
-import net.grandcentrix.thirtyinch.sample.util.AndroidDeveloperOptions;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,9 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.concurrent.TimeUnit;
-
+import net.grandcentrix.thirtyinch.sample.R;
+import net.grandcentrix.thirtyinch.sample.util.AndroidDeveloperOptions;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -29,6 +26,56 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
     private SwitchCompat mSwitchAddToBackStack;
 
     private SwitchCompat mSwitchRetainPresenterInstance;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            //started for the first time, reset all counters
+            fragmentLifecycleActivityInstanceCount = -1;
+            TestFragment.testFragmentInstanceCount = -1;
+        }
+
+        fragmentLifecycleActivityInstanceCount++;
+        setContentView(R.layout.activity_fragment_lifecycle);
+        FragmentManager.enableDebugLogging(true);
+        Log.v(TAG, "onCreate of " + this);
+
+        mSwitchAddToBackStack = (SwitchCompat) findViewById(R.id.switch_add_back_stack);
+        mSwitchRetainPresenterInstance = (SwitchCompat) findViewById(
+                R.id.switch_retain_presenter_instance);
+        final TextView textDontKeepActivities = (TextView) findViewById(
+                R.id.text_dont_keep_activities);
+        textDontKeepActivities.setText(
+                isDontKeepActivities() ? R.string.dont_keep_activities_enabled
+                        : R.string.dont_keep_activities_disabled);
+
+        Log.v(TAG, "// A new Activity gets created by the Android Framework.");
+        Log.v(TAG, "final HostingActivity hostingActivity" + fragmentLifecycleActivityInstanceCount
+                + " = new HostingActivity();");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState(Bundle)");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.v(TAG, "onDestroy");
+
+        Log.v(TAG, "// hostingActivity" + fragmentLifecycleActivityInstanceCount
+                + " got destroyed.");
+    }
 
     public void addFragmentA(View view) {
         final TestFragmentA fragment = new TestFragmentA();
@@ -97,56 +144,6 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
                     .remove(fragment)
                     .commitNow();
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            //started for the first time, reset all counters
-            fragmentLifecycleActivityInstanceCount = -1;
-            TestFragment.testFragmentInstanceCount = -1;
-        }
-
-        fragmentLifecycleActivityInstanceCount++;
-        setContentView(R.layout.activity_fragment_lifecycle);
-        FragmentManager.enableDebugLogging(true);
-        Log.v(TAG, "onCreate of " + this);
-
-        mSwitchAddToBackStack = (SwitchCompat) findViewById(R.id.switch_add_back_stack);
-        mSwitchRetainPresenterInstance = (SwitchCompat) findViewById(
-                R.id.switch_retain_presenter_instance);
-        final TextView textDontKeepActivities = (TextView) findViewById(
-                R.id.text_dont_keep_activities);
-        textDontKeepActivities.setText(
-                isDontKeepActivities() ? R.string.dont_keep_activities_enabled
-                        : R.string.dont_keep_activities_disabled);
-
-        Log.v(TAG, "// A new Activity gets created by the Android Framework.");
-        Log.v(TAG, "final HostingActivity hostingActivity" + fragmentLifecycleActivityInstanceCount
-                + " = new HostingActivity();");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        Log.v(TAG, "onDestroy");
-
-        Log.v(TAG, "// hostingActivity" + fragmentLifecycleActivityInstanceCount
-                + " got destroyed.");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause()");
-    }
-
-    @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState(Bundle)");
     }
 
     private void addFragment(final Fragment fragment) {

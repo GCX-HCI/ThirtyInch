@@ -16,17 +16,14 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.TiView;
+import static org.mockito.Mockito.*;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-
 import java.util.concurrent.Executor;
-
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiPresenter;
+import net.grandcentrix.thirtyinch.TiView;
 
 /**
  * mock implementation of a {@link Activity} with all relevant lifecycle methods instructing the

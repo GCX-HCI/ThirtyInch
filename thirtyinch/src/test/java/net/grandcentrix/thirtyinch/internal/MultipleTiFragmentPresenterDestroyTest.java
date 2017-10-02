@@ -15,14 +15,12 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.TiConfiguration;
-
-import org.junit.Test;
+import static org.assertj.core.api.Java6Assertions.*;
+import static org.mockito.Mockito.*;
 
 import android.view.LayoutInflater;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import net.grandcentrix.thirtyinch.TiConfiguration;
+import org.junit.*;
 
 public class MultipleTiFragmentPresenterDestroyTest extends AbstractPresenterDestroyTest {
 

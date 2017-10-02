@@ -15,10 +15,9 @@
 
 package net.grandcentrix.thirtyinch.test;
 
+import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
-
-import java.util.concurrent.Executor;
 
 public class TiPresenterInstructor<V extends TiView> {
 

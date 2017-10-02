@@ -15,16 +15,12 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import net.grandcentrix.thirtyinch.TiView;
-
-import org.junit.Before;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static org.assertj.core.api.Java6Assertions.*;
 
 import java.lang.reflect.Method;
-
-import static junit.framework.Assert.assertEquals;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.fail;
+import net.grandcentrix.thirtyinch.TiView;
+import org.junit.*;
 
 public class DistinctUntilChangedInvocationHandlerTest {
 

@@ -16,7 +16,6 @@ package net.grandcentrix.thirtyinch.util;
 
 
 import android.support.annotation.Nullable;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -42,17 +41,42 @@ public abstract class AbstractInvocationHandler implements InvocationHandler {
     private static final Object[] NO_ARGS = {};
 
     /**
+     * By default delegates to {@link Object#equals} so instances are only equal if they are
+     * identical. {@code proxy.equals(argument)} returns true if:
+     *
+     * <ul>
+     * <li>{@code proxy} and {@code argument} are of the same type
+     * <li>and this method returns true for the {@link InvocationHandler} of {@code argument}
+     * </ul>
+     *
+     * <p>Subclasses can override this method to provide custom equality.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    /**
+     * By default delegates to {@link Object#hashCode}. The dynamic proxies' {@code hashCode()} will
+     * delegate to this method. Subclasses can override this method to provide custom equality.
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
      * {@inheritDoc}
      *
      * <ul>
      * <li>{@code proxy.hashCode()} delegates to {@link AbstractInvocationHandler#hashCode}
      * <li>{@code proxy.toString()} delegates to {@link AbstractInvocationHandler#toString}
      * <li>{@code proxy.equals(argument)} returns true if:
-     *   <ul>
-     *   <li>{@code proxy} and {@code argument} are of the same type
-     *   <li>and {@link AbstractInvocationHandler#equals} returns true for the
-     *       {@link InvocationHandler} of {@code argument}
-     *   </ul>
+     * <ul>
+     * <li>{@code proxy} and {@code argument} are of the same type
+     * <li>and {@link AbstractInvocationHandler#equals} returns true for the
+     * {@link InvocationHandler} of {@code argument}
+     * </ul>
      * <li>other method calls are dispatched to {@link #handleInvocation}.
      * </ul>
      */
@@ -85,6 +109,16 @@ public abstract class AbstractInvocationHandler implements InvocationHandler {
     }
 
     /**
+     * By default delegates to {@link Object#toString}. The dynamic proxies' {@code toString()} will
+     * delegate to this method. Subclasses can override this method to provide custom string
+     * representation for the proxies.
+     */
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    /**
      * {@link #invoke} delegates to this method upon any method invocation on the proxy instance,
      * except {@link Object#equals}, {@link Object#hashCode} and {@link Object#toString}. The result
      * will be returned as the proxied method's return value.
@@ -94,41 +128,6 @@ public abstract class AbstractInvocationHandler implements InvocationHandler {
      */
     protected abstract Object handleInvocation(Object proxy, Method method, Object[] args)
             throws Throwable;
-
-    /**
-     * By default delegates to {@link Object#equals} so instances are only equal if they are
-     * identical. {@code proxy.equals(argument)} returns true if:
-     *
-     * <ul>
-     * <li>{@code proxy} and {@code argument} are of the same type
-     * <li>and this method returns true for the {@link InvocationHandler} of {@code argument}
-     * </ul>
-     *
-     * <p>Subclasses can override this method to provide custom equality.
-     */
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    /**
-     * By default delegates to {@link Object#hashCode}. The dynamic proxies' {@code hashCode()} will
-     * delegate to this method. Subclasses can override this method to provide custom equality.
-     */
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    /**
-     * By default delegates to {@link Object#toString}. The dynamic proxies' {@code toString()} will
-     * delegate to this method. Subclasses can override this method to provide custom string
-     * representation for the proxies.
-     */
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 
     private static boolean isProxyOfSameInterfaces(Object arg, Class<?> proxyClass) {
         return proxyClass.isInstance(arg)
