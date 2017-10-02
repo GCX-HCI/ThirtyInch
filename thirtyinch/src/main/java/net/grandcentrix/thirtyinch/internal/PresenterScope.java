@@ -16,14 +16,13 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
-import net.grandcentrix.thirtyinch.TiLog;
-import net.grandcentrix.thirtyinch.TiPresenter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.grandcentrix.thirtyinch.TiLog;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 /**
  * Simple wrapper around a {@link HashMap} to save {@link TiPresenter} by id. For every host of a

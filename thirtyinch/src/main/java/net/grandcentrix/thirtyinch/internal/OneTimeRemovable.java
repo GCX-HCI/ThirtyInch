@@ -15,9 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import net.grandcentrix.thirtyinch.Removable;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+import net.grandcentrix.thirtyinch.Removable;
 
 /**
  * Removable which allows removing only once

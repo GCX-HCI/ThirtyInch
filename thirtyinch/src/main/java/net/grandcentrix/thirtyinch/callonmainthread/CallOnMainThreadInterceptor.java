@@ -15,14 +15,13 @@
 
 package net.grandcentrix.thirtyinch.callonmainthread;
 
+import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
+import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
+
+import java.lang.reflect.Proxy;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiView;
-
-import java.lang.reflect.Proxy;
-
-import static net.grandcentrix.thirtyinch.util.AnnotationUtil.getInterfaceOfClassExtendingGivenInterface;
-import static net.grandcentrix.thirtyinch.util.AnnotationUtil.hasObjectMethodWithAnnotation;
 
 public class CallOnMainThreadInterceptor implements BindViewInterceptor {
 

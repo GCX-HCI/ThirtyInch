@@ -15,17 +15,6 @@
 
 package net.grandcentrix.thirtyinch;
 
-import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
-import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
-import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
-import net.grandcentrix.thirtyinch.internal.PresenterSavior;
-import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
-import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
-import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
-import net.grandcentrix.thirtyinch.internal.TiViewProvider;
-import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
-import net.grandcentrix.thirtyinch.util.AnnotationUtil;
-
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -37,9 +26,18 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.util.List;
 import java.util.concurrent.Executor;
+import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
+import net.grandcentrix.thirtyinch.internal.InterceptableViewBinder;
+import net.grandcentrix.thirtyinch.internal.PresenterAccessor;
+import net.grandcentrix.thirtyinch.internal.PresenterSavior;
+import net.grandcentrix.thirtyinch.internal.TiFragmentDelegate;
+import net.grandcentrix.thirtyinch.internal.TiLoggingTagProvider;
+import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
+import net.grandcentrix.thirtyinch.internal.TiViewProvider;
+import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
+import net.grandcentrix.thirtyinch.util.AnnotationUtil;
 
 /**
  * An Fragment which has a {@link TiPresenter} to build the Model View Presenter architecture on
@@ -120,6 +118,57 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     private final UiThreadExecutor mUiThreadExecutor = new UiThreadExecutor();
 
+    @CallSuper
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDelegate.onCreate_afterSuper(savedInstanceState);
+    }
+
+    @CallSuper
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
+        mDelegate.onCreateView_beforeSuper(inflater, container, savedInstanceState);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @CallSuper
+    @Override
+    public void onStart() {
+        super.onStart();
+        mDelegate.onStart_afterSuper();
+    }
+
+    @CallSuper
+    @Override
+    public void onStop() {
+        mDelegate.onStop_beforeSuper();
+        super.onStop();
+    }
+
+    @CallSuper
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mDelegate.onSaveInstanceState_afterSuper(outState);
+    }
+
+    @CallSuper
+    @Override
+    public void onDestroyView() {
+        mDelegate.onDestroyView_beforeSuper();
+        super.onDestroyView();
+    }
+
+    @CallSuper
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDelegate.onDestroy_afterSuper();
+    }
+
     @NonNull
     @Override
     public final Removable addBindViewInterceptor(@NonNull final BindViewInterceptor interceptor) {
@@ -189,57 +238,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     @Override
     public boolean isFragmentRemoving() {
         return isRemoving();
-    }
-
-    @CallSuper
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mDelegate.onCreate_afterSuper(savedInstanceState);
-    }
-
-    @CallSuper
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
-            @Nullable final Bundle savedInstanceState) {
-        mDelegate.onCreateView_beforeSuper(inflater, container, savedInstanceState);
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @CallSuper
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDelegate.onDestroy_afterSuper();
-    }
-
-    @CallSuper
-    @Override
-    public void onDestroyView() {
-        mDelegate.onDestroyView_beforeSuper();
-        super.onDestroyView();
-    }
-
-    @CallSuper
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState_afterSuper(outState);
-    }
-
-    @CallSuper
-    @Override
-    public void onStart() {
-        super.onStart();
-        mDelegate.onStart_afterSuper();
-    }
-
-    @CallSuper
-    @Override
-    public void onStop() {
-        mDelegate.onStop_beforeSuper();
-        super.onStop();
     }
 
     /**

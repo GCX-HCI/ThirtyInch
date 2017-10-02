@@ -16,12 +16,11 @@
 package net.grandcentrix.thirtyinch.internal;
 
 
-import net.grandcentrix.thirtyinch.TiPresenter;
-
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import net.grandcentrix.thirtyinch.TiPresenter;
 
 /**
  * Store for presenters to survive when their associated context gets destroyed (e.g. Activity or
