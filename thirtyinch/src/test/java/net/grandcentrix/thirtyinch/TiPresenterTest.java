@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import net.grandcentrix.thirtyinch.test.TiTestPresenter;
+import org.assertj.core.api.Assertions;
 import org.junit.*;
 
 /**
@@ -441,6 +443,13 @@ public class TiPresenterTest {
         } catch (SuperNotCalledException e) {
             assertTrue(e.getMessage().contains("super.onSleep()"));
         }
+    }
+
+    @Test
+    public void testTest_ShouldReturnTiTestPresenter() throws Exception {
+        final TiTestPresenter<TiView> test = mPresenter.test();
+
+        Assertions.assertThat(test).isInstanceOf(TiTestPresenter.class);
     }
 
     @Test

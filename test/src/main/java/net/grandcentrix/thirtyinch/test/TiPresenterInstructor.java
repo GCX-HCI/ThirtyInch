@@ -19,6 +19,10 @@ import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
+/**
+ * @deprecated Use {@link TiTestPresenter} instead
+ */
+@Deprecated
 public class TiPresenterInstructor<V extends TiView> {
 
     private TiPresenter<V> mPresenter;

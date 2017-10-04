@@ -29,6 +29,7 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import net.grandcentrix.thirtyinch.internal.OneTimeRemovable;
+import net.grandcentrix.thirtyinch.test.TiTestPresenter;
 
 /**
  * Represents the Presenter of the popular Model-View-Presenter design pattern. If used with {@link
@@ -142,7 +143,6 @@ public abstract class TiPresenter<V extends TiView> {
             }
         };
     }
-
 
     /**
      * bind a new view to this presenter.
@@ -384,6 +384,10 @@ public abstract class TiPresenter<V extends TiView> {
      */
     public void setUiThreadExecutor(@Nullable final Executor uiThreadExecutor) {
         mUiThreadExecutor = uiThreadExecutor;
+    }
+
+    public TiTestPresenter<V> test() {
+        return new TiTestPresenter<>(this);
     }
 
     @Override
