@@ -71,13 +71,20 @@ public class TiTestPresenterTest {
 
     @Test
     public void testAttachView_ShouldReplaceUIThreadExecutor() throws Exception {
-        final TiPresenter mockPresenter = mock(TiPresenter.class);
-        when(mockPresenter.getState()).thenReturn(State.VIEW_DETACHED);
-        final TiTestPresenter<TiView> tiTestPresenter = new TiTestPresenter<TiView>(mockPresenter);
-        tiTestPresenter.attachView(mMockTiView);
 
-        verify(mockPresenter).setUiThreadExecutor(any(Executor.class));
-        verify(mockPresenter).attachView(mMockTiView);
+        // Given the presenter is currently in the state VIEW_DETACHED.
+        when(mMockPresenter.getState()).thenReturn(State.VIEW_DETACHED);
+
+        final TiTestPresenter<TiView> tiTestPresenter = new TiTestPresenter<>(mMockPresenter);
+
+        // When a new View is attached to the TiTestPresenter.
+        tiTestPresenter.attachView(mMockView);
+
+        // Then the TiTestPresenter should set any ui thread executor on the Presenter.
+        verify(mMockPresenter).setUiThreadExecutor(any(Executor.class));
+
+        // And then the TiTestPresenter should attach the new View to the Presenter.
+        verify(mMockPresenter).attachView(mMockView);
     }
 
     @Test
