@@ -70,6 +70,16 @@ public class TiTestPresenterTest {
     }
 
     @Test
+    public void testAttachView_WithAttachedView_ShouldDetachPreviousView() {
+        final TiPresenter mockPresenter = mock(TiPresenter.class);
+        when(mockPresenter.getState()).thenReturn(State.VIEW_ATTACHED);
+        final TiTestPresenter<TiView> tiTestPresenter = new TiTestPresenter<TiView>(mockPresenter);
+        tiTestPresenter.attachView(mMockTiView);
+
+        verify(mockPresenter).detachView();
+    }
+
+    @Test
     public void testSendToView_InUnitTestWithTiTestPresenter_ShouldNotThrow() throws Exception {
         final TiTestPresenter<MockTiView> testPresenter = new TiTestPresenter<>(mMockTiPresenter);
         testPresenter.attachView(mMockTiView);
