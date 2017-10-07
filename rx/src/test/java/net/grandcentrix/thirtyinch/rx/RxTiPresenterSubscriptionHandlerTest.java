@@ -15,10 +15,7 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Java6Assertions.*;
 import static org.mockito.Mockito.*;
 
 import net.grandcentrix.thirtyinch.TiView;
@@ -62,7 +59,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
             mSubscriptionHandler.manageSubscription(testSubscriber);
             fail("no exception");
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), containsString("DESTROYED"));
+            assertThat(e).hasMessageContaining("DESTROYED");
         }
     }
 
@@ -74,7 +71,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         final Subscription subscription = mSubscriptionHandler.manageSubscription(testSubscriber);
 
-        assertThat(testSubscriber, is(equalTo(subscription)));
+        assertThat(testSubscriber).isEqualTo(subscription);
     }
 
     @Test
@@ -94,7 +91,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
         mSubscriptionHandler.manageSubscription(testSubscriber);
-        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(testSubscriber.isUnsubscribed()).isFalse();
 
         mPresenter.destroy();
         testSubscriber.assertUnsubscribed();
@@ -112,7 +109,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
             mSubscriptionHandler.manageSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
             fail("no exception");
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), containsString("DESTROYED"));
+            assertThat(e).hasMessageContaining("DESTROYED");
         }
     }
 
@@ -141,9 +138,9 @@ public class RxTiPresenterSubscriptionHandlerTest {
         TestSubscriber<Void> thirdSubscriber = new TestSubscriber<>();
 
         mSubscriptionHandler.manageSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
-        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(firstSubscriber.isUnsubscribed()).isFalse();
+        assertThat(secondSubscriber.isUnsubscribed()).isFalse();
+        assertThat(thirdSubscriber.isUnsubscribed()).isFalse();
         mPresenter.destroy();
         firstSubscriber.assertUnsubscribed();
         secondSubscriber.assertUnsubscribed();
@@ -160,9 +157,9 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         mSubscriptionHandler
                 .manageViewSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
-        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(firstSubscriber.isUnsubscribed()).isFalse();
+        assertThat(secondSubscriber.isUnsubscribed()).isFalse();
+        assertThat(thirdSubscriber.isUnsubscribed()).isFalse();
 
         mPresenter.detachView();
         firstSubscriber.assertUnsubscribed();
@@ -190,7 +187,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
             presenter.detachView();
             fail("did not throw");
         } catch (Throwable e) {
-            assertThat(e.getMessage(), containsString("no view"));
+            assertThat(e).hasMessageContaining("no view");
         }
     }
 
@@ -203,7 +200,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
         final Subscription subscription =
                 mSubscriptionHandler.manageViewSubscription(testSubscriber);
 
-        assertThat(testSubscriber, is(equalTo(subscription)));
+        assertThat(testSubscriber).isEqualTo(subscription);
     }
 
     @Test
@@ -214,7 +211,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
         TestSubscriber<Integer> testSubscriber = new TestSubscriber<>();
 
         mSubscriptionHandler.manageViewSubscription(testSubscriber);
-        assertThat(testSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(testSubscriber.isUnsubscribed()).isFalse();
 
         mPresenter.detachView();
         testSubscriber.assertUnsubscribed();
@@ -245,7 +242,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
             mSubscriptionHandler.manageViewSubscription(testSubscriber);
             fail("no exception");
         } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("when there is no view"));
+            assertThat(e).hasMessageContaining("when there is no view");
         }
     }
 
@@ -259,7 +256,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
             mSubscriptionHandler.manageViewSubscription(testSubscriber);
             fail("no exception");
         } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("when there is no view"));
+            assertThat(e).hasMessageContaining("when there is no view");
         }
     }
 
@@ -274,7 +271,7 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         mSubscriptionHandler.manageViewSubscriptions(firstSubscriber, secondSubscriber);
 
-        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(firstSubscriber.isUnsubscribed()).isFalse();
         secondSubscriber.assertUnsubscribed();
     }
 
@@ -288,9 +285,9 @@ public class RxTiPresenterSubscriptionHandlerTest {
 
         mSubscriptionHandler
                 .manageViewSubscriptions(firstSubscriber, secondSubscriber, thirdSubscriber);
-        assertThat(firstSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(secondSubscriber.isUnsubscribed(), equalTo(false));
-        assertThat(thirdSubscriber.isUnsubscribed(), equalTo(false));
+        assertThat(firstSubscriber.isUnsubscribed()).isFalse();
+        assertThat(secondSubscriber.isUnsubscribed()).isFalse();
+        assertThat(thirdSubscriber.isUnsubscribed()).isFalse();
 
         mPresenter.detachView();
         firstSubscriber.assertUnsubscribed();

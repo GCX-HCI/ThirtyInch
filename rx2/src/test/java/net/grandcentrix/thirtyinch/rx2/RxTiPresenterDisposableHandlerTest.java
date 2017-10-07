@@ -15,10 +15,7 @@
 
 package net.grandcentrix.thirtyinch.rx2;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Java6Assertions.*;
 import static org.mockito.Mockito.*;
 
 import io.reactivex.Observable;
@@ -57,7 +54,7 @@ public class RxTiPresenterDisposableHandlerTest {
             mDisposableHandler.manageDisposable(testObserver);
             fail("no exception");
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), containsString("DESTROYED"));
+            assertThat(e).hasMessageContaining("DESTROYED");
         }
     }
 
@@ -69,7 +66,7 @@ public class RxTiPresenterDisposableHandlerTest {
 
         final Disposable disposable = mDisposableHandler.manageDisposable(testObserver);
 
-        assertThat(testObserver, is(equalTo(disposable)));
+        assertThat(testObserver).isEqualTo(disposable);
     }
 
     @Test
@@ -77,11 +74,11 @@ public class RxTiPresenterDisposableHandlerTest {
             throws Exception {
         final TestObserver<Integer> testObserver = new TestObserver<>();
         testObserver.dispose();
-        assertThat(testObserver.isDisposed(), is(true));
+        assertThat(testObserver.isDisposed()).isTrue();
 
         mDisposableHandler.manageDisposable(testObserver);
 
-        assertThat(testObserver.isDisposed(), is(true));
+        assertThat(testObserver.isDisposed()).isTrue();
     }
 
     @Test
@@ -90,10 +87,10 @@ public class RxTiPresenterDisposableHandlerTest {
         final TestObserver<Integer> testObserver = new TestObserver<>();
 
         mDisposableHandler.manageDisposable(testObserver);
-        assertThat(testObserver.isDisposed(), is(false));
+        assertThat(testObserver.isDisposed()).isFalse();
 
         mPresenter.destroy();
-        assertThat(testObserver.isDisposed(), is(true));
+        assertThat(testObserver.isDisposed()).isTrue();
     }
 
     @Test
@@ -106,8 +103,8 @@ public class RxTiPresenterDisposableHandlerTest {
 
         mDisposableHandler.manageDisposables(firstTestObserver, secondTestObserver);
 
-        assertThat(firstTestObserver.isDisposed(), is(false));
-        assertThat(secondTestObserver.isDisposed(), is(true));
+        assertThat(firstTestObserver.isDisposed()).isFalse();
+        assertThat(secondTestObserver.isDisposed()).isTrue();
     }
 
     @Test
@@ -118,7 +115,7 @@ public class RxTiPresenterDisposableHandlerTest {
 
         final Disposable disposable = mDisposableHandler.manageViewDisposable(testObserver);
 
-        assertThat(testObserver, is(equalTo(disposable)));
+        assertThat(testObserver).isEqualTo(disposable);
     }
 
     @Test
@@ -129,10 +126,10 @@ public class RxTiPresenterDisposableHandlerTest {
         final TestObserver<Integer> testObserver = new TestObserver<>();
 
         mDisposableHandler.manageViewDisposable(testObserver);
-        assertThat(testObserver.isDisposed(), is(false));
+        assertThat(testObserver.isDisposed()).isFalse();
 
         mPresenter.detachView();
-        assertThat(testObserver.isDisposed(), is(true));
+        assertThat(testObserver.isDisposed()).isTrue();
     }
 
     @Test
@@ -148,7 +145,7 @@ public class RxTiPresenterDisposableHandlerTest {
             mDisposableHandler.manageViewDisposable(testObserver);
             fail("no exception");
         } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("when there is no view"));
+            assertThat(e).hasMessageContaining("when there is no view");
         }
     }
 
@@ -162,7 +159,7 @@ public class RxTiPresenterDisposableHandlerTest {
             mDisposableHandler.manageViewDisposable(testObserver);
             fail("no exception");
         } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("when there is no view"));
+            assertThat(e).hasMessageContaining("when there is no view");
         }
     }
 
@@ -177,8 +174,8 @@ public class RxTiPresenterDisposableHandlerTest {
 
         mDisposableHandler.manageViewDisposables(firstTestObserver, secondTestObserver);
 
-        assertThat(firstTestObserver.isDisposed(), is(false));
-        assertThat(secondTestObserver.isDisposed(), is(true));
+        assertThat(firstTestObserver.isDisposed()).isFalse();
+        assertThat(secondTestObserver.isDisposed()).isTrue();
     }
 
     @Test
@@ -201,7 +198,7 @@ public class RxTiPresenterDisposableHandlerTest {
             presenter.detachView();
             fail("did not throw");
         } catch (Throwable e) {
-            assertThat(e.getMessage(), containsString("no view"));
+            assertThat(e).hasMessageContaining("no view");
         }
     }
 
@@ -216,9 +213,9 @@ public class RxTiPresenterDisposableHandlerTest {
                 .manageDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
 
         mPresenter.destroy();
-        assertThat(firstTestObserver.isDisposed(), equalTo(true));
-        assertThat(secondTestObserver.isDisposed(), equalTo(true));
-        assertThat(thirdTestObserver.isDisposed(), equalTo(true));
+        assertThat(firstTestObserver.isDisposed()).isTrue();
+        assertThat(secondTestObserver.isDisposed()).isTrue();
+        assertThat(thirdTestObserver.isDisposed()).isTrue();
     }
 
     @Test
@@ -234,7 +231,7 @@ public class RxTiPresenterDisposableHandlerTest {
                     .manageDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
             fail("no exception");
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), containsString("DESTROYED"));
+            assertThat(e).hasMessageContaining("DESTROYED");
         }
     }
 
@@ -248,13 +245,13 @@ public class RxTiPresenterDisposableHandlerTest {
 
         mDisposableHandler
                 .manageViewDisposables(firstTestObserver, secondTestObserver, thirdTestObserver);
-        assertThat(firstTestObserver.isDisposed(), equalTo(false));
-        assertThat(secondTestObserver.isDisposed(), equalTo(false));
-        assertThat(thirdTestObserver.isDisposed(), equalTo(false));
+        assertThat(firstTestObserver.isDisposed()).isFalse();
+        assertThat(secondTestObserver.isDisposed()).isFalse();
+        assertThat(thirdTestObserver.isDisposed()).isFalse();
 
         mPresenter.detachView();
-        assertThat(firstTestObserver.isDisposed(), equalTo(true));
-        assertThat(secondTestObserver.isDisposed(), equalTo(true));
-        assertThat(thirdTestObserver.isDisposed(), equalTo(true));
+        assertThat(firstTestObserver.isDisposed()).isTrue();
+        assertThat(secondTestObserver.isDisposed()).isTrue();
+        assertThat(thirdTestObserver.isDisposed()).isTrue();
     }
 }
