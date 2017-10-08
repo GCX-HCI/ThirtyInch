@@ -39,6 +39,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 dependencies {
@@ -50,6 +53,7 @@ dependencies {
 
     androidTestCompile "com.android.support.test:runner:$supportTestVersion"
     androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
+    androidTestCompile "org.assertj:assertj-core:$assertjVersion"
 }
 
 publish {

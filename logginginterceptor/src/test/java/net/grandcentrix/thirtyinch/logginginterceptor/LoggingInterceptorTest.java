@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.logginginterceptor;
 
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;

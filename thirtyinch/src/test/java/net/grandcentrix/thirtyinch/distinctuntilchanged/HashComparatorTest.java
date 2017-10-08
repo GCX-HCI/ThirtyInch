@@ -15,9 +15,7 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.*;
 
@@ -26,24 +24,24 @@ public class HashComparatorTest {
     @Test
     public void different() throws Exception {
         final HashComparator comparator = new HashComparator();
-        assertFalse(comparator.compareWith(new Object[]{"arg1"}));
-        assertFalse(comparator.compareWith(new Object[]{"arg2"}));
+        assertThat(comparator.compareWith(new Object[]{"arg1"})).isFalse();
+        assertThat(comparator.compareWith(new Object[]{"arg2"})).isFalse();
     }
 
     @Test
     public void initialize() throws Exception {
 
         final HashComparator comparator = new HashComparator();
-        assertFalse(comparator.compareWith(new Object[]{"arg1"}));
+        assertThat(comparator.compareWith(new Object[]{"arg1"})).isFalse();
     }
 
     @Test
     public void same() throws Exception {
         final HashComparator comparator = new HashComparator();
 
-        assertFalse(comparator.compareWith(new Object[]{"arg1"}));
-        assertTrue(comparator.compareWith(new Object[]{"arg1"}));
-        assertTrue(comparator.compareWith(new Object[]{"arg1"}));
+        assertThat(comparator.compareWith(new Object[]{"arg1"})).isFalse();
+        assertThat(comparator.compareWith(new Object[]{"arg1"})).isTrue();
+        assertThat(comparator.compareWith(new Object[]{"arg1"})).isTrue();
     }
 
     @Test

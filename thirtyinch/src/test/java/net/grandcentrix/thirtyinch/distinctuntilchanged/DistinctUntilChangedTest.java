@@ -15,9 +15,7 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.core.Is.*;
-import static org.hamcrest.core.IsEqual.*;
+import static org.assertj.core.api.Assertions.*;
 
 import net.grandcentrix.thirtyinch.TiView;
 import org.junit.*;
@@ -128,7 +126,7 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod("test");
         testViewWrapped.annotatedMethod("test2");
 
-        assertThat(counter.getCalled(), is(equalTo(2)));
+        assertThat(counter.getCalled()).isEqualTo(2);
     }
 
     /**
@@ -151,7 +149,7 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod("test");
         testViewWrapped.annotatedMethod("test2");
 
-        assertThat(counter.getCalled(), is(equalTo(2)));
+        assertThat(counter.getCalled()).isEqualTo(2);
     }
 
     /**
@@ -174,7 +172,7 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
         testViewWrapped.annotatedMethod(new BadEqualsObject("test2"));
 
-        assertThat(counter.getCalled(), is(equalTo(1)));
+        assertThat(counter.getCalled()).isEqualTo(1);
     }
 
     /**
@@ -197,7 +195,7 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod(new BadHashObject("test"));
         testViewWrapped.annotatedMethod(new BadHashObject("test2"));
 
-        assertThat(counter.getCalled(), is(equalTo(2)));
+        assertThat(counter.getCalled()).isEqualTo(2);
     }
 
     /**
@@ -220,7 +218,7 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod(new BadEqualsObject("test"));
         testViewWrapped.annotatedMethod(new BadEqualsObject("test2"));
 
-        assertThat(counter.getCalled(), is(equalTo(2)));
+        assertThat(counter.getCalled()).isEqualTo(2);
     }
 
     /**
@@ -243,6 +241,6 @@ public class DistinctUntilChangedTest {
         testViewWrapped.annotatedMethod(new BadHashObject("test"));
         testViewWrapped.annotatedMethod(new BadHashObject("test2"));
 
-        assertThat(counter.getCalled(), is(equalTo(1)));
+        assertThat(counter.getCalled()).isEqualTo(1);
     }
 }
