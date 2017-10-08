@@ -16,7 +16,7 @@
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
 
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;

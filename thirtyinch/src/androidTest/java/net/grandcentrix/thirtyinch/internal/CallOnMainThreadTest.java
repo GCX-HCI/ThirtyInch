@@ -15,7 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import net.grandcentrix.thirtyinch.TiView;
 import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
@@ -52,7 +53,7 @@ public class CallOnMainThreadTest {
 
         try {
             testView.throwingMethod();
-            Assert.fail("not thrown");
+            fail("not thrown");
         } catch (IllegalStateException e) {
             assertThat(e).hasMessage("myException");
         }
@@ -61,7 +62,7 @@ public class CallOnMainThreadTest {
 
         try {
             wrappedView.throwingMethod();
-            Assert.fail("not thrown");
+            fail("not thrown");
         } catch (IllegalStateException e) {
             e.printStackTrace();
             assertThat(e).hasMessage("myException");

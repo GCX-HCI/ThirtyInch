@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import net.grandcentrix.thirtyinch.TiView;

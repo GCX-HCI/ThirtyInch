@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import net.grandcentrix.thirtyinch.TiView;
 import org.junit.*;

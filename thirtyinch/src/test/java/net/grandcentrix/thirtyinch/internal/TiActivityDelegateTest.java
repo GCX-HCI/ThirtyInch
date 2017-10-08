@@ -15,8 +15,7 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import static junit.framework.Assert.fail;
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import org.junit.*;

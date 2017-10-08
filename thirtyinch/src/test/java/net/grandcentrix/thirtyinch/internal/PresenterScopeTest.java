@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import net.grandcentrix.thirtyinch.TiPresenter;

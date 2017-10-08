@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.rx2;
 
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import io.reactivex.Observable;
