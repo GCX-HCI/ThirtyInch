@@ -43,7 +43,7 @@ dependencies {
 }
 
 publish {
-    userOrg = 'passsy'
+    userOrg = 'grandcentrix'
     groupId = 'net.grandcentrix.thirtyinch'
     artifactId = 'thirtyinch-test'
     uploadName = 'ThirtyInch'

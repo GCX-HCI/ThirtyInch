@@ -1,5 +1,37 @@
 # ThirtyInch Releases
 
+
+## Version 0.8.5 `12.10.17`
+
+### Summary
+
+Mostly a maintenance release improving documentation, adding tests and cleaning up the repository.
+
+Highlight: The `test` package is now deprecated and all functionality was moved into the `thirtyinch` artifact.
+
+Thanks for external contributors:
+@baltuky @vpondala 
+
+### Public changes
+
+- [Pull 115](https://github.com/grandcentrix/ThirtyInch/pull/115) New: Update dependencies (support lib 26.0.0, target- and compileSdkVersion 26 and other minor updates)
+- [Pull 120](https://github.com/grandcentrix/ThirtyInch/pull/120) New: `TiPresenter#test()` returns a `TiTestPresenter` with helper methods for unit testing. Replaces `TiPresenterInstructor` and deprecates the `test` artifact.
+- [Pull 126](https://github.com/grandcentrix/ThirtyInch/pull/126) Fix: `TiPresenter#test()` documentation, thx @baltuky
+
+### Internal changes
+
+- [Pull 99](https://github.com/grandcentrix/ThirtyInch/pull/99) Fix: remove javadoc warnings
+- [Pull 103](https://github.com/grandcentrix/ThirtyInch/pull/103) New: Improved `RELEASE.md` instructions
+- [Pull 105](https://github.com/grandcentrix/ThirtyInch/pull/105) New: Deprecate internal `DelegatedTiActivity#isActivityChangingConfigurations` which turned out as not required to handle config changes correctly. Simplifies internal logic
+- [Pull 112](https://github.com/grandcentrix/ThirtyInch/pull/112) New: Update to gradlew 4.1 allowing development with Android Studio 3.0
+- [Pull 113](https://github.com/grandcentrix/ThirtyInch/pull/113) New: Test for LifecycleObserver cleanup
+- [Pull 114](https://github.com/grandcentrix/ThirtyInch/pull/114) New: Tests for internal `OneTimeRemovable`
+- [Pull 117](https://github.com/grandcentrix/ThirtyInch/pull/117) New: internal `PresenterScope` tests
+- [Pull 121](https://github.com/grandcentrix/ThirtyInch/pull/121) New: Replace all `Hamcrest` assertions with `AssertJ`, thx @vpondala 
+- [Pull 123](https://github.com/grandcentrix/ThirtyInch/pull/123) New: Add codestyle to project and reformat all sources according to this. Reduces diffs for external contributors
+- [Pull 127](https://github.com/grandcentrix/ThirtyInch/pull/127) New: Additional tests for 
+`TiTestPresenter`
+
 ## Version 0.8.0 `04.05.17`
 
 ### Summary
