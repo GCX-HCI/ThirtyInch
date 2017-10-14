@@ -1,2 +1,8 @@
-include ':thirtyinch', ':plugin', ':sample', ':rx', ':test', ':plugin-test', ':rx2',
-        ':logginginterceptor'
+include ':thirtyinch',
+        ':thirtyinch-logginginterceptor',
+        ':thirtyinch-plugin',
+        ':thirtyinch-rx',
+        ':thirtyinch-rx2',
+        ':thirtyinch-test',
+        ':sample',
+        ':plugin-test'

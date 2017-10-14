@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    compile project(':plugin')
+    compile project(':thirtyinch-plugin')
 
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
