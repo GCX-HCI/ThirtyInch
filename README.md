@@ -25,7 +25,7 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.8.0'
+    def thirtyinchVersion = '0.8.5'
     
     // MVP for activity and fragment
     compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
@@ -35,10 +35,6 @@ dependencies {
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
     
     compile "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
-    
-    // test extension
-    testCompile "net.grandcentrix.thirtyinch:thirtyinch-test:$thirtyinchVersion"
-    
      
     // CompositeAndroid plugin
     // When you are using ThirtyInch with the CompositeAndroid extension you have to manually 
