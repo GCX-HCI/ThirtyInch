@@ -29,6 +29,8 @@ dependencies {
     
     // MVP for activity and fragment
     compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
+    // We only provid AppCompat so you have to include it by yourself
+    compile "com.android.support:appcompat-v7:$appCompatVersion"
     
     // rx (1 or 2) extension
     compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
