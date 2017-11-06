@@ -21,7 +21,7 @@ See the slides of the latest talk on [Speakerdeck](https://speakerdeck.com/passs
 
 ## Get it [![Download](https://api.bintray.com/packages/passsy/maven/ThirtyInch/images/download.svg) ](https://bintray.com/passsy/maven/ThirtyInch/_latestVersion)
 
-ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
+ThirtyInch is available via [jcenter](https://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
 
 ```gradle
 dependencies {
@@ -116,7 +116,7 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 - is not a singleton
 - dies when the `Activity` gets finished
 
-##### Lifecycle
+#### Lifecycle
 
 The `TiPresenter` lifecycle is very easy.
 
