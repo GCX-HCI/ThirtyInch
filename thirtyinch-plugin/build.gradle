@@ -36,9 +36,9 @@ android {
 }
 
 dependencies {
-    compile project(':thirtyinch')
-    provided "com.pascalwelsch.compositeandroid:activity:$compositeAndroidVersion"
-    provided "com.pascalwelsch.compositeandroid:fragment:$compositeAndroidVersion"
+    implementation project(':thirtyinch')
+    compileOnly "com.pascalwelsch.compositeandroid:activity:$compositeAndroidVersion"
+    compileOnly "com.pascalwelsch.compositeandroid:fragment:$compositeAndroidVersion"
 }
 
 publish {

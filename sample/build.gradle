@@ -44,12 +44,12 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compile 'com.jakewharton.rxbinding:rxbinding:1.0.1'
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
 
+    implementation project(':thirtyinch')
+    implementation project(':thirtyinch-rx')
+    implementation project(':thirtyinch-logginginterceptor')
 
-    compile project(':thirtyinch')
-    compile project(':thirtyinch-rx')
-    compile project(':thirtyinch-logginginterceptor')
-    testCompile "junit:junit:$junitVersion"
+    testImplementation "junit:junit:$junitVersion"
 }
