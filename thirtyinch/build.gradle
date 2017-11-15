@@ -47,13 +47,14 @@ android {
 dependencies {
     compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
 
+    testCompileOnly "com.android.support:support-annotations:$supportLibraryVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
 
     androidTestImplementation "com.android.support.test:runner:$supportTestVersion"
-    androidTestImplementation  "org.mockito:mockito-core:$mockitoVersion"
-    androidTestImplementation  "org.assertj:assertj-core:$assertjVersion"
+    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
+    androidTestImplementation "org.assertj:assertj-core:$assertjVersion"
 }
 
 publish {
