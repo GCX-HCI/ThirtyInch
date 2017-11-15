@@ -36,10 +36,10 @@ android {
 }
 
 dependencies {
-    compile project(':thirtyinch')
+    implementation project(':thirtyinch')
 
-    testCompile "junit:junit:$junitVersion"
-    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
 }
 
 publish {

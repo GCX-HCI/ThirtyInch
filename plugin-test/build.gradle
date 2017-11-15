@@ -23,14 +23,15 @@ android {
 }
 
 dependencies {
-    compile project(':thirtyinch-plugin')
+    implementation project(':thirtyinch-plugin')
+    implementation project(':thirtyinch')
 
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
-    compile "com.pascalwelsch.compositeandroid:fragment:$supportLibraryVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
+    implementation "com.pascalwelsch.compositeandroid:fragment:$supportLibraryVersion"
 
-    androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"
-    androidTestCompile "com.android.support.test:runner:$supportTestVersion";
-    androidTestCompile "com.android.support.test:rules:$supportTestVersion";
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoVersion";
+    androidTestImplementation "com.android.support:support-annotations:$supportLibraryVersion"
+    androidTestImplementation "com.android.support.test:runner:$supportTestVersion";
+    androidTestImplementation "com.android.support.test:rules:$supportTestVersion";
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion";
 }
