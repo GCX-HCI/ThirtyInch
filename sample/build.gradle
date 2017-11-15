@@ -22,9 +22,6 @@ android {
             // https://developer.android.com/studio/build/shrink-code.html#gradle-shrinker
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            // output coverage with ./gradlew clean build createDebugCoverageReport
-            testCoverageEnabled true
         }
         release {
             // use real proguard for release builds, not the build in shrinker which doesn't support obfuscation
