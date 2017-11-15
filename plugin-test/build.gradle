@@ -24,6 +24,7 @@ android {
 
 dependencies {
     implementation project(':thirtyinch-plugin')
+    implementation project(':thirtyinch')
 
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
