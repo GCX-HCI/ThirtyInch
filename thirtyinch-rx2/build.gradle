@@ -34,7 +34,7 @@ android {
 
 dependencies {
     implementation project(':thirtyinch')
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.4'
+    api 'io.reactivex.rxjava2:rxjava:2.1.4'
     compileOnly "com.android.support:support-annotations:$supportLibraryVersion"
 
     testImplementation "junit:junit:$junitVersion"
