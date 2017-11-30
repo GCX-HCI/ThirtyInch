@@ -39,7 +39,7 @@ ext {
     // Since composite is not up to date we can't use the latest one
     compositeAndroidVersion = supportLibraryVersion
 
-    bintrayVersion = '0.5.0'
+    bintrayVersion = '0.8.0'
     junitVersion = '4.12'
     mockitoVersion = '2.10.0'
     assertjVersion = '2.8.0'
