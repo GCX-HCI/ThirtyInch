@@ -132,6 +132,30 @@ public class RxTiPresenterUtilsTest {
     }
 
     @Test
+    public void testDeliverLatestToView_SingleItemViewComesAndGoes() throws Exception {
+        mPresenter.create();
+
+        PublishSubject<Integer> source = PublishSubject.create();
+        TestObserver<Integer> testObserver = new TestObserver<>();
+
+        source
+                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .subscribe(testObserver);
+
+        source.onNext(1);
+        source.onNext(2);
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+        mPresenter.attachView(mView);
+
+        testObserver.assertNotComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertValuesOnly(2, 2, 2);
+    }
+
+    @Test
     public void testDeliverLatestToView_Empty() throws Exception {
         mPresenter.create();
 
