@@ -87,9 +87,9 @@ public class RxTiPresenterUtils {
     }
 
     /**
-     * Returns a transformer that will delay onNext, onError and onComplete emissions unless a view
-     * become available. getView() is guaranteed to be != null during all emissions. This
-     * transformer can only be used on application's main thread.
+     * Returns a transformer that will delay onNext, onError and onComplete emissions until a view
+     * become available. getView() is guaranteed to be != null during all emissions, provided that this
+     * transformer is only used on the application's main thread.
      * <p/>
      * If this transformer receives a next value while the previous value has not been delivered,
      * the previous value will be dropped.
