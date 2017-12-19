@@ -28,24 +28,24 @@ dependencies {
     def thirtyinchVersion = '0.8.5'
     
     // MVP for activity and fragment
-    compile "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
     // We only provid AppCompat so you have to include it by yourself
-    compile "com.android.support:appcompat-v7:$appCompatVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     
     // rx (1 or 2) extension
-    compile "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
-    compile "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
     
-    compile "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
      
     // CompositeAndroid plugin
     // When you are using ThirtyInch with the CompositeAndroid extension you have to manually 
     // include the CompositeAndroid dependency. It has to be the same version as appcompat and 
     // the support library 
     
-    compile "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
-    // def supportLibraryVersion = '24.2.1' <-- use your own version
-    compile "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
+    // def supportLibraryVersion = '27.0.1' <-- use your own version
+    implementation "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
 }
 ```
 
