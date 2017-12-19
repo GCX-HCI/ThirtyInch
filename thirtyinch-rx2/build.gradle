@@ -9,7 +9,6 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'bintray-release'
-apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -26,8 +25,6 @@ android {
             minifyEnabled false
         }
         debug {
-            // output coverage with ./gradlew clean build createDebugCoverageReport
-            testCoverageEnabled true
         }
     }
     lintOptions {
@@ -36,13 +33,13 @@ android {
 }
 
 dependencies {
-    compile project(':thirtyinch')
-    compile 'io.reactivex.rxjava2:rxjava:2.1.4'
-    provided "com.android.support:support-annotations:$supportLibraryVersion"
+    implementation project(':thirtyinch')
+    api 'io.reactivex.rxjava2:rxjava:2.1.4'
+    compileOnly "com.android.support:support-annotations:$supportLibraryVersion"
 
-    testCompile "junit:junit:$junitVersion"
-    testCompile "org.mockito:mockito-core:$mockitoVersion"
-    testCompile "org.assertj:assertj-core:$assertjVersion"
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.assertj:assertj-core:$assertjVersion"
 }
 
 publish {

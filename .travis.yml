@@ -11,7 +11,7 @@ android:
     - tools
 
     # The BuildTools version used by your project
-    - build-tools-26.0.1
+    - build-tools-26.0.2
 
     # The SDK version used to compile your project
     - android-22
@@ -43,7 +43,7 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew build jacocoTestReport assembleAndroidTest connectedCheck
+  - ./gradlew build jacocoTestReportDebug assembleAndroidTest connectedCheck
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

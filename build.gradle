@@ -3,12 +3,15 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
+        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.10.0'
     }
 }
+
+apply plugin: 'com.vanniktech.android.junit.jacoco'
 
 allprojects {
     repositories {
@@ -29,14 +32,14 @@ ext {
     TARGET_SDK_VERSION = 26
     COMPILE_SDK_VERSION = 26
     // If you change the build tools version don't forgot to update .travis.yml
-    BUILD_TOOLS_VERSION = '26.0.1'
+    BUILD_TOOLS_VERSION = '26.0.2'
 
     supportLibraryVersion = '26.0.0'
     // compositeAndroidVersion should be always the same version as the supportLib version
     // Since composite is not up to date we can't use the latest one
     compositeAndroidVersion = supportLibraryVersion
 
-    bintrayVersion = '0.5.0'
+    bintrayVersion = '0.8.0'
     junitVersion = '4.12'
     mockitoVersion = '2.10.0'
     assertjVersion = '2.8.0'
