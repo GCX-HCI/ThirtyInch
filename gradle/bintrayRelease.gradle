@@ -1,0 +1,35 @@
+class MissingExtraException extends GradleException {
+
+    MissingExtraException(String extraName) {
+        super("Extra '$extraName' missing. Please provide with 'ext.set($extraName, value)'!")
+    }
+
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.novoda:bintray-release:$bintrayVersion"
+    }
+}
+
+apply plugin: com.novoda.gradle.release.ReleasePlugin
+
+String maybeArtifactId = ext.has("artifactId") ? ext.get("artifactId") : ""
+if (maybeArtifactId.isEmpty()) {
+    throw new MissingExtraException("artifactId")
+}
+
+String maybeDesc = ext.has("desc") ? ext.get("desc") : null
+
+publish {
+    userOrg = 'grandcentrix'
+    groupId = 'net.grandcentrix.thirtyinch'
+    publishVersion = VERSION_NAME
+    artifactId = "$maybeArtifactId"
+    uploadName = 'ThirtyInch'
+    desc = "$maybeDesc"
+    website = 'https://github.com/grandcentrix/ThirtyInch'
+}
