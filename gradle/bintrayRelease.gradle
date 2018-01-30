@@ -2,8 +2,8 @@ class MissingConfigurePublishException extends GradleException {
 
     MissingConfigurePublishException(String extraName) {
         super("Extra '$extraName' missing. " +
-                "Please provide with 'ext.set('$extraName', { ['artifactId': 'artifactId', desc: 'description'] })'" +
-                " (while 'desc' is optional)!")
+                "Please provide with 'ext.set('$extraName', { ['artifactId': 'artifactId', desc: 'description'] })' " +
+                "(while 'desc' is optional)!")
     }
 
 }
@@ -21,9 +21,7 @@ apply plugin: com.novoda.gradle.release.ReleasePlugin
 
 Closure configurePublish = ext.has('configurePublish') ? ext.get('configurePublish') : {}
 def config = configurePublish()
-if (config == null) {
-    throw new MissingConfigurePublishException('configurePublish')
-}
+if (config == null) throw new MissingConfigurePublishException('configurePublish')
 
 publish {
     userOrg = 'grandcentrix'
