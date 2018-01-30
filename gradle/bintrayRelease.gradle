@@ -1,0 +1,34 @@
+class MissingConfigurePublishException extends GradleException {
+
+    MissingConfigurePublishException(String extraName) {
+        super("Extra '$extraName' missing. " +
+                "Please provide with 'ext.set('$extraName', { ['artifactId': 'artifactId', desc: 'description'] })' " +
+                "(while 'desc' is optional)!")
+    }
+
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.novoda:bintray-release:$bintrayVersion"
+    }
+}
+
+apply plugin: com.novoda.gradle.release.ReleasePlugin
+
+Closure configurePublish = ext.has('configurePublish') ? ext.get('configurePublish') : {}
+def config = configurePublish()
+if (config == null) throw new MissingConfigurePublishException('configurePublish')
+
+publish {
+    userOrg = 'grandcentrix'
+    groupId = 'net.grandcentrix.thirtyinch'
+    publishVersion = VERSION_NAME
+    artifactId = config['artifactId']
+    uploadName = 'ThirtyInch'
+    desc = config['desc']
+    website = 'https://github.com/grandcentrix/ThirtyInch'
+}

@@ -1,14 +1,4 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "com.novoda:bintray-release:$bintrayVersion"
-    }
-}
-
 apply plugin: 'com.android.library'
-apply plugin: 'bintray-release'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -41,11 +31,6 @@ dependencies {
     testImplementation "org.assertj:assertj-core:$assertjVersion"
 }
 
-publish {
-    userOrg = 'grandcentrix'
-    groupId = 'net.grandcentrix.thirtyinch'
-    artifactId = 'thirtyinch-logginginterceptor'
-    uploadName = 'ThirtyInch'
-    publishVersion = VERSION_NAME
-    website = 'https://github.com/grandcentrix/ThirtyInch'
-}
+// For uploading to bintray
+ext.set('configurePublish', { [artifactId: 'thirtyinch-logginginterceptor'] })
+apply from: '../gradle/bintrayRelease.gradle'
