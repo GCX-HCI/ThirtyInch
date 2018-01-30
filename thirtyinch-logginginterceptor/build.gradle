@@ -32,5 +32,7 @@ dependencies {
 }
 
 // For uploading to bintray
-ext.set('configurePublish', { [artifactId: 'thirtyinch-logginginterceptor'] })
 apply from: '../gradle/bintrayRelease.gradle'
+configurePublish {
+    artifactId = 'thirtyinch-logginginterceptor'
+}

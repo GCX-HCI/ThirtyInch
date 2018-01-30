@@ -45,5 +45,8 @@ dependencies {
 }
 
 // For uploading to bintray
-ext.set('configurePublish', { [artifactId: 'thirtyinch', desc: 'a Model View Presenter library for Android'] })
 apply from: '../gradle/bintrayRelease.gradle'
+configurePublish {
+    artifactId = 'thirtyinch'
+    desc = 'a Model View Presenter library for Android'
+}
