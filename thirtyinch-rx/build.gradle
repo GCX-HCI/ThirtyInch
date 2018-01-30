@@ -35,5 +35,5 @@ dependencies {
 }
 
 // For uploading to bintray
-ext.set("artifactId", "thirtyinch-rx")
+ext.set('configurePublish', { ['artifactId': 'thirtyinch-rx'] })
 apply from: '../gradle/bintrayRelease.gradle'
