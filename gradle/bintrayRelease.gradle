@@ -1,13 +1,3 @@
-class MissingConfigurePublishException extends GradleException {
-
-    MissingConfigurePublishException(String extraName) {
-        super("Extra '$extraName' missing. " +
-                "Please provide with 'ext.set('$extraName', { ['artifactId': 'artifactId', desc: 'description'] })' " +
-                "(while 'desc' is optional)!")
-    }
-
-}
-
 buildscript {
     repositories {
         jcenter()
