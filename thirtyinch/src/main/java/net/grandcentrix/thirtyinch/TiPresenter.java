@@ -560,7 +560,7 @@ public abstract class TiPresenter<V extends TiView> {
      * @see #sendPostponedActionsToView
      * @see #onAttachView(TiView)
      */
-    protected void sendToView(final ViewAction<V> action) {
+    public void sendToView(final ViewAction<V> action) {
         final V view = getView();
         if (view != null) {
             runOnUiThread(new Runnable() {
