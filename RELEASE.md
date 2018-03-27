@@ -18,7 +18,7 @@ Anyway. If you want to use the latest and greatest features of Ti (or just want 
 ```
 (MockedUserName and MockedKey can be any value 😉)
 
-Or you can use directly the `publishToMavenLocal` task:
+Or you can use directly the `publishReleasePublicationToMavenLocal` task:
 ```
-./gradlew clean bundleRelease publishToMavenLocal
+./gradlew clean bundleRelease publishReleasePublicationToMavenLocal
 ```

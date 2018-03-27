@@ -1,14 +1,4 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "com.novoda:bintray-release:$bintrayVersion"
-    }
-}
-
 apply plugin: 'com.android.library'
-apply plugin: 'bintray-release'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -38,11 +28,8 @@ dependencies {
     compileOnly "com.pascalwelsch.compositeandroid:fragment:$compositeAndroidVersion"
 }
 
-publish {
-    userOrg = 'grandcentrix'
-    groupId = 'net.grandcentrix.thirtyinch'
+// For uploading to bintray
+apply from: '../gradle/bintrayRelease.gradle'
+configurePublish {
     artifactId = 'thirtyinch-plugin'
-    uploadName = 'ThirtyInch'
-    publishVersion = VERSION_NAME
-    website = 'https://github.com/grandcentrix/ThirtyInch'
 }

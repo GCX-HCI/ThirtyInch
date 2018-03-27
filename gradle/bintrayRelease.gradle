@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.8.0'
+    }
+}
+
+apply plugin: com.novoda.gradle.release.ReleasePlugin
+
+/**
+ * Call this method with a closure to configure publishing your thirtyinch module to bintray.
+ */
+def configurePublish(Closure body) {
+    project.publish {
+        userOrg = 'grandcentrix'
+        groupId = 'net.grandcentrix.thirtyinch'
+        publishVersion = VERSION_NAME
+        uploadName = 'ThirtyInch'
+        website = 'https://github.com/grandcentrix/ThirtyInch'
+        body.delegate = delegate
+        body()
+    }
+}
+
+ext {
+    // expose method to everyone applying this gradle file
+    configurePublish = this.&configurePublish
+}
