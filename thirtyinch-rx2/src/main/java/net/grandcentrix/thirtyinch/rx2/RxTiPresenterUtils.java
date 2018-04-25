@@ -47,46 +47,6 @@ public class RxTiPresenterUtils {
     }
 
     /**
-     * Observable of the view state. The View is ready to receive calls after calling {@link
-     * TiPresenter#attachView(TiView)} and before calling {@link TiPresenter#detachView()}.
-     */
-    public static Observable<Boolean> isViewReady(final TiPresenter presenter) {
-        return Observable.create(new ObservableOnSubscribe<Boolean>() {
-            @Override
-            public void subscribe(final ObservableEmitter<Boolean> emitter)
-                    throws Exception {
-                if (!emitter.isDisposed()) {
-                    emitter.onNext(presenter.getState() == TiPresenter.State.VIEW_ATTACHED);
-                }
-
-                final Removable removable = presenter
-                        .addLifecycleObserver(new TiLifecycleObserver() {
-                            @Override
-                            public void onChange(final TiPresenter.State state,
-                                    final boolean hasLifecycleMethodBeenCalled) {
-                                if (!emitter.isDisposed()) {
-                                    emitter.onNext(state == TiPresenter.State.VIEW_ATTACHED
-                                            && hasLifecycleMethodBeenCalled);
-                                }
-                            }
-                        });
-
-                emitter.setDisposable(new Disposable() {
-                    @Override
-                    public void dispose() {
-                        removable.remove();
-                    }
-
-                    @Override
-                    public boolean isDisposed() {
-                        return removable.isRemoved();
-                    }
-                });
-            }
-        }).distinctUntilChanged();
-    }
-
-    /**
      * Returns a transformer that will delay onNext, onError and onComplete emissions until a view
      * become available. getView() is guaranteed to be != null during all emissions, provided that this
      * transformer is only used on the application's main thread.
@@ -134,6 +94,46 @@ public class RxTiPresenterUtils {
                         });
             }
         };
+    }
+
+    /**
+     * Observable of the view state. The View is ready to receive calls after calling {@link
+     * TiPresenter#attachView(TiView)} and before calling {@link TiPresenter#detachView()}.
+     */
+    public static Observable<Boolean> isViewReady(final TiPresenter presenter) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> emitter)
+                    throws Exception {
+                if (!emitter.isDisposed()) {
+                    emitter.onNext(presenter.getState() == TiPresenter.State.VIEW_ATTACHED);
+                }
+
+                final Removable removable = presenter
+                        .addLifecycleObserver(new TiLifecycleObserver() {
+                            @Override
+                            public void onChange(final TiPresenter.State state,
+                                    final boolean hasLifecycleMethodBeenCalled) {
+                                if (!emitter.isDisposed()) {
+                                    emitter.onNext(state == TiPresenter.State.VIEW_ATTACHED
+                                            && hasLifecycleMethodBeenCalled);
+                                }
+                            }
+                        });
+
+                emitter.setDisposable(new Disposable() {
+                    @Override
+                    public void dispose() {
+                        removable.remove();
+                    }
+
+                    @Override
+                    public boolean isDisposed() {
+                        return removable.isRemoved();
+                    }
+                });
+            }
+        }).distinctUntilChanged();
     }
 
 }

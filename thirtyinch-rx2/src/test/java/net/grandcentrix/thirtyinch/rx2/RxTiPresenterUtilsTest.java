@@ -29,35 +29,83 @@ public class RxTiPresenterUtilsTest {
     }
 
     @Test
-    public void testIsViewReady_AttachView_ShouldCallValueFalseTrue() throws Exception {
+    public void testDeliverLatestToView_Empty() throws Exception {
         mPresenter.create();
 
-        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
+        TestObserver<Integer> testObserver = new TestObserver<>();
+        Observable.<Integer>empty()
+                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .subscribe(testObserver);
 
         mPresenter.attachView(mView);
-        test.assertValues(false, true);
+
+        testObserver.assertNotComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertEmpty();
     }
 
     @Test
-    public void testIsViewReady_BeforeAttachView_ShouldCallValueFalse() throws Exception {
+    public void testDeliverLatestToView_SingleItemViewComesAndGoes() throws Exception {
         mPresenter.create();
 
-        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
+        PublishSubject<Integer> source = PublishSubject.create();
+        TestObserver<Integer> testObserver = new TestObserver<>();
 
-        test.assertValue(false);
+        source
+                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .subscribe(testObserver);
+
+        source.onNext(1);
+        source.onNext(2);
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+        mPresenter.attachView(mView);
+        mPresenter.detachView();
+        mPresenter.attachView(mView);
+
+        testObserver.assertNotComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertValuesOnly(2, 2, 2);
     }
 
     @Test
-    public void testIsViewReady_DisposeBeforeAttachView_ShouldRemoveCallback() throws Exception {
+    public void testDeliverLatestToView_ViewComesAndGoes() throws Exception {
         mPresenter.create();
 
-        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
+        PublishSubject<Integer> source = PublishSubject.create();
+        TestObserver<Integer> testObserver = new TestObserver<>();
 
-        test.assertValue(false);
-        test.dispose();
-        test.isDisposed();
+        source
+                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .subscribe(testObserver);
+
+        source.onNext(1);
+        source.onNext(2);
         mPresenter.attachView(mView);
-        test.assertValue(false);
+        source.onNext(3);
+        mPresenter.detachView();
+        source.onNext(4);
+        source.onNext(5);
+        mPresenter.attachView(mView);
+        source.onNext(6);
+
+        testObserver.assertNotComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertValuesOnly(2, 3, 5, 6);
+    }
+
+    @Test
+    public void testDeliverLatestToView_ViewNeverReady() throws Exception {
+        mPresenter.create();
+
+        TestObserver<Integer> testObserver = new TestObserver<>();
+        Observable.just(1, 2, 3)
+                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
+                .subscribe(testObserver);
+
+        testObserver.assertNotComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertEmpty();
     }
 
     @Test
@@ -92,83 +140,35 @@ public class RxTiPresenterUtilsTest {
     }
 
     @Test
-    public void testDeliverLatestToView_ViewNeverReady() throws Exception {
+    public void testIsViewReady_AttachView_ShouldCallValueFalseTrue() throws Exception {
         mPresenter.create();
 
-        TestObserver<Integer> testObserver = new TestObserver<>();
-        Observable.just(1, 2, 3)
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
-                .subscribe(testObserver);
+        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
 
-        testObserver.assertNotComplete();
-        testObserver.assertNoErrors();
-        testObserver.assertEmpty();
+        mPresenter.attachView(mView);
+        test.assertValues(false, true);
     }
 
     @Test
-    public void testDeliverLatestToView_ViewComesAndGoes() throws Exception {
+    public void testIsViewReady_BeforeAttachView_ShouldCallValueFalse() throws Exception {
         mPresenter.create();
 
-        PublishSubject<Integer> source = PublishSubject.create();
-        TestObserver<Integer> testObserver = new TestObserver<>();
+        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
 
-        source
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
-                .subscribe(testObserver);
-
-        source.onNext(1);
-        source.onNext(2);
-        mPresenter.attachView(mView);
-        source.onNext(3);
-        mPresenter.detachView();
-        source.onNext(4);
-        source.onNext(5);
-        mPresenter.attachView(mView);
-        source.onNext(6);
-
-        testObserver.assertNotComplete();
-        testObserver.assertNoErrors();
-        testObserver.assertValuesOnly(2, 3, 5, 6);
+        test.assertValue(false);
     }
 
     @Test
-    public void testDeliverLatestToView_SingleItemViewComesAndGoes() throws Exception {
+    public void testIsViewReady_DisposeBeforeAttachView_ShouldRemoveCallback() throws Exception {
         mPresenter.create();
 
-        PublishSubject<Integer> source = PublishSubject.create();
-        TestObserver<Integer> testObserver = new TestObserver<>();
+        final TestObserver<Boolean> test = RxTiPresenterUtils.isViewReady(mPresenter).test();
 
-        source
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
-                .subscribe(testObserver);
-
-        source.onNext(1);
-        source.onNext(2);
+        test.assertValue(false);
+        test.dispose();
+        test.isDisposed();
         mPresenter.attachView(mView);
-        mPresenter.detachView();
-        mPresenter.attachView(mView);
-        mPresenter.detachView();
-        mPresenter.attachView(mView);
-
-        testObserver.assertNotComplete();
-        testObserver.assertNoErrors();
-        testObserver.assertValuesOnly(2, 2, 2);
-    }
-
-    @Test
-    public void testDeliverLatestToView_Empty() throws Exception {
-        mPresenter.create();
-
-        TestObserver<Integer> testObserver = new TestObserver<>();
-        Observable.<Integer>empty()
-                .compose(RxTiPresenterUtils.<Integer>deliverLatestToView(mPresenter))
-                .subscribe(testObserver);
-
-        mPresenter.attachView(mView);
-
-        testObserver.assertNotComplete();
-        testObserver.assertNoErrors();
-        testObserver.assertEmpty();
+        test.assertValue(false);
     }
 
 }
