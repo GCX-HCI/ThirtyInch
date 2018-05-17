@@ -19,7 +19,7 @@ Read the introduction article on [Medium](https://medium.com/@passsy/thirtyinch-
 See the slides of the latest talk on [Speakerdeck](https://speakerdeck.com/passsy/thirtyinch-living-next-to-the-activity)
 
 
-## Get it [![Download](https://api.bintray.com/packages/passsy/maven/ThirtyInch/images/download.svg) ](https://bintray.com/passsy/maven/ThirtyInch/_latestVersion)
+## Get it [![Download](https://api.bintray.com/packages/grandcentrix/maven/ThirtyInch/images/download.svg) ](https://bintray.com/grandcentrix/maven/ThirtyInch/_latestVersion)
 
 ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
 
