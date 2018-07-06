@@ -376,6 +376,43 @@ public abstract class TiPresenter<V extends TiView> {
     }
 
     /**
+     * Executes the {@link ViewAction} when the view is available on the UI thread.
+     * Once a view is attached the actions get called in the same order they have been added.
+     * When the view is already attached the action will be executed immediately.
+     * <p>
+     * This method might be very useful for single actions which invoke function like {@link
+     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link Toast} in the
+     * view.
+     * <p>
+     * <b>But don't overuse it.</b>
+     * The action will only be called <b>once</b>.
+     * When a new view attaches (after a configuration change) it doesn't know about the previously
+     * sent actions.
+     * If your using this method too often you should rethink your architecture.
+     * A model which can be bound to the view in {@link #onAttachView(TiView)} and when changes
+     * happen might be a better solution.
+     * See the <a href="https://github.com/passsy/thirtyinch-sample">thirtyinch-sample</a> project
+     * for ideas.
+     *
+     * @see #sendPostponedActionsToView
+     * @see #onAttachView(TiView)
+     */
+    @RestrictTo(SUBCLASSES)
+    public void sendToView(final ViewAction<V> action) {
+        final V view = getView();
+        if (view != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    action.call(view);
+                }
+            });
+        } else {
+            mPostponedViewActions.add(action);
+        }
+    }
+
+    /**
      * sets the Executor used for the {@link #runOnUiThread(Runnable)} method.
      * <p>
      * This Executor is most likely the {@link net.grandcentrix.thirtyinch.internal.UiThreadExecutor}
@@ -539,43 +576,6 @@ public abstract class TiPresenter<V extends TiView> {
                     "don't call #onWakeUp() directly, call #attachView(TiView)");
         }
         mCalled = true;
-    }
-
-    /**
-     * Executes the {@link ViewAction} when the view is available on the UI thread.
-     * Once a view is attached the actions get called in the same order they have been added.
-     * When the view is already attached the action will be executed immediately.
-     * <p>
-     * This method might be very useful for single actions which invoke function like {@link
-     * Activity#finish()}, {@link Activity#startActivity(Intent)} or showing a {@link Toast} in the
-     * view.
-     * <p>
-     * <b>But don't overuse it.</b>
-     * The action will only be called <b>once</b>.
-     * When a new view attaches (after a configuration change) it doesn't know about the previously
-     * sent actions.
-     * If your using this method too often you should rethink your architecture.
-     * A model which can be bound to the view in {@link #onAttachView(TiView)} and when changes
-     * happen might be a better solution.
-     * See the <a href="https://github.com/passsy/thirtyinch-sample">thirtyinch-sample</a> project
-     * for ideas.
-     *
-     * @see #sendPostponedActionsToView
-     * @see #onAttachView(TiView)
-     */
-    @RestrictTo(SUBCLASSES)
-    public void sendToView(final ViewAction<V> action) {
-        final V view = getView();
-        if (view != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    action.call(view);
-                }
-            });
-        } else {
-            mPostponedViewActions.add(action);
-        }
     }
 
     /**
