@@ -14,8 +14,8 @@ import net.grandcentrix.thirtyinch.TiView
  * // Before
  * presenter.sendToView { it.aViewMethod() }
  * // After
- * presenter.sendToViewKt { aViewMethod() }
+ * presenter.deliverToView { aViewMethod() }
  * ```
  */
 @SuppressLint("RestrictedApi")
-fun <V : TiView> TiPresenter<V>.sendToViewKt(block: V.() -> Unit) = sendToView { block.invoke(it) }
+fun <V : TiView> TiPresenter<V>.deliverToView(block: V.() -> Unit) = sendToView { block.invoke(it) }

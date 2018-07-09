@@ -263,7 +263,7 @@ Take a look at the `sendToViewKt` example:
 class HelloWorldPresenter : TiPresenter<HelloWorldView> {
 
   override fun onCreate() {
-    sendToViewKt {
+    deliverToView {
         showText("Hello World")
     }
   }
