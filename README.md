@@ -37,6 +37,9 @@ dependencies {
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
     
     implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
+    
+    // kotlin extensions
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin:$thirtyinchVersion"
      
     // CompositeAndroid plugin
     // When you are using ThirtyInch with the CompositeAndroid extension you have to manually 
@@ -249,6 +252,30 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 ```
 
 `LoggingInterceptor` is available as module and logs all calls to the view.
+
+### Kotlin
+
+Using Kotlin these days is a no brainer.
+`ThirtyInch` provides some extension methods to improve itself even further!  
+
+Take a look at the `sendToViewKt` example:
+```kotlin
+class HelloWorldPresenter : TiPresenter<HelloWorldView> {
+
+  override fun onCreate() {
+    sendToViewKt {
+        showText("Hello World")
+    }
+  }
+
+}
+
+interface HelloWorldView : TiView {
+    fun showText(text: String)
+}
+``` 
+Back in the Java days we had to use `it` inside the `sendToView`-lambda.
+With this extension the `TiView` will be give over to the lambda as `this`.
 
 ### [RxJava](https://github.com/ReactiveX/RxJava)
 
