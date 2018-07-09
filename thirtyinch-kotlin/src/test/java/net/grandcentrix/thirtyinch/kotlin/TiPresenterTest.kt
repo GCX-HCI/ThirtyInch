@@ -27,7 +27,7 @@ class TiPresenterTest {
         tiTestPresenter.create()
         tiTestPresenter.attachView(mockView)
 
-        sendToViewKotlin { aViewMethod() }
+        sendToViewKt { aViewMethod() }
 
         verify(mockView).aViewMethod()
     }
