@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.novoda:bintray-release:0.8.0'
+        classpath 'com.novoda:bintray-release:0.8.1'
     }
 }
 
@@ -19,6 +19,7 @@ def configurePublish(Closure body) {
         publishVersion = VERSION_NAME
         uploadName = 'ThirtyInch'
         website = 'https://github.com/grandcentrix/ThirtyInch'
+        desc = ''
         body.delegate = delegate
         body()
     }
