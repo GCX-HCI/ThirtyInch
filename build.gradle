@@ -7,7 +7,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:3.0.1"
+        classpath "com.android.tools.build:gradle:3.1.3"
         classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:0.10.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -23,6 +23,7 @@ allprojects {
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
         options.addStringOption('encoding', 'UTF-8')
+        excludes = ['**/*.kt']
     }
 }
 
@@ -33,8 +34,6 @@ ext {
     // If you change the SDK version don't forgot to update .travis.yml
     TARGET_SDK_VERSION = 26
     COMPILE_SDK_VERSION = 26
-    // If you change the build tools version don't forgot to update .travis.yml
-    BUILD_TOOLS_VERSION = '26.0.2'
 
     supportLibraryVersion = '26.0.0'
     // compositeAndroidVersion should be always the same version as the supportLib version
