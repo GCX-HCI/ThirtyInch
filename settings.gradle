@@ -1,8 +1,11 @@
-include ':thirtyinch',
-        ':thirtyinch-logginginterceptor',
-        ':thirtyinch-plugin',
-        ':thirtyinch-rx',
-        ':thirtyinch-rx2',
-        ':thirtyinch-test',
-        ':sample',
-        ':plugin-test'
+include(
+        ":thirtyinch",
+        ":thirtyinch-logginginterceptor",
+        ":thirtyinch-plugin",
+        ":thirtyinch-rx",
+        ":thirtyinch-rx2",
+        ":thirtyinch-test",
+        ":thirtyinch-kotlin",
+        ":sample",
+        ":plugin-test"
+)

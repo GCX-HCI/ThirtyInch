@@ -1,0 +1,38 @@
+apply plugin: "com.android.library"
+apply plugin: "org.jetbrains.kotlin.android"
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    api project(":thirtyinch")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
+}
+
+// For uploading to bintray
+apply from: '../gradle/bintrayRelease.gradle'
+configurePublish {
+    artifactId = 'thirtyinch-kotlin'
+}
