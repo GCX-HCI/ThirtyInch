@@ -7,7 +7,7 @@ import net.grandcentrix.thirtyinch.TiView
 /**
  * Will call the given [block] in [TiPresenter.sendToView].
  *
- * This have the benefit that we can omit the `it` inside the `sendToView{}` call.
+ * This have the benefit that we can omit the `it` inside the `sendToView { }` call.
  *
  * Example:
  * ```
@@ -18,4 +18,4 @@ import net.grandcentrix.thirtyinch.TiView
  * ```
  */
 @SuppressLint("RestrictedApi")
-fun <V : TiView> TiPresenter<V>.deliverToView(block: V.() -> Unit) = sendToView { block.invoke(it) }
+fun <V : TiView> TiPresenter<V>.deliverToView(block: V.() -> Unit) = sendToView { block(it) }
