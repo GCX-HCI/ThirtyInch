@@ -255,19 +255,28 @@ public class HelloWorldActivity extends TiActivity<HelloWorldPresenter, HelloWor
 
 ### Kotlin
 
-Using Kotlin these days is a no brainer.
+Using Kotlin these days is a no-brainer.
 `ThirtyInch` provides some extension methods to improve itself even further!  
 
-Take a look at the `sendToViewKt` example:
+#### SendToView
+
+When using `sendToView`, repeating `it.*` inside the lambda is quite annoying.
+It's clear that the methods are called *on* the view.
+With the kotlin extension `deliverToView` the `TiView` will be give over to the lambda as `this`.
 ```kotlin
 class HelloWorldPresenter : TiPresenter<HelloWorldView> {
 
   override fun onCreate() {
-    deliverToView {
-        showText("Hello World")
-    }
+      // normal java API
+      sendToView {
+          it.showText("Hello World")
+      }
+      
+      // kotlin extension
+      deliverToView {
+          showText("Hello World")
+      }
   }
-
 }
 
 interface HelloWorldView : TiView {
@@ -275,7 +284,6 @@ interface HelloWorldView : TiView {
 }
 ``` 
 Back in the Java days we had to use `it` inside the `sendToView`-lambda.
-With this extension the `TiView` will be give over to the lambda as `this`.
 
 ### [RxJava](https://github.com/ReactiveX/RxJava)
 
