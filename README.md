@@ -25,30 +25,15 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.8.5'
-    
-    // MVP for activity and fragment
+    def thirtyinchVersion = '0.9.0'   
     implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
-    // We only provid AppCompat so you have to include it by yourself
-    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
-    
-    // rx (1 or 2) extension
-    implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
-    
     implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
-    
-    // kotlin extensions
     implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin:$thirtyinchVersion"
-     
-    // CompositeAndroid plugin
-    // When you are using ThirtyInch with the CompositeAndroid extension you have to manually 
-    // include the CompositeAndroid dependency. It has to be the same version as appcompat and 
-    // the support library 
     
+    // Lagacy dependencies
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
-    // def supportLibraryVersion = '27.0.1' <-- use your own version
-    implementation "com.pascalwelsch.compositeandroid:activity:$supportLibraryVersion"
 }
 ```
 
