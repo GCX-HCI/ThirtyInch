@@ -28,8 +28,8 @@ allprojects {
 }
 
 ext {
-    VERSION_NAME = "0.8.6-SNAPSHOT"
-    VERSION_CODE = 8
+    VERSION_NAME = "0.9.0"
+    VERSION_CODE = 9
     MIN_SDK_VERSION = 14
     // If you change the SDK version don't forgot to update .travis.yml
     TARGET_SDK_VERSION = 26
