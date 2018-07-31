@@ -1,5 +1,8 @@
 package android.support.v4.app;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Reads package private information about the {@link FragmentManager} backstack
  *
@@ -16,6 +19,20 @@ public class BackstackReader {
      * stack)
      */
     public static boolean isInBackStack(final Fragment fragment) {
-        return fragment.isInBackStack();
+        try {
+            return fragment.isInBackStack();
+        } catch (IllegalAccessError e) {
+            return isInBackStackAndroidX(fragment);
+        }
+    }
+
+    /**
+     * Hacky workaround because Fragment#isInBackStack is inaccessible with AndroidX
+     */
+    private static boolean isInBackStackAndroidX(final Fragment fragment) {
+        final StringWriter writer = new StringWriter();
+        fragment.dump("", null, new PrintWriter(writer), null);
+        final String dump = writer.toString();
+        return !dump.contains("mBackStackNesting=0");
     }
 }
