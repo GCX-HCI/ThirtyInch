@@ -45,4 +45,5 @@ ext {
     assertjVersion = '2.8.0'
     supportTestVersion = '1.0.1'
     espressoVersion = '3.0.1'
+    lintVersion = '26.1.2'
 }
