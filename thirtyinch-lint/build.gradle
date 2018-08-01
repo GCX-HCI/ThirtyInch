@@ -23,6 +23,7 @@ dependencies {
 
 jar {
     manifest {
+        attributes("Lint-Registry": "net.grandcentrix.thirtyinch.lint.TiLintRegistry")
     }
 }
 
