@@ -34,7 +34,7 @@ sealed class TiIssue(
                     severity,
                     Implementation(
                             detectorCls,
-                            EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
+                            Scope.JAVA_FILE_SCOPE
                     )
             )
 }
