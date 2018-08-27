@@ -15,8 +15,7 @@ import org.jetbrains.uast.getUastContext
 abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
 
     /**
-     * The Issue that the detector is connected to,
-     * reported on illegal state detection
+     * The Issue that the detector is connected to, reported on illegal state detection
      */
     abstract val issue: Issue
 
@@ -27,20 +26,16 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
     abstract override fun applicableSuperClasses(): List<String>
 
     /**
-     * Tries to extract the PsiType of the TiView sub-class
-     * that is relevant for the given declaration. The relevant
-     * super-class (from applicableSuperClasses()) & its resolved variant
-     * are given as well.
+     * Tries to extract the PsiType of the TiView sub-class that is relevant for the given declaration.
+     * The relevant super-class (from applicableSuperClasses()) & its resolved variant are given as well.
      */
     abstract fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType,
             resolvedType: PsiClass): PsiType?
 
     /**
-     * Whether or not to allow the absence of an "implements TiView" clause
-     * on the given declaration. The View interface is given as well to allow
-     * for further introspection into the setup of the class at hand.
-     * When false is returned here, Lint will report the Issue connected to this Detector
-     * on the given declaration.
+     * Whether or not to allow the absence of an "implements TiView" clause on the given declaration.
+     * The View interface is given as well to allow for further introspection into the setup of the class at hand.
+     * When false is returned here, Lint will report the Issue connected to this Detector on the given declaration.
      */
     abstract fun allowMissingViewInterface(context: JavaContext, declaration: UClass, viewInterface: PsiType): Boolean
 
