@@ -59,10 +59,12 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
                 // Interface not implemented; check if alternate condition applies
                 if (!allowMissingViewInterface(context, declaration, viewInterface)) {
                     // Invalid state: Report issue for this class
-                    context.report(
-                            issue,
-                            context.getLocation(declaration.navigationElement),
-                            issue.getBriefDescription(TextFormat.TEXT))
+                    declaration.nameIdentifier?.run {
+                        context.report(
+                                issue,
+                                context.getLocation(this.originalElement),
+                                issue.getBriefDescription(TextFormat.TEXT))
+                    }
                 }
             }
         }
