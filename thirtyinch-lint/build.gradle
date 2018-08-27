@@ -7,6 +7,10 @@ repositories {
     jcenter()
 }
 
+configurations {
+    lintChecks
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
@@ -19,10 +23,13 @@ dependencies {
 
     testImplementation "com.android.tools.lint:lint:$lintVersion"
     testImplementation "com.android.tools.lint:lint-tests:$lintVersion"
+
+    lintChecks files(jar)
 }
 
 jar {
     manifest {
+        attributes("Manifest-Version": 1.0)
         attributes("Lint-Registry": "net.grandcentrix.thirtyinch.lint.TiLintRegistry")
     }
 }
