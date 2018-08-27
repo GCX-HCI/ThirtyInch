@@ -31,6 +31,8 @@ jar {
     manifest {
         attributes("Manifest-Version": 1.0)
         attributes("Lint-Registry": "net.grandcentrix.thirtyinch.lint.TiLintRegistry")
+        // The TI checks are build with the new 3.0 APIs (including UAST) so we should also register the v2 lint registry.
+        attributes("Lint-Registry-v2": "net.grandcentrix.thirtyinch.lint.TiLintRegistry")
     }
 }
 
