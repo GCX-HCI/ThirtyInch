@@ -6,7 +6,8 @@ import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
-import java.util.EnumSet
+
+private val CATEGORY_TI = Category.create("ThirtyInch", 5)
 
 sealed class TiIssue(
         val id: String,
@@ -19,7 +20,7 @@ sealed class TiIssue(
     object MissingView : TiIssue(
             id = "MissingTiViewImplementation",
             briefDescription = "TiView Implementation missing in class",
-            category = Category.CORRECTNESS,
+            category = CATEGORY_TI,
             priority = 8,
             severity = Severity.ERROR
     )
