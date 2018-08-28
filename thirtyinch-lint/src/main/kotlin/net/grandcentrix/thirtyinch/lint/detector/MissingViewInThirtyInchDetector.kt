@@ -19,7 +19,7 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
     companion object {
         val ISSUE = MissingView.asLintIssue(
                 MissingViewInThirtyInchDetector::class.java,
-                "When using ThirtyInch, a class extending TiActivity, TiFragment or CompositeActivity " +
+                "When using ThirtyInch, a class extending TiActivity or TiFragment " +
                         "has to implement the TiView interface associated with it in its signature, " +
                         "or implement `provideView()` instead to override this default behaviour."
         )
