@@ -37,7 +37,6 @@ jar {
 
 sourceCompatibility = 1.6
 
-defaultTasks 'assemble'
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
