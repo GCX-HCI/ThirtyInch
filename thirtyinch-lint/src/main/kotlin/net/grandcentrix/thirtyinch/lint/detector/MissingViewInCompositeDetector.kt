@@ -33,7 +33,7 @@ class MissingViewInCompositeDetector : BaseMissingViewDetector() {
 
     override fun applicableSuperClasses() = CA_CLASS_NAMES
 
-    override val issue: Issue; get() = MissingViewInThirtyInchDetector.ISSUE
+    override val issue: Issue = MissingViewInThirtyInchDetector.ISSUE
 
     override fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType,
             resolvedType: PsiClass): PsiType? {
