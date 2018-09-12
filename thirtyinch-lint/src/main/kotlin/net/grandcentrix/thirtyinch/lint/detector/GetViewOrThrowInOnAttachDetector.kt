@@ -14,14 +14,11 @@ import org.jetbrains.uast.UReturnExpression
 import org.jetbrains.uast.getUastContext
 import org.jetbrains.uast.toUElement
 
+private const val TI_CLASS_PRESENTER = "net.grandcentrix.thirtyinch.TiPresenter"
 private const val TI_METHOD_ONATTACHVIEW = "onAttachView"
 private const val TI_METHOD_GETVIEWORTHROW = "getViewOrThrow"
 
 private const val MAX_TRANSITIVE_CHECK_DEPTH = 5
-
-private val TI_CLASS_NAMES = listOf(
-        "net.grandcentrix.thirtyinch.TiPresenter"
-)
 
 class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
 
@@ -34,7 +31,7 @@ class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
         )
     }
 
-    override fun applicableSuperClasses(): List<String> = TI_CLASS_NAMES
+    override fun applicableSuperClasses(): List<String> = listOf(TI_CLASS_PRESENTER)
 
     override fun visitClass(context: JavaContext, declaration: UClass) {
         val methods = declaration.findMethodsByName(TI_METHOD_ONATTACHVIEW, true)
