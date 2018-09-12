@@ -58,7 +58,7 @@ class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
                 uElement.returnExpression?.run { checkForTransitiveUsage(context, uElement = this) }
             }
             is UCallExpression -> {
-                if (shouldWarn(uElement)) report(context, uElement)
+                if (shouldWarn(context, uElement)) report(context, uElement)
                 else {
                     uElement.resolve()
                             ?.let { uElement.getUastContext().getMethodBody(it) }
@@ -68,9 +68,10 @@ class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
         }
     }
 
-    private fun shouldWarn(call: UCallExpression): Boolean {
-        return call.valueArgumentCount == 0 && TI_METHOD_GETVIEWORTHROW == call.methodName
-        // TODO do a check if the method is from the right class
+    private fun shouldWarn(context: JavaContext, call: UCallExpression): Boolean {
+        return call.valueArgumentCount == 0
+                && TI_METHOD_GETVIEWORTHROW == call.methodName
+                && call.resolve()?.let { context.evaluator.isMemberInClass(it, TI_CLASS_PRESENTER) } == true
     }
 
     private fun report(context: JavaContext, element: UCallExpression) {
