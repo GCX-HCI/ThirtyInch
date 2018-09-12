@@ -6,23 +6,9 @@ import com.android.tools.lint.detector.api.Issue
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInCompositeDetector
 import org.assertj.core.api.Assertions.*
 
-private const val NO_WARNINGS = "No warnings."
-
 class MissingViewInCompositeDetectorTest : LintDetectorTest() {
 
     /* Stubbed-out source files */
-
-    private val tiPresenterStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiPresenter<V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiViewStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public interface TiView {\n" +
-                    "}"
-    )
 
     private val caBasePluginStub = java(
             "package com.pascalwelsch.compositeandroid;\n" +
