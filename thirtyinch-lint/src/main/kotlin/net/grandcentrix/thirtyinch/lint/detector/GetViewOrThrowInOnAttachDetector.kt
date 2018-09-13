@@ -10,13 +10,16 @@ import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UDeclarationsExpression
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.ULocalVariable
+import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.UReturnExpression
+import org.jetbrains.uast.USimpleNameReferenceExpression
 import org.jetbrains.uast.getUastContext
 import org.jetbrains.uast.toUElement
 
 private const val TI_CLASS_PRESENTER = "net.grandcentrix.thirtyinch.TiPresenter"
 private const val TI_METHOD_ONATTACHVIEW = "onAttachView"
 private const val TI_METHOD_GETVIEWORTHROW = "getViewOrThrow"
+private const val TI_REFERENCE_VIEWORTHROW = "viewOrThrow"
 
 private const val MAX_TRANSITIVE_CHECK_DEPTH = 5
 
@@ -41,7 +44,12 @@ class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
                 .forEach { methodBody -> checkForTransitiveUsage(context, methodBody) }
     }
 
-    private fun checkForTransitiveUsage(context: JavaContext, uElement: UElement, depth: Int = 0) {
+    private fun checkForTransitiveUsage(
+            context: JavaContext,
+            uElement: UElement,
+            depth: Int = 0,
+            reportElement: UElement = uElement
+    ) {
         if (depth > MAX_TRANSITIVE_CHECK_DEPTH) return // limit check of call cascades to reduce lint check speed
 
         when (uElement) {
@@ -57,8 +65,15 @@ class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
             is UReturnExpression -> {
                 uElement.returnExpression?.run { checkForTransitiveUsage(context, uElement = this) }
             }
+            is USimpleNameReferenceExpression -> {
+                if (uElement.identifier == TI_REFERENCE_VIEWORTHROW) report(context, reportElement)
+            }
+            is UQualifiedReferenceExpression -> {
+                checkForTransitiveUsage(context, uElement.receiver)
+                checkForTransitiveUsage(context, uElement.selector, reportElement = uElement)
+            }
             is UCallExpression -> {
-                if (shouldWarn(context, uElement)) report(context, uElement)
+                if (shouldWarn(context, uElement)) report(context, uElement.methodIdentifier ?: uElement)
                 else {
                     uElement.resolve()
                             ?.let { uElement.getUastContext().getMethodBody(it) }
@@ -74,10 +89,10 @@ class GetViewOrThrowInOnAttachDetector : Detector(), Detector.UastScanner {
                 && call.resolve()?.let { context.evaluator.isMemberInClass(it, TI_CLASS_PRESENTER) } == true
     }
 
-    private fun report(context: JavaContext, element: UCallExpression) {
+    private fun report(context: JavaContext, element: UElement) {
         context.report(
                 ISSUE,
-                context.getLocation(element.methodIdentifier ?: element),
+                context.getLocation(element),
                 ISSUE.getBriefDescription(TextFormat.TEXT)
         )
     }
