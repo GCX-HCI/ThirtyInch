@@ -10,6 +10,7 @@ private val view = LintDetectorTest.java(
         "package foo;\n" +
                 "import net.grandcentrix.thirtyinch.*;\n" +
                 "interface MyView extends TiView {\n" +
+                "  void invoke();\n" +
                 "}"
 )
 
