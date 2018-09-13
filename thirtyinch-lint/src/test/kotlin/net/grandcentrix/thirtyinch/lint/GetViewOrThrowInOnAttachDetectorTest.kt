@@ -27,8 +27,8 @@ class GetViewOrThrowInOnAttachDetectorTest : LintDetectorTest() {
                         "import net.grandcentrix.thirtyinch.*;\n" +
                         "public class MyPresenter extends TiPresenter<MyView> {\n" +
                         "  protected void onAttachView(MyView view) {\n" +
-                        "    val test = 42;\n" +
-                        "    val test = test();\n" +
+                        "    final int test = 42;\n" +
+                        "    final int test2 = test();\n" +
                         "    test();\n" +
                         "  }\n" +
                         "  private int test() {" +
