@@ -68,14 +68,7 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
     private fun tryFindViewInterface(context: JavaContext, declaration: UClass): PsiType? {
         for (extendedType in declaration.extendsListTypes) {
             extendedType.resolveGenerics().element?.let { resolvedType ->
-                val qualifiedName = resolvedType.qualifiedName
-                if (applicableSuperClasses().contains(qualifiedName)) {
-                    // This detector is interested in this class; delegate to it
-                    return tryFindViewInterface(context, declaration, extendedType, resolvedType)
-                }
-                // Crawl up the type hierarchy to catch declarations in super classes
-                val uastContext = declaration.getUastContext()
-                return tryFindViewInterface(context, uastContext.getClass(resolvedType))
+                return tryFindViewInterface(context, declaration, extendedType, resolvedType)
             }
         }
         return null

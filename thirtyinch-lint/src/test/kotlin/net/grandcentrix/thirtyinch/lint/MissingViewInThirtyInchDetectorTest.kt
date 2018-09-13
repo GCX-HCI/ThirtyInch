@@ -37,7 +37,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
      * --------------------------------------------------------------------------------
      */
 
-    fun testActivity_dontTriggerOnAbstractClass() {
+    fun testJava_Activity_dontTriggerOnAbstractClass() {
         val activity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
@@ -57,7 +57,27 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         ).isEqualTo(NO_WARNINGS)
     }
 
-    fun testActivity_andViewIsImplementedCorrectly_noWarnings() {
+    fun testKotlin_Activity_dontTriggerOnAbstractClass() {
+        val activity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class MyActivity : TiActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        presenter,
+                        view,
+                        activity
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_Activity_andViewIsImplementedCorrectly_noWarnings() {
         val activity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
@@ -77,7 +97,27 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         ).isEqualTo(NO_WARNINGS)
     }
 
-    fun testActivity_doesntImplementInterface_hasWarning() {
+    fun testKotlin_Activity_andViewIsImplementedCorrectly_noWarnings() {
+        val activity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyActivity : TiActivity<MyPresenter, MyView>(), MyView {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        presenter,
+                        view,
+                        activity
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_Activity_doesntImplementInterface_hasWarning() {
         val activity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
@@ -97,7 +137,27 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         ).containsOnlyOnce(TiIssue.MissingView.id)
     }
 
-    fun testActivity_doesntImplementInterface_butOverridesProvideView_noWarnings() {
+    fun testKotlin_Activity_doesntImplementInterface_hasWarning() {
+        val activity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyActivity : TiActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        presenter,
+                        view,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testJava_Activity_doesntImplementInterface_butOverridesProvideView_noWarnings() {
         val activity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
@@ -120,7 +180,30 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         ).isEqualTo(NO_WARNINGS)
     }
 
-    fun testActivity_throughTransitiveBaseClass_hasWarning() {
+    fun testKotlin_Activity_doesntImplementInterface_butOverridesProvideView_noWarnings() {
+        val activity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyActivity : TiActivity<MyPresenter, MyView>() {\n" +
+                        "   fun provideView() : MyView {\n" +
+                        "       return null\n" +
+                        "   }\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        presenter,
+                        view,
+                        activity
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_Activity_throughTransitiveBaseClass_hasWarning() {
         val baseActivity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
@@ -141,6 +224,206 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         tiPresenterStub,
                         tiViewStub,
                         presenter,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testKotlin_Activity_throughTransitiveBaseClass_hasWarning() {
+        val baseActivity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseActivity<P : TiPresenter<V>, V : TiView> : TiActivity<P, V>() {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        presenter,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testJava_Activity_throughTransitiveBaseClass_withBasePresenter_hasWarning() {
+        val basePresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BasePresenter<V extends TiView> extends TiPresenter<V> {\n" +
+                        "}"
+        )
+
+        val baseActivity = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BaseActivity<P extends BasePresenter<V>, V extends TiView> extends TiActivity<P, V> {\n" +
+                        "}"
+        )
+
+        val activity = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public class MyActivity extends BaseActivity<MyPresenter, MyView> {\n" +
+                        "}"
+        )
+
+        val customPresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "final class MyPresenter extends BasePresenter<MyView> {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testKotlin_Activity_throughTransitiveBaseClass_withBasePresenter_hasWarning() {
+        val basePresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BasePresenter<V : TiView> : TiPresenter<V>() {\n" +
+                        "}"
+        )
+
+        val baseActivity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseActivity<P : BasePresenter<V>, V : TiView> : TiActivity<P, V>() {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        val customPresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyPresenter : BasePresenter<MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testJava_Activity_throughTransitiveBaseClass_withBasePresenter_noWarning() {
+        val basePresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BasePresenter<V extends TiView> extends TiPresenter<V> {\n" +
+                        "}"
+        )
+
+        val baseActivity = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BaseActivity<P extends BasePresenter<V>, V extends TiView> extends TiActivity<P, V> {\n" +
+                        "}"
+        )
+
+        val activity = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public class MyActivity extends BaseActivity<MyPresenter, MyView> {\n" +
+                        "}"
+        )
+
+        val customPresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "final class MyPresenter extends BasePresenter<MyView> implements MyView {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testKotlin_Activity_throughTransitiveBaseClass_withBasePresenter_noWarning() {
+        val basePresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BasePresenter<V : TiView> : TiPresenter<V>() {\n" +
+                        "}"
+        )
+
+        val baseActivity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseActivity<P : BasePresenter<V>, V : TiView> : TiActivity<P, V>() {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        val customPresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyPresenter : BasePresenter<MyView>(), MyView {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
                         view,
                         baseActivity,
                         activity
