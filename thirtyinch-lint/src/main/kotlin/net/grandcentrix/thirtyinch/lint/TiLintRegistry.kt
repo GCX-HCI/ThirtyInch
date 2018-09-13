@@ -15,4 +15,6 @@ class TiLintRegistry : IssueRegistry() {
                     setEnabledByDefault(true)
                 }
         )
+
+    override val api: Int = com.android.tools.lint.detector.api.CURRENT_API
 }
