@@ -389,7 +389,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         val activity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
-                        "public class MyActivity extends BaseActivity<MyPresenter, MyView> {\n" +
+                        "public class MyActivity extends BaseActivity<MyPresenter, MyView> implements MyView {\n" +
                         "}"
         )
 
@@ -411,7 +411,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         baseActivity,
                         activity
                 )
-        ).containsOnlyOnce(TiIssue.MissingView.id)
+        ).isEqualTo(NO_WARNINGS)
     }
 
     fun testKotlin_Activity_throughTransitiveBaseClass_withBasePresenter_noWarning() {
@@ -432,7 +432,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         val activity = kotlin(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
-                        "class MyActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "class MyActivity : BaseActivity<MyPresenter, MyView>(), MyView {\n" +
                         "}"
         )
 
@@ -454,8 +454,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         baseActivity,
                         activity
                 )
-        ).containsOnlyOnce(TiIssue.MissingView.id)
+        ).isEqualTo(NO_WARNINGS)
     }
+
     /*
      * --------------------------------------------------------------------------------
      * TiFragment
