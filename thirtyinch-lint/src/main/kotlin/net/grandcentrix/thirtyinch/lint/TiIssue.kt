@@ -7,7 +7,7 @@ import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 
-private val CATEGORY_TI = Category.create("ThirtyInch", 5)
+private val CATEGORY_TI = Category.create("ThirtyInch", 90)
 
 sealed class TiIssue(
         val id: String,
