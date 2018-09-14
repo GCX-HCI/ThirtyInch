@@ -27,7 +27,7 @@ sealed class TiIssue(
 
     object GetViewOrThrowInOnAttach : TiIssue(
             id = "GetViewOrThrowInOnAttach",
-            briefDescription = "getView() might be null when used in TiPresenter.onAttach(). So getViewOrThrow() might throw an exception.",
+            briefDescription = "TiPresenter.getViewOrThrow() might throw an exception",
             category = CATEGORY_TI,
             priority = 6,
             severity = Severity.WARNING
