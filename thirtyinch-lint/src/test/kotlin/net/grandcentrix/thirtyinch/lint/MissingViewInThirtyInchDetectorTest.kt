@@ -363,7 +363,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         val activity = java(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
-                        "public class MyActivity extends BaseActivity<MyPresenter, MyView> {\n" +
+                        "public class MyActivity extends BaseActivity<MyPresenter, MyView> implements MyView {\n" +
                         "}"
         )
 
@@ -385,7 +385,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         baseActivity,
                         activity
                 )
-        ).containsOnlyOnce(TiIssue.MissingView.id)
+        ).isEqualTo(NO_WARNINGS)
     }
 
     fun testKotlin_Activity_throughTransitiveBaseClass_withBasePresenter_noWarning() {
@@ -406,7 +406,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         val activity = kotlin(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
-                        "class MyActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "class MyActivity : BaseActivity<MyPresenter, MyView>(), MyView {\n" +
                         "}"
         )
 
@@ -428,8 +428,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         baseActivity,
                         activity
                 )
-        ).containsOnlyOnce(TiIssue.MissingView.id)
+        ).isEqualTo(NO_WARNINGS)
     }
+
     /*
      * --------------------------------------------------------------------------------
      * TiFragment
@@ -539,5 +540,177 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         fragment
                 )
         ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testJava_Fragment_throughTransitiveBaseClass_withBasePresenter_hasWarning() {
+        val basePresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BasePresenter<V extends TiView> extends TiPresenter<V> {\n" +
+                        "}"
+        )
+
+        val baseFragment = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BaseFragment<P extends BasePresenter<V>, V extends TiView> extends TiFragment<P, V> {\n" +
+                        "}"
+        )
+
+        val fragment = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public class MyFragment extends BaseFragment<MyPresenter, MyView> {\n" +
+                        "}"
+        )
+
+        val customPresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "final class MyPresenter extends BasePresenter<MyView> {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiFragmentStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseFragment,
+                        fragment
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testKotlin_Fragment_throughTransitiveBaseClass_withBasePresenter_hasWarning() {
+        val basePresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BasePresenter<V : TiView> : TiPresenter<V>() {\n" +
+                        "}"
+        )
+
+        val baseFragment = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseFragment<P : BasePresenter<V>, V : TiView> : TiFragment<P, V>() {\n" +
+                        "}"
+        )
+
+        val fragment = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyFragment : BaseFragment<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        val customPresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyPresenter : BasePresenter<MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiFragmentStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseFragment,
+                        fragment
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testJava_Fragment_throughTransitiveBaseClass_withBasePresenter_noWarning() {
+        val basePresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BasePresenter<V extends TiView> extends TiPresenter<V> {\n" +
+                        "}"
+        )
+
+        val baseFragment = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public abstract class BaseFragment<P extends BasePresenter<V>, V extends TiView> extends TiFragment<P, V> {\n" +
+                        "}"
+        )
+
+        val fragment = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public class MyFragment extends BaseFragment<MyPresenter, MyView> implements MyView {\n" +
+                        "}"
+        )
+
+        val customPresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "final class MyPresenter extends BasePresenter<MyView> implements MyView {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiFragmentStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseFragment,
+                        fragment
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testKotlin_Fragment_throughTransitiveBaseClass_withBasePresenter_noWarning() {
+        val basePresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BasePresenter<V : TiView> : TiPresenter<V>() {\n" +
+                        "}"
+        )
+
+        val baseFragment = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseFragment<P : BasePresenter<V>, V : TiView> : TiFragment<P, V>() {\n" +
+                        "}"
+        )
+
+        val fragment = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyActivity : BaseFragment<MyPresenter, MyView>(), MyView {\n" +
+                        "}"
+        )
+
+        val customPresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyPresenter : BasePresenter<MyView>(), MyView {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiFragmentStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        basePresenter,
+                        customPresenter,
+                        view,
+                        baseFragment,
+                        fragment
+                )
+        ).isEqualTo(NO_WARNINGS)
     }
 }
