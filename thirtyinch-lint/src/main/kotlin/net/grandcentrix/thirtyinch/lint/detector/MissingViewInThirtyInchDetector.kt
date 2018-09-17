@@ -12,7 +12,8 @@ private const val TI_VIEW_FQ = "net.grandcentrix.thirtyinch.TiView"
 private const val PROVIDE_VIEW_METHOD = "provideView"
 private val TI_CLASS_NAMES = listOf(
         "net.grandcentrix.thirtyinch.TiActivity",
-        "net.grandcentrix.thirtyinch.TiFragment"
+        "net.grandcentrix.thirtyinch.TiFragment",
+        "net.grandcentrix.thirtyinch.TiDialogFragment"
 )
 
 class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
