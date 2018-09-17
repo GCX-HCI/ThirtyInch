@@ -29,8 +29,16 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
 
     override val issue: Issue = ISSUE
 
-    override fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType,
-            resolvedType: PsiClass): PsiType? {
+    override fun findViewInterface(context: JavaContext, declaration: UClass): PsiType? {
+        for (extendedType in declaration.extendsListTypes) {
+            extendedType.resolveGenerics().element?.let { resolvedType ->
+                return tryFindViewInterface(extendedType, resolvedType)
+            }
+        }
+        return null
+    }
+
+    private fun tryFindViewInterface(extendedType: PsiClassType, resolvedType: PsiClass): PsiType? {
         // Expect <P extends TiPresenter, V extends TiView> signature in the extended Ti class
         val parameters = extendedType.parameters
         val parameterTypes = resolvedType.typeParameters
