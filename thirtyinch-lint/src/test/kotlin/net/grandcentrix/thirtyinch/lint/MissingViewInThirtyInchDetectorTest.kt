@@ -431,6 +431,60 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         ).isEqualTo(NO_WARNINGS)
     }
 
+    fun testKotlin_Activity_throughBaseClass_noWarning() {
+        val baseActivity = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public class BaseActivity : TiActivity<TiPresenter<MyView>, MyView>(), MyView {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyActivity : BaseActivity {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testKotlin_Activity_throughBaseClass_hasWarning() {
+        val baseActivity = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "public class BaseActivity : TiActivity<TiPresenter<MyView>, MyView>() {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyActivity : BaseActivity {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiActivityStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        view,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
     /*
      * --------------------------------------------------------------------------------
      * TiFragment
@@ -712,5 +766,59 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         fragment
                 )
         ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testKotlin_Fragment_throughBaseClass_noWarning() {
+        val baseFragment = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class BaseFragment : TiFragment<TiPresenter<MyView>, MyView>(), MyView {\n" +
+                        "}"
+        )
+
+        val fragment = kotlin(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "class MyFragment : BaseFragment {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiFragmentStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        view,
+                        baseFragment,
+                        fragment
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testKotlin_Fragment_throughBaseClass_hasWarning() {
+        val baseFragment = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class BaseFragment : TiFragment<TiPresenter<MyView>, MyView>() {\n" +
+                        "}"
+        )
+
+        val fragment = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "class MyFragment : BaseFragment {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        tiFragmentStub,
+                        tiPresenterStub,
+                        tiViewStub,
+                        view,
+                        baseFragment,
+                        fragment
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
     }
 }

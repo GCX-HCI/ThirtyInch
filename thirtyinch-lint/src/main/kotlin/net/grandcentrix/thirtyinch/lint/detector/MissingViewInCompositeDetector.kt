@@ -2,8 +2,6 @@ package net.grandcentrix.thirtyinch.lint.detector
 
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiType
 import net.grandcentrix.thirtyinch.lint.TiIssue.MissingView
@@ -35,8 +33,7 @@ class MissingViewInCompositeDetector : BaseMissingViewDetector() {
 
     override val issue: Issue = MissingViewInThirtyInchDetector.ISSUE
 
-    override fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType,
-            resolvedType: PsiClass): PsiType? {
+    override fun findViewInterface(context: JavaContext, declaration: UClass): PsiType? {
         // Expect TiPlugin to be applied in the extended CA class
         // Found default constructor
         val defaultConstructor = declaration.constructors.firstOrNull { it.typeParameters.isEmpty() }

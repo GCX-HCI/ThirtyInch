@@ -2,17 +2,18 @@ package net.grandcentrix.thirtyinch.lint.detector
 
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
 import net.grandcentrix.thirtyinch.lint.TiIssue.MissingView
+import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import org.jetbrains.uast.UClass
 
 private const val TI_VIEW_FQ = "net.grandcentrix.thirtyinch.TiView"
 private const val PROVIDE_VIEW_METHOD = "provideView"
 private val TI_CLASS_NAMES = listOf(
         "net.grandcentrix.thirtyinch.TiActivity",
-        "net.grandcentrix.thirtyinch.TiFragment"
+        "net.grandcentrix.thirtyinch.TiFragment",
+        "net.grandcentrix.thirtyinch.TiDialogFragment"
 )
 
 class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
@@ -29,23 +30,29 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
 
     override val issue: Issue = ISSUE
 
-    override fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType,
-            resolvedType: PsiClass): PsiType? {
-        // Expect <P extends TiPresenter, V extends TiView> signature in the extended Ti class
+    override fun findViewInterface(context: JavaContext, declaration: UClass): PsiType? {
+        return declaration.extendsListTypes
+                .firstNotNullResult { extendedType -> tryFindViewInterface(extendedType) }
+    }
+
+    private fun tryFindViewInterface(extendedType: PsiClassType): PsiType? {
+        val resolvedType = extendedType.resolveGenerics().element ?: return null
+
         val parameters = extendedType.parameters
         val parameterTypes = resolvedType.typeParameters
-        if (parameters.size != 2 || parameterTypes.size != 2) {
-            return null
-        }
 
-        // Check that the second type parameter is actually a TiView
-        val parameterType = parameterTypes[1]
-        val parameter = parameters[1]
-        return parameterType.extendsListTypes
-                .map { it.resolveGenerics().element }
-                .filter { TI_VIEW_FQ == it?.qualifiedName }
-                .map { parameter }
-                .firstOrNull()
+        check(parameters.size == parameterTypes.size) { "Got different Array Sizes" }
+
+        return parameters
+                .mapIndexed { i, psiType -> Pair(psiType, parameterTypes[i]) }
+                .firstNotNullResult { (type, typeParameter) ->
+                    typeParameter.extendsListTypes
+                            .map { it.resolveGenerics().element }
+                            .filter { TI_VIEW_FQ == it?.qualifiedName }
+                            .map { type }
+                            .firstOrNull()
+                            ?: (type as? PsiClassType)?.let { tryFindViewInterface(it) }
+                }
     }
 
     override fun allowMissingViewInterface(context: JavaContext, declaration: UClass,

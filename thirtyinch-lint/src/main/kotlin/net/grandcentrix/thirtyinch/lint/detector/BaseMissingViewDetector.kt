@@ -4,8 +4,6 @@ import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.TextFormat
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
 import com.intellij.psi.util.PsiUtil
 import org.jetbrains.uast.UClass
@@ -26,18 +24,17 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
     abstract override fun applicableSuperClasses(): List<String>
 
     /**
-     * Tries to extract the PsiType of the TiView sub-class that is relevant for the given declaration.
-     * The relevant super-class (from applicableSuperClasses()) & its resolved variant are given as well.
-     */
-    abstract fun tryFindViewInterface(context: JavaContext, declaration: UClass, extendedType: PsiClassType,
-            resolvedType: PsiClass): PsiType?
-
-    /**
      * Whether or not to allow the absence of an "implements TiView" clause on the given declaration.
      * The View interface is given as well to allow for further introspection into the setup of the class at hand.
      * When false is returned here, Lint will report the Issue connected to this Detector on the given declaration.
      */
     abstract fun allowMissingViewInterface(context: JavaContext, declaration: UClass, viewInterface: PsiType): Boolean
+
+    /**
+     * Tries to extract the PsiType of the TiView sub-class that is relevant for the given declaration.
+     * The relevant super-class (from applicableSuperClasses()) & its resolved variant are given as well.
+     */
+    abstract fun findViewInterface(context: JavaContext, declaration: UClass): PsiType?
 
     final override fun visitClass(context: JavaContext, declaration: UClass) {
         if (!context.isEnabled(issue)) {
@@ -48,7 +45,7 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
             return
         }
         // Extract the MVP View type from the declaration
-        tryFindViewInterface(context, declaration)?.let { viewInterface ->
+        findViewInterface(context, declaration)?.let { viewInterface ->
             // Check if the class implements that interface as well
             if (!tryFindViewImplementation(context, declaration, viewInterface)) {
                 // Interface not implemented; check if alternate condition applies
@@ -63,15 +60,6 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
                 }
             }
         }
-    }
-
-    private fun tryFindViewInterface(context: JavaContext, declaration: UClass): PsiType? {
-        for (extendedType in declaration.extendsListTypes) {
-            extendedType.resolveGenerics().element?.let { resolvedType ->
-                return tryFindViewInterface(context, declaration, extendedType, resolvedType)
-            }
-        }
-        return null
     }
 
     private fun tryFindViewImplementation(context: JavaContext, declaration: UClass,
