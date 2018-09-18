@@ -1,8 +1,7 @@
-package net.grandcentrix.thirtyinch.kotlin
+package net.grandcentrix.thirtyinch.rx2
 
 import net.grandcentrix.thirtyinch.TiPresenter
 import net.grandcentrix.thirtyinch.TiView
-import net.grandcentrix.thirtyinch.rx2.RxTiPresenterDisposableHandler
 
 /**
  * Convenience base [TiPresenter] class implementing [DisposableHandler] to be extended by your presenters.

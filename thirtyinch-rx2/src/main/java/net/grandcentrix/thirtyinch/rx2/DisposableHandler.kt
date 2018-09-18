@@ -1,7 +1,6 @@
-package net.grandcentrix.thirtyinch.kotlin
+package net.grandcentrix.thirtyinch.rx2
 
 import io.reactivex.disposables.Disposable
-import net.grandcentrix.thirtyinch.rx2.RxTiPresenterDisposableHandler
 
 /**
  * Interface to implement by your [TiPresenter][net.grandcentrix.thirtyinch.TiPresenter] to provide extension

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'guru.stefma.bintrayrelease'
 
 android {
@@ -24,6 +25,7 @@ android {
 
 dependencies {
     implementation project(':thirtyinch')
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     api 'io.reactivex.rxjava2:rxjava:2.1.4'
     compileOnly "com.android.support:support-annotations:$supportLibraryVersion"
 

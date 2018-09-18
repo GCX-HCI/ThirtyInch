@@ -25,7 +25,6 @@ android {
 
 dependencies {
     api project(":thirtyinch")
-    api project(":thirtyinch-rx2")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
 
     testImplementation "junit:junit:$junitVersion"
