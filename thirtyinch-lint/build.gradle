@@ -1,0 +1,48 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "jacoco"
+}
+
+repositories {
+    jcenter()
+}
+
+configurations {
+    lintChecks
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    compileOnly "com.android.tools.lint:lint-api:$lintVersion"
+    compileOnly "com.android.tools.lint:lint-checks:$lintVersion"
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.assertj:assertj-core:$assertjVersion"
+
+    testImplementation "com.android.tools.lint:lint:$lintVersion"
+    testImplementation "com.android.tools.lint:lint-tests:$lintVersion"
+
+    lintChecks files(jar)
+}
+
+jar {
+    manifest {
+        attributes("Manifest-Version": 1.0)
+        attributes("Lint-Registry": "net.grandcentrix.thirtyinch.lint.TiLintRegistry")
+        // The TI checks are build with the new 3.0 APIs (including UAST) so we should also register the v2 lint registry.
+        attributes("Lint-Registry-v2": "net.grandcentrix.thirtyinch.lint.TiLintRegistry")
+    }
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

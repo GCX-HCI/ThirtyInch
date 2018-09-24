@@ -30,6 +30,10 @@ android {
     }
 }
 
+configurations {
+    lintChecks
+}
+
 dependencies {
     compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
 
@@ -41,6 +45,8 @@ dependencies {
     androidTestImplementation "com.android.support.test:runner:$supportTestVersion"
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "org.assertj:assertj-core:$assertjVersion"
+
+    lintChecks project(path: ":thirtyinch-lint", configuration: "lintChecks")
 }
 
 // For uploading to bintray
@@ -48,4 +54,17 @@ apply from: '../gradle/bintrayRelease.gradle'
 configurePublish {
     artifactId = 'thirtyinch'
     desc = 'a Model View Presenter library for Android'
+}
+
+task copyLintJar(type: Copy) {
+    from(configurations.lintChecks) {
+        rename { String fileName -> 'lint.jar' }
+    }
+    into 'build/intermediates/lint/'
+}
+
+
+project.afterEvaluate {
+    def compileLintTask = project.tasks.find { it.name == 'compileLint' }
+    compileLintTask.dependsOn(copyLintJar)
 }
