@@ -19,7 +19,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.HashMap;
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;

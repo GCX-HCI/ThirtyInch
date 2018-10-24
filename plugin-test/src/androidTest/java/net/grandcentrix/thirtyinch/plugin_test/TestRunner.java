@@ -20,7 +20,7 @@ import android.app.Application;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.os.PowerManager;
-import android.support.test.runner.AndroidJUnitRunner;
+import androidx.test.runner.AndroidJUnitRunner;
 
 /**
  * own test runner unlocking the screen of the emulator. Helps stability on travis ci, or

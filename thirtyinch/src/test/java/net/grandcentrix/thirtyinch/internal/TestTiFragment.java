@@ -19,16 +19,17 @@ package net.grandcentrix.thirtyinch.internal;
 import static org.mockito.Mockito.*;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
 import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
 
 /**
- * mock implementation of a {@link android.support.v4.app.Fragment} with all relevant lifecycle
+ * mock implementation of a {@link Fragment} with all relevant lifecycle
  * methods instructing the {@link TiFragmentDelegate} for testing
  */
 public class TestTiFragment

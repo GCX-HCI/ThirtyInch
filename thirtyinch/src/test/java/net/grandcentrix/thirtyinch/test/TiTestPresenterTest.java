@@ -19,7 +19,7 @@ import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiPresenter.State;

@@ -15,8 +15,8 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import java.util.List;
 import net.grandcentrix.thirtyinch.BindViewInterceptor;
 import net.grandcentrix.thirtyinch.Removable;

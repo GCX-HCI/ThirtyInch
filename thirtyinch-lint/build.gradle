@@ -12,7 +12,7 @@ configurations {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     compileOnly "com.android.tools.lint:lint-api:$lintVersion"
     compileOnly "com.android.tools.lint:lint-checks:$lintVersion"

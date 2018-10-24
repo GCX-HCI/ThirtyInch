@@ -23,14 +23,14 @@
             android:padding="16dp"
             tools:text="@string/dont_keep_activities_enabled" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_retain_presenter_instance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:text="@string/retain_presenter_instance" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_add_back_stack"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

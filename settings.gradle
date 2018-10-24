@@ -1,7 +1,6 @@
 include(
         ":thirtyinch",
         ":thirtyinch-logginginterceptor",
-        ":thirtyinch-plugin",
         ":thirtyinch-rx",
         ":thirtyinch-rx2",
         ":thirtyinch-test",

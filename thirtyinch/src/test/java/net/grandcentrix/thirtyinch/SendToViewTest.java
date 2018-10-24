@@ -19,7 +19,7 @@ package net.grandcentrix.thirtyinch;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;

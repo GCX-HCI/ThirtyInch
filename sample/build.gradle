@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
 
     //def thirtyinchVersion = '0.8.6-SNAPSHOT'
