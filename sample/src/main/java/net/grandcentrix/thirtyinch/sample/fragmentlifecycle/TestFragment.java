@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.BackstackReader;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import android.util.AttributeSet;
@@ -27,6 +26,8 @@ import java.util.UUID;
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiFragment;
 import net.grandcentrix.thirtyinch.sample.R;
+import net.grandcentrix.thirtyinch.util.BackstackReader;
+
 import rx.subjects.PublishSubject;
 
 public abstract class TestFragment
@@ -142,7 +143,7 @@ public abstract class TestFragment
     }
 
     @Override
-    public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         printState();
         super.onViewCreated(view, savedInstanceState);
         Log.v(TAG, "onViewCreated");
