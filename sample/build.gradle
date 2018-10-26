@@ -42,11 +42,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
 
-    //def thirtyinchVersion = '0.8.6-SNAPSHOT'
-    //implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
-    //implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
-    //implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
-
     implementation project(':thirtyinch')
     implementation project(':thirtyinch-rx')
     implementation project(':thirtyinch-logginginterceptor')

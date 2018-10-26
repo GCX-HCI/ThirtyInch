@@ -16,7 +16,6 @@
 package net.grandcentrix.thirtyinch;
 
 import android.os.Bundle;
-import net.grandcentrix.thirtyinch.util.BackstackReader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +35,7 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+import net.grandcentrix.thirtyinch.util.BackstackReader;
 
 public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatDialogFragment
@@ -59,7 +59,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     @CallSuper
     @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
         mDelegate.invalidateView();
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -81,7 +81,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
 
     @CallSuper
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
@@ -197,6 +197,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         }
     }
 
+    @NonNull
     @Override
     public String toString() {
         String presenter = getPresenter() == null ? "null" :
