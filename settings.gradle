@@ -3,7 +3,6 @@ include(
         ":thirtyinch-logginginterceptor",
         ":thirtyinch-rx",
         ":thirtyinch-rx2",
-        ":thirtyinch-test",
         ":thirtyinch-kotlin",
         ":thirtyinch-lint",
         ":sample",
