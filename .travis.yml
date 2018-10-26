@@ -4,9 +4,14 @@ jdk:
 
 # Cache our Gradle cache
 # so we don't have to download everything again and again...
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-  - $HOME/.gradle
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
 
 # Define multiple jobs
 # to get faster unittest feedback
