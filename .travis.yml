@@ -8,6 +8,16 @@ cache:
   directories:
   - $HOME/.gradle
 
+# Define multiple jobs
+# to get faster unittest feedback
+jobs:
+  include:
+    - stage: unittest
+      before_script: skip
+      script: ./gradlew testDebugUnitTest
+    - stage: all
+      script: ./gradlew build jacocoTestReportDebug assembleAndroidTest connectedCheck
+
 android:
   components:
     # Uncomment the lines below if you want to
@@ -47,9 +57,6 @@ before_script:
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
-
-script:
-  - ./gradlew build jacocoTestReportDebug assembleAndroidTest connectedCheck
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
