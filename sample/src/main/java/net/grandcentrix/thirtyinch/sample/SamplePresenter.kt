@@ -13,29 +13,26 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample
 
-import java.util.concurrent.TimeUnit;
-import net.grandcentrix.thirtyinch.TiPresenter;
-import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler;
-import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils;
-import rx.Observable;
+import java.util.concurrent.TimeUnit
+import net.grandcentrix.thirtyinch.TiPresenter
+import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler
+import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils
+import rx.Observable
 
+class SamplePresenter : TiPresenter<SampleView>() {
 
-public class SamplePresenter extends TiPresenter<SampleView> {
+    private val mSubscriptionHandler = RxTiPresenterSubscriptionHandler(this)
 
-    private RxTiPresenterSubscriptionHandler mSubscriptionHandler
-            = new RxTiPresenterSubscriptionHandler(this);
-
-    @Override
-    protected void onCreate() {
-        super.onCreate();
+    override fun onCreate() {
+        super.onCreate()
 
         mSubscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
                 .compose(RxTiPresenterUtils.deliverLatestToView(this))
-                .subscribe(alive -> {
+                .subscribe { alive ->
                     // deliverLatestToView makes getView() here @NonNull
-                    getView().showText("I'm a fragment and alive for " + (alive * 37) + "ms");
-                }));
+                    view!!.showText("I'm a fragment and alive for " + alive!! * 37 + "ms")
+                })
     }
 }

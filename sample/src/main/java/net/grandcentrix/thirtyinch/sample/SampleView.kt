@@ -13,19 +13,13 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample
 
+import net.grandcentrix.thirtyinch.TiView
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread
 
-import android.app.Application;
-import net.grandcentrix.thirtyinch.TiLog;
+interface SampleView : TiView {
 
-public class SampleApp extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // log ThirtyInch output with logcat
-        TiLog.setLogger(TiLog.LOGCAT);
-    }
+    @CallOnMainThread
+    fun showText(s: String)
 }
