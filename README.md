@@ -1,4 +1,6 @@
-![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat) [![Gitter](https://badges.gitter.im/ThirtyInch/gitter.svg)](https://gitter.im/ThirtyInch/Lobby)
+[![Build Status](https://travis-ci.org/grandcentrix/ThirtyInch.svg?branch=master)](https://travis-ci.org/grandcentrix/ThirtyInch)
+![License](https://img.shields.io/badge/license-Apache%202-green.svg?style=flat) 
+[![Gitter](https://badges.gitter.im/ThirtyInch/gitter.svg)](https://gitter.im/ThirtyInch/Lobby)
 # ThirtyInch - a MVP library for Android
 
 
