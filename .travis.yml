@@ -14,12 +14,12 @@ jobs:
   include:
     - stage: unittest
       before_script: skip
-      script: echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$HOME/android-sdk/licenses/android-sdk-license"
-      script: echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$HOME/android-sdk/licenses/android-sdk-preview-license"
+      script: echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "/usr/local/android-sdk/licenses/android-sdk-license"
+      script: echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "/usr/local/android-sdk/licenses/android-sdk-preview-license"
       script: ./gradlew testDebugUnitTest
     - stage: all
-      script: echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$HOME/android-sdk/licenses/android-sdk-license"
-      script: echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$HOME/android-sdk/licenses/android-sdk-preview-license"
+      script: echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "/usr/local/android-sdk/android-sdk-license"
+      script: echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "/usr/local/android-sdk/android-sdk-preview-license"
       script: ./gradlew build jacocoTestReportDebug assembleAndroidTest connectedCheck
 
 android:
