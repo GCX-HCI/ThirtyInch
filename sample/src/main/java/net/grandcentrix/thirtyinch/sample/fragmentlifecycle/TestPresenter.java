@@ -17,6 +17,8 @@ package net.grandcentrix.thirtyinch.sample.fragmentlifecycle;
 
 
 import net.grandcentrix.thirtyinch.TiConfiguration;
+import net.grandcentrix.thirtyinch.TiLifecycleObserver;
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 
@@ -28,14 +30,19 @@ public class TestPresenter extends TiPresenter<TestPresenter.TestView> {
 
     private final String mName;
 
-    public TestPresenter(final String name) {
-        mName = name;
-    }
-
     public TestPresenter(final TiConfiguration config, final String name) {
         super(config);
 
         mName = name;
+
+        addLifecycleObserver(new TiLifecycleObserver() {
+            @Override
+            public void onChange(final State state, final boolean hasLifecycleMethodBeenCalled) {
+                if (hasLifecycleMethodBeenCalled) {
+                    TiLog.i(mName + "Presenter", "state: " + state);
+                }
+            }
+        });
     }
 
     @Override

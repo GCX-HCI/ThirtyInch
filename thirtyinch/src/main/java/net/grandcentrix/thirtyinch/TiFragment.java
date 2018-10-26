@@ -109,6 +109,11 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
         implements DelegatedTiFragment, TiPresenterProvider<P>, TiLoggingTagProvider,
         TiViewProvider<V>, InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
+    @Override
+    public Fragment getFragment() {
+        return this;
+    }
+
     private final String TAG = this.getClass().getSimpleName()
             + ":" + TiFragment.class.getSimpleName()
             + "@" + Integer.toHexString(this.hashCode());
@@ -146,13 +151,6 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     public void onStop() {
         mDelegate.onStop_beforeSuper();
         super.onStop();
-    }
-
-    @CallSuper
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState_afterSuper(outState);
     }
 
     @CallSuper

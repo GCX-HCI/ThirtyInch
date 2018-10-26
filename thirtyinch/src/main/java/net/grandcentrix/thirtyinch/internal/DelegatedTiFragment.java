@@ -53,4 +53,6 @@ public interface DelegatedTiFragment {
      */
     boolean isFragmentRemoving();
 
+    Fragment getFragment();
+
 }

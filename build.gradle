@@ -36,7 +36,7 @@ ext {
     TARGET_SDK_VERSION = 26
     COMPILE_SDK_VERSION = 26
 
-    supportLibraryVersion = '26.0.0'
+    supportLibraryVersion = '27.1.1'
     // compositeAndroidVersion should be always the same version as the supportLib version
     // Since composite is not up to date we can't use the latest one
     compositeAndroidVersion = supportLibraryVersion

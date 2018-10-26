@@ -81,13 +81,6 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
 
     @CallSuper
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mDelegate.onSaveInstanceState_afterSuper(outState);
-    }
-
-    @CallSuper
-    @Override
     public void onDestroyView() {
         mDelegate.onDestroyView_beforeSuper();
         super.onDestroyView();

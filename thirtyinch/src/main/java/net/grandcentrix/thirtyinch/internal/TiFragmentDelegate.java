@@ -15,10 +15,10 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import java.util.List;
@@ -42,9 +42,6 @@ import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChangedInte
 public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         implements InterceptableViewBinder<V>, PresenterAccessor<P, V> {
 
-    @VisibleForTesting
-    static final String SAVED_STATE_PRESENTER_ID = "presenter_id";
-
     /**
      * enables debug logging during development
      */
@@ -56,11 +53,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
     private P mPresenter;
 
-    private String mPresenterId;
-
     private final TiPresenterProvider<P> mPresenterProvider;
-
-    private final TiPresenterSavior mSavior;
 
     private final DelegatedTiFragment mTiFragment;
 
@@ -80,7 +73,6 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
         mPresenterProvider = presenterProvider;
         mLogTag = logTag;
         mViewBinder = new PresenterViewBinder<>(logTag);
-        mSavior = savior;
     }
 
     @NonNull
@@ -133,25 +125,12 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             mPresenter = null;
         }
 
+        final PresenterHoldingViewModel viewModel =
+                ViewModelProviders.of(mTiFragment.getFragment()).get(PresenterHoldingViewModel.class);
         if (mPresenter == null && savedInstanceState != null) {
-            // recover with Savior
-            // this should always work.
-            final String recoveredPresenterId = savedInstanceState
-                    .getString(SAVED_STATE_PRESENTER_ID);
-            if (recoveredPresenterId != null) {
-                TiLog.v(mLogTag.getLoggingTag(),
-                        "try to recover Presenter with id: " + recoveredPresenterId);
-                mPresenter = (P) mSavior
-                        .recover(recoveredPresenterId, mTiFragment.getHostingContainer());
-                if (mPresenter != null) {
-                    // save recovered presenter with new id. No other instance of this activity,
-                    // holding the presenter before, is now able to remove the reference to
-                    // this presenter from the savior
-                    mSavior.free(recoveredPresenterId, mTiFragment.getHostingContainer());
-                    mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingContainer());
-                }
-                TiLog.v(mLogTag.getLoggingTag(), "recovered Presenter " + mPresenter);
-            }
+            mPresenter = (P) viewModel.getPresenter();
+
+            TiLog.v(mLogTag.getLoggingTag(), "recovered Presenter " + mPresenter);
         }
 
         if (mPresenter == null) {
@@ -165,7 +144,7 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
             TiLog.v(mLogTag.getLoggingTag(), "created Presenter: " + mPresenter);
             final TiConfiguration config = mPresenter.getConfig();
             if (config.shouldRetainPresenter()) {
-                mPresenterId = mSavior.save(mPresenter, mTiFragment.getHostingContainer());
+                viewModel.setPresenter(mPresenter);
             }
             mPresenter.create();
         }
@@ -225,15 +204,10 @@ public class TiFragmentDelegate<P extends TiPresenter<V>, V extends TiView>
 
         if (destroyPresenter) {
             mPresenter.destroy();
-            mSavior.free(mPresenterId, mTiFragment.getHostingContainer());
         } else {
             TiLog.v(mLogTag.getLoggingTag(), "not destroying " + mPresenter
                     + " which will be reused by a future Fragment instance");
         }
-    }
-
-    public void onSaveInstanceState_afterSuper(final Bundle outState) {
-        outState.putString(SAVED_STATE_PRESENTER_ID, mPresenterId);
     }
 
     public void onStart_afterSuper() {
