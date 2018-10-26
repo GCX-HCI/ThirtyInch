@@ -35,7 +35,6 @@ dependencies {
     
     // Lagacy dependencies
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
-    implementation "net.grandcentrix.thirtyinch:thirtyinch-plugin:$thirtyinchVersion"
 }
 ```
 
@@ -307,37 +306,6 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
     }
 }
 ```
-
-### [CompositeAndroid](https://github.com/passsy/CompositeAndroid)
-
-Extending `TiActivity` is probably not what you want because you already have a `BaseActivity`.
-Extending all already existing Activities from `TiActivity` doesn't make sense because they don't use MVP right now.
-[`CompositeAndroid`](https://github.com/passsy/CompositeAndroid) uses composition to add a `TiPresenter` to an `Activity`.
-One line adds the `TiActivityPlugin` and everything works as expected.
-
-```java
-public class HelloWorldActivity extends CompositeActivity implements HelloWorldView {
-
-    public HelloWorldActivity() {
-    
-        // Java 7
-        addPlugin(new TiActivityPlugin<>(
-                new TiPresenterProvider<HelloWorldPresenter>() {
-                    @NonNull
-                    @Override
-                    public HelloWorldPresenter providePresenter() {
-                        return new HelloWorldPresenter();
-                    }
-                }));
-
-        // Java 8
-        addPlugin(new TiActivityPlugin<HelloWorldPresenter, HelloWorldView>(
-                () -> new HelloWorldPresenter()));
-    }
-}
-```
-
-Yes you have to extend `CompositeActivity`, but that's the last level of inheritance you'll ever need.
 
 # License
 
