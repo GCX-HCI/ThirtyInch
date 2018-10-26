@@ -34,6 +34,9 @@ android:
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-24
+    license:
+      - 'android-sdk-preview-license-52d11cd2'
+      - 'android-sdk-license-.+'
 
 
 before_script:
