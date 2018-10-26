@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample
 
-import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
-import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
-import rx.Observable;
+import net.grandcentrix.thirtyinch.TiView
+import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread
+import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged
+import rx.Observable
 
-public interface HelloWorldView extends TiView {
+interface HelloWorldView : TiView {
 
-    Observable<Void> onButtonClicked();
+    fun onButtonClicked(): Observable<Void>
 
-    void showPresenterUpTime(Long uptime);
+    fun showPresenterUpTime(uptime: Long?)
 
     @CallOnMainThread
     @DistinctUntilChanged
-    void showText(final String text);
+    fun showText(text: String)
 }
