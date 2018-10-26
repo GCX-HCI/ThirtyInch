@@ -27,13 +27,12 @@ import net.grandcentrix.thirtyinch.TiActivity
 import net.grandcentrix.thirtyinch.logginginterceptor.LoggingInterceptor
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.viewpager.LifecycleViewPagerActivity
-import rx.Observable
 
 class HelloWorldActivity : TiActivity<HelloWorldPresenter, HelloWorldView>(), HelloWorldView {
 
-    private lateinit var mButton: Button
-    private lateinit var mOutput: TextView
-    private lateinit var mUptime: TextView
+    private val button by lazy { findViewById<Button>(R.id.button) }
+    private val output by lazy { findViewById<TextView>(R.id.output) }
+    private val uptime by lazy { findViewById<TextView>(R.id.uptime) }
 
     init {
         addBindViewInterceptor(LoggingInterceptor())
@@ -42,10 +41,6 @@ class HelloWorldActivity : TiActivity<HelloWorldPresenter, HelloWorldView>(), He
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hello_world)
-
-        mButton = findViewById(R.id.button)
-        mOutput = findViewById(R.id.output)
-        mUptime = findViewById(R.id.uptime)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -56,9 +51,7 @@ class HelloWorldActivity : TiActivity<HelloWorldPresenter, HelloWorldView>(), He
         findViewById<View>(R.id.recreate).setOnClickListener { recreate() }
     }
 
-    override fun onButtonClicked(): Observable<Void> {
-        return RxView.clicks(mButton)
-    }
+    override fun onButtonClicked() = RxView.clicks(button)
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_hello_world, menu)
@@ -76,18 +69,16 @@ class HelloWorldActivity : TiActivity<HelloWorldPresenter, HelloWorldView>(), He
                 return true
             }
         }
-        return false
+        return super.onOptionsItemSelected(item)
     }
 
-    override fun providePresenter(): HelloWorldPresenter {
-        return HelloWorldPresenter()
-    }
+    override fun providePresenter() = HelloWorldPresenter()
 
-    override fun showPresenterUpTime(uptime: Long?) {
-        mUptime.text = String.format("Presenter alive for %ss", uptime)
+    override fun showPresenterUpTime(uptime: Long) {
+        this.uptime.text = String.format("Presenter alive for %ss", uptime)
     }
 
     override fun showText(text: String) {
-        mOutput.text = text
+        output.text = text
     }
 }

@@ -24,7 +24,7 @@ import net.grandcentrix.thirtyinch.TiFragment
 
 class SampleFragment : TiFragment<SamplePresenter, SampleView>(), SampleView {
 
-    private lateinit var mSampleText: TextView
+    private lateinit var sampleText: TextView
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
@@ -33,7 +33,7 @@ class SampleFragment : TiFragment<SamplePresenter, SampleView>(), SampleView {
         val view = inflater!!
                 .inflate(R.layout.fragment_sample, container, false) as ViewGroup
 
-        mSampleText = view.findViewById(R.id.sample_text)
+        sampleText = view.findViewById(R.id.sample_text)
         return view
     }
 
@@ -41,7 +41,7 @@ class SampleFragment : TiFragment<SamplePresenter, SampleView>(), SampleView {
         return SamplePresenter()
     }
 
-    override fun showText(s: String) {
-        mSampleText.text = s
+    override fun showText(text: String) {
+        sampleText.text = text
     }
 }

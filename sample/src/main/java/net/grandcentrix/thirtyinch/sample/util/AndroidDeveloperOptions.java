@@ -16,7 +16,6 @@
 package net.grandcentrix.thirtyinch.sample.util;
 
 import android.content.Context;
-import android.os.Build;
 import android.provider.Settings;
 
 public class AndroidDeveloperOptions {
@@ -28,15 +27,9 @@ public class AndroidDeveloperOptions {
     @SuppressWarnings("deprecation")
     public static boolean isDontKeepActivitiesEnabled(final Context context) {
         int alwaysFinishActivitiesInt;
-        if (Build.VERSION.SDK_INT >= 17) {
-            alwaysFinishActivitiesInt = Settings.System
-                    .getInt(context.getContentResolver(), Settings.Global.ALWAYS_FINISH_ACTIVITIES,
-                            0);
-        } else {
-            alwaysFinishActivitiesInt = Settings.System
-                    .getInt(context.getContentResolver(), Settings.System.ALWAYS_FINISH_ACTIVITIES,
-                            0);
-        }
+        alwaysFinishActivitiesInt = Settings.System
+                .getInt(context.getContentResolver(), Settings.Global.ALWAYS_FINISH_ACTIVITIES,
+                        0);
 
         return alwaysFinishActivitiesInt == 1;
     }

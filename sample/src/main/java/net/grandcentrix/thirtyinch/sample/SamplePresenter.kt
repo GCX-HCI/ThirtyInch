@@ -15,20 +15,20 @@
 
 package net.grandcentrix.thirtyinch.sample
 
-import java.util.concurrent.TimeUnit
 import net.grandcentrix.thirtyinch.TiPresenter
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterSubscriptionHandler
 import net.grandcentrix.thirtyinch.rx.RxTiPresenterUtils
 import rx.Observable
+import java.util.concurrent.TimeUnit
 
 class SamplePresenter : TiPresenter<SampleView>() {
 
-    private val mSubscriptionHandler = RxTiPresenterSubscriptionHandler(this)
+    private val subscriptionHandler = RxTiPresenterSubscriptionHandler(this)
 
     override fun onCreate() {
         super.onCreate()
 
-        mSubscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
+        subscriptionHandler.manageSubscription(Observable.interval(0, 37, TimeUnit.MILLISECONDS)
                 .compose(RxTiPresenterUtils.deliverLatestToView(this))
                 .subscribe { alive ->
                     // deliverLatestToView makes getView() here @NonNull

@@ -26,32 +26,32 @@ import java.util.concurrent.TimeUnit
 
 class HelloWorldPresenter : TiPresenter<HelloWorldView>() {
 
-    private var mCounter = 0
-    private val mText = BehaviorSubject.create<String>()
+    private var counter = 0
+    private val textSubject = BehaviorSubject.create<String>()
     private val rxSubscriptionHelper = RxTiPresenterSubscriptionHandler(this)
     private val triggerHeavyCalculation = PublishSubject.create<Void>()
 
     override fun onCreate() {
         super.onCreate()
 
-        mText.onNext("Hello World!")
+        textSubject.onNext("Hello World!")
 
         rxSubscriptionHelper.manageSubscription(Observable.interval(0, 1, TimeUnit.SECONDS)
                 .compose(RxTiPresenterUtils.deliverLatestToView(this))
                 .subscribe { uptime -> sendToView { view -> view.showPresenterUpTime(uptime) } })
 
         rxSubscriptionHelper.manageSubscription(triggerHeavyCalculation
-                .onBackpressureDrop { mText.onNext("Don't hurry me!") }
-                .doOnNext { mText.onNext("calculating next number...") }
+                .onBackpressureDrop { textSubject.onNext("Don't hurry me!") }
+                .doOnNext { textSubject.onNext("calculating next number...") }
                 .flatMap({ increaseCounter() }, 1)
-                .doOnNext { mText.onNext("Count: $mCounter") }
+                .doOnNext { textSubject.onNext("Count: $counter") }
                 .subscribe())
     }
 
     override fun onAttachView(view: HelloWorldView) {
         super.onAttachView(view)
 
-        val showTextSub = mText.asObservable().subscribe { view.showText(it) }
+        val showTextSub = textSubject.asObservable().subscribe { view.showText(it) }
         val onButtonClickSub = view.onButtonClicked()
                 .subscribe { triggerHeavyCalculation.onNext(null) }
 
@@ -62,13 +62,13 @@ class HelloWorldPresenter : TiPresenter<HelloWorldView>() {
      * fake a heavy calculation
      */
     private fun increaseCounter(): Observable<Int> {
-        return Observable.just(mCounter)
+        return Observable.just(counter)
                 .subscribeOn(Schedulers.computation())
                 // fake heavy calculation
                 .delay(2, TimeUnit.SECONDS)
                 .doOnNext {
-                    mCounter++
-                    mText.onNext("value: $mCounter")
+                    counter++
+                    textSubject.onNext("value: $counter")
                 }
     }
 }

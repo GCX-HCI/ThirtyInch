@@ -24,7 +24,7 @@ interface HelloWorldView : TiView {
 
     fun onButtonClicked(): Observable<Void>
 
-    fun showPresenterUpTime(uptime: Long?)
+    fun showPresenterUpTime(uptime: Long)
 
     @CallOnMainThread
     @DistinctUntilChanged

@@ -13,13 +13,27 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample
+package net.grandcentrix.thirtyinch.sample.fragmentlifecycle
 
+import net.grandcentrix.thirtyinch.TiConfiguration
+import net.grandcentrix.thirtyinch.TiPresenter
 import net.grandcentrix.thirtyinch.TiView
-import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread
 
-interface SampleView : TiView {
+class TestPresenter : TiPresenter<TestPresenter.TestView> {
 
-    @CallOnMainThread
-    fun showText(text: String)
+    private val name: String
+
+    interface TestView : TiView
+
+    constructor(name: String) {
+        this.name = name
+    }
+
+    constructor(config: TiConfiguration, name: String) : super(config) {
+        this.name = name
+    }
+
+    override fun toString(): String {
+        return name + "#" + super.toString()
+    }
 }
