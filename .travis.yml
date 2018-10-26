@@ -31,19 +31,15 @@ android:
     - platform-tools
     - tools
 
-    # The SDK version used to compile your project
-    - android-24
-    - android-26
-
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-24
-  license:
-    - 'android-sdk-preview-license-52d11cd2'
-    - 'android-sdk-license-.+'
 
 
 before_script:
+
+  # The SDK version used to compile your project
+   - yes | sdkmanager "platforms;android-24;android-27"
 
   # First assemble the project before launching the emulator
   - ./gradlew assemble
