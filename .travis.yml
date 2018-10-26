@@ -2,6 +2,12 @@ language: android
 jdk:
     - oraclejdk8
 
+# Cache our Gradle cache
+# so we don't have to download everything again and again...
+cache:
+  directories:
+  - $HOME/.gradle
+
 android:
   components:
     # Uncomment the lines below if you want to
