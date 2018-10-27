@@ -26,20 +26,17 @@ class SampleFragment : TiFragment<SamplePresenter, SampleView>(), SampleView {
 
     private lateinit var sampleText: TextView
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        val view = inflater!!
-                .inflate(R.layout.fragment_sample, container, false) as ViewGroup
+        val view = inflater.inflate(R.layout.fragment_sample, container, false) as ViewGroup
 
         sampleText = view.findViewById(R.id.sample_text)
         return view
     }
 
-    override fun providePresenter(): SamplePresenter {
-        return SamplePresenter()
-    }
+    override fun providePresenter(): SamplePresenter = SamplePresenter()
 
     override fun showText(text: String) {
         sampleText.text = text

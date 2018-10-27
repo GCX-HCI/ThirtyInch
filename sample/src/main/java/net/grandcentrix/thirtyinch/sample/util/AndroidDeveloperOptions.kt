@@ -13,15 +13,17 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample.fragmentlifecycle
+package net.grandcentrix.thirtyinch.sample.util
 
-import net.grandcentrix.thirtyinch.TiConfiguration
-import net.grandcentrix.thirtyinch.TiPresenter
-import net.grandcentrix.thirtyinch.TiView
+import android.content.Context
+import android.provider.Settings
+import android.provider.Settings.Global.ALWAYS_FINISH_ACTIVITIES
 
-class TestPresenter(config: TiConfiguration, private val name: String) : TiPresenter<TestPresenter.TestView>(config) {
-
-    interface TestView : TiView
-
-    override fun toString(): String = "$name#${super.toString()}"
+/**
+ * Returns the state of the "Don't keep activities - Destroy every activity as soon as the user
+ * leaves it" developer option
+ */
+fun Context.isDontKeepActivitiesEnabled(): Boolean {
+    val alwaysFinishActivities = Settings.System.getInt(contentResolver, ALWAYS_FINISH_ACTIVITIES, 0)
+    return alwaysFinishActivities == 1
 }

@@ -10,28 +10,18 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import net.grandcentrix.thirtyinch.sample.R
-import net.grandcentrix.thirtyinch.sample.util.AndroidDeveloperOptions
+import net.grandcentrix.thirtyinch.sample.util.isDontKeepActivitiesEnabled
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 
 class FragmentLifecycleActivity : AppCompatActivity() {
 
-    private val TAG = (this.javaClass.simpleName
-            + "@" + Integer.toHexString(this.hashCode()))
+    private val TAG = "${this.javaClass.simpleName}@${Integer.toHexString(this.hashCode())}"
 
     private var switchAddToBackStack: SwitchCompat? = null
 
     private var switchRetainPresenterInstance: SwitchCompat? = null
-
-    private val isAddToBackStack: Boolean
-        get() = switchAddToBackStack!!.isChecked
-
-    private val isDontKeepActivities: Boolean
-        get() = AndroidDeveloperOptions.isDontKeepActivitiesEnabled(this)
-
-    private val isRetainPresenterInstance: Boolean
-        get() = switchRetainPresenterInstance!!.isChecked
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,15 +37,14 @@ class FragmentLifecycleActivity : AppCompatActivity() {
         Log.v(TAG, "onCreate of " + this)
 
         switchAddToBackStack = findViewById(R.id.switch_add_back_stack)
-        switchRetainPresenterInstance = findViewById(
-                R.id.switch_retain_presenter_instance)
-        val textDontKeepActivities = findViewById<TextView>(
-                R.id.text_dont_keep_activities)
-        textDontKeepActivities.setText(
-                if (isDontKeepActivities)
-                    R.string.dont_keep_activities_enabled
-                else
-                    R.string.dont_keep_activities_disabled)
+        switchRetainPresenterInstance = findViewById(R.id.switch_retain_presenter_instance)
+        val textDontKeepActivities = findViewById<TextView>(R.id.text_dont_keep_activities)
+        val keepActivitiesText = if (isDontKeepActivitiesEnabled()) {
+            R.string.dont_keep_activities_enabled
+        } else {
+            R.string.dont_keep_activities_disabled
+        }
+        textDontKeepActivities.setText(keepActivitiesText)
 
         Log.v(TAG, "// A new Activity gets created by the Android Framework.")
         Log.v(TAG, "final HostingActivity hostingActivity" + fragmentLifecycleActivityInstanceCount
@@ -151,7 +140,7 @@ class FragmentLifecycleActivity : AppCompatActivity() {
     private fun addFragment(fragment: Fragment?) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-        val retain = isRetainPresenterInstance
+        val retain = switchRetainPresenterInstance?.isChecked == true
         if (retain) {
             Log.v(TAG, "retaining presenter")
         }
@@ -164,7 +153,7 @@ class FragmentLifecycleActivity : AppCompatActivity() {
         }
 
         fragmentTransaction.replace(R.id.fragment_placeholder, fragment)
-        if (isAddToBackStack) {
+        if (switchAddToBackStack?.isChecked == true) {
             Log.v(TAG, "adding transaction to the back stack")
             fragmentTransaction.addToBackStack(null)
         }

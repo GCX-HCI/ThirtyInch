@@ -38,6 +38,8 @@ class HelloWorldActivity : TiActivity<HelloWorldPresenter, HelloWorldView>(), He
         addBindViewInterceptor(LoggingInterceptor())
     }
 
+    override fun providePresenter() = HelloWorldPresenter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hello_world)
@@ -71,8 +73,6 @@ class HelloWorldActivity : TiActivity<HelloWorldPresenter, HelloWorldView>(), He
         }
         return super.onOptionsItemSelected(item)
     }
-
-    override fun providePresenter() = HelloWorldPresenter()
 
     override fun showPresenterUpTime(uptime: Long) {
         this.uptime.text = String.format("Presenter alive for %ss", uptime)

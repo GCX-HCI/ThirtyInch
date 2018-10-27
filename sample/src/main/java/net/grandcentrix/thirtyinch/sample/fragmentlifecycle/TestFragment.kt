@@ -16,7 +16,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.widget.TextView
 import net.grandcentrix.thirtyinch.TiConfiguration
 import net.grandcentrix.thirtyinch.TiFragment
@@ -25,10 +24,26 @@ import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleAct
 import rx.subjects.PublishSubject
 import java.util.UUID
 
+class TestFragmentA : TestFragment() {
+
+    override val layoutResId: Int = R.layout.fragment_a_test
+}
+
+class TestFragmentB : TestFragment() {
+
+    override val layoutResId: Int = R.layout.fragment_b_test
+}
+
 abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(), TestPresenter.TestView {
 
-    private val TAG = (this.javaClass.simpleName
-            + "@" + Integer.toHexString(this.hashCode()))
+    companion object {
+
+        const val RETAIN_PRESENTER = "retain"
+
+        internal var testFragmentInstanceCount = -1
+    }
+
+    private val TAG = "${this.javaClass.simpleName}@${Integer.toHexString(this.hashCode())}"
 
     private var instanceNum = Integer.MIN_VALUE
 
@@ -57,31 +72,23 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
     }
 
     override fun onAttach(context: Context?) {
-        addedState.startWith(false).distinctUntilChanged().skip(1).subscribe { added ->
-            Log.d(TAG, "fragment$instanceNum.setAdded($added)")
-        }
-        detachedState.startWith(false).distinctUntilChanged().skip(1).subscribe { detached ->
-            Log.d(TAG, "fragment$instanceNum.setDetached($detached)")
-        }
-        removingState.startWith(false).distinctUntilChanged().skip(1).subscribe { removing ->
-            Log.d(TAG, "fragment$instanceNum.setRemoving($removing)")
-        }
-        inBackStackState.startWith(false).distinctUntilChanged().skip(1).subscribe { inBackstack ->
-            Log.d(TAG,
-                    "fragment$instanceNum.setInBackstack($inBackstack)")
-        }
+        addedState.startWith(false).distinctUntilChanged().skip(1)
+                .subscribe { added -> Log.d(TAG, "fragment$instanceNum.setAdded($added)") }
+        detachedState.startWith(false).distinctUntilChanged().skip(1)
+                .subscribe { detached -> Log.d(TAG, "fragment$instanceNum.setDetached($detached)") }
+        removingState.startWith(false).distinctUntilChanged().skip(1)
+                .subscribe { removing -> Log.d(TAG, "fragment$instanceNum.setRemoving($removing)") }
+        inBackStackState.startWith(false).distinctUntilChanged().skip(1)
+                .subscribe { inBackstack -> Log.d(TAG, "fragment$instanceNum.setInBackstack($inBackstack)") }
 
         isActivityChangingConfigState.startWith(false).distinctUntilChanged().skip(1)
                 .subscribe { changing ->
                     Log.d(TAG,
-                            "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                                    + ".setChangingConfiguration(" + changing + ");")
+                            "hostingActivity$fragmentLifecycleActivityInstanceCount.setChangingConfiguration($changing);")
                 }
         isActivityFinishingState.startWith(false).distinctUntilChanged().skip(1)
                 .subscribe { finishing ->
-                    Log.d(TAG,
-                            "hostingActivity" + fragmentLifecycleActivityInstanceCount + ""
-                                    + ".setFinishing(" + finishing + ");")
+                    Log.d(TAG, "hostingActivity$fragmentLifecycleActivityInstanceCount.setFinishing($finishing);")
                 }
 
         printState()
@@ -97,18 +104,17 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         printState()
         if (savedInstanceState != null) {
             uuid = savedInstanceState.getString("uuid")
-            Log.v(TAG, "RESTORED " + uuid!!)
+            Log.v(TAG, "RESTORED $uuid")
         }
         if (uuid == null) {
             uuid = UUID.randomUUID().toString()
-            Log.v(TAG, "CREATED " + uuid!!)
+            Log.v(TAG, "CREATED $uuid")
         }
 
         if (savedInstanceState == null) {
             Log.d(TAG, "fragment$instanceNum.onCreate(null);")
         } else {
-            Log.d(TAG, "fragment" + instanceNum
-                    + ".onCreate(savedInstanceState);")
+            Log.d(TAG, "fragment$instanceNum.onCreate(savedInstanceState);")
         }
     }
 
@@ -117,14 +123,11 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         super.onCreateView(inflater, container, savedInstanceState)
         printState()
         Log.v(TAG,
-                "onCreateView() called with: inflater = [" + inflater + "], container = ["
-                        + container + "], savedInstanceState = [" + savedInstanceState + "]")
+                "onCreateView() called with: inflater = [$inflater], container = [$container], savedInstanceState = [$savedInstanceState]")
         if (savedInstanceState == null) {
-            Log.d(TAG, "fragment" + instanceNum
-                    + ".onCreateView(inflater, null, null);")
+            Log.d(TAG, "fragment$instanceNum.onCreateView(inflater, null, null);")
         } else {
-            Log.d(TAG, "fragment" + instanceNum
-                    + ".onCreateView(inflater, null, savedInstanceState);")
+            Log.d(TAG, "fragment$instanceNum.onCreateView(inflater, null, savedInstanceState);")
         }
 
         return inflater!!.inflate(layoutResId, container, false)
@@ -208,7 +211,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         Log.v(TAG, "onDestroy")
         Log.d(TAG, "fragment$instanceNum.onDestroy();")
         printState()
-        Log.v("FragmentManager", "DESTROYED " + uuid!!)
+        Log.v("FragmentManager", "DESTROYED $uuid")
     }
 
     override fun onDetach() {
@@ -308,10 +311,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
     }
 
     override fun providePresenter(): TestPresenter {
-        var retain = false
-        if (arguments != null) {
-            retain = arguments.getBoolean(RETAIN_PRESENTER, false)
-        }
+        var retain = arguments?.getBoolean(RETAIN_PRESENTER, false) ?: false
 
         val config = TiConfiguration.Builder()
                 .setRetainPresenterEnabled(retain)
@@ -326,6 +326,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
 
     // Override finalize in kotlin
     // https://kotlinlang.org/docs/reference/java-interop.html#finalize
+    @Suppress("unused")
     protected fun finalize() {
         Log.v(TAG, "GCed " + this + ", uuid: " + this.uuid)
     }
@@ -336,17 +337,8 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         removingState.onNext(isRemoving)
         inBackStackState.onNext(BackstackReader.isInBackStack(this))
 
-        val activity = activity
-        if (activity != null) {
-            isActivityFinishingState.onNext(activity.isFinishing)
-            isActivityChangingConfigState.onNext(activity.isChangingConfigurations)
-        }
-    }
-
-    companion object {
-
-        const val RETAIN_PRESENTER = "retain"
-
-        internal var testFragmentInstanceCount = -1
+        val activity = activity ?: return
+        isActivityFinishingState.onNext(activity.isFinishing)
+        isActivityChangingConfigState.onNext(activity.isChangingConfigurations)
     }
 }

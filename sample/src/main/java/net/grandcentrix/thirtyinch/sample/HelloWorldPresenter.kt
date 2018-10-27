@@ -51,7 +51,8 @@ class HelloWorldPresenter : TiPresenter<HelloWorldView>() {
     override fun onAttachView(view: HelloWorldView) {
         super.onAttachView(view)
 
-        val showTextSub = textSubject.asObservable().subscribe { view.showText(it) }
+        val showTextSub = textSubject.asObservable()
+                .subscribe { view.showText(it) }
         val onButtonClickSub = view.onButtonClicked()
                 .subscribe { triggerHeavyCalculation.onNext(null) }
 
@@ -61,14 +62,12 @@ class HelloWorldPresenter : TiPresenter<HelloWorldView>() {
     /**
      * fake a heavy calculation
      */
-    private fun increaseCounter(): Observable<Int> {
-        return Observable.just(counter)
-                .subscribeOn(Schedulers.computation())
-                // fake heavy calculation
-                .delay(2, TimeUnit.SECONDS)
-                .doOnNext {
-                    counter++
-                    textSubject.onNext("value: $counter")
-                }
-    }
+    private fun increaseCounter(): Observable<Int> = Observable.just(counter)
+            .subscribeOn(Schedulers.computation())
+            // fake heavy calculation
+            .delay(2, TimeUnit.SECONDS)
+            .doOnNext {
+                counter++
+                textSubject.onNext("value: $counter")
+            }
 }
