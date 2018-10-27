@@ -58,11 +58,35 @@
 
         </LinearLayout>
 
-        <Button
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="addFragmentB"
-            android:text="@string/add_fragment_b" />
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="addFragmentB"
+                android:text="@string/add_fragment_b" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="addFragmentBAsChild"
+                android:text="Add B (child)" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="removeFragmentBAsChild"
+                android:text="Remove B (child)" />
+
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

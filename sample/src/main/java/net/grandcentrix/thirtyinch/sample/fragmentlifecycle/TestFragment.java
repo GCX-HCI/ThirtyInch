@@ -26,6 +26,7 @@ import android.widget.TextView;
 import java.util.UUID;
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiFragment;
+import net.grandcentrix.thirtyinch.TiLog;
 import net.grandcentrix.thirtyinch.sample.R;
 import rx.subjects.PublishSubject;
 
@@ -256,6 +257,14 @@ public abstract class TestFragment
         printState();
     }
 
+    public void addChildFragment() {
+        final TestFragmentB fragment = new TestFragmentB();
+        TiLog.v("Child", "Added child fragment " + fragment);
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.child, fragment)
+                .commitNow();
+    }
+
     @Override
     public void onAttachFragment(final Fragment childFragment) {
         super.onAttachFragment(childFragment);
@@ -369,6 +378,14 @@ public abstract class TestFragment
         Log.v(TAG, "retain presenter " + retain + ", " + presenter);
 
         return presenter;
+    }
+
+    public void removeChildFragment() {
+        final Fragment fragment = getChildFragmentManager().getFragments().get(0);
+        TiLog.v("Child", "removing child fragment " + fragment);
+        getChildFragmentManager().beginTransaction()
+                .remove(fragment)
+                .commitNow();
     }
 
     @Override

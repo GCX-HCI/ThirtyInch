@@ -46,6 +46,12 @@ public class TestPresenter extends TiPresenter<TestPresenter.TestView> {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        TiLog.i(mName + "Presenter", "state: really DESTROYED");
+    }
+
+    @Override
     public String toString() {
         return mName + "#" + super.toString();
     }

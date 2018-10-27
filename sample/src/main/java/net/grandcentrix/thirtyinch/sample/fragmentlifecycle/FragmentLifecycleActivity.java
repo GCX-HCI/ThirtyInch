@@ -89,6 +89,14 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
         addFragment(fragment);
     }
 
+    public void addFragmentBAsChild(View view) {
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_placeholder);
+        if (fragment instanceof TestFragmentA) {
+            ((TestFragmentA) fragment).addChildFragment();
+        }
+    }
+
     public void detachFragmentAndAddAgain(View view) {
         final Fragment fragment = getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_placeholder);
@@ -143,6 +151,14 @@ public class FragmentLifecycleActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .remove(fragment)
                     .commitNow();
+        }
+    }
+
+    public void removeFragmentBAsChild(View view) {
+        final Fragment fragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_placeholder);
+        if (fragment instanceof TestFragmentA) {
+            ((TestFragmentA) fragment).removeChildFragment();
         }
     }
 
