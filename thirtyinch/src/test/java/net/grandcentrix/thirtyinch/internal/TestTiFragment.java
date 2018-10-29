@@ -28,6 +28,7 @@ import net.grandcentrix.thirtyinch.TiView;
 
 
 /**
+ * mock implementation of a {@link androidx.fragment.app.Fragment} with all relevant lifecycle
  * methods instructing the {@link TiFragmentDelegate} for testing
  */
 public class TestTiFragment
