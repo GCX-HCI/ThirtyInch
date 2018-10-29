@@ -13,19 +13,17 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample.util
 
+import android.content.Context
+import android.provider.Settings
+import android.provider.Settings.Global.ALWAYS_FINISH_ACTIVITIES
 
-import android.app.Application;
-import net.grandcentrix.thirtyinch.TiLog;
-
-public class SampleApp extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // log ThirtyInch output with logcat
-        TiLog.setLogger(TiLog.LOGCAT);
-    }
+/**
+ * Returns the state of the "Don't keep activities - Destroy every activity as soon as the user
+ * leaves it" developer option
+ */
+fun Context.isDontKeepActivitiesEnabled(): Boolean {
+    val alwaysFinishActivities = Settings.System.getInt(contentResolver, ALWAYS_FINISH_ACTIVITIES, 0)
+    return alwaysFinishActivities == 1
 }

@@ -13,20 +13,15 @@
  * limitations under the License.
  */
 
-package net.grandcentrix.thirtyinch.sample;
+package net.grandcentrix.thirtyinch.sample.fragmentlifecycle
 
-import net.grandcentrix.thirtyinch.TiView;
-import net.grandcentrix.thirtyinch.callonmainthread.CallOnMainThread;
-import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;
-import rx.Observable;
+import net.grandcentrix.thirtyinch.TiConfiguration
+import net.grandcentrix.thirtyinch.TiPresenter
+import net.grandcentrix.thirtyinch.TiView
 
-public interface HelloWorldView extends TiView {
+class TestPresenter(config: TiConfiguration, private val name: String) : TiPresenter<TestPresenter.TestView>(config) {
 
-    Observable<Void> onButtonClicked();
+    interface TestView : TiView
 
-    void showPresenterUpTime(Long uptime);
-
-    @CallOnMainThread
-    @DistinctUntilChanged
-    void showText(final String text);
+    override fun toString(): String = "$name#${super.toString()}"
 }
