@@ -36,6 +36,7 @@ ext {
     TARGET_SDK_VERSION = 28
     COMPILE_SDK_VERSION = 28
 
+    androidXLibrarayVersion = '1.0.0'
     junitVersion = '4.12'
     mockitoVersion = '2.10.0'
     assertjVersion = '2.8.0'

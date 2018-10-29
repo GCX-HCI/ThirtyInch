@@ -24,8 +24,8 @@ android {
 
 dependencies {
     implementation project(':thirtyinch')
-    api 'io.reactivex.rxjava2:rxjava:2.2.2'
-    compileOnly 'androidx.annotation:annotation:1.0.0'
+    api 'io.reactivex.rxjava2:rxjava:2.2.3'
+    compileOnly "androidx.annotation:annotation:$androidXLibrarayVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
