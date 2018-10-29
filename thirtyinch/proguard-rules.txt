@@ -1,3 +1,2 @@
 # ThirtyInch
 -keep public class * implements net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctComparator
--keep class androidx.fragment.app.Fragment { *; }
