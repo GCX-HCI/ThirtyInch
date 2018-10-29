@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -39,12 +40,14 @@ android {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
 
     implementation project(':thirtyinch')
     implementation project(':thirtyinch-rx')
+    testImplementation "junit:junit:$junitVersion"
     implementation project(':thirtyinch-logginginterceptor')
 
-    testImplementation "junit:junit:$junitVersion"
 }
