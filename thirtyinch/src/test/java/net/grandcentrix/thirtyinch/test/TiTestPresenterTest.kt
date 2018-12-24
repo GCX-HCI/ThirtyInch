@@ -21,6 +21,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import junit.framework.Assert.fail
 import net.grandcentrix.thirtyinch.TiPresenter
 import net.grandcentrix.thirtyinch.TiPresenter.State
@@ -69,11 +70,13 @@ class TiTestPresenterTest {
         // When a new View is attached to the TiTestPresenter.
         tiTestPresenter.attachView(mockView)
 
-        // Then the TiTestPresenter should set any ui thread executor on the Presenter.
-        verify { mockPresenter.setUiThreadExecutor(any()) }
+        verifyOrder {
+            // Then the TiTestPresenter should set any ui thread executor on the Presenter.
+            mockPresenter.setUiThreadExecutor(any())
 
-        // And then the TiTestPresenter should attach the new View to the Presenter.
-        verify { mockPresenter.attachView(mockView) }
+            // And then the TiTestPresenter should attach the new View to the Presenter.
+            mockPresenter.attachView(mockView)
+        }
     }
 
     @Test
