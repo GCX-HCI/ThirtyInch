@@ -59,7 +59,7 @@ class TiTestPresenterTest {
     }
 
     @Test
-    fun `test attachView should replace UiThreadExecutor`() {
+    fun `test attachView should replace ui thread executor`() {
 
         // Given the presenter is currently in the state VIEW_DETACHED.
         every { mockPresenter.state } returns State.VIEW_DETACHED
