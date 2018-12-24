@@ -1,3 +1,5 @@
+@file:JvmName("DisposableHandler")
+
 package net.grandcentrix.thirtyinch.rx2
 
 import io.reactivex.disposables.Disposable

@@ -32,6 +32,7 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
+    testImplementation 'io.mockk:mockk:1.8.13.kotlin13'
 }
 
 // For uploading to bintray
