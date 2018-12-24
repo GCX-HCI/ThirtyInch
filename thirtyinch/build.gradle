@@ -38,12 +38,12 @@ configurations {
 
 dependencies {
     compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testCompileOnly "com.android.support:support-annotations:$supportLibraryVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation "io.mockk:mockk:1.8.13.kotlin13"
 
     androidTestImplementation "com.android.support.test:runner:$supportTestVersion"
