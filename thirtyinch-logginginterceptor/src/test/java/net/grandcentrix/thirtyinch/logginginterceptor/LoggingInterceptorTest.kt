@@ -15,7 +15,6 @@
 
 package net.grandcentrix.thirtyinch.logginginterceptor
 
-import io.mockk.Called
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -93,7 +92,7 @@ class LoggingInterceptorTest {
     @Test
     fun `test do not log object invocations`() {
 
-        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
+        val logger = mockk<TiLog.Logger>()
         val loggingInterceptor = LoggingInterceptor(logger)
         val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
@@ -101,7 +100,7 @@ class LoggingInterceptorTest {
         view.toString()
         view.javaClass
 
-        verify { logger.log(any(), any(), any()) wasNot Called }
+        verify(exactly = 0) { logger.log(any(), any(), any()) }
     }
 
     @Test
