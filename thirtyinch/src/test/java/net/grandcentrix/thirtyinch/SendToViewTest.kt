@@ -15,12 +15,12 @@
 
 package net.grandcentrix.thirtyinch
 
+import io.mockk.Called
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
 import org.assertj.core.api.Assertions.*
 import org.junit.*
-import org.mockito.Mockito.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -138,17 +138,17 @@ class SendToViewTest {
         presenter.setUiThreadExecutor(immediatelySameThread)
         assertThat(presenter.queuedViewActions).isEmpty()
 
-        val view = mock(TestView::class.java)
+        val view = mockk<TestView>(relaxUnitFun = true)
         presenter.attachView(view)
         presenter.detachView()
 
         presenter.sendToView { it.doSomething1() }
         assertThat(presenter.queuedViewActions).hasSize(1)
-        verifyZeroInteractions(view)
+        verify { view wasNot Called }
 
         presenter.attachView(view)
 
-        verify(view).doSomething1()
+        verify { view.doSomething1() }
         assertThat(presenter.queuedViewActions).isEmpty()
 
         presenter.detachView()
@@ -156,6 +156,7 @@ class SendToViewTest {
         presenter.sendToView { it.doSomething1() }
         assertThat(presenter.queuedViewActions).hasSize(1)
 
-        verifyNoMoreInteractions(view)
+        // There were no more interactions with the view
+        verify(exactly = 1) { view.doSomething1() }
     }
 }
