@@ -16,13 +16,14 @@
 package net.grandcentrix.thirtyinch
 
 import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.verify
+import io.mockk.verifyOrder
 import io.mockk.verifySequence
 import org.assertj.core.api.Assertions.*
 import org.junit.*
-import org.mockito.*
-import org.mockito.Mockito.*
 
 class TiLifecycleObserverTest {
 
@@ -227,35 +228,28 @@ class TiLifecycleObserverTest {
         presenter.create()
 
         // add observers only for attach event
-        val observer1 = mock(TiLifecycleObserver::class.java)
+        val observer1 = mockk<TiLifecycleObserver>(relaxUnitFun = true)
         presenter.addLifecycleObserver(observer1)
-        val observer2 = mock(TiLifecycleObserver::class.java)
+        val observer2 = mockk<TiLifecycleObserver>(relaxUnitFun = true)
         val removable = presenter.addLifecycleObserver(observer2)
 
         // when observer1 receives the first event it unregisters observer2
-        doAnswer {
-            removable.remove()
-            null
-        }.`when`(observer1).onChange(
-                ArgumentMatchers.any(TiPresenter.State::class.java),
-                ArgumentMatchers.anyBoolean()
-        )
+        every { observer1.onChange(any(), any()) } answers { removable.remove() }
 
-        presenter.attachView(mock(TiView::class.java))
+        presenter.attachView(mockk())
 
-        val inOrder = inOrder(observer1, observer2)
+        verifyOrder {
+            //observer 1 receives pre onAttachView event
+            observer1.onChange(TiPresenter.State.VIEW_ATTACHED, false)
 
-        //observer 1 receives pre onAttachView event
-        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, false)
+            // observer2 receives the pre event even when observer1 removed observer2 before observer2 received the pre event
+            observer2.onChange(TiPresenter.State.VIEW_ATTACHED, false)
 
-        // observer2 receives the pre event even when observer1 removed observer2 before observer2 received the pre event
-        inOrder.verify(observer2).onChange(TiPresenter.State.VIEW_ATTACHED, false)
-
-        // observer 1 receives post onAttachView event
-        inOrder.verify(observer1).onChange(TiPresenter.State.VIEW_ATTACHED, true)
-
+            // observer 1 receives post onAttachView event
+            observer1.onChange(TiPresenter.State.VIEW_ATTACHED, true)
+        }
         // observer2 never receives the post event, is unregistered at that time
-        verifyNoMoreInteractions(observer2)
+        verify(exactly = 1) { observer2.onChange(TiPresenter.State.VIEW_ATTACHED, any()) }
     }
 
     @Test
