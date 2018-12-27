@@ -74,9 +74,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test crop long params`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -93,9 +93,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test do not log object invocations`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         view.hashCode()
         view.toString()
@@ -109,7 +109,7 @@ class LoggingInterceptorTest {
 
         val interceptor = LoggingInterceptor()
 
-        val interceptView = interceptor.intercept(MyActivity())
+        val interceptView: TiView = interceptor.intercept(MyActivity())
 
         assertThat(interceptView)
                 .isInstanceOf(TiView::class.java)
@@ -121,9 +121,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log array`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -139,9 +139,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log empty list`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -158,9 +158,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log lists`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -178,9 +178,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log multiple arguments`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -193,9 +193,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log null`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -208,9 +208,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log null varargs`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -223,9 +223,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log varargs`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -241,9 +241,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test log void methods`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
@@ -280,9 +280,9 @@ class LoggingInterceptorTest {
     @Test
     fun `test report errors correctly`() {
 
-        val logger = mockk<TiLog.Logger>()
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
         val loggingInterceptor = LoggingInterceptor(logger)
-        val view = loggingInterceptor.intercept(TestViewImpl())
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
 
         val msgSlot = slot<String>()
 
