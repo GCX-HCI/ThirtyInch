@@ -131,9 +131,9 @@ class LoggingInterceptorTest {
         view.twoArgs(array, "B")
         verify { logger.log(any(), any(), capture(msgSlot)) }
 
-        assertThat(msgSlot.captured)
-                .matches(
-                        "twoArgs\\(\\{String\\[\\]\\[3\\]@[\\da-f]{1,8}\\} \\" + "[Buenos Aires, Córdoba, La Plata\\], B\\)")
+        assertThat(msgSlot.captured).matches(
+                Pattern.compile("""twoArgs\(\{String\[]\[3]@[\da-f]{1,8}} \[Buenos Aires, Córdoba, La Plata], B\)""")
+        )
     }
 
     @Test
@@ -149,10 +149,7 @@ class LoggingInterceptorTest {
         verify { logger.log(any(), any(), capture(msgSlot)) }
 
         assertThat(msgSlot.captured)
-                .matches("twoArgs\\("
-                        + "\\{ArrayList\\[0\\]@[\\da-f]{1,8}\\} \\[\\], "
-                        + "B"
-                        + "\\)")
+                .matches(Pattern.compile("""twoArgs\(\{ArrayList\[0]@[\da-f]{1,8}} \[], B\)"""))
     }
 
     @Test
@@ -168,11 +165,9 @@ class LoggingInterceptorTest {
         view.twoArgs(list, "B")
         verify { logger.log(any(), any(), capture(msgSlot)) }
 
-        assertThat(msgSlot.captured)
-                .matches("twoArgs\\("
-                        + "\\{ArrayList\\[3\\]@[\\da-f]{1,8}\\} \\[Buenos Aires, Córdoba, La Plata\\], "
-                        + "B"
-                        + "\\)")
+        assertThat(msgSlot.captured).matches(
+                Pattern.compile("""twoArgs\(\{ArrayList\[3]@[\da-f]{1,8}} \[Buenos Aires, Córdoba, La Plata], B\)""")
+        )
     }
 
     @Test
@@ -233,10 +228,9 @@ class LoggingInterceptorTest {
         view.varargs("Buenos Aires", "Córdoba", "La Plata")
         verify { logger.log(any(), any(), capture(msgSlot)) }
 
-        assertThat(msgSlot.captured)
-                .matches(
-                        "varargs\\(\\{Object\\[\\]\\[3\\]@[\\da-f]{1,8}\\} \\" + "[Buenos Aires, Córdoba, La Plata\\]\\)"
-                )
+        assertThat(msgSlot.captured).matches(
+                Pattern.compile("""varargs\(\{Object\[]\[3]@[\da-f]{1,8}} \[Buenos Aires, Córdoba, La Plata]\)""")
+        )
     }
 
     @Test
