@@ -27,6 +27,10 @@ import org.junit.runner.*;
 import org.junit.runners.*;
 import org.mockito.*;
 
+/**
+ * This test class is left intentionally because of differences how Kotlin and Java treat varargs.
+ * Because of that we have to test the behavior separately for both platforms.
+ */
 @RunWith(JUnit4.class)
 public class LoggingInterceptorTestJava {
 
@@ -44,6 +48,10 @@ public class LoggingInterceptorTestJava {
 
     }
 
+    /**
+     * In Java it is possible to pass a null array reference as a single vararg parameter.
+     * In Kotlin a single value (null as well) passed as a vararg parameter will always be wrapped in an array.
+     */
     @Test
     public void testLogNullVarargs() {
 
