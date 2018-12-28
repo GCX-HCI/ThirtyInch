@@ -24,6 +24,7 @@ import org.assertj.core.api.Assertions.*
 import org.junit.*
 import org.junit.runner.*
 import org.junit.runners.*
+import java.util.regex.Pattern
 
 @RunWith(JUnit4::class)
 class LoggingInterceptorTest {
@@ -50,7 +51,7 @@ class LoggingInterceptorTest {
             // stub
         }
 
-        override fun varargs(vararg args: Any) {
+        override fun varargs(vararg args: Any?) {
             // stub
         }
     }
@@ -67,7 +68,7 @@ class LoggingInterceptorTest {
 
         fun twoArgs(arg1: Any, arg2: Any)
 
-        fun varargs(vararg args: Any)
+        fun varargs(vararg args: Any?)
     }
 
     @Test
@@ -213,10 +214,11 @@ class LoggingInterceptorTest {
 
         val msgSlot = slot<String>()
 
-        view.varargs()
+        view.varargs(null)
         verify { logger.log(any(), any(), capture(msgSlot)) }
 
-        assertThat(msgSlot.captured).isEqualTo("varargs(null)")
+        assertThat(msgSlot.captured).matches(
+                Pattern.compile("""varargs\(\{Object\[]\[1]@[\da-f]{1,8}} \[null]\)"""))
     }
 
     @Test
