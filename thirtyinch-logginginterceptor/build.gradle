@@ -11,6 +11,9 @@ android {
         versionCode VERSION_CODE
         versionName VERSION_NAME
     }
+    sourceSets {
+        test.java.srcDirs += 'src/test/kotlin'
+    }
     buildTypes {
         release {
             minifyEnabled false

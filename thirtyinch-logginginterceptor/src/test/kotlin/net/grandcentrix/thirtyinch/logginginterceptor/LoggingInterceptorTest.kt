@@ -50,7 +50,7 @@ class LoggingInterceptorTest {
             // stub
         }
 
-        override fun varargs(vararg args: Any?) {
+        override fun varargs(vararg args: Any) {
             // stub
         }
     }
@@ -67,7 +67,7 @@ class LoggingInterceptorTest {
 
         fun twoArgs(arg1: Any, arg2: Any)
 
-        fun varargs(vararg args: Any?)
+        fun varargs(vararg args: Any)
     }
 
     @Test
@@ -213,7 +213,7 @@ class LoggingInterceptorTest {
 
         val msgSlot = slot<String>()
 
-        view.varargs(null)
+        view.varargs()
         verify { logger.log(any(), any(), capture(msgSlot)) }
 
         assertThat(msgSlot.captured).isEqualTo("varargs(null)")
