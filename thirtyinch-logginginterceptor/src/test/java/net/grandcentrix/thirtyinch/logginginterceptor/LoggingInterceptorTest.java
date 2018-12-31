@@ -153,6 +153,22 @@ public class LoggingInterceptorTest {
     }
 
     @Test
+    public void testLogArrayContainingNull() throws Exception {
+
+        final TiLog.Logger logger = mock(TiLog.Logger.class);
+        final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
+        final TestView view = loggingInterceptor.intercept(new TestViewImpl());
+
+        final ArgumentCaptor<String> msgCaptor = ArgumentCaptor.forClass(String.class);
+
+        view.twoArgs(new Object[]{null}, "B");
+        verify(logger).log(anyInt(), anyString(), msgCaptor.capture());
+
+        assertThat(msgCaptor.getValue())
+                .matches("twoArgs\\(\\{Object\\[\\]\\[1\\]@[\\da-f]{1,8}\\} \\[null\\], B\\)");
+    }
+
+    @Test
     public void testLogEmptyList() throws Exception {
 
         final TiLog.Logger logger = mock(TiLog.Logger.class);
@@ -187,6 +203,27 @@ public class LoggingInterceptorTest {
         assertThat(msgCaptor.getValue())
                 .matches("twoArgs\\("
                         + "\\{ArrayList\\[3\\]@[\\da-f]{1,8}\\} \\[Buenos Aires, Córdoba, La Plata\\], "
+                        + "B"
+                        + "\\)");
+    }
+
+    @Test
+    public void testLogListContainingNull() throws Exception {
+
+        final TiLog.Logger logger = mock(TiLog.Logger.class);
+        final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
+        final TestView view = loggingInterceptor.intercept(new TestViewImpl());
+
+        final ArgumentCaptor<String> msgCaptor = ArgumentCaptor.forClass(String.class);
+
+        final List<Object> list = new ArrayList<>();
+        list.add(null);
+        view.twoArgs(list, "B");
+        verify(logger).log(anyInt(), anyString(), msgCaptor.capture());
+
+        assertThat(msgCaptor.getValue())
+                .matches("twoArgs\\("
+                        + "\\{ArrayList\\[1\\]@[\\da-f]{1,8}\\} \\[null\\], "
                         + "B"
                         + "\\)");
     }
@@ -253,6 +290,22 @@ public class LoggingInterceptorTest {
         assertThat(msgCaptor.getValue())
                 .matches("varargs\\(\\{Object\\[\\]\\[3\\]@[\\da-f]{1,8}\\} \\"
                         + "[Buenos Aires, Córdoba, La Plata\\]\\)");
+    }
+
+    @Test
+    public void testLogVarargsContainingNull() throws Exception {
+
+        final TiLog.Logger logger = mock(TiLog.Logger.class);
+        final LoggingInterceptor loggingInterceptor = new LoggingInterceptor(logger);
+        final TestView view = loggingInterceptor.intercept(new TestViewImpl());
+
+        final ArgumentCaptor<String> msgCaptor = ArgumentCaptor.forClass(String.class);
+
+        view.varargs(new Object[]{null});
+        verify(logger).log(anyInt(), anyString(), msgCaptor.capture());
+
+        assertThat(msgCaptor.getValue())
+                .matches("varargs\\(\\{Object\\[\\]\\[1\\]@[\\da-f]{1,8}\\} \\[null\\]\\)");
     }
 
     @Test
