@@ -137,6 +137,24 @@ class LoggingInterceptorTest {
     }
 
     @Test
+    fun `test log array containing null`() {
+
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
+        val loggingInterceptor = LoggingInterceptor(logger)
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
+
+        val msgSlot = slot<String>()
+
+        val array: Array<Any?> = arrayOf(null)
+        view.twoArgs(array, "B")
+        verify { logger.log(any(), any(), capture(msgSlot)) }
+
+        assertThat(msgSlot.captured).matches(
+                Pattern.compile("""twoArgs\(\{Object\[]\[1]@[\da-f]{1,8}} \[null], B\)""")
+        )
+    }
+
+    @Test
     fun `test log empty list`() {
 
         val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
@@ -167,6 +185,25 @@ class LoggingInterceptorTest {
 
         assertThat(msgSlot.captured).matches(
                 Pattern.compile("""twoArgs\(\{ArrayList\[3]@[\da-f]{1,8}} \[Buenos Aires, Córdoba, La Plata], B\)""")
+        )
+    }
+
+    @Test
+    fun `test log list containing null`() {
+
+        val logger = mockk<TiLog.Logger>(relaxUnitFun = true)
+        val loggingInterceptor = LoggingInterceptor(logger)
+        val view: TestView = loggingInterceptor.intercept(TestViewImpl())
+
+        val msgSlot = slot<String>()
+
+        // listOf() would create SingletonList
+        val list: List<Any?> = arrayListOf(null)
+        view.twoArgs(list, "B")
+        verify { logger.log(any(), any(), capture(msgSlot)) }
+
+        assertThat(msgSlot.captured).matches(
+                Pattern.compile("""twoArgs\(\{ArrayList\[1]@[\da-f]{1,8}} \[null], B\)""")
         )
     }
 

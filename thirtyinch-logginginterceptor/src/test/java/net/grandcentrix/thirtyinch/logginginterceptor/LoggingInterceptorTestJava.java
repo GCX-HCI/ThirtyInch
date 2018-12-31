@@ -64,7 +64,6 @@ public class LoggingInterceptorTestJava {
         view.varargs((Object[]) null);
         verify(logger).log(anyInt(), anyString(), msgCaptor.capture());
 
-        assertThat(msgCaptor.getValue())
-                .isEqualTo("varargs(null)");
+        assertThat(msgCaptor.getValue()).isEqualTo("varargs(null)");
     }
 }
