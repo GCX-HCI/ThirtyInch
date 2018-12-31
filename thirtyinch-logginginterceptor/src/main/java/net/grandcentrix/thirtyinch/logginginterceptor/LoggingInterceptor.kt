@@ -98,7 +98,7 @@ private fun toString(method: Method, args: Array<Any?>): String =
 private fun parseParams(methodParams: Array<Any?>, maxLenOfParam: Int): String =
         methodParams.joinToString { param ->
 
-            val paramString: String = when (param) {
+            val paramString = when (param) {
                 is List<*> -> {
                     val clazz = param.javaClass.simpleName
                     val size = param.size
