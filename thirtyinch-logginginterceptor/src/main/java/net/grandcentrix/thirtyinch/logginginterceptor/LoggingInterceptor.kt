@@ -56,14 +56,13 @@ class LoggingInterceptor @JvmOverloads constructor(logger: TiLog.Logger? = TiLog
         override fun toString(): String = "MethodLoggingProxy@${Integer.toHexString(hashCode())}-$view"
 
         @Throws(Throwable::class)
-        override fun handleInvocation(proxy: Any, method: Method, args: Array<Any?>): Any? {
-            try {
-                logger.log(Log.VERBOSE, TAG, toString(method, args))
-                return method.invoke(view, *args)
-            } catch (e: InvocationTargetException) {
-                throw e.cause ?: Exception("Invoked method exception cause is null")
-            }
-        }
+        override fun handleInvocation(proxy: Any, method: Method, args: Array<Any?>): Any? =
+                try {
+                    logger.log(Log.VERBOSE, TAG, toString(method, args))
+                    method.invoke(view, *args)
+                } catch (e: InvocationTargetException) {
+                    throw e.cause ?: Exception("Invoked method exception cause is null")
+                }
     }
 
     override fun <V : TiView> intercept(view: V): V =
