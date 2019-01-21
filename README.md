@@ -307,6 +307,49 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
 }
 ```
 
+You can make `Disposable` handling even less intrusive in Kotlin. Just create the following interface and make your presenters implement it:
+
+```kotlin
+interface DisposableHandler {
+
+    // Initialize with reference to your TiPresenter instance
+    val disposableHandler: RxTiPresenterDisposableHandler
+
+    // Dispose of Disposables dependent on the TiPresenter lifecycle
+    fun Disposable.disposeWhenDestroyed(): Disposable = disposableHandler.manageDisposable(this)
+
+    // Dispose of Disposables dependent on the TiView attached/detached state
+    fun Disposable.disposeWhenViewDetached(): Disposable = disposableHandler.manageViewDisposable(this)
+} 
+```
+
+Then just implement the interface in your presenter and you can use created extension functions to manage `Disposable`s:
+
+```kotlin
+class MyPresenter : TiPresenter<MyView>(), DisposableHandler {
+
+    override val disposableHandler = RxTiPresenterDisposableHandler(this)
+
+    override fun onCreate() {
+        super.onCreate()
+
+        // Presenter lifecycle dependent Disposable
+        myObservable
+            .subscribe()
+            .disposeWhenDestroyed()
+    }
+
+    override fun onAttachView(view: MyView) {
+        super.onAttachView(view)
+
+        // View attached/detached dependent Disposable
+        myViewObservable
+            .subscribe()
+            .disposeWhenViewDetached()
+    }
+}
+```
+
 # License
 
 ```
