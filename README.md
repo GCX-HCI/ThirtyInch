@@ -289,7 +289,7 @@ class HelloWorldPresenter : TiPresenter<HelloWorldView> {
   private lateinit var scope: CoroutineScope
 
   override fun onAttachView(view: HelloWorldView) {
-      scope = TiCoroutineScope(this, Dispatchers.Default)
+      scope = TiCoroutineScope(this, Dispatchers.Default, true)
       scope.launch { ... }
   }
 }
