@@ -4,6 +4,7 @@ include(
         ":thirtyinch-rx",
         ":thirtyinch-rx2",
         ":thirtyinch-kotlin",
+        ":thirtyinch-kotlin-coroutines",
         ":thirtyinch-lint",
         ":sample",
 )
