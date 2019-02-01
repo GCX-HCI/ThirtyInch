@@ -39,15 +39,35 @@ class TiCoroutineScopeTest {
 
     @Test
     fun `cancels all jobs when view is detached`() {
-        val scope = TiCoroutineScope(presenter, coroutineContext, true)
+        val scope = TiCoroutineScope(presenter, coroutineContext)
         testPresenter.attachView(view)
 
         // starting a job while a view is attached
-        val newJob = scope.launch { delay(10000) }
+        val newJob = scope.launchUntilViewDetaches { delay(10000) }
 
         // detaching the view cancels the job
         testPresenter.detachView()
         assertTrue(newJob.isCancelled)
+    }
+
+    @Test
+    fun `cancelling a job when view detaches does not cancel a job until presenter is destroyed`() {
+        val scope = TiCoroutineScope(presenter, coroutineContext)
+        testPresenter.attachView(view)
+
+        // starting two jobs, one until presenter is destroyed, one until view detaches
+        val onDestroyJob = scope.launch { delay(10000) }
+        val onViewDetachJob = scope.launchUntilViewDetaches { delay(10000) }
+
+        // and then view detaches, cancels onViewDetachJob but not onDestroyJob
+        testPresenter.detachView()
+
+        assertTrue(onViewDetachJob.isCancelled)
+        assertFalse(onDestroyJob.isCancelled)
+
+        // destroying presenter then cancels the job
+        testPresenter.destroy()
+        assertTrue(onDestroyJob.isCancelled)
     }
 }
 

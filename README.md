@@ -282,19 +282,18 @@ class HelloWorldPresenter : TiPresenter<HelloWorldView> {
 ```
 The created `Job` will automatically be cancelled when the presenter is destroyed.
 
-You can also configure it so it cancels all jobs when the view detaches:
+Alternatively, you can launch jobs that get cancelled when a `TiView` detaches:
 ```kotlin
 class HelloWorldPresenter : TiPresenter<HelloWorldView> {
 
-  private lateinit var scope: CoroutineScope
+  private val scope = TiCoroutineScope(this, Dispatchers.Default)
 
   override fun onAttachView(view: HelloWorldView) {
-      scope = TiCoroutineScope(this, Dispatchers.Default, true)
-      scope.launch { ... }
+      scope.launchUntilViewDetaches { ... }
   }
 }
 ```
-Here, however, the `TiCoroutineScope` needs to be recreated every time a new view attaches.
+However, be careful that `launchUntilViewDetaches` can only be called when there is a view attached!
 
 ### [RxJava](https://github.com/ReactiveX/RxJava)
 
