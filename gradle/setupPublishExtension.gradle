@@ -1,6 +1,0 @@
-publish {
-    userOrg = "grandcentrix"
-    uploadName = "ThirtyInch"
-    website = "https://github.com/grandcentrix/ThirtyInch"
-    desc = "a Model View Presenter library for Android"
-}
