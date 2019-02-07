@@ -12,10 +12,6 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  * A [CoroutineScope] that is bound to the lifecycle of the given [TiPresenter].
- *
- * @param cancelWhenViewDetaches If all started coroutines in this scope should be cancelled when the view detaches.
- * By default they're cancelled when `presenter` is destroyed. You should recreate this object when the view attaches,
- * if you set this to `true`.
  */
 class TiCoroutineScope(
         private val presenter: TiPresenter<*>,
@@ -23,13 +19,13 @@ class TiCoroutineScope(
 ) : CoroutineScope {
 
     /**
-     * Parent [Job] for all coroutines that are started in the given presenter instance. When this `job` gets
-     * cancelled all of its children jobs will get cancelled too.
+     * Parent [Job] for all coroutines that are started in the given presenter instance. When this `onPresenterDestroyedJob` gets
+     * cancelled (when the presenter is destroyed) all of its children jobs will get cancelled too.
      */
-    private val job = Job()
-    override val coroutineContext: CoroutineContext = context + job
+    private val onPresenterDestroyedJob = Job()
+    override val coroutineContext: CoroutineContext = context + onPresenterDestroyedJob
     /**
-     * Parent [Job] for all coroutines that are started while a `view` attached. When this `job` gets
+     * Parent [Job] for all coroutines that are started while a `view` attached. When this `onPresenterDestroyedJob` gets
      * cancelled (when the view detaches) all of its children jobs will get cancelled too.
      */
     private var onViewDetachJob: Job? = null
@@ -48,14 +44,14 @@ class TiCoroutineScope(
             if (!hasLifecycleMethodBeenCalled) return@addLifecycleObserver
 
             when {
-                state == DESTROYED -> job.cancel()
+                state == DESTROYED -> onPresenterDestroyedJob.cancel()
                 state == VIEW_DETACHED && presenterState != null -> {
                     onViewDetachCoroutineContext?.cancel()
                     onViewDetachCoroutineContext = null
                     onViewDetachJob = null
                 }
                 state == VIEW_ATTACHED -> {
-                    onViewDetachJob = Job(job)
+                    onViewDetachJob = Job(onPresenterDestroyedJob)
                     onViewDetachCoroutineContext = context + onViewDetachJob!!
                 }
             }
