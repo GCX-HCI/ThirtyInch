@@ -51,8 +51,9 @@ class TiCoroutineScope(
                     onViewDetachJob = null
                 }
                 state == VIEW_ATTACHED -> {
-                    onViewDetachJob = Job(onPresenterDestroyedJob)
-                    onViewDetachCoroutineContext = context + onViewDetachJob!!
+                    onViewDetachJob = Job(onPresenterDestroyedJob).apply {
+                        onViewDetachCoroutineContext = context + this
+                    }
                 }
             }
             presenterState = state
