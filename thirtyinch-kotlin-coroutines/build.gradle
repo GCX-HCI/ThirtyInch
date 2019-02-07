@@ -10,6 +10,7 @@ android {
         targetSdkVersion TARGET_SDK_VERSION
         versionCode VERSION_CODE
         versionName VERSION_NAME
+        consumerProguardFiles 'proguard-rules.pro'
     }
     buildTypes {
         release {
@@ -26,7 +27,7 @@ android {
 dependencies {
     api project(":thirtyinch-kotlin")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1")
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
