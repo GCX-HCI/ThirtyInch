@@ -1,0 +1,34 @@
+apply plugin: "com.android.library"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: 'net.grandcentrix.gradle.publish'
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION
+
+    defaultConfig {
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    api project(":thirtyinch-kotlin")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1")
+
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
+}
