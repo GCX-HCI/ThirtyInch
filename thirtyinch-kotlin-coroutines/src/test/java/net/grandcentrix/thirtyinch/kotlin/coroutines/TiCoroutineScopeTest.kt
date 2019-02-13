@@ -19,10 +19,10 @@ class TiCoroutineScopeTest {
     private val testPresenter = presenter.test()
     private val coroutineContext = TestCoroutineContext()
     private val view = object : TiView {}
+    private val scope = TiCoroutineScope(presenter, coroutineContext)
 
     @Test
     fun `cancels all jobs when presenter is destroyed`() {
-        val scope = TiCoroutineScope(presenter, coroutineContext)
         testPresenter.attachView(view)
 
         // starting a job while a view is attached
@@ -39,7 +39,6 @@ class TiCoroutineScopeTest {
 
     @Test
     fun `cancels all jobs when view is detached`() {
-        val scope = TiCoroutineScope(presenter, coroutineContext)
         testPresenter.attachView(view)
 
         // starting a job while a view is attached
@@ -52,7 +51,6 @@ class TiCoroutineScopeTest {
 
     @Test
     fun `cancelling a job when view detaches does not cancel a job until presenter is destroyed`() {
-        val scope = TiCoroutineScope(presenter, coroutineContext)
         testPresenter.attachView(view)
 
         // starting two jobs, one until presenter is destroyed, one until view detaches
@@ -68,6 +66,16 @@ class TiCoroutineScopeTest {
         // destroying presenter then cancels the job
         testPresenter.destroy()
         assertTrue(onDestroyJob.isCancelled)
+    }
+
+    @Test
+    fun `throw when launchUntilViewDetaches got called before view got attached`() {
+        // don't attach a view
+        try {
+            scope.launchUntilViewDetaches { delay(10000) }
+        } catch (exe: IllegalStateException) {
+            assertTrue(exe.message == "launchUntilViewDetaches can only be called when there is a view attached")
+        }
     }
 }
 
