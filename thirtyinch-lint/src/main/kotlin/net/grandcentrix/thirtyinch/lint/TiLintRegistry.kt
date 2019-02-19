@@ -16,5 +16,10 @@ class TiLintRegistry : IssueRegistry() {
                 }
         )
 
-    override val api: Int = com.android.tools.lint.detector.api.CURRENT_API
+    /**
+     * Lint API Version for which the Checks are build.
+     *
+     * See [com.android.tools.lint.detector.api.describeApi] for possible options
+     */
+    override val api: Int = 1
 }
