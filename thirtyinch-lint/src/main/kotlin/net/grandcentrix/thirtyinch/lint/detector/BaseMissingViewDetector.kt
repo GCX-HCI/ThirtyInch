@@ -73,6 +73,9 @@ abstract class BaseMissingViewDetector : Detector(), Detector.UastScanner {
                 return tryFindViewImplementation(context, uastContext.getClass(resolvedType), viewInterface)
             }
         }
-        return false
+
+        val superClass = declaration.superClass
+
+        return superClass != null && tryFindViewImplementation(context, superClass, viewInterface)
     }
 }
