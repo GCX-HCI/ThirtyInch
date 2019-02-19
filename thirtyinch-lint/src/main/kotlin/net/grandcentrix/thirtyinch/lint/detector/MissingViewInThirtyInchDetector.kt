@@ -53,6 +53,9 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
                             .firstOrNull()
                             ?: (type as? PsiClassType)?.let { tryFindViewInterface(it) }
                 }
+                ?: extendedType.superTypes.firstNotNullResult { superType ->
+                    (superType as? PsiClassType)?.let { tryFindViewInterface(it) }
+                }
     }
 
     override fun allowMissingViewInterface(context: JavaContext, declaration: UClass,
