@@ -19,7 +19,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import java.util.HashMap;
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
@@ -65,7 +64,6 @@ public abstract class AbstractPresenterDestroyTest {
         mFragmentSavedState = null;
     }
 
-    @NonNull
     private Answer getFromMap(final HashMap<String, String> store) {
         return new Answer() {
             @Override
@@ -77,7 +75,6 @@ public abstract class AbstractPresenterDestroyTest {
         };
     }
 
-    @NonNull
     private Answer saveInMap(final HashMap<String, String> store) {
         return new Answer() {
             @Override

@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
@@ -48,7 +47,6 @@ public class TestTiActivity
             TiPresenterProvider<TiPresenter<TiView>> presenterProvider = mPresenterProvider;
             if (presenterProvider == null) {
                 presenterProvider = new TiPresenterProvider<TiPresenter<TiView>>() {
-                    @NonNull
                     @Override
                     public TiPresenter<TiView> providePresenter() {
                         return mPresenter;
@@ -109,7 +107,7 @@ public class TestTiActivity
     public Executor getUiThreadExecutor() {
         return new Executor() {
             @Override
-            public void execute(@NonNull final Runnable action) {
+            public void execute(final Runnable action) {
                 action.run();
             }
         };
@@ -141,7 +139,6 @@ public class TestTiActivity
         mDelegate.onStop_afterSuper();
     }
 
-    @NonNull
     @Override
     public TiView provideView() {
         return mock(TiView.class);

@@ -19,7 +19,6 @@ package net.grandcentrix.thirtyinch;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import androidx.annotation.NonNull;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -46,7 +45,7 @@ public class SendToViewTest {
 
     private Executor mImmediatelySameThread = new Executor() {
         @Override
-        public void execute(@NonNull final Runnable action) {
+        public void execute(final Runnable action) {
             action.run();
         }
     };
