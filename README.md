@@ -32,16 +32,12 @@ dependencies {
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin-coroutines:$thirtyinchVersion"
     
     // Lagacy dependencies
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
 }
 ```
-
-
-## [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
-
-There is a sample implementation based on the [Android Architecture Blueprints TODO app](https://github.com/googlesamples/android-architecture) which can be found here: [ThirtyInch sample project](https://github.com/passsy/thirtyinch-sample) (work in progress)
 
 ## Hello World MVP example with ThirtyInch
 
@@ -271,6 +267,34 @@ interface HelloWorldView : TiView {
 ``` 
 Back in the Java days we had to use `it` inside the `sendToView`-lambda.
 
+#### Coroutines
+If you're using Kotlin's Coroutines we offer a `CoroutineScope` that scopes to a presenter's lifecycle.
+
+```kotlin
+class HelloWorldPresenter : TiPresenter<HelloWorldView> {
+
+  private val scope = TiCoroutineScope(this, Dispatchers.Default)
+
+  override fun onCreate() {
+      scope.launch { ... }
+  }
+}
+```
+The created `Job` will automatically be cancelled when the presenter is destroyed.
+
+Alternatively, you can launch jobs that get cancelled when a `TiView` detaches:
+```kotlin
+class HelloWorldPresenter : TiPresenter<HelloWorldView> {
+
+  private val scope = TiCoroutineScope(this, Dispatchers.Default)
+
+  override fun onAttachView(view: HelloWorldView) {
+      scope.launchUntilViewDetaches { ... }
+  }
+}
+```
+However, be careful that `launchUntilViewDetaches` can only be called when there is a view attached!
+
 ### [RxJava](https://github.com/ReactiveX/RxJava)
 
 Using RxJava for networking is very often used.
@@ -303,6 +327,49 @@ public class HelloWorldPresenter extends TiPresenter<HelloWorldView> {
         
         // automatically unsubscribe in onDetachView(view)
         rxHelper.manageViewSubscription(anotherObservable.subscribe());
+    }
+}
+```
+
+You can make `Disposable` handling even less intrusive in Kotlin. Just create the following interface and make your presenters implement it:
+
+```kotlin
+interface DisposableHandler {
+
+    // Initialize with reference to your TiPresenter instance
+    val disposableHandler: RxTiPresenterDisposableHandler
+
+    // Dispose of Disposables dependent on the TiPresenter lifecycle
+    fun Disposable.disposeWhenDestroyed(): Disposable = disposableHandler.manageDisposable(this)
+
+    // Dispose of Disposables dependent on the TiView attached/detached state
+    fun Disposable.disposeWhenViewDetached(): Disposable = disposableHandler.manageViewDisposable(this)
+} 
+```
+
+Then just implement the interface in your presenter and you can use created extension functions to manage `Disposable`s:
+
+```kotlin
+class MyPresenter : TiPresenter<MyView>(), DisposableHandler {
+
+    override val disposableHandler = RxTiPresenterDisposableHandler(this)
+
+    override fun onCreate() {
+        super.onCreate()
+
+        // Presenter lifecycle dependent Disposable
+        myObservable
+            .subscribe()
+            .disposeWhenDestroyed()
+    }
+
+    override fun onAttachView(view: MyView) {
+        super.onAttachView(view)
+
+        // View attached/detached dependent Disposable
+        myViewObservable
+            .subscribe()
+            .disposeWhenViewDetached()
     }
 }
 ```

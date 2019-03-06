@@ -1,4 +1,5 @@
-apply plugin: 'com.android.library'
+apply plugin: "com.android.library"
+apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: 'net.grandcentrix.gradle.publish'
 
 android {
@@ -9,6 +10,7 @@ android {
         targetSdkVersion TARGET_SDK_VERSION
         versionCode VERSION_CODE
         versionName VERSION_NAME
+        consumerProguardFiles 'proguard-rules.pro'
     }
     buildTypes {
         release {
@@ -23,10 +25,10 @@ android {
 }
 
 dependencies {
-    implementation project(':thirtyinch')
-    compileOnly "androidx.annotation:annotation:$androidXLibraryVersion"
+    api project(":thirtyinch-kotlin")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1")
 
     testImplementation "junit:junit:$junitVersion"
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    testImplementation "org.assertj:assertj-core:$assertjVersion"
+    testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
 }

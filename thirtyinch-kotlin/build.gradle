@@ -1,6 +1,6 @@
 apply plugin: "com.android.library"
 apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: 'guru.stefma.bintrayrelease'
+apply plugin: 'net.grandcentrix.gradle.publish'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -29,10 +29,4 @@ dependencies {
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
-}
-
-// For uploading to bintray
-apply from: '../gradle/setupPublishExtension.gradle'
-androidArtifact {
-    artifactId = 'thirtyinch-kotlin'
 }
