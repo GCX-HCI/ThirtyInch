@@ -39,9 +39,9 @@ ext {
     androidXLibraryVersion = '1.0.2'
     androidXTestVersion = '1.1.1'
     junitVersion = '4.12'
-    mockitoVersion = '2.10.0'
-    assertjVersion = '2.8.0'
-    espressoVersion = '3.0.1'
+    mockitoVersion = '2.25.0'
+    assertjVersion = '3.12.1'
+    espressoVersion = '3.1.0'
 
     // According to https://github.com/googlesamples/android-custom-lint-rules/tree/master/android-studio-3
     // the lint version should match to the used Android Gradle Plugin by the formula "AGP Version X.Y.Z + 23.0.0"
