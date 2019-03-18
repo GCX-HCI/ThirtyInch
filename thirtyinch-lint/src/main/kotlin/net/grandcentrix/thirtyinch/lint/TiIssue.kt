@@ -44,6 +44,15 @@ sealed class TiIssue(
             severity = Severity.WARNING
     )
 
+    object AnnotationOnNonTiView : TiIssue(
+            id = "TiAnnotationOnNonTiViewInterface",
+            briefDescription = "ThirtyInch Annotations on a method of a not TiView Interface is useless",
+            longDescription = "When using a ThirtyInch annotation on a method of a not TiView Interface it will not be recognized and so will not change anything.",
+            category = CATEGORY_TI,
+            priority = 5,
+            severity = Severity.WARNING
+    )
+
     fun asLintIssue(detectorCls: Class<out Detector>, description: String? = null): Issue =
             Issue.create(
                     id,
