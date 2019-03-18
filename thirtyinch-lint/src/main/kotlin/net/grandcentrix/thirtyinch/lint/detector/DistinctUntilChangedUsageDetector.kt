@@ -3,8 +3,9 @@ package net.grandcentrix.thirtyinch.lint.detector
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Detector.UastScanner
+import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
-import com.android.tools.lint.detector.api.TextFormat
+import com.android.tools.lint.detector.api.TextFormat.TEXT
 import com.intellij.psi.PsiType
 import net.grandcentrix.thirtyinch.lint.TiIssue
 import org.jetbrains.uast.UAnnotation
@@ -34,20 +35,20 @@ class DistinctUntilChangedUsageDetector : Detector(), UastScanner {
             val method = node.uastParent as? UMethod ?: return
 
             if (!method.hasParameters()) {
-                context.report(
-                        ISSUE_NO_PARAMETER,
-                        context.getLocation(node),
-                        ISSUE_NO_PARAMETER.getBriefDescription(TextFormat.TEXT)
-                )
+                report(context, node, ISSUE_NO_PARAMETER)
             }
-            
+
             if (method.returnType != PsiType.VOID) {
-                context.report(
-                        ISSUE_NON_VOID_RETURN_TYPE,
-                        context.getLocation(node),
-                        ISSUE_NON_VOID_RETURN_TYPE.getBriefDescription(TextFormat.TEXT)
-                )
+                report(context, node, ISSUE_NON_VOID_RETURN_TYPE)
             }
         }
+    }
+
+    private fun report(context: JavaContext, annotation: UAnnotation, issue: Issue) {
+        context.report(
+                issue,
+                context.getLocation(annotation),
+                issue.getBriefDescription(TEXT)
+        )
     }
 }
