@@ -2,6 +2,7 @@ package net.grandcentrix.thirtyinch.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.detector.api.Issue
+import net.grandcentrix.thirtyinch.lint.detector.CallOnMainThreadUsageDetector
 import net.grandcentrix.thirtyinch.lint.detector.DistinctUntilChangedUsageDetector
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInCompositeDetector
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInThirtyInchDetector
@@ -22,6 +23,12 @@ class TiLintRegistry : IssueRegistry() {
                     setEnabledByDefault(true)
                 },
                 DistinctUntilChangedUsageDetector.ISSUE_NO_TIVIEW_CHILD.apply {
+                    setEnabledByDefault(true)
+                },
+                CallOnMainThreadUsageDetector.ISSUE_NON_VOID_RETURN_TYPE.apply {
+                    setEnabledByDefault(true)
+                },
+                CallOnMainThreadUsageDetector.ISSUE_NO_TIVIEW_CHILD.apply {
                     setEnabledByDefault(true)
                 }
         )
