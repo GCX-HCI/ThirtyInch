@@ -30,13 +30,19 @@ private val CLASS_DISTINCTUNTILCHANGED = java(
                 "}"
 )
 
+private val CLASS_TIVIEW = java(
+        "package net.grandcentrix.thirtyinch;\n" +
+                "public interface TiView {}"
+)
+
 class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
 
     override fun getDetector(): Detector = DistinctUntilChangedUsageDetector()
 
     override fun getIssues(): MutableList<Issue> = mutableListOf(
             DistinctUntilChangedUsageDetector.ISSUE_NO_PARAMETER,
-            DistinctUntilChangedUsageDetector.ISSUE_NON_VOID_RETURN_TYPE
+            DistinctUntilChangedUsageDetector.ISSUE_NON_VOID_RETURN_TYPE,
+            DistinctUntilChangedUsageDetector.ISSUE_NO_TIVIEW_CHILD
     )
 
     fun testJava_annotation_used_on_method_without_parameter_should_have_warning() {
@@ -50,7 +56,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
                 .containsOnlyOnce(TiIssue.DistinctUntilChangedWithoutParameter.id)
     }
 
@@ -65,7 +71,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
                 .containsOnlyOnce(TiIssue.DistinctUntilChangedWithoutParameter.id)
     }
 
@@ -80,7 +86,8 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface)).isEqualTo(NO_WARNINGS)
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .isEqualTo(NO_WARNINGS)
     }
 
     fun testKotlin_annotation_used_on_method_with_parameter_should_have_no_warning() {
@@ -94,7 +101,8 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface)).isEqualTo(NO_WARNINGS)
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .isEqualTo(NO_WARNINGS)
     }
 
     fun testJava_annotation_used_on_method_with_non_void_return_type_should_have_warning() {
@@ -108,7 +116,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonVoidMethod.id)
     }
 
@@ -123,7 +131,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonVoidMethod.id)
     }
 
@@ -138,7 +146,8 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface)).isEqualTo(NO_WARNINGS)
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .isEqualTo(NO_WARNINGS)
     }
 
     fun testKotlin_annotation_used_on_method_with_void_return_type_should_have_no_warning() {
@@ -152,6 +161,127 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface)).isEqualTo(NO_WARNINGS)
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_annotation_used_on_method_in_TiView_child_interface_should_have_no_warning() {
+        val testInterface = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;\n" +
+                        "import net.grandcentrix.thirtyinch.TiView;\n" +
+                        "public interface MyInterface extends TiView {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   public void test(String id);\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .isEqualTo(NO_WARNINGS)
+    }
+
+    fun testKotlin_annotation_used_on_method_in_TiView_child_interface_should_have_no_warning() {
+        val testInterface = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged\n" +
+                        "import net.grandcentrix.thirtyinch.TiView\n" +
+                        "interface MyInterface : TiView {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   fun test(id: String)\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_annotation_used_on_method_in_TiView_child_class_should_have_warning() {
+        val testInterface = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;\n" +
+                        "import net.grandcentrix.thirtyinch.TiView;\n" +
+                        "public class MyClass extends TiView {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   public void test(String id);\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
+    }
+
+    fun testKotlin_annotation_used_on_method_in_TiView_child_class_should_have_warning() {
+        val testInterface = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged\n" +
+                        "import net.grandcentrix.thirtyinch.TiView\n" +
+                        "class MyClass : TiView {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   fun test(id: String)\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
+    }
+
+    fun testJava_annotation_used_on_method_in_non_TiView_child_class_should_have_warning() {
+        val testInterface = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;\n" +
+                        "import net.grandcentrix.thirtyinch.TiView;\n" +
+                        "public class MyClass {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   public void test(String id);\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
+    }
+
+    fun testKotlin_annotation_used_on_method_in_non_TiView_child_class_should_have_warning() {
+        val testInterface = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged\n" +
+                        "import net.grandcentrix.thirtyinch.TiView\n" +
+                        "class MyClass {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   fun test(id: String)\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
+    }
+
+    fun testJava_annotation_used_on_method_in_non_TiView_interface_class_should_have_warning() {
+        val testInterface = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged;\n" +
+                        "import net.grandcentrix.thirtyinch.TiView;\n" +
+                        "public interface MyView {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   public void test(String id);\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
+    }
+
+    fun testKotlin_annotation_used_on_method_in_non_TiView_interface_class_should_have_warning() {
+        val testInterface = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged\n" +
+                        "import net.grandcentrix.thirtyinch.TiView\n" +
+                        "interface MyClass {\n" +
+                        "   @DistinctUntilChanged\n" +
+                        "   fun test(id: String)\n" +
+                        "}"
+        )
+
+        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+                .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 }
