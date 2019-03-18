@@ -34,11 +34,11 @@ class DistinctUntilChangedUsageDetector : Detector(), UastScanner {
 
             val method = node.uastParent as? UMethod ?: return
 
-            if (!method.hasParameters()) {
+            if (context.isEnabled(ISSUE_NO_PARAMETER) && !method.hasParameters()) {
                 report(context, node, ISSUE_NO_PARAMETER)
             }
 
-            if (method.returnType != PsiType.VOID) {
+            if (context.isEnabled(ISSUE_NON_VOID_RETURN_TYPE) && method.returnType != PsiType.VOID) {
                 report(context, node, ISSUE_NON_VOID_RETURN_TYPE)
             }
         }
