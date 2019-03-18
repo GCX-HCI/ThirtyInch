@@ -10,32 +10,6 @@ private const val NO_WARNINGS = "No warnings."
 
 class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
-    /* Stubbed-out source files */
-
-    private val tiActivityStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiFragmentStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiPresenterStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiPresenter<V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiViewStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public interface TiView {\n" +
-                    "}"
-    )
-
     private val view = java(
             "package foo;\n" +
                     "import net.grandcentrix.thirtyinch.*;\n" +
@@ -73,9 +47,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -93,9 +67,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -113,9 +87,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -133,9 +107,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -153,9 +127,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -173,9 +147,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -196,9 +170,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -219,9 +193,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -246,9 +220,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         baseActivity,
@@ -274,9 +248,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         baseActivity,
@@ -316,9 +290,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -359,9 +333,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -402,9 +376,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -445,9 +419,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -499,9 +473,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         baseView,
                         view,
                         basePresenter,
@@ -554,9 +528,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         baseView,
                         view,
                         basePresenter,
@@ -609,9 +583,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         baseView,
                         view,
                         basePresenter,
@@ -664,9 +638,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         baseView,
                         view,
                         basePresenter,
@@ -694,9 +668,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseActivity,
                         activity
@@ -721,9 +695,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseActivity,
                         activity
@@ -747,9 +721,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -766,8 +740,13 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         )
 
         assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, fragment))
+                TiStubs.TiFragment,
+                TiStubs.TiPresenter,
+                TiStubs.TiView,
+                presenter,
+                view,
+                fragment
+        ))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -781,9 +760,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -804,9 +783,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -831,9 +810,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         baseFragment,
@@ -873,9 +852,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -916,9 +895,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -959,9 +938,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -1002,9 +981,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -1031,9 +1010,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseFragment,
                         fragment
@@ -1058,9 +1037,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseFragment,
                         fragment

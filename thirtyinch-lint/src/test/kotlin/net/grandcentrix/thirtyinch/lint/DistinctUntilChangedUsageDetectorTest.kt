@@ -1,39 +1,12 @@
 package net.grandcentrix.thirtyinch.lint
 
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
-import com.android.tools.lint.checks.infrastructure.LintDetectorTest.java
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import net.grandcentrix.thirtyinch.lint.detector.DistinctUntilChangedUsageDetector
 import org.assertj.core.api.Assertions
 
 private const val NO_WARNINGS = "No warnings."
-
-private val CLASS_DISTINCTUNTILCHANGED = java(
-        "package net.grandcentrix.thirtyinch.distinctuntilchanged;\n" +
-                "\n" +
-                "import java.lang.annotation.Documented;\n" +
-                "import java.lang.annotation.ElementType;\n" +
-                "import java.lang.annotation.Retention;\n" +
-                "import java.lang.annotation.RetentionPolicy;\n" +
-                "import java.lang.annotation.Target;\n" +
-                "\n" +
-                "@Documented\n" +
-                "@Target(ElementType.METHOD)\n" +
-                "@Retention(RetentionPolicy.RUNTIME)\n" +
-                "public @interface DistinctUntilChanged {\n" +
-                "\n" +
-                "    Class<? extends DistinctComparator> comparator() default HashComparator.class;\n" +
-                "\n" +
-                "    boolean logDropped() default false;\n" +
-                "\n" +
-                "}"
-)
-
-private val CLASS_TIVIEW = java(
-        "package net.grandcentrix.thirtyinch;\n" +
-                "public interface TiView {}"
-)
 
 class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
 
@@ -56,7 +29,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.DistinctUntilChangedWithoutParameter.id)
     }
 
@@ -71,7 +44,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.DistinctUntilChangedWithoutParameter.id)
     }
 
@@ -86,7 +59,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -101,7 +74,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -116,7 +89,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonVoidMethod.id)
     }
 
@@ -131,7 +104,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonVoidMethod.id)
     }
 
@@ -146,7 +119,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -161,7 +134,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -176,7 +149,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -191,7 +164,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -206,7 +179,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -221,7 +194,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -236,7 +209,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -251,7 +224,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -266,7 +239,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -281,7 +254,7 @@ class DistinctUntilChangedUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_DISTINCTUNTILCHANGED, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.DistinctUntilChanged, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 }

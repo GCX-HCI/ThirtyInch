@@ -1,34 +1,12 @@
 package net.grandcentrix.thirtyinch.lint
 
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
-import com.android.tools.lint.checks.infrastructure.LintDetectorTest.java
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import net.grandcentrix.thirtyinch.lint.detector.CallOnMainThreadUsageDetector
 import org.assertj.core.api.Assertions
 
 private const val NO_WARNINGS = "No warnings."
-
-private val CLASS_CALLONMAINTHREAD = java(
-        "package net.grandcentrix.thirtyinch.callonmainthread;\n" +
-                "\n" +
-                "import java.lang.annotation.Documented;\n" +
-                "import java.lang.annotation.ElementType;\n" +
-                "import java.lang.annotation.Retention;\n" +
-                "import java.lang.annotation.RetentionPolicy;\n" +
-                "import java.lang.annotation.Target;\n" +
-                "\n" +
-                "@Documented\n" +
-                "@Target(ElementType.METHOD)\n" +
-                "@Retention(RetentionPolicy.RUNTIME)\n" +
-                "public @interface CallOnMainThread {\n" +
-                "}"
-)
-
-private val CLASS_TIVIEW = java(
-        "package net.grandcentrix.thirtyinch;\n" +
-                "public interface TiView {}"
-)
 
 class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
 
@@ -50,7 +28,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonVoidMethod.id)
     }
 
@@ -65,7 +43,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonVoidMethod.id)
     }
 
@@ -80,7 +58,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -95,7 +73,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -110,7 +88,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -125,7 +103,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -140,7 +118,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -155,7 +133,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_TIVIEW, CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.TiView, TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -170,7 +148,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -185,7 +163,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -200,7 +178,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 
@@ -215,7 +193,7 @@ class CallOnMainThreadUsageDetectorTest : LintDetectorTest() {
                         "}"
         )
 
-        Assertions.assertThat(lintProject(CLASS_CALLONMAINTHREAD, testInterface))
+        Assertions.assertThat(lintProject(TiStubs.CallOnMainThread, testInterface))
                 .containsOnlyOnce(TiIssue.AnnotationOnNonTiView.id)
     }
 }
