@@ -15,7 +15,8 @@ class IssueRegistryTest {
                         MissingViewInThirtyInchDetector.ISSUE,
                         MissingViewInCompositeDetector.ISSUE,
                         DistinctUntilChangedUsageDetector.ISSUE_NO_PARAMETER,
-                        DistinctUntilChangedUsageDetector.ISSUE_NON_VOID_RETURN_TYPE
+                        DistinctUntilChangedUsageDetector.ISSUE_NON_VOID_RETURN_TYPE,
+                        DistinctUntilChangedUsageDetector.ISSUE_NO_TIVIEW_CHILD
                 )
     }
 }

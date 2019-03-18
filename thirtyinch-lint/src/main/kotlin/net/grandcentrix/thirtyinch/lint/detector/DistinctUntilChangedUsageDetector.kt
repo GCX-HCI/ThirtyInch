@@ -9,9 +9,13 @@ import com.android.tools.lint.detector.api.TextFormat.TEXT
 import com.intellij.psi.PsiType
 import net.grandcentrix.thirtyinch.lint.TiIssue
 import org.jetbrains.uast.UAnnotation
+import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.getContainingUClass
+import org.jetbrains.uast.toUElement
 
+private const val FQN_CLASS_TIVIEW = "net.grandcentrix.thirtyinch.TiView"
 private const val FQN_ANNOTATION_DISTINCTUNTILCHANGED = "net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged"
 
 class DistinctUntilChangedUsageDetector : Detector(), UastScanner {
@@ -20,6 +24,9 @@ class DistinctUntilChangedUsageDetector : Detector(), UastScanner {
                 detectorCls = DistinctUntilChangedUsageDetector::class.java
         )
         val ISSUE_NON_VOID_RETURN_TYPE = TiIssue.AnnotationOnNonVoidMethod.asLintIssue(
+                detectorCls = DistinctUntilChangedUsageDetector::class.java
+        )
+        val ISSUE_NO_TIVIEW_CHILD = TiIssue.AnnotationOnNonTiView.asLintIssue(
                 detectorCls = DistinctUntilChangedUsageDetector::class.java
         )
     }
@@ -41,8 +48,19 @@ class DistinctUntilChangedUsageDetector : Detector(), UastScanner {
             if (context.isEnabled(ISSUE_NON_VOID_RETURN_TYPE) && method.returnType != PsiType.VOID) {
                 report(context, node, ISSUE_NON_VOID_RETURN_TYPE)
             }
+
+            if (context.isEnabled(ISSUE_NO_TIVIEW_CHILD)) {
+                val methodClass = method.getContainingUClass()
+                if (methodClass == null || !methodClass.isInterface || !methodClass.extends(FQN_CLASS_TIVIEW)) {
+                    report(context, node, ISSUE_NO_TIVIEW_CHILD)
+                }
+            }
         }
     }
+
+    private fun UClass.extends(fqClassName: String): Boolean = qualifiedName == fqClassName ||
+            interfaces.mapNotNull { iFace -> iFace.toUElement() as? UClass }
+                    .any { iFace -> iFace.extends(fqClassName) }
 
     private fun report(context: JavaContext, annotation: UAnnotation, issue: Issue) {
         context.report(

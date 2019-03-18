@@ -20,6 +20,9 @@ class TiLintRegistry : IssueRegistry() {
                 },
                 DistinctUntilChangedUsageDetector.ISSUE_NON_VOID_RETURN_TYPE.apply {
                     setEnabledByDefault(true)
+                },
+                DistinctUntilChangedUsageDetector.ISSUE_NO_TIVIEW_CHILD.apply {
+                    setEnabledByDefault(true)
                 }
         )
 
