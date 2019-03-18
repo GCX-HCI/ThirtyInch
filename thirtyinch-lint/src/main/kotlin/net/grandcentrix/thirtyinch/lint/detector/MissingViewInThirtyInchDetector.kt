@@ -5,15 +5,15 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
 import net.grandcentrix.thirtyinch.lint.TiIssue.MissingView
+import net.grandcentrix.thirtyinch.lint.TiNames
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import org.jetbrains.uast.UClass
 
-private const val TI_VIEW_FQ = "net.grandcentrix.thirtyinch.TiView"
 private const val PROVIDE_VIEW_METHOD = "provideView"
 private val TI_CLASS_NAMES = listOf(
-        "net.grandcentrix.thirtyinch.TiActivity",
-        "net.grandcentrix.thirtyinch.TiFragment",
-        "net.grandcentrix.thirtyinch.TiDialogFragment"
+        TiNames.FQN_CLASS_TIACTIVITY,
+        TiNames.FQN_CLASS_TIFRAGMENT,
+        TiNames.FQN_CLASS_TIDIALOGFRAGMENT
 )
 
 class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
@@ -48,7 +48,7 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
                 .firstNotNullResult { (type, typeParameter) ->
                     typeParameter.extendsListTypes
                             .map { it.resolveGenerics().element }
-                            .filter { TI_VIEW_FQ == it?.qualifiedName }
+                            .filter { TiNames.FQN_CLASS_TIVIEW == it?.qualifiedName }
                             .map { type }
                             .firstOrNull()
                             ?: (type as? PsiClassType)?.let { tryFindViewInterface(it) }

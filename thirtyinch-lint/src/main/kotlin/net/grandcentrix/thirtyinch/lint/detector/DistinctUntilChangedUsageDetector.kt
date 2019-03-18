@@ -8,15 +8,14 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.TextFormat.TEXT
 import com.intellij.psi.PsiType
 import net.grandcentrix.thirtyinch.lint.TiIssue
+import net.grandcentrix.thirtyinch.lint.TiNames.FQN_ANNOTATION_DISTINCTUNTILCHANGED
+import net.grandcentrix.thirtyinch.lint.TiNames.FQN_CLASS_TIVIEW
 import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.getContainingUClass
 import org.jetbrains.uast.toUElement
-
-private const val FQN_CLASS_TIVIEW = "net.grandcentrix.thirtyinch.TiView"
-private const val FQN_ANNOTATION_DISTINCTUNTILCHANGED = "net.grandcentrix.thirtyinch.distinctuntilchanged.DistinctUntilChanged"
 
 class DistinctUntilChangedUsageDetector : Detector(), UastScanner {
     companion object {
