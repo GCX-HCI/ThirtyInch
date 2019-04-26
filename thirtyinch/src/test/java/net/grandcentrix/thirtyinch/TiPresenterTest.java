@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import androidx.annotation.NonNull;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -354,7 +355,7 @@ public class TiPresenterTest {
         TiPresenter<TiView> presenter = new TiPresenter<TiView>() {
 
             @Override
-            protected void onAttachView(final TiView view) {
+            protected void onAttachView(@NonNull final TiView view) {
                 // Intentionally not calling super.onSleep()
             }
         };

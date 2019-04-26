@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch.internal;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import net.grandcentrix.thirtyinch.TiConfiguration;
 import net.grandcentrix.thirtyinch.TiPresenter;
@@ -548,6 +549,7 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
                     @Override
                     public TiPresenter<TiView> providePresenter() {
                         return new TestPresenter(config);
@@ -607,6 +609,7 @@ public class SingleTiFragmentPresenterDestroyTest extends AbstractPresenterDestr
                 .setHostingActivity(hostingActivity)
                 .setSavior(mSavior)
                 .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
                     @Override
                     public TiPresenter<TiView> providePresenter() {
                         return new TestPresenter(config);

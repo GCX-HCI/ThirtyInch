@@ -19,6 +19,7 @@ import static junit.framework.Assert.fail;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiPresenter.State;
@@ -54,7 +55,7 @@ public class TiTestPresenterTest {
         mMockTiPresenter = new TiPresenter<MockTiView>() {
 
             @Override
-            protected void onAttachView(MockTiView view) {
+            protected void onAttachView(@NonNull MockTiView view) {
                 super.onAttachView(view);
                 sendToView(new ViewAction<MockTiView>() {
                     @Override
@@ -123,7 +124,7 @@ public class TiTestPresenterTest {
     public void testSimpleViewInvocationWithTestPresenter() throws Exception {
         final TiPresenter<MockTiView> presenter = new TiPresenter<MockTiView>() {
             @Override
-            protected void onAttachView(MockTiView view) {
+            protected void onAttachView(@NonNull MockTiView view) {
                 super.onAttachView(view);
                 sendToView(new ViewAction<MockTiView>() {
                     @Override

@@ -18,6 +18,7 @@ package net.grandcentrix.thirtyinch.internal;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.grandcentrix.thirtyinch.TiConfiguration;
@@ -73,6 +74,7 @@ public class TiFragmentDelegateTest extends AbstractPresenterDestroyTest {
         // Given a fragment which always return a new presenter instance in providePresenter()
         final TestTiFragment fragment = new TestTiFragment.Builder()
                 .setPresenterProvider(new TiPresenterProvider<TiPresenter<TiView>>() {
+                    @NonNull
                     @Override
                     public TiPresenter<TiView> providePresenter() {
                         providePresenterCalls.incrementAndGet();

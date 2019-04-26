@@ -20,6 +20,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import android.os.Bundle;
+import androidx.annotation.NonNull;
 import java.util.HashMap;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import org.junit.*;
@@ -363,6 +364,7 @@ public class PresenterSaviorTest {
         doAnswer(getFromMap()).when(mSavedState).getString(anyString());
     }
 
+    @NonNull
     private Answer getFromMap() {
         return new Answer() {
             @Override
@@ -374,6 +376,7 @@ public class PresenterSaviorTest {
         };
     }
 
+    @NonNull
     private Answer saveInMap() {
         return new Answer() {
             @Override
