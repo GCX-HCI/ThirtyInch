@@ -43,7 +43,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
 
-    //def thirtyinchVersion = '0.8.6-SNAPSHOT'
+    //def thirtyinchVersion = '0.9.6-SNAPSHOT'
     //implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
     //implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
     //implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
@@ -54,7 +54,4 @@ dependencies {
 
     testImplementation "junit:junit:$junitVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-repositories {
-    mavenCentral()
 }
