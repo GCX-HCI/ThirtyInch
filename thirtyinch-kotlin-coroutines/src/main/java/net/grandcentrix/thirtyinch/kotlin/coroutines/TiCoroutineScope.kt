@@ -41,7 +41,7 @@ class TiCoroutineScope(
 
     init {
         presenter.addLifecycleObserver { state, hasLifecycleMethodBeenCalled ->
-            if (!hasLifecycleMethodBeenCalled) return@addLifecycleObserver
+            if (hasLifecycleMethodBeenCalled) return@addLifecycleObserver
 
             when {
                 state == DESTROYED -> onPresenterDestroyedJob.cancel()

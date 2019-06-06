@@ -1,5 +1,6 @@
 package net.grandcentrix.thirtyinch.kotlin.coroutines
 
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -77,6 +78,31 @@ class TiCoroutineScopeTest {
             assertTrue(exe.message == "launchUntilViewDetaches can only be called when there is a view attached")
         }
     }
+
+    @Test
+    fun `launching a job in onAttachView doesn't throw`() {
+        lateinit var job: Job
+        val presenter = Presenter2().apply {
+            val scope = TiCoroutineScope(this, coroutineContext)
+            jobLauncher = {
+                job = scope.launchUntilViewDetaches { }
+            }
+        }
+
+        presenter.test().attachView(view)
+
+        assertTrue(job.isActive)
+    }
 }
 
-class Presenter : TiPresenter<TiView>()
+private class Presenter : TiPresenter<TiView>()
+
+private class Presenter2 : TiPresenter<TiView>() {
+
+    lateinit var jobLauncher: (() -> Unit)
+
+    override fun onAttachView(view: TiView) {
+        super.onAttachView(view)
+        jobLauncher()
+    }
+}
