@@ -25,10 +25,6 @@ class TiMockPresenter extends TiPresenter<TiView> {
 
     protected int onDestroyCalled = 0;
 
-    protected int onSleepCalled = 0;
-
-    protected int onWakeUpCalled = 0;
-
     public TiMockPresenter() {
     }
 
@@ -48,15 +44,4 @@ class TiMockPresenter extends TiPresenter<TiView> {
         onDestroyCalled++;
     }
 
-    @Override
-    protected void onSleep() {
-        super.onSleep();
-        onSleepCalled++;
-    }
-
-    @Override
-    protected void onWakeUp() {
-        super.onWakeUp();
-        onWakeUpCalled++;
-    }
 }
