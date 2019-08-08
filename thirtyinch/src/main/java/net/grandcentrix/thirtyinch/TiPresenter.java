@@ -190,13 +190,6 @@ public abstract class TiPresenter<V extends TiView> {
             throw new SuperNotCalledException("Presenter " + this
                     + " did not call through to super.onAttachView(TiView)");
         }
-        mCalled = false;
-        TiLog.v(TAG, "deprecated onWakeUp()");
-        onWakeUp();
-        if (!mCalled) {
-            throw new SuperNotCalledException("Presenter " + this
-                    + " did not call through to super.onWakeUp()");
-        }
         moveToState(State.VIEW_ATTACHED, true);
 
         sendPostponedActionsToView(view);
@@ -262,8 +255,6 @@ public abstract class TiPresenter<V extends TiView> {
      * available anymore.
      * Calling detachView in {@code Fragment#onDestroyView()} makes sense because observing a
      * discarded view does not.
-     *
-     * @see #onSleep()
      */
     public final void detachView() {
         if (!isViewAttached()) {
@@ -271,13 +262,6 @@ public abstract class TiPresenter<V extends TiView> {
             return;
         }
         moveToState(State.VIEW_DETACHED, false);
-        mCalled = false;
-        TiLog.v(TAG, "deprecated onSleep()");
-        onSleep();
-        if (!mCalled) {
-            throw new SuperNotCalledException("Presenter " + this
-                    + " did not call through to super.onSleep()");
-        }
         mCalled = false;
         TiLog.v(TAG, "onDetachView()");
         onDetachView();
@@ -308,7 +292,7 @@ public abstract class TiPresenter<V extends TiView> {
 
     /**
      * Gets the currently attached view. The view is attached between the lifecycle callbacks
-     * {@link #onAttachView(TiView)} and {@link #onSleep()}.
+     * {@link #onAttachView(TiView)} and {@link #onDetachView()}.
      * <p>
      * If you don't care about the view being attached or detached you should either rethink your
      * architecture or use {@link #sendToView(ViewAction)} where the action will be executed when
@@ -551,29 +535,6 @@ public abstract class TiPresenter<V extends TiView> {
     protected void onDetachView() {
         if (mCalled) {
             throw new IllegalAccessError("don't call #onDetachView() directly, call #detachView()");
-        }
-        mCalled = true;
-    }
-
-    /**
-     * @deprecated use {@link #onDetachView()} instead
-     */
-    @Deprecated
-    protected void onSleep() {
-        if (mCalled) {
-            throw new IllegalAccessError("don't call #onSleep() directly, call #detachView()");
-        }
-        mCalled = true;
-    }
-
-    /**
-     * @deprecated use {@link #onAttachView(TiView)} instead
-     */
-    @Deprecated
-    protected void onWakeUp() {
-        if (mCalled) {
-            throw new IllegalAccessError(
-                    "don't call #onWakeUp() directly, call #attachView(TiView)");
         }
         mCalled = true;
     }

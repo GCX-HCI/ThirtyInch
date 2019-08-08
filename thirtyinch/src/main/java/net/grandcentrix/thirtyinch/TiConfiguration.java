@@ -169,19 +169,6 @@ public class TiConfiguration {
             return this;
         }
 
-        /**
-         * Deprecated: The savior will be always used when {@code setRetainPresenterEnabled(true)}.
-         * Setting this property has no effect and will removed in the next version
-         * <p>
-         * Was a property whether the {@link PresenterSavior} singleton should be used to restore
-         * the {@link TiPresenter}.
-         * </p>
-         */
-        @Deprecated
-        public Builder setUseStaticSaviorToRetain(final boolean enabled) {
-            return this;
-        }
-
     }
 
     public static final TiConfiguration DEFAULT = new Builder().build();

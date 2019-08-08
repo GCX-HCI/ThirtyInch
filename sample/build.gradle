@@ -40,14 +40,19 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
-    implementation "androidx.appcompat:appcompat:$androidXLibraryVersion"
+    implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
     implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
+
+    //def thirtyinchVersion = '0.9.7-SNAPSHOT'
+    //implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
+    //implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
+    //implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
 
     implementation project(':thirtyinch')
     implementation project(':thirtyinch-rx')
     testImplementation "junit:junit:$junitVersion"
     implementation project(':thirtyinch-logginginterceptor')
 
+    testImplementation "junit:junit:$junitVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
