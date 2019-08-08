@@ -1,6 +1,8 @@
 language: android
 dist: trusty
 
+cache: false
+
 android:
   components:
     # Uncomment the lines below if you want to
