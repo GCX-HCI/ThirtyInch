@@ -54,5 +54,5 @@ dependencies {
     implementation project(':thirtyinch-logginginterceptor')
 
     testImplementation "junit:junit:$junitVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
