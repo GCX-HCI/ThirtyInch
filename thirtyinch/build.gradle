@@ -36,14 +36,14 @@ configurations {
 }
 
 dependencies {
-    compileOnly "androidx.appcompat:appcompat:$androidXLibraryVersion"
-    compileOnly "androidx.annotation:annotation:$androidXLibraryVersion"
+    compileOnly "androidx.appcompat:appcompat:$androidXAppCompatVersion"
+    compileOnly "androidx.annotation:annotation:$androidXAnnotationVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
 
-    androidTestImplementation "androidx.test:runner:$androidXTestVersion"
+    androidTestImplementation "androidx.test:runner:1.1.1"
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "org.assertj:assertj-core:$assertjVersion"
 
@@ -56,7 +56,6 @@ task copyLintJar(type: Copy) {
     }
     into 'build/intermediates/lint/'
 }
-
 
 project.afterEvaluate {
     def compileLintTask = project.tasks.find { it.name == 'compileLint' }

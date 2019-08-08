@@ -24,7 +24,7 @@ android {
 
 dependencies {
     implementation project(':thirtyinch')
-    compileOnly "androidx.annotation:annotation:$androidXLibraryVersion"
+    compileOnly "androidx.annotation:annotation:$androidXAnnotationVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
