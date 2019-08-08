@@ -39,6 +39,7 @@ dependencies {
     compileOnly "androidx.appcompat:appcompat:$androidXAppCompatVersion"
     compileOnly "androidx.annotation:annotation:$androidXAnnotationVersion"
 
+    testCompileOnly "androidx.annotation:annotation:$androidXAnnotationVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
