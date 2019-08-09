@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.rx;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;
 

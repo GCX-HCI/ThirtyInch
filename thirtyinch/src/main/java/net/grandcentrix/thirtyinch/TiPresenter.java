@@ -16,15 +16,15 @@
 package net.grandcentrix.thirtyinch;
 
 
-import static android.support.annotation.RestrictTo.Scope.SUBCLASSES;
+import static androidx.annotation.RestrictTo.Scope.SUBCLASSES;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.Fragment;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;

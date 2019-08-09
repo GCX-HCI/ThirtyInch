@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.test;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.TiPresenter;
 import net.grandcentrix.thirtyinch.TiView;

@@ -16,14 +16,13 @@
 package net.grandcentrix.thirtyinch;
 
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.BackstackReader;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDialogFragment;
 import java.util.List;
 import java.util.concurrent.Executor;
 import net.grandcentrix.thirtyinch.internal.DelegatedTiFragment;
@@ -36,6 +35,7 @@ import net.grandcentrix.thirtyinch.internal.TiPresenterProvider;
 import net.grandcentrix.thirtyinch.internal.TiViewProvider;
 import net.grandcentrix.thirtyinch.internal.UiThreadExecutor;
 import net.grandcentrix.thirtyinch.util.AnnotationUtil;
+import net.grandcentrix.thirtyinch.util.BackstackReader;
 
 public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiView>
         extends AppCompatDialogFragment
@@ -59,7 +59,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
     @CallSuper
     @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
         mDelegate.invalidateView();
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -81,7 +81,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
 
     @CallSuper
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
@@ -197,6 +197,7 @@ public abstract class TiDialogFragment<P extends TiPresenter<V>, V extends TiVie
         }
     }
 
+    @NonNull
     @Override
     public String toString() {
         String presenter = getPresenter() == null ? "null" :

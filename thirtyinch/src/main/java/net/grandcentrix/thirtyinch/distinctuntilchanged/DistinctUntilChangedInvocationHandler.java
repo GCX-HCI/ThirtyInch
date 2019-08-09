@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.distinctuntilchanged;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;

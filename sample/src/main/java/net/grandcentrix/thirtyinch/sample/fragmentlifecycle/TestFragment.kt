@@ -5,8 +5,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.annotation.LayoutRes
-import android.support.v4.app.BackstackReader
-import android.support.v4.app.Fragment
 import android.util.AttributeSet
 import android.util.Log
 import android.view.ContextMenu
@@ -17,10 +15,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import net.grandcentrix.thirtyinch.TiConfiguration
 import net.grandcentrix.thirtyinch.TiFragment
 import net.grandcentrix.thirtyinch.sample.R
 import net.grandcentrix.thirtyinch.sample.fragmentlifecycle.FragmentLifecycleActivity.Companion.fragmentLifecycleActivityInstanceCount
+import net.grandcentrix.thirtyinch.util.BackstackReader
 import rx.subjects.PublishSubject
 import java.util.UUID
 
@@ -118,7 +118,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         printState()
@@ -130,16 +130,16 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
             Log.d(TAG, "fragment$instanceNum.onCreateView(inflater, null, savedInstanceState);")
         }
 
-        return inflater!!.inflate(layoutResId, container, false)
+        return inflater.inflate(layoutResId, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         printState()
         super.onViewCreated(view, savedInstanceState)
         Log.v(TAG, "onViewCreated")
         printState()
 
-        val fragmentTag = view!!.findViewById<TextView>(R.id.sample_text)
+        val fragmentTag = view.findViewById<TextView>(R.id.sample_text)
         fragmentTag.text = TAG
     }
 
@@ -186,11 +186,11 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         printState()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         printState()
 
-        outState!!.putString("uuid", uuid)
+        outState.putString("uuid", uuid)
 
         Log.d(TAG, "fragment$instanceNum.onSaveInstanceState(outState);")
         printState()
@@ -235,7 +235,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         printState()
     }
 
-    override fun onAttachFragment(childFragment: Fragment?) {
+    override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)
         printState()
         Log.v(TAG, "onAttachFragment")
@@ -311,7 +311,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
     }
 
     override fun providePresenter(): TestPresenter {
-        var retain = arguments?.getBoolean(RETAIN_PRESENTER, false) ?: false
+        val retain = arguments?.getBoolean(RETAIN_PRESENTER, false) ?: false
 
         val config = TiConfiguration.Builder()
                 .setRetainPresenterEnabled(retain)

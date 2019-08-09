@@ -15,7 +15,7 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import java.util.concurrent.Executor;
 
 public interface DelegatedTiFragment {
