@@ -1,14 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = "1.3.31"
+    ext.kotlin_version = "1.3.21"
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:3.3.2" // if you update this, also update the lintVersion below
-        classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:0.12.0"
+        classpath "com.android.tools.build:gradle:3.3.1" // if you update this, also update the lintVersion below
+        classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:0.11.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'guru.stefma.bintrayrelease:bintrayrelease:1.1.1'
     }
@@ -39,14 +39,14 @@ ext {
     androidXAppCompatVersion = '1.0.2'
     androidXAnnotationVersion = '1.1.0'
     junitVersion = '4.12'
-    mockitoVersion = '2.25.0'
-    assertjVersion = '3.12.1'
-    espressoVersion = '3.1.0'
+    mockitoVersion = '2.10.0'
+    assertjVersion = '2.8.0'
+    espressoVersion = '3.0.1'
 
     // According to https://github.com/googlesamples/android-custom-lint-rules/tree/master/android-studio-3
     // the lint version should match to the used Android Gradle Plugin by the formula "AGP Version X.Y.Z + 23.0.0"
     // E.g. "AGP Version 3.1.3 + 23.0.0 = Lint Version 26.1.3"
-    lintVersion = '26.3.2'
+    lintVersion = '26.3.1'
 }
 
 allprojects {
