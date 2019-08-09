@@ -10,9 +10,11 @@ android:
     - tools
 
     # The BuildTools version used by your project
+    - build-tools-27.0.3
     - build-tools-28.0.3
 
     # The SDK version used to compile your project
+    - android-22
     - android-28
 
     # Additional components
@@ -24,7 +26,8 @@ android:
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-22
-
+  licenses:
+    - 'android-sdk-license-.+'
 
 before_script:
 
@@ -45,6 +48,3 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
-before_install:
-  - yes | sdkmanager "platforms;android-28"
