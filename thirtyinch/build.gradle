@@ -9,7 +9,7 @@ android {
         targetSdkVersion TARGET_SDK_VERSION
         versionCode VERSION_CODE
         versionName VERSION_NAME
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-rules.txt'
     }
     buildTypes {
@@ -20,8 +20,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     lintOptions {
         abortOnError false
@@ -36,14 +36,15 @@ configurations {
 }
 
 dependencies {
-    compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compileOnly "androidx.appcompat:appcompat:$androidXAppCompatVersion"
+    compileOnly "androidx.annotation:annotation:$androidXAnnotationVersion"
 
-    testCompileOnly "com.android.support:support-annotations:$supportLibraryVersion"
+    testCompileOnly "androidx.annotation:annotation:$androidXAnnotationVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
 
-    androidTestImplementation "com.android.support.test:runner:$supportTestVersion"
+    androidTestImplementation "androidx.test:runner:$androidXTestRunnerVersion"
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "org.assertj:assertj-core:$assertjVersion"
 
@@ -56,7 +57,6 @@ task copyLintJar(type: Copy) {
     }
     into 'build/intermediates/lint/'
 }
-
 
 project.afterEvaluate {
     def compileLintTask = project.tasks.find { it.name == 'compileLint' }

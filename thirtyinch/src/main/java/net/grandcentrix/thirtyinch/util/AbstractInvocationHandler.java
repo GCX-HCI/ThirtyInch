@@ -15,7 +15,7 @@
 package net.grandcentrix.thirtyinch.util;
 
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

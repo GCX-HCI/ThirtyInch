@@ -33,18 +33,15 @@ ext {
     VERSION_CODE = 14
     MIN_SDK_VERSION = 14
     // If you change the SDK version don't forgot to update .travis.yml
-    TARGET_SDK_VERSION = 26
-    COMPILE_SDK_VERSION = 26
+    TARGET_SDK_VERSION = 28
+    COMPILE_SDK_VERSION = 28
 
-    supportLibraryVersion = '26.0.0'
-    // compositeAndroidVersion should be always the same version as the supportLib version
-    // Since composite is not up to date we can't use the latest one
-    compositeAndroidVersion = supportLibraryVersion
-
+    androidXAppCompatVersion = '1.0.2'
+    androidXAnnotationVersion = '1.1.0'
+    androidXTestRunnerVersion = '1.2.0'
     junitVersion = '4.12'
     mockitoVersion = '2.10.0'
     assertjVersion = '2.8.0'
-    supportTestVersion = '1.0.1'
     espressoVersion = '3.0.1'
 
     // According to https://github.com/googlesamples/android-custom-lint-rules/tree/master/android-studio-3

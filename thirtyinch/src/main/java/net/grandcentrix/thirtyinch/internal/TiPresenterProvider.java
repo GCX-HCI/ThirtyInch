@@ -15,7 +15,9 @@
 
 package net.grandcentrix.thirtyinch.internal;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import net.grandcentrix.thirtyinch.TiPresenter;
 
 /**
@@ -35,8 +37,8 @@ public interface TiPresenterProvider<P extends TiPresenter> {
      * </p>
      * <p>
      * Can be called multiple times per Fragment. The Presenter gets destroyed when the Fragment is
-     * removed from the {@link android.support.v4.app.FragmentManager}. When the {@link
-     * android.support.v4.app.Fragment} gets added again this method is called to create a new
+     * removed from the {@link FragmentManager}. When the {@link
+     * Fragment} gets added again this method is called to create a new
      * presenter.
      * </p>
      */
