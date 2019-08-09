@@ -27,8 +27,8 @@ android {
 dependencies {
     api project(":thirtyinch-kotlin")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.2")
 
     testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
+    testImplementation "com.nhaarman:mockito-kotlin:$mockitKotlinVersion"
 }
