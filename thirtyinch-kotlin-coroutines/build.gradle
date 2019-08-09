@@ -30,5 +30,5 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.2")
 
     testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.nhaarman:mockito-kotlin:$mockitKotlinVersion"
+    testImplementation "com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"
 }
