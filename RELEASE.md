@@ -14,11 +14,11 @@ Before we release a new version we have to make sure that we increase the `VERSI
 At this time we don't provide public `SNAPSHOT` releases.
 Anyway. If you want to use the latest and greatest features of Ti (or just want to build it by yourself because it is fun) you can "publish" Ti directly into your `mavenLocal()`. To do it you can run either:
 ```
-./gradlew clean bundleRelease bintrayUpload -PbintrayUser=MockedUserName -PbintrayKey=MockedKey -PdryRun=true
+./gradlew clean bundleReleaseAar bintrayUpload -PbintrayUser=MockedUserName -PbintrayKey=MockedKey -PdryRun=true
 ```
 (MockedUserName and MockedKey can be any value 😉)
 
 Or you can use directly the `publishReleasePublicationToMavenLocal` task:
 ```
-./gradlew clean bundleRelease publishReleasePublicationToMavenLocal
+./gradlew clean bundleReleaseAar publishReleasePublicationToMavenLocal
 ```
