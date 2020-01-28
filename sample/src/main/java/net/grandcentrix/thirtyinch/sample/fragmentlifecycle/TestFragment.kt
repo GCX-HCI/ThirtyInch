@@ -71,7 +71,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         instanceNum = testFragmentInstanceCount
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         addedState.startWith(false).distinctUntilChanged().skip(1)
                 .subscribe { added -> Log.d(TAG, "fragment$instanceNum.setAdded($added)") }
         detachedState.startWith(false).distinctUntilChanged().skip(1)
@@ -241,22 +241,22 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         Log.v(TAG, "onAttachFragment")
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         Log.v(TAG, "onConfigurationChanged")
     }
 
-    override fun onContextItemSelected(item: MenuItem?): Boolean {
+    override fun onContextItemSelected(item: MenuItem): Boolean {
         Log.v(TAG, "onContextItemSelected")
         return super.onContextItemSelected(item)
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo) {
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
         Log.v(TAG, "onCreateContextMenu")
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         Log.v(TAG, "onCreateOptionsMenu")
     }
@@ -271,8 +271,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         Log.v(TAG, "onHiddenChanged")
     }
 
-    override fun onInflate(context: Context?, attrs: AttributeSet,
-            savedInstanceState: Bundle) {
+    override fun onInflate(context: Context, attrs: AttributeSet, savedInstanceState: Bundle?) {
         super.onInflate(context, attrs, savedInstanceState)
         Log.v(TAG, "onInflate")
     }
@@ -289,12 +288,12 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         printState()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.v(TAG, "onOptionsItemSelected")
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onOptionsMenuClosed(menu: Menu?) {
+    override fun onOptionsMenuClosed(menu: Menu) {
         super.onOptionsMenuClosed(menu)
         Log.v(TAG, "onOptionsMenuClosed")
     }
@@ -305,7 +304,7 @@ abstract class TestFragment : TiFragment<TestPresenter, TestPresenter.TestView>(
         printState()
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         Log.v(TAG, "onPrepareOptionsMenu")
     }

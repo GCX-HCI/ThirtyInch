@@ -128,7 +128,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
     @CallSuper
     @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState) {
         mDelegate.onCreateView_beforeSuper(inflater, container, savedInstanceState);
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -150,7 +150,7 @@ public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> ext
 
     @CallSuper
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
