@@ -27,7 +27,7 @@ ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android
 
 ```gradle
 dependencies {
-    def thirtyinchVersion = '0.9.6'   
+    def thirtyinchVersion = '1.0.0'   
     implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
