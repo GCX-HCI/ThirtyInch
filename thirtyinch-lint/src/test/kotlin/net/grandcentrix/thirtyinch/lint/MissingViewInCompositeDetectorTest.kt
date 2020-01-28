@@ -88,10 +88,10 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
 
     override fun getDetector(): Detector = MissingViewInCompositeDetector()
 
-    override fun getIssues(): MutableList<Issue> = mutableListOf(
-            MissingViewInCompositeDetector.ISSUE)
+    override fun getIssues(): MutableList<Issue> = mutableListOf(MissingViewInCompositeDetector.ISSUE)
 
-    /*
+    override fun allowMissingSdk(): Boolean = true
+/*
      * --------------------------------------------------------------------------------
      * CompositeActivity
      * --------------------------------------------------------------------------------

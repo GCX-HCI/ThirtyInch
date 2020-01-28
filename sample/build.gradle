@@ -10,24 +10,7 @@ android {
         targetSdkVersion TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
-    }
-    buildTypes {
-        debug {
-            // only use the build in shrinker for debug builds, don't obfuscate
-            // remove unused classes and to make sure the proguard config is correct
-            // http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
-            // https://developer.android.com/studio/build/shrink-code.html#shrink-code
-            minifyEnabled true
-            // using the build in shrinker only works with proguard disabled
-            // https://developer.android.com/studio/build/shrink-code.html#gradle-shrinker
-            useProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        release {
-            // use real proguard for release builds, not the build in shrinker which doesn't support obfuscation
-            useProguard true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         abortOnError false

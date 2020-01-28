@@ -121,7 +121,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @CallSuper
     @Override
-    protected void onSaveInstanceState(final Bundle outState) {
+    protected void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         mDelegate.onSaveInstanceState_afterSuper(outState);
     }
@@ -191,7 +191,7 @@ public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView>
 
     @CallSuper
     @Override
-    public void onConfigurationChanged(final Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDelegate.onConfigurationChanged_afterSuper(newConfig);
     }

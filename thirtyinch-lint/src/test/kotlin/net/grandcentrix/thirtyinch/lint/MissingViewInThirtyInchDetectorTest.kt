@@ -54,8 +54,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
     override fun getDetector(): Detector = MissingViewInThirtyInchDetector()
 
-    override fun getIssues(): MutableList<Issue> = mutableListOf(
-            MissingViewInThirtyInchDetector.ISSUE)
+    override fun getIssues(): MutableList<Issue> = mutableListOf(MissingViewInThirtyInchDetector.ISSUE)
+
+    override fun allowMissingSdk(): Boolean = true
 
     /*
      * --------------------------------------------------------------------------------
