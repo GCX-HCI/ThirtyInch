@@ -21,11 +21,36 @@ Read the introduction article on [Medium](https://medium.com/@passsy/thirtyinch-
 See the slides of the latest talk on [Speakerdeck](https://speakerdeck.com/passsy/thirtyinch-living-next-to-the-activity)
 
 
-## Get it [![Download](https://api.bintray.com/packages/grandcentrix/maven/ThirtyInch/images/download.svg) ](https://bintray.com/grandcentrix/maven/ThirtyInch/_latestVersion)
+## Get it
 
-ThirtyInch is available via [jcenter](http://blog.bintray.com/2015/02/09/android-studio-migration-from-maven-central-to-jcenter/)
+### GitHub Packages
 
 ```gradle
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/grandcentrix")
+    }
+}
+
+dependencies {
+    implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-logginginterceptor:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin:$thirtyinchVersion"
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin-coroutines:$thirtyinchVersion"
+    
+    // Lagacy dependencies
+    implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
+}
+```
+
+### JCenter (deprecated)
+
+```gradle
+repositories {
+    jcenter()
+}
+
 dependencies {
     implementation "net.grandcentrix.thirtyinch:thirtyinch:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx2:$thirtyinchVersion"
