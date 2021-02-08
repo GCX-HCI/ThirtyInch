@@ -28,7 +28,7 @@ See the slides of the latest talk on [Speakerdeck](https://speakerdeck.com/passs
 ```gradle
 repositories {
     maven {
-        url = uri("https://maven.pkg.github.com/grandcentrix")
+        url = uri("https://maven.pkg.github.com/grandcentrix/ThirtyInch")
     }
 }
 
@@ -39,7 +39,7 @@ dependencies {
     implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin:$thirtyinchVersion"
     implementation "net.grandcentrix.thirtyinch:thirtyinch-kotlin-coroutines:$thirtyinchVersion"
     
-    // Lagacy dependencies
+    // Legacy dependencies
     implementation "net.grandcentrix.thirtyinch:thirtyinch-rx:$thirtyinchVersion"
 }
 ```
