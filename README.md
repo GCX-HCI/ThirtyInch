@@ -30,7 +30,7 @@ See the slides of the latest talk on [Speakerdeck](https://speakerdeck.com/passs
 ```gradle
 repositories {
     maven {
-        url = uri("https://maven.pkg.github.com/grandcentrix/ThirtyInch")
+        url = uri("https://maven.pkg.github.com/GCX-HCI/ThirtyInch")
     }
 }
 
