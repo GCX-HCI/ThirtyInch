@@ -25,6 +25,14 @@ sealed class TiIssue(
             severity = Severity.ERROR
     )
 
+    object GetViewOrThrowInOnAttach : TiIssue(
+            id = "GetViewOrThrowInOnAttach",
+            briefDescription = "TiPresenter.getViewOrThrow() might throw an exception",
+            category = CATEGORY_TI,
+            priority = 6,
+            severity = Severity.WARNING
+    )
+
     fun asLintIssue(detectorCls: Class<out Detector>, description: String = briefDescription): Issue =
             Issue.create(
                     id,

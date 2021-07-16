@@ -1,5 +1,6 @@
 package net.grandcentrix.thirtyinch.lint
 
+import net.grandcentrix.thirtyinch.lint.detector.GetViewOrThrowInOnAttachDetector
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInCompositeDetector
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInThirtyInchDetector
 import org.assertj.core.api.Assertions.*
@@ -12,7 +13,8 @@ class IssueRegistryTest {
         assertThat(TiLintRegistry().issues)
                 .containsExactly(
                         MissingViewInThirtyInchDetector.ISSUE,
-                        MissingViewInCompositeDetector.ISSUE
+                        MissingViewInCompositeDetector.ISSUE,
+                        GetViewOrThrowInOnAttachDetector.ISSUE
                 )
     }
 }
