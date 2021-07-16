@@ -11,19 +11,6 @@ private const val NO_WARNINGS = "No warnings."
 class MissingViewInCompositeDetectorTest : LintDetectorTest() {
 
     /* Stubbed-out source files */
-
-    private val tiPresenterStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiPresenter<V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiViewStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public interface TiView {\n" +
-                    "}"
-    )
-
     private val caBasePluginStub = java(
             "package com.pascalwelsch.compositeandroid;\n" +
                     "public interface Plugin {\n" +
@@ -111,8 +98,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caActivityStub,
                         caBasePluginStub,
                         caActivityPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -138,8 +125,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caActivityStub,
                         caBasePluginStub,
                         caActivityPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -165,8 +152,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caActivityStub,
                         caBasePluginStub,
                         caActivityPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -188,8 +175,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caActivityStub,
                         caBasePluginStub,
                         caActivityPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -217,8 +204,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caActivityStub,
                         caBasePluginStub,
                         caActivityPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -244,8 +231,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caFragmentStub,
                         caBasePluginStub,
                         caFragmentPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -276,8 +263,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caFragmentStub,
                         caBasePluginStub,
                         caFragmentPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -303,8 +290,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caFragmentStub,
                         caBasePluginStub,
                         caFragmentPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -326,8 +313,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caFragmentStub,
                         caBasePluginStub,
                         caFragmentPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -359,8 +346,8 @@ class MissingViewInCompositeDetectorTest : LintDetectorTest() {
                         caFragmentStub,
                         caBasePluginStub,
                         caFragmentPluginStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         otherPlugin,

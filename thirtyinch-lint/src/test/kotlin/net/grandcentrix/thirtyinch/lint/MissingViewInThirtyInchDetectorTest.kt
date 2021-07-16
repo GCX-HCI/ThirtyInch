@@ -10,32 +10,6 @@ private const val NO_WARNINGS = "No warnings."
 
 class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
-    /* Stubbed-out source files */
-
-    private val tiActivityStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiActivity<P extends TiPresenter<V>, V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiFragmentStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiFragment<P extends TiPresenter<V>, V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiPresenterStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public abstract class TiPresenter<V extends TiView> {\n" +
-                    "}"
-    )
-
-    private val tiViewStub = java(
-            "package net.grandcentrix.thirtyinch;\n" +
-                    "public interface TiView {\n" +
-                    "}"
-    )
-
     private val view = java(
             "package foo;\n" +
                     "import net.grandcentrix.thirtyinch.*;\n" +
@@ -74,9 +48,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -94,9 +68,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -114,9 +88,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -134,9 +108,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -154,9 +128,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -174,9 +148,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -197,9 +171,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -220,9 +194,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         activity
@@ -247,9 +221,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         baseActivity,
@@ -275,9 +249,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         baseActivity,
@@ -317,9 +291,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -360,9 +334,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -403,9 +377,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -446,9 +420,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -456,6 +430,226 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
                         activity
                 )
         ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_Activity_throughTransitiveBaseClass_withBasePresenter_withBaseView_noWarning() {
+        val baseView = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "interface BaseView extends TiView {\n" +
+                        "}"
+        )
+
+        val basePresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "abstract class BasePresenter<V extends BaseView> extends TiPresenter<V> {\n" +
+                        "}"
+        )
+
+        val baseActivity = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "abstract class BaseActivity<P extends BasePresenter<V>, V extends BaseView> extends TiActivity<P, V> {\n" +
+                        "}"
+        )
+
+        val activity = java(
+                "package foo;\n" +
+                        "class InformationActivity extends BaseActivity<MyPresenter, MyView> implements MyView {\n" +
+                        "}"
+        )
+
+        val view = java(
+                "package foo;\n" +
+                        "interface MyView extends BaseView {\n" +
+                        "}"
+        )
+
+        val customPresenter = java(
+                "package foo;\n" +
+                        "class MyPresenter extends BasePresenter<MyView> {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
+                        baseView,
+                        view,
+                        basePresenter,
+                        customPresenter,
+                        baseActivity,
+                        activity
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testKotlin_Activity_throughTransitiveBaseClass_withBasePresenter_withBaseView_noWarning() {
+        val baseView = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "interface BaseView : TiView {\n" +
+                        "}"
+        )
+
+        val basePresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BasePresenter<V : BaseView> : TiPresenter<V>() {\n" +
+                        "}"
+        )
+
+        val baseActivity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseActivity<P : BasePresenter<V>, V : BaseView> : TiActivity<P, V>(), MyView {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo\n" +
+                        "class InformationActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        val view = kotlin(
+                "package foo\n" +
+                        "interface MyView : BaseView {\n" +
+                        "}"
+        )
+
+        val customPresenter = kotlin(
+                "package foo\n" +
+                        "class MyPresenter : BasePresenter<MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
+                        baseView,
+                        view,
+                        basePresenter,
+                        customPresenter,
+                        baseActivity,
+                        activity
+                )
+        ).isEqualTo(NO_WARNINGS)
+    }
+
+    fun testJava_Activity_throughTransitiveBaseClass_withBasePresenter_withBaseView_hasWarning() {
+        val baseView = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "interface BaseView extends TiView {\n" +
+                        "}"
+        )
+
+        val basePresenter = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "abstract class BasePresenter<V extends BaseView> extends TiPresenter<V> {\n" +
+                        "}"
+        )
+
+        val baseActivity = java(
+                "package foo;\n" +
+                        "import net.grandcentrix.thirtyinch.*;\n" +
+                        "abstract class BaseActivity<P extends BasePresenter<V>, V extends BaseView> extends TiActivity<P, V> {\n" +
+                        "}"
+        )
+
+        val activity = java(
+                "package foo;\n" +
+                        "class InformationActivity extends BaseActivity<MyPresenter, MyView> {\n" +
+                        "}"
+        )
+
+        val view = java(
+                "package foo;\n" +
+                        "interface MyView extends BaseView {\n" +
+                        "}"
+        )
+
+        val customPresenter = java(
+                "package foo;\n" +
+                        "class MyPresenter extends BasePresenter<MyView> {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
+                        baseView,
+                        view,
+                        basePresenter,
+                        customPresenter,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
+    }
+
+    fun testKotlin_Activity_throughTransitiveBaseClass_withBasePresenter_withBaseView_hasWarning() {
+        val baseView = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "interface BaseView : TiView {\n" +
+                        "}"
+        )
+
+        val basePresenter = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BasePresenter<V : BaseView> : TiPresenter<V>() {\n" +
+                        "}"
+        )
+
+        val baseActivity = kotlin(
+                "package foo\n" +
+                        "import net.grandcentrix.thirtyinch.*\n" +
+                        "abstract class BaseActivity<P : BasePresenter<V>, V : BaseView> : TiActivity<P, V>() {\n" +
+                        "}"
+        )
+
+        val activity = kotlin(
+                "package foo\n" +
+                        "class InformationActivity : BaseActivity<MyPresenter, MyView>() {\n" +
+                        "}"
+        )
+
+        val view = kotlin(
+                "package foo\n" +
+                        "interface MyView : BaseView {\n" +
+                        "}"
+        )
+
+        val customPresenter = kotlin(
+                "package foo\n" +
+                        "class MyPresenter : BasePresenter<MyView>() {\n" +
+                        "}"
+        )
+
+        assertThat(
+                lintProject(
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
+                        baseView,
+                        view,
+                        basePresenter,
+                        customPresenter,
+                        baseActivity,
+                        activity
+                )
+        ).containsOnlyOnce(TiIssue.MissingView.id)
     }
 
     fun testKotlin_Activity_throughBaseClass_noWarning() {
@@ -475,9 +669,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseActivity,
                         activity
@@ -489,7 +683,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         val baseActivity = kotlin(
                 "package foo;\n" +
                         "import net.grandcentrix.thirtyinch.*;\n" +
-                        "public class BaseActivity : TiActivity<TiPresenter<MyView>, MyView>() {\n" +
+                        "public abstract class BaseActivity : TiActivity<TiPresenter<MyView>, MyView>() {\n" +
                         "}"
         )
 
@@ -502,9 +696,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiActivityStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiActivity,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseActivity,
                         activity
@@ -528,9 +722,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -547,8 +741,13 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         )
 
         assertThat(lintProject(
-                tiFragmentStub, tiPresenterStub, tiViewStub,
-                presenter, view, fragment))
+                TiStubs.TiFragment,
+                TiStubs.TiPresenter,
+                TiStubs.TiView,
+                presenter,
+                view,
+                fragment
+        ))
                 .isEqualTo(NO_WARNINGS)
     }
 
@@ -562,9 +761,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -585,9 +784,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         fragment
@@ -612,9 +811,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         presenter,
                         view,
                         baseFragment,
@@ -654,9 +853,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -697,9 +896,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -740,9 +939,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -783,9 +982,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         basePresenter,
                         customPresenter,
                         view,
@@ -812,9 +1011,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseFragment,
                         fragment
@@ -826,7 +1025,7 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
         val baseFragment = kotlin(
                 "package foo\n" +
                         "import net.grandcentrix.thirtyinch.*\n" +
-                        "class BaseFragment : TiFragment<TiPresenter<MyView>, MyView>() {\n" +
+                        "abstract class BaseFragment : TiFragment<TiPresenter<MyView>, MyView>() {\n" +
                         "}"
         )
 
@@ -839,9 +1038,9 @@ class MissingViewInThirtyInchDetectorTest : LintDetectorTest() {
 
         assertThat(
                 lintProject(
-                        tiFragmentStub,
-                        tiPresenterStub,
-                        tiViewStub,
+                        TiStubs.TiFragment,
+                        TiStubs.TiPresenter,
+                        TiStubs.TiView,
                         view,
                         baseFragment,
                         fragment
