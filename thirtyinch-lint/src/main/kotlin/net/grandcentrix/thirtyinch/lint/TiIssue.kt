@@ -12,6 +12,7 @@ private val CATEGORY_TI = Category.create("ThirtyInch", 90)
 sealed class TiIssue(
         val id: String,
         val briefDescription: String,
+        val longDescription: String = briefDescription,
         val category: Category,
         val priority: Int,
         val severity: Severity
@@ -25,11 +26,38 @@ sealed class TiIssue(
             severity = Severity.ERROR
     )
 
-    fun asLintIssue(detectorCls: Class<out Detector>, description: String = briefDescription): Issue =
+    object DistinctUntilChangedWithoutParameter : TiIssue(
+            id = "DistinctUntilChangedWithoutParameter",
+            briefDescription = "@DistinctUntilChanged Annotation on a method without Parameter is useless",
+            longDescription = "When using the @DistinctUntilChanged annotation on a method without parameter the method call will be executed each time. @DistinctUntilChanged needs at least one parameter to check if it changed compared to the last method invocation.",
+            category = CATEGORY_TI,
+            priority = 5,
+            severity = Severity.WARNING
+    )
+
+    object AnnotationOnNonVoidMethod : TiIssue(
+            id = "TiAnnotationOnNonVoidMethod",
+            briefDescription = "Annotation of a non Void method is not supported in ThirtyInch",
+            longDescription = "When using a ThirtyInch annotation on a method without parameter the method call will be executed each time. Return types are not supported.",
+            category = CATEGORY_TI,
+            priority = 5,
+            severity = Severity.WARNING
+    )
+
+    object AnnotationOnNonTiView : TiIssue(
+            id = "TiAnnotationOnNonTiViewInterface",
+            briefDescription = "ThirtyInch Annotations on a method of a not TiView Interface is useless",
+            longDescription = "When using a ThirtyInch annotation on a method of a not TiView Interface it will not be recognized and so will not change anything.",
+            category = CATEGORY_TI,
+            priority = 5,
+            severity = Severity.WARNING
+    )
+
+    fun asLintIssue(detectorCls: Class<out Detector>, description: String? = null): Issue =
             Issue.create(
                     id,
                     briefDescription,
-                    description,
+                    description ?: longDescription,
                     category,
                     priority,
                     severity,

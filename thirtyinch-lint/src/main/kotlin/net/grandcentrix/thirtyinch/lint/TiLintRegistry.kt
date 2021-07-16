@@ -2,6 +2,8 @@ package net.grandcentrix.thirtyinch.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.detector.api.Issue
+import net.grandcentrix.thirtyinch.lint.detector.CallOnMainThreadUsageDetector
+import net.grandcentrix.thirtyinch.lint.detector.DistinctUntilChangedUsageDetector
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInCompositeDetector
 import net.grandcentrix.thirtyinch.lint.detector.MissingViewInThirtyInchDetector
 
@@ -13,8 +15,28 @@ class TiLintRegistry : IssueRegistry() {
                 },
                 MissingViewInCompositeDetector.ISSUE.apply {
                     setEnabledByDefault(true)
+                },
+                DistinctUntilChangedUsageDetector.ISSUE_NO_PARAMETER.apply {
+                    setEnabledByDefault(true)
+                },
+                DistinctUntilChangedUsageDetector.ISSUE_NON_VOID_RETURN_TYPE.apply {
+                    setEnabledByDefault(true)
+                },
+                DistinctUntilChangedUsageDetector.ISSUE_NO_TIVIEW_CHILD.apply {
+                    setEnabledByDefault(true)
+                },
+                CallOnMainThreadUsageDetector.ISSUE_NON_VOID_RETURN_TYPE.apply {
+                    setEnabledByDefault(true)
+                },
+                CallOnMainThreadUsageDetector.ISSUE_NO_TIVIEW_CHILD.apply {
+                    setEnabledByDefault(true)
                 }
         )
 
-    override val api: Int = com.android.tools.lint.detector.api.CURRENT_API
+    /**
+     * Lint API Version for which the Checks are build.
+     *
+     * See [com.android.tools.lint.detector.api.describeApi] for possible options
+     */
+    override val api: Int = 1
 }

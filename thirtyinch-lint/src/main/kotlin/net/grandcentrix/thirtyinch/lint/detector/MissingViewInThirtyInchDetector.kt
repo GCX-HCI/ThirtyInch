@@ -53,12 +53,22 @@ class MissingViewInThirtyInchDetector : BaseMissingViewDetector() {
                             .firstOrNull()
                             ?: (type as? PsiClassType)?.let { tryFindViewInterface(it) }
                 }
+                ?: extendedType.superTypes.firstNotNullResult { superType ->
+                    (superType as? PsiClassType)?.let { tryFindViewInterface(it) }
+                }
     }
 
     override fun allowMissingViewInterface(context: JavaContext, declaration: UClass,
             viewInterface: PsiType): Boolean {
+        // if the superClass is one of the TI base classes, prevent deeper recursive checks
+        val superClass = declaration.superClass
+                .let { sClass ->
+                    if (TI_CLASS_NAMES.any { tiName -> tiName == sClass?.qualifiedName }) null else sClass
+                }
+
         // Interface not implemented; check if provideView() is overridden instead
-        return declaration.findMethodsByName(PROVIDE_VIEW_METHOD, true)
-                .any { viewInterface == it.returnType }
+        return declaration.findMethodsByName(PROVIDE_VIEW_METHOD, false)
+                .firstNotNullResult { viewInterface == it.returnType }
+                ?: (superClass != null && allowMissingViewInterface(context, superClass, viewInterface))
     }
 }
